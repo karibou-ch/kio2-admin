@@ -11,7 +11,7 @@
   <ion-navbar>
     <ion-title>login</ion-title>
     <ion-buttons end>
-      <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
+      <button ion-button *ngIf="user.isAuthenticated()" (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </button>
     </ion-buttons>
@@ -33,33 +33,5 @@
     </ion-item>
     <button ion-button [disabled]="!loginForm.form.valid || !isReady" type="submit" block>Soumettre</button>
   </form>
-
-  <!--
-<div class="container">
-  <h2 class="title">Login</h2>
-  <form (ngSubmit)="login()" class="col-xs-4" #loginForm="ngForm">
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input [(ngModel)]="model.email" type="email" class="form-control validate" id="email" name="email" required>
-    </div>
-    <div class="form-group">
-      <label for="password">Mot de passe</label>
-      <input [(ngModel)]="model.password" type="password" class="form-control validate" id="password" name="password" required>
-      <a routerLink="/recovery">mot de passe oublié?</a>
-    </div>
-    <button [disabled]="!loginForm.form.valid || !isReady" type="submit" class="btn btn-info">Soumettre</button>
-  </form>
-</div>
-
-<div [hidden]="!submitted">
-  <h2>{{ status }}</h2>
-  <div class="row">
-    <div class="col-xs-3">User object</div>
-    <div class="col-xs-9  pull-left">{{ user?.displayName }}</div>
-  </div>
-  <button class="btn btn-primary" (click)="logout()" [disabled]="!isReady">Logout</button>
-</div>
--->
-
 
 </ion-content>
