@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>profil</ion-title>
+    <ion-title>Profil</ion-title>
     <ion-buttons end>
       <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
@@ -19,5 +19,27 @@
 
 
 <ion-content padding>
-  <p>Connecté en tant que {{ user?.displayName }}</p>
+  <ion-list>
+    
+    <ion-item>
+      <h2>Nom</h2>
+      <p text-capitalize>{{ user?.name.familyName }}</p>
+    </ion-item>
+    <ion-item>
+      <h2>Prenom</h2>
+      <p text-capitalize>{{ user?.name.givenName }}</p>
+    </ion-item>
+    <ion-item>
+      <h2>Email</h2>
+      <p>{{ user?.email.address }}</p>
+    </ion-item>
+    <ion-item>
+      <h2>Telephone</h2>
+      <p *ngFor="let phone of user?.phoneNumbers">{{ phone }}</p>
+    </ion-item>
+    <ion-item *ngIf="user.logistic?.PostalCode?.length > 0">
+      <h2>Code Postaux</h2>
+      <p *ngFor="let postal of user?.logistic?.PostalCode">{{ postal }}</p>
+    </ion-item>
+  </ion-list>
 </ion-content>

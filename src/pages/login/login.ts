@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AlertController, IonicPage, Loading, LoadingController, NavController, NavParams } from 'ionic-angular';
 import { LoaderService, User, UserService } from 'kng2-core';
-import { TabsPage } from '../tabs/tabs'
+import { TabsPage } from '../tabs/tabs';
 
 /**
  * Generated class for the LoginPage page.
@@ -37,9 +37,15 @@ export class LoginPage {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
       this.isReady=true;
-    })
-    // if(this.user.isAuthenticated()) this.navCtrl.setRoot(ProfilPage);
+
+      if(this.userSrv.currentUser.isAuthenticated()) this.navCtrl.setRoot(TabsPage);
+        
+    
+    });
+    
   }
+
+  //TODO checker rôle à la connexion. Modifier comportement si non logistique | admin
 
   login() {
     this.isReady = false;  //to hide submit button after submitting
@@ -56,9 +62,6 @@ export class LoginPage {
     );  
   }
 
-  logout() {
-    this.userSrv.logout().subscribe();
-  }
 
   showLoading() {
     this.loader = this.loadingCtrl.create({

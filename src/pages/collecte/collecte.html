@@ -15,4 +15,11 @@
 
 <ion-content padding>
 
+  <ion-item>
+  <ion-label>Choisir le mois</ion-label>
+  <ion-datetime displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="myDate" cancelText="Annuler" doneText="Fait"
+    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
+  ></ion-datetime>
+</ion-item>
+
 </ion-content>

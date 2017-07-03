@@ -1,3 +1,42 @@
 page-livraison {
 
+   ion-grid {
+      background-color: #f7f7f7;
+   }
+
+   ion-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+
+      p {
+         margin-top:0;
+         color: #999999;
+      }
+
+   
+      ion-icon {
+         font-size: 270% !important;
+      }
+
+
+      ion-datetime {
+         display: none;
+      }
+   }
+
+   .slide-butt {
+      width: 11rem;
+   }
+
+   ion-slides {
+      height: auto;
+   }
+
+   ion-slide {
+      align-items: flex-start !important;
+   }
+
 }

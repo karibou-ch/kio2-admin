@@ -16,28 +16,28 @@ import { LoaderService, User, UserService } from 'kng2-core';
 })
 export class ProfilPage {
 
-  isReady:boolean;
-  user:User = new User();
+  isReady: boolean;
+  user: User = new User();
 
   constructor(
     private _app: App,
     private loaderSrv: LoaderService,
-    public navCtrl: NavController, 
+    public navCtrl: NavController,
     public navParams: NavParams,
-    private userSrv:UserService
-    ) {
+    private userSrv: UserService
+  ) {
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
-      this.isReady=true;
-      console.log('ready in profile');
+      this.isReady = true;
+      console.log(this.user);
     })
   }
 
   logout() {
-    this.userSrv.logout().subscribe( () => 
+    this.userSrv.logout().subscribe(() =>
       //this.navCtrl.setRoot(LoginPage)
       this._app.getRootNav().setRoot(LoginPage)
     );
