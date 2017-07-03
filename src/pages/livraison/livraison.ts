@@ -24,6 +24,7 @@ export class LivraisonPage {
   shippingByDay = [];
   weekDay;
   openShippings;
+  nbCabas;
 
   constructor(
     private loaderSrv: LoaderService,

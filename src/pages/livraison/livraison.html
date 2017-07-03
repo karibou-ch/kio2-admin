@@ -15,7 +15,7 @@
 
 <ion-content>
 
-  <ion-grid no-padding>
+  <ion-grid no-padding id="first-grid">
     <ion-row align-items-start>
 
       <ion-col>
@@ -63,6 +63,7 @@
     <ion-item-sliding *ngFor="let order of results">
       <ion-item>
         <ion-grid>
+
           <ion-row>
             <ion-col item-start>
               <ion-badge color="primary">{{ order.rank }}</ion-badge>
@@ -71,29 +72,46 @@
               <h2>{{ order.customer.displayName }}</h2>
             </ion-col>
             <ion-col>
-
+              <!--<ion-label>Cabas:~</ion-label>
+              <ion-select [(ngModel)]="nbCabas">
+                <ion-option value="1">1</ion-option>
+                <ion-option value="2">2</ion-option>
+                <ion-option value="3">3</ion-option>
+                <ion-option value="4">4</ion-option>
+              </ion-select>-->
             </ion-col>
           </ion-row>
+
           <ion-row>
             <ion-col>
               <ion-icon name="pin" color="grey-icon"></ion-icon>
             </ion-col>
             <ion-col>
+              {{ order.shipping.streetAdress }}
+            </ion-col>
+          </ion-row>
 
+          <ion-row>
+            <ion-col>
+              <ion-icon name="information-circle"></ion-icon>
             </ion-col>
             <ion-col>
-
+              {{ order.shipping.note }}
             </ion-col>
           </ion-row>
-          <ion-row>
 
-          </ion-row>
         </ion-grid>
       </ion-item>
 
       <ion-item-options side="right">
-      <button ion-button (click)="favorite(item)">Favorite</button>
-      <button ion-button color="danger" (click)="share(item)">Share</button>
+        <button ion-button color="light">
+          <ion-icon name="person"></ion-icon>
+          Plus d'info
+        </button>
+        <button ion-button color="secondary" (click)="share(item)">
+          <ion-icon name="call"></ion-icon>
+          Appeler
+          </button>
       </ion-item-options>
 
     </ion-item-sliding>
