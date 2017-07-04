@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { LoaderService, Order, OrderService, User, UserService } from 'kng2-core';
+import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserService } from 'kng2-core';
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
 /**
@@ -20,10 +20,11 @@ export class LivraisonPage {
   isReady:boolean;
   user: User = new User();
   myDate;
-  results;
+  results: Order[];
+  toggledResults: Order[];
   shippingByDay = [];
   weekDay;
-  openShippings;
+  openShippings: boolean;
   nbCabas;
 
   constructor(
@@ -44,12 +45,25 @@ export class LivraisonPage {
     })
   }
 
-  getDayShipping(orders: Order[]){
-    this.results = orders;
+  getDayShipping(ordersOneDay: Order[]){
+    this.toggledResults = null;
+    this.results = this.openShippings ? ordersOneDay.filter(order => order.payment.status === EnumFinancialStatus.authorized)
+        : ordersOneDay;
+  }
+
+  toggleFilter(){
+    if(this.openShippings){
+      this.toggledResults = this.results;
+      this.results = this.results.filter(order => order.payment.status === EnumFinancialStatus.authorized);
+    }
+    else
+      this.results = this.toggledResults;
   }
 
   findAllOrdersForShipping(){
     this.shippingByDay = [];
+    this.results = null;
+    this.toggledResults = null;
     let date = new Date(this.myDate);
     let month = date.getMonth();
     this.orderSrv.findAllOrders({fulfillments:'fulfilled,partial', month:month+1})
