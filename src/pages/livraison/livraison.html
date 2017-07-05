@@ -13,9 +13,19 @@
     <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 </span>-->
 
-<ion-content>
+<ion-header>
 
-  <ion-grid no-padding id="first-grid">
+  <ion-navbar>
+    <ion-title>Profil</ion-title>
+    <ion-buttons end>
+      <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
+        <ion-icon name="log-out"></ion-icon>
+      </button>
+    </ion-buttons>
+</ion-navbar>
+
+<ion-toolbar>
+<ion-grid no-padding id="first-grid">
     <ion-row>
 
       <ion-col>
@@ -33,7 +43,7 @@
 
       <!--Calendar-->
       <ion-col>
-        <button ion-button (click)="picker.open()" clear="true">
+        <button [disabled]="!isReady" ion-button (click)="picker.open()" clear="true">
           <ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="myDate" 
             (ngModelChange)="findAllOrdersForShipping()" cancelText="Annuler" doneText="Fait" 
             monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
@@ -45,18 +55,33 @@
 
     </ion-row>
   </ion-grid>
+</ion-toolbar>
+  
 
-  <!--slides of Days-->
-  <ion-slides pager paginationType="progress" centeredSlides="false" slidesPerView="3">
+<ion-toolbar *ngIf="shippingByDay">
+  
+
+    <!--slides of Days-->
+  <ion-slides  pager paginationType="progress" centeredSlides="false" slidesPerView="3">
     <ion-slide *ngFor="let orders of shippingByDay">
       <!--<ion-toolbar>-->
       <!--<ion-buttons >-->
       <button ion-button margin-top="1rem" class="slide-butt" round outline (click)="getDayShipping(orders)" color="primary">
-          {{ orders[0].created | date:'EEEE d' }}</button>
+          {{ orders[0].shipping.when | date:'EEEE d' }}</button>
       <!--</ion-buttons>-->
       <!--</ion-toolbar>-->
     </ion-slide>
   </ion-slides>
+
+</ion-toolbar>
+
+
+</ion-header>
+
+<ion-content>
+
+
+
 
   <!--Actual list-->
   
@@ -70,7 +95,7 @@
               <ion-badge color="primary">{{ order.rank }}</ion-badge>
             </ion-col>
             <ion-col col-6>
-              <h2>{{ order.customer.displayName }}</h2>
+              <h2>{{ order.shipping.name }}</h2>
             </ion-col>
             <ion-col col-4>
               <!--<ion-label>Cabas:~</ion-label>
@@ -83,12 +108,13 @@
             </ion-col>
           </ion-row>
 
-          <ion-row>
+          <ion-row wrap text-wrap>
             <ion-col col-2 text-center>
               <ion-icon name="pin" color="grey-icon"></ion-icon>
             </ion-col>
             <ion-col >
-              <p>{{ order.shipping.streetAdress }}</p>
+              <p>{{ order.shipping.streetAdress }}, {{order.shipping.region}} <b>{{order.shipping.postalCode}}</b>                                       
+                <br><b>Etage:</b> {{order.shipping.floor}}     </p>
             </ion-col>
           </ion-row>
 

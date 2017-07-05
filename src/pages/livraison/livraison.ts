@@ -22,7 +22,7 @@ export class LivraisonPage {
   myDate;
   results: Order[];
   toggledResults: Order[];
-  shippingByDay = [];
+  shippingByDay;
   weekDay;
   openShippings: boolean;
   nbCabas;
@@ -64,11 +64,10 @@ export class LivraisonPage {
     this.shippingByDay = [];
     this.results = null;
     this.toggledResults = null;
-    let date = new Date(this.myDate);
-    let month = date.getMonth();
+    let month = new Date(this.myDate).getMonth();
     this.orderSrv.findAllOrders({fulfillments:'fulfilled,partial', month:month+1})
       .flatMap(orders => Observable.from(orders)) //transform single order[] item into Observable order sequence (for groupBy)
-      .groupBy(order=> new Date(order.closed).getDate()) //group items by month
+      .groupBy(order=> new Date(order.shipping.when).getDate()) //group items by month
       .flatMap(group => group.reduce((acc, curr) => [...acc, curr], []))  //create an array item for each group
       .subscribe(ordersByDay => this.shippingByDay.push(ordersByDay),
       (err)=>console.log(err),
