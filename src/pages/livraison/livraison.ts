@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { Content, IonicPage, NavController, NavParams } from 'ionic-angular';
 import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserService } from 'kng2-core';
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
@@ -15,6 +15,8 @@ import { Observable } from 'rxjs/Rx';
   templateUrl: 'livraison.html',
 })
 export class LivraisonPage {
+
+  @ViewChild(Content) content: Content;
 
   isAuthenticated:boolean;
   isReady:boolean;
@@ -49,6 +51,7 @@ export class LivraisonPage {
     this.toggledResults = null;
     this.results = this.openShippings ? ordersOneDay.filter(order => order.payment.status === EnumFinancialStatus.authorized)
         : ordersOneDay;
+    this.content.resize();
   }
 
   toggleFilter(){

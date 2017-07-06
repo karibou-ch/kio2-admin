@@ -2,7 +2,9 @@ page-livraison {
 
    ion-navbar {
       p {
-         color : map-get($colors, light)
+         color : map-get($colors, light);
+         font-weight: bold;
+         text-transform: uppercase;
       }
    }
 
@@ -23,7 +25,6 @@ page-livraison {
       align-items: center;
       p {
          margin-top:0;
-         color: #999999;
          
       }
    }

@@ -5,89 +5,74 @@
   Ionic pages and navigation.
 -->
 
-
-<!--TODO filtre (jour livraison)-->
-
-<!--<input type="text" class="form-control" datepicker-popup="MM/yyyy" ng-model="dt" is-open="opened" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'"/>
-<span class="input-group-btn">
-    <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
-</span>-->
-
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Profil</ion-title>
-    <ion-buttons end>
-      <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
+  <ion-navbar color="primary">
+    <div>
+      <ion-title>Livraison</ion-title>
+      <ion-buttons end>
+        <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </button>
-    </ion-buttons>
-</ion-navbar>
+      </ion-buttons>
+    </div>
 
-<ion-toolbar>
-<ion-grid no-padding id="first-grid">
-    <ion-row>
+    <div>
+      <ion-grid no-padding id="first-grid">
+        <ion-row>
+          <ion-col>
 
-      <ion-col>
+            <ion-toggle color="light" [disabled]="!results" [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
+            <p>Réservées</p>
 
-        <ion-toggle [disabled]="!results" [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
-        <p>Réservées</p>
+          </ion-col>
 
-      </ion-col>
-
-      <ion-col>
-        <button ion-button icon-only clear="true">
+          <ion-col>
+            <button color="light" ion-button icon-only clear="true">
           <ion-icon name="pin" id="pin-icon"></ion-icon>
         </button>
-      </ion-col>
+          </ion-col>
 
-      <!--Calendar-->
-      <ion-col>
-        <button [disabled]="!isReady" ion-button (click)="picker.open()" clear="true">
+          <ion-col>
+            <button color="light"[disabled]="!isReady" ion-button (click)="picker.open()" clear="true">
           <ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="myDate" 
             (ngModelChange)="findAllOrdersForShipping()" cancelText="Annuler" doneText="Fait" 
             monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
           </ion-datetime>
             <ion-icon name="calendar"></ion-icon>
         </button>
-        <p>{{ myDate | date:"MMMM y" }}</p>
-      </ion-col>
+            <p>{{ myDate | date:"MMMM y" }}</p>
+          </ion-col>
+        </ion-row>
 
-    </ion-row>
-  </ion-grid>
-</ion-toolbar>
-  
+      </ion-grid>
+    </div>
 
-<ion-toolbar *ngIf="shippingByDay">
-  
+  </ion-navbar>
+
+  <ion-toolbar color="primary" [hidden]="!shippingByDay">
+
 
     <!--slides of Days-->
-  <ion-slides  pager paginationType="progress" centeredSlides="false" slidesPerView="3">
-    <ion-slide *ngFor="let orders of shippingByDay">
-      <!--<ion-toolbar>-->
-      <!--<ion-buttons >-->
-      <button ion-button margin-top="1rem" class="slide-butt" round outline (click)="getDayShipping(orders)" color="primary">
+    <ion-slides pager paginationType="progress" centeredSlides="false" slidesPerView="3">
+      <ion-slide *ngFor="let orders of shippingByDay">
+        <button ion-button margin-top="1rem" class="slide-butt" round outline (click)="getDayShipping(orders)" color="light">
           {{ orders[0].shipping.when | date:'EEEE d' }}</button>
-      <!--</ion-buttons>-->
-      <!--</ion-toolbar>-->
-    </ion-slide>
-  </ion-slides>
+      </ion-slide>
+    </ion-slides>
 
-</ion-toolbar>
+  </ion-toolbar>
 
 
 </ion-header>
 
 <ion-content>
 
-
-
-
   <!--Actual list-->
-  
+
   <ion-list>
     <ion-item-sliding *ngFor="let order of results">
-      
+
       <ion-item>
         <ion-grid>
           <ion-row>
@@ -112,9 +97,9 @@
             <ion-col col-2 text-center>
               <ion-icon name="pin" color="grey-icon"></ion-icon>
             </ion-col>
-            <ion-col >
-              <p>{{ order.shipping.streetAdress }}, {{order.shipping.region}} <b>{{order.shipping.postalCode}}</b>                                       
-                <br><b>Etage:</b> {{order.shipping.floor}}     </p>
+            <ion-col>
+              <p>{{ order.shipping.streetAdress }}, {{order.shipping.region}} <b>{{order.shipping.postalCode}}</b>
+                <br><b>Etage:</b> {{order.shipping.floor}} </p>
             </ion-col>
           </ion-row>
 
@@ -140,9 +125,9 @@
           Appeler
           </button>
       </ion-item-options>
-       
+
     </ion-item-sliding>
 
   </ion-list>
- 
+
 </ion-content>
