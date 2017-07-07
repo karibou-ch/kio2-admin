@@ -4,17 +4,17 @@ import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserServ
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
 /**
- * Generated class for the LivraisonPage page.
+ * Generated class for the ShopperPage page.
  *
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
 @IonicPage()
 @Component({
-  selector: 'page-livraison',
-  templateUrl: 'livraison.html',
+  selector: 'page-shopper',
+  templateUrl: 'shopper.html',
 })
-export class LivraisonPage {
+export class ShopperPage {
 
   @ViewChild(Content) content: Content;
 

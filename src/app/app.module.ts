@@ -6,7 +6,7 @@ import { MyApp } from './app.component';
 import { Kng2CoreModule } from 'kng2-core';
 import { HttpModule } from '@angular/http';
 
-import { LivraisonPage }  from '../pages/livraison/livraison';
+import { ShopperPage }  from '../pages/shopper/shopper';
 import { CollectePage }  from '../pages/collecte/collecte';
 import { ProfilPage }  from '../pages/profil/profil';
 import { LoginPage } from '../pages/login/login'
@@ -19,7 +19,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 @NgModule({
   declarations: [
     MyApp,
-    LivraisonPage,
+    ShopperPage,
     CollectePage,
     ProfilPage,
     LoginPage,
@@ -34,7 +34,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    LivraisonPage,
+    ShopperPage,
     CollectePage,
     ProfilPage,
     LoginPage,
