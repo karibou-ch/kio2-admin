@@ -6,13 +6,14 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Profil</ion-title>
+  <ion-navbar color="primary">
+    <!--<ion-title>Profil</ion-title>
     <ion-buttons end>
       <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </button>
-    </ion-buttons>
+    </ion-buttons>-->
+    <top-navigation [title]="'Profil'"></top-navigation>
   </ion-navbar>
 
 </ion-header>

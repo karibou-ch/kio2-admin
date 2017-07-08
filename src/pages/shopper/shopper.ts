@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Content, IonicPage, NavController, NavParams } from 'ionic-angular';
 import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserService } from 'kng2-core';
+import { ShopperItemComponent } from '../../components/shopper-item/shopper-item'
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
 /**
@@ -12,7 +13,7 @@ import { Observable } from 'rxjs/Rx';
 @IonicPage()
 @Component({
   selector: 'page-shopper',
-  templateUrl: 'shopper.html',
+  templateUrl: 'shopper.html'
 })
 export class ShopperPage {
 

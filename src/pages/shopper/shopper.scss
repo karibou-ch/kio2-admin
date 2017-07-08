@@ -1,15 +1,23 @@
 page-shopper {
 
-   ion-navbar {
+   ion-toolbar {
       p {
-         color : map-get($colors, light);
+         color : color($colors, light);
          font-weight: bold;
          text-transform: uppercase;
+         font-size: 1.3rem;
+      }
+      ion-slides button {
+         font-size: 1.2rem !important;
+         &:focus{
+            background-color: color($colors, light);
+            color: color($colors, primary);
+         }
       }
    }
 
    h2 {
-      color: #999999;
+      color: color($colors, info);
       font-weight: bold;
    }
 
@@ -29,7 +37,7 @@ page-shopper {
       }
    }
       ion-icon {
-         font-size: 270% !important;
+         font-size: 2.8rem !important;
       }
    }
 
@@ -38,7 +46,7 @@ page-shopper {
       }
 
    .slide-butt {
-      width: 11rem;
+      width: 8.5rem;
    }
 
    ion-slides {

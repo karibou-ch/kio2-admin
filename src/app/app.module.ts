@@ -9,12 +9,15 @@ import { HttpModule } from '@angular/http';
 import { ShopperPage }  from '../pages/shopper/shopper';
 import { CollectePage }  from '../pages/collecte/collecte';
 import { ProfilPage }  from '../pages/profil/profil';
-import { LoginPage } from '../pages/login/login'
+import { LoginPage } from '../pages/login/login';
 
 import { TabsPage } from '../pages/tabs/tabs';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+
+import { ShopperItemComponent } from '../components/shopper-item/shopper-item';
+import { TopNavigationComponent } from '../components/top-navigation/top-navigation';
 
 @NgModule({
   declarations: [
@@ -23,7 +26,9 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     CollectePage,
     ProfilPage,
     LoginPage,
-    TabsPage
+    TabsPage,
+    ShopperItemComponent,
+    TopNavigationComponent
   ],
   imports: [
     BrowserModule,

@@ -8,22 +8,25 @@
 <ion-header>
 
   <ion-navbar color="primary">
-    <div>
-      <ion-title>Livraison</ion-title>
+    <top-navigation [title]="'Shopper'"></top-navigation>
+  </ion-navbar>
+
+  <!-- TODO DANS nav-bar à inclure ici!!!!
+    <ion-title>Livraison</ion-title>
       <ion-buttons end>
         <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </button>
-      </ion-buttons>
-    </div>
+      </ion-buttons>-->
 
-    <div>
+  <ion-toolbar color="primary">
+
       <ion-grid no-padding id="first-grid">
         <ion-row>
           <ion-col>
 
             <ion-toggle color="light" [disabled]="!results" [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
-            <p>Réservées</p>
+            <p>{{ openShippings ? 'Ouvertes' : 'Toutes' }}</p>
 
           </ion-col>
 
@@ -46,15 +49,14 @@
         </ion-row>
 
       </ion-grid>
-    </div>
 
-  </ion-navbar>
+  </ion-toolbar>
 
   <ion-toolbar color="primary" [hidden]="!shippingByDay">
 
 
     <!--slides of Days-->
-    <ion-slides pager paginationType="progress" centeredSlides="false" slidesPerView="3">
+    <ion-slides pager paginationType="progress" centeredSlides="false" slidesPerView="4">
       <ion-slide *ngFor="let orders of shippingByDay">
         <button ion-button margin-top="1rem" class="slide-butt" round outline (click)="getDayShipping(orders)" color="light">
           {{ orders[0].shipping.when | date:'EEEE d' }}</button>
