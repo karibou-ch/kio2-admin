@@ -1,9 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { Content, IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Content, IonicPage, ModalController, NavController, NavParams } from 'ionic-angular';
 import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserService } from 'kng2-core';
 import { ShopperItemComponent } from '../../components/shopper-item/shopper-item'
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
+import { TrackerPage }  from '../tracker/tracker';
 /**
  * Generated class for the ShopperPage page.
  *
@@ -32,6 +33,7 @@ export class ShopperPage {
 
   constructor(
     private loaderSrv: LoaderService,
+    private modalCtrl: ModalController,
     public navCtrl: NavController, 
     public navParams: NavParams,
     private orderSrv: OrderService,
@@ -78,7 +80,10 @@ export class ShopperPage {
       ()=> {
         this.shippingByDay.reverse();
       });
-
 }
+
+  openTracker(){
+    this.modalCtrl.create(TrackerPage, {results: this.results}).present();
+  }
 
 }

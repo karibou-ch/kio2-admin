@@ -1,0 +1,37 @@
+<!--
+  Generated template for the TrackerPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>tracker</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <button [disabled]="!isReady" ion-button icon-only clear="true" (click)="openTracker()">
+          <ion-icon name="expand" ></ion-icon>
+        </button>
+      </ion-col>
+      <ion-col>
+        <button [disabled]="!isReady" ion-button icon-only clear="true" (click)="openTracker()">
+          <ion-icon name="locate" ></ion-icon>
+        </button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <div id="map"></div>
+
+  <button [disabled]="!isReady" ion-button block (click)="onDismiss()">Fermer</button>
+
+</ion-content>

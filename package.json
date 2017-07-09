@@ -1,49 +1,62 @@
 {
-  "name": "ionic-hello-world",
-  "version": "0.0.0",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
-  "private": true,
-  "scripts": {
-    "clean": "ionic-app-scripts clean",
-    "build": "ionic-app-scripts build",
-    "lint": "ionic-app-scripts lint",
-    "ionic:build": "ionic-app-scripts build",
-    "ionic:serve": "ionic-app-scripts serve"
-  },
-  "dependencies": {
-    "@angular/common": "4.1.3",
-    "@angular/compiler": "4.1.3",
-    "@angular/compiler-cli": "4.1.3",
-    "@angular/core": "4.1.3",
-    "@angular/forms": "4.1.3",
-    "@angular/http": "4.1.3",
-    "@angular/platform-browser": "4.1.3",
-    "@angular/platform-browser-dynamic": "4.1.3",
-    "@ionic-native/core": "3.10.2",
-    "@ionic-native/splash-screen": "3.10.2",
-    "@ionic-native/status-bar": "3.10.2",
-    "@ionic/storage": "2.0.1",
-    "ionic-angular": "3.4.2",
-    "ionicons": "3.0.0",
-    "kng2-core": "git+https://github.com/karibou-ch/kng2-core.git",
-    "rxjs": "^5.4.1",
-    "sw-toolbox": "3.6.0",
-    "zone.js": "0.8.12"
-  },
-  "devDependencies": {
-    "@ionic/app-scripts": "1.3.7",
-    "@ionic/cli-plugin-ionic-angular": "1.3.1",
-    "typescript": "2.3.3"
-  },
-  "cordovaPlugins": [
-    "cordova-plugin-whitelist",
-    "cordova-plugin-console",
-    "cordova-plugin-statusbar",
-    "cordova-plugin-device",
-    "ionic-plugin-keyboard",
-    "cordova-plugin-splashscreen"
-  ],
-  "cordovaPlatforms": [],
-  "description": "kio2-logistic: An Ionic project"
+    "name": "ionic-hello-world",
+    "version": "0.0.0",
+    "author": "Ionic Framework",
+    "homepage": "http://ionicframework.com/",
+    "private": true,
+    "scripts": {
+        "clean": "ionic-app-scripts clean",
+        "build": "ionic-app-scripts build",
+        "lint": "ionic-app-scripts lint",
+        "ionic:build": "ionic-app-scripts build",
+        "ionic:serve": "ionic-app-scripts serve"
+    },
+    "dependencies": {
+        "@angular/common": "4.1.3",
+        "@angular/compiler": "4.1.3",
+        "@angular/compiler-cli": "4.1.3",
+        "@angular/core": "4.1.3",
+        "@angular/forms": "4.1.3",
+        "@angular/http": "4.1.3",
+        "@angular/platform-browser": "4.1.3",
+        "@angular/platform-browser-dynamic": "4.1.3",
+        "@ionic-native/background-geolocation": "^3.14.0",
+        "@ionic-native/core": "3.10.2",
+        "@ionic-native/geolocation": "^3.14.0",
+        "@ionic-native/splash-screen": "3.10.2",
+        "@ionic-native/status-bar": "3.10.2",
+        "@ionic/storage": "2.0.1",
+        "@types/leaflet": "^1.0.65",
+        "cordova-plugin-geolocation": "^2.4.3",
+        "cordova-plugin-mauron85-background-geolocation": "^2.2.5",
+        "ionic-angular": "3.4.2",
+        "ionicons": "3.0.0",
+        "kng2-core": "git+https://github.com/karibou-ch/kng2-core.git",
+        "leaflet": "^1.1.0",
+        "rxjs": "^5.4.1",
+        "sw-toolbox": "3.6.0",
+        "zone.js": "0.8.12"
+    },
+    "devDependencies": {
+        "@ionic/app-scripts": "1.3.7",
+        "@ionic/cli-plugin-cordova": "1.4.0",
+        "@ionic/cli-plugin-ionic-angular": "1.3.1",
+        "typescript": "2.3.3"
+    },
+    "cordovaPlugins": [
+        "cordova-plugin-whitelist",
+        "cordova-plugin-console",
+        "cordova-plugin-statusbar",
+        "cordova-plugin-device",
+        "ionic-plugin-keyboard",
+        "cordova-plugin-splashscreen"
+    ],
+    "cordovaPlatforms": [],
+    "description": "kio2-logistic: An Ionic project",
+    "cordova": {
+        "plugins": {
+            "cordova-plugin-mauron85-background-geolocation": {},
+            "cordova-plugin-geolocation": {}
+        }
+    }
 }

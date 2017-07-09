@@ -10,6 +10,7 @@ import { ShopperPage }  from '../pages/shopper/shopper';
 import { CollectePage }  from '../pages/collecte/collecte';
 import { ProfilPage }  from '../pages/profil/profil';
 import { LoginPage } from '../pages/login/login';
+import { TrackerPage }  from '../pages/tracker/tracker';
 
 import { TabsPage } from '../pages/tabs/tabs';
 
@@ -19,6 +20,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { ShopperItemComponent } from '../components/shopper-item/shopper-item';
 import { TopNavigationComponent } from '../components/top-navigation/top-navigation';
 
+import { TrackerProvider } from '../providers/tracker/tracker.provider';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
+import { Geolocation } from '@ionic-native/geolocation';
+
 @NgModule({
   declarations: [
     MyApp,
@@ -27,6 +32,7 @@ import { TopNavigationComponent } from '../components/top-navigation/top-navigat
     ProfilPage,
     LoginPage,
     TabsPage,
+    TrackerPage,
     ShopperItemComponent,
     TopNavigationComponent
   ],
@@ -43,13 +49,18 @@ import { TopNavigationComponent } from '../components/top-navigation/top-navigat
     CollectePage,
     ProfilPage,
     LoginPage,
-    TabsPage
+    TabsPage,
+    TrackerPage
+
   ],
   providers: [
     { provide: LOCALE_ID, useValue: "fr-FR" },  //set locale to french (dates, etc. )
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    BackgroundGeolocation,
+    Geolocation,
+    TrackerProvider
   ]
 })
 export class AppModule {}
