@@ -11,11 +11,11 @@
     <!-- left toggle -->
     <ion-toggle color="light" [disabled]="!results" [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
     <span class="toggle-label">{{openShippings?'ouvertes':'fermées'}}</span>
-    <ion-title>
+    <div class="title">
         <button color="light" ion-button icon-only clear="true">
           <ion-icon name="pin" id="pin-icon"></ion-icon>
         </button>
-    </ion-title>
+    </div>
 
     <!-- right calendar -->
     <ion-buttons end>    

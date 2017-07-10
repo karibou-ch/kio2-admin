@@ -8,15 +8,22 @@ page-shopper {
          font-size: 1.3rem;
       }
 
+      .title{
+        position: absolute;
+        top: 4px;
+        left: 45%;        
+      }
+
       .calendar-label{
         font-size: 80%;
         margin-right: 10px;        
       }
 
       .toggle-label{
+        font-size: 90%;
         margin-left: 10px;        
         position: absolute;
-        top: 30%;
+        top: 35%;
         left: 50px;
         color: color($colors, light);        
       }
