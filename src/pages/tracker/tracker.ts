@@ -101,11 +101,12 @@ export class TrackerPage {
   createMap() {
     this.map = L.map('map');
 
+    //  contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      attribution: '&copy; OpenStreetMap',
       maxZoom: 18,
       id: 'mapbox.streets',
-      accessToken: this.config.mapBoxToken
+      accessToken: 'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
     }).addTo(this.map);
 
     //this.map.setView([this.lat, this.lng], 10);
@@ -119,7 +120,7 @@ export class TrackerPage {
       return marker;
     });
     let group = L.featureGroup(this.markers).addTo(this.map);
-    this.map.fitBounds(group.getBounds().pad(0.5));
+    this.map.fitBounds(group.getBounds().pad(0.1));
     
   }
 
