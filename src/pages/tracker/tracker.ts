@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage,Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
-import { Order } from 'kng2-core';
+import { Order, Config, ConfigService } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
@@ -22,6 +22,8 @@ import * as L from 'leaflet';
 })
 export class TrackerPage {
 
+  private ready$;
+  private config = this.configSrv.defaultConfig;
   private orders: Order[] = this.navParams.get('results');
   public lat: number;
   public lng: number;
@@ -35,6 +37,7 @@ export class TrackerPage {
   private router;
 
   constructor(
+    private configSrv: ConfigService,
     private loadingCtrl: LoadingController,
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -50,6 +53,7 @@ export class TrackerPage {
 
   ngOnDestroy(){
     if(this.map) this.map.off();
+    if(this.ready$) this.ready$.unsubscribe();
   }
 
   ngOnInit() {
@@ -101,7 +105,7 @@ export class TrackerPage {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom: 18,
       id: 'mapbox.streets',
-      accessToken: 'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
+      accessToken: this.config.mapBoxToken
     }).addTo(this.map);
 
     //this.map.setView([this.lat, this.lng], 10);

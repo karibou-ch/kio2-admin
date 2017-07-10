@@ -6,29 +6,23 @@
 -->
 <ion-header>
 
-  <ion-navbar>
+  <ion-navbar color="primary">
     <ion-title>tracker</ion-title>
+    
+    <ion-buttons end>
+      <button [disabled]="!isReady" ion-button icon-only clear="true" (click)="allOrdersZoom()">
+          <ion-icon name="expand" ></ion-icon>
+    </button>
+    <button [disabled]="!isReady" ion-button icon-only clear="true" (click)="trackMe()">
+          <ion-icon name="locate" ></ion-icon>
+    </button>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-
-  <ion-grid>
-    <ion-row>
-      <ion-col>
-        <button [disabled]="!isReady" ion-button icon-only clear="true" (click)="allOrdersZoom()">
-          <ion-icon name="expand" ></ion-icon>
-        </button>
-      </ion-col>
-      <ion-col>
-        <button [disabled]="!isReady" ion-button icon-only clear="true" (click)="trackMe()">
-          <ion-icon name="locate" ></ion-icon>
-        </button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 
   <ion-list>
     <button ion-item *ngFor="let order of closestOrders">

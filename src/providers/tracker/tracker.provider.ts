@@ -24,9 +24,16 @@ export class TrackerProvider {
     public zone: NgZone
   ) {
     // Background Tracking
+    // see configuration values at : https://github.com/mauron85/cordova-plugin-background-geolocation
     let config = {
-      desiredAccuracy: 100,
+      // Desired accuracy in meters. Possible values [0, 10, 100, 1000]. 
+      // The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings. 
+      // 1000 results in lowest power drain and least accurate readings.
+      desiredAccuracy: 100, 
+      // Stationary radius in meters. When stopped, the minimum distance the device must move 
+      // beyond the stationary location for aggressive background-tracking to engage.
       stationaryRadius: 20,
+      // The minimum distance (measured in meters) a device must move horizontally before an update event is generated.
       distanceFilter: 10,
       debug: true,
       interval: 5000
