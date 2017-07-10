@@ -1,7 +1,10 @@
 page-tracker {
 
    #map {
-      height: 80%;
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    width: 100%;
    }
 
 }

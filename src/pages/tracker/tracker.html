@@ -7,7 +7,11 @@
 <ion-header>
 
   <ion-navbar color="primary">
-    <ion-title>tracker</ion-title>
+    <ion-buttons left>
+        <button ion-button (click)="onDismiss()">
+            <ion-icon  name="arrow-back"></ion-icon>
+        </button>
+    </ion-buttons>
     
     <ion-buttons end>
       <button [disabled]="!isReady" ion-button icon-only clear="true" (click)="allOrdersZoom()">
@@ -22,9 +26,10 @@
 </ion-header>
 
 
-<ion-content padding>
+<ion-content >
 
   <ion-list>
+    <!-- QU'EST-CE QUE C'EST?? -->
     <button ion-item *ngFor="let order of closestOrders">
       {{ order.shipping.name }}, {{ order.shipping.streetAdress }}
     </button>
@@ -32,6 +37,5 @@
 
   <div id="map"></div>
 
-  <button [disabled]="!isReady" ion-button block (click)="onDismiss()">Fermer</button>
 
 </ion-content>
