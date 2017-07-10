@@ -33,6 +33,8 @@
         "ionicons": "3.0.0",
         "kng2-core": "git+https://github.com/karibou-ch/kng2-core.git",
         "leaflet": "^1.1.0",
+        "leaflet-routing-machine": "^3.2.5",
+        "leaflet-usermarker": "^1.0.0",
         "rxjs": "^5.4.1",
         "sw-toolbox": "3.6.0",
         "zone.js": "0.8.12"

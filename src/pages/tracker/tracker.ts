@@ -5,6 +5,8 @@ import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
 import 'leaflet';
+import 'leaflet-routing-machine';
+//import 'leaflet-usermarker';
 
 
 /**
@@ -25,9 +27,12 @@ export class TrackerPage {
   public lng: number;
   private isReady;
   private map;
+  private userMarker;
   private markers: L.Marker[];
+  public closestOrders;
   private geoSub:Subscription;
   private loader:Loading;
+  private router;
 
   constructor(
     private loadingCtrl: LoadingController,
@@ -80,9 +85,9 @@ export class TrackerPage {
       this.zone.run(() => {
         this.lat = position.coords.latitude;
         this.lng = position.coords.longitude;
-        if(!this.map)this.createMap();
+        if(!this.map) this.createMap();
         this.isReady = true;
-        this.loader.dismiss();
+        if(this.loader) this.loader.dismiss();
       });
 
     });
@@ -99,7 +104,7 @@ export class TrackerPage {
       accessToken: 'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
     }).addTo(this.map);
 
-    this.map.setView([this.lat, this.lng], 10);
+    //this.map.setView([this.lat, this.lng], 10);
 
     this.markers = this.orders.map((order) => {
       let marker = L.marker(new L.LatLng(order.shipping.geo.lat, order.shipping.geo.lng));
@@ -125,6 +130,24 @@ export class TrackerPage {
   onDismiss() {
     if(!this.geoSub.closed) this.geoSub.unsubscribe();
     this.viewCtrl.dismiss();
+  }
+
+  trackMe(){
+    // user marker
+    if(!this.userMarker)this.userMarker = L.marker([this.lat, this.lng]);
+    this.userMarker.addTo(this.map);
+    // destinations markers within a radius
+    this.closestOrders = this.orders
+      .filter(order => L.latLng(this.lat, this.lng).distanceTo(L.latLng(order.shipping.geo.lat, order.shipping.geo.lng)) <= 5000 )
+      .sort((a, b)=> {return L.latLng(a.shipping.geo.lat, a.shipping.geo.lng).distanceTo([this.lat, this.lng]) - L.latLng(b.shipping.geo.lat, b.shipping.geo.lng).distanceTo([this.lat, this.lng])});
+      
+
+    this.map.flyTo([this.lat, this.lng], 18);
+    
+  }
+
+  allOrdersZoom(){
+    this.map.flyToBounds(L.featureGroup(this.markers).getBounds());
   }
 
 }
