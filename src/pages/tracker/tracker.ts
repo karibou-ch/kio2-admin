@@ -4,8 +4,8 @@ import { Order } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
-import 'leaflet';
-import 'leaflet-routing-machine';
+import * as L from 'leaflet';
+//import 'leaflet-routing-machine';
 //import 'leaflet-usermarker';
 
 

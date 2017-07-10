@@ -13,9 +13,9 @@
     <ion-toggle color="light" [disabled]="!results" [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
     <span class="toggle-label">{{openShippings?'ouvertes':'fermées'}}</span>
     <div class="title">
-        <button color="light" ion-button icon-only clear="true">
+        <button [disabled]="!results" color="light" ion-button icon-only clear="true" (click)="openTracker()">
           <ion-icon name="pin" id="pin-icon"></ion-icon>
-        </button>
+</button>
     </div>
 
     <!-- right calendar -->
