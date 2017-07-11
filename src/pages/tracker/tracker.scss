@@ -7,4 +7,13 @@ page-tracker {
     width: 100%;
    }
 
+   #closestOrders{
+      position: absolute;
+      top: 50%;
+   }
+
+   .leaflet-control-container, .leaflet-routing-container {
+    display: none;
+   }
+
 }

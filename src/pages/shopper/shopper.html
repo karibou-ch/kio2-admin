@@ -10,10 +10,10 @@
 
   <ion-navbar color="primary">
     <!-- left toggle -->
-    <ion-toggle color="light" [disabled]="!results" [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
+    <ion-toggle color="light" [disabled]="currentOrders===undefined" [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
     <span class="toggle-label">{{openShippings?'ouvertes':'fermées'}}</span>
     <div class="title">
-        <button [disabled]="!results" color="light" ion-button icon-only clear="true" (click)="openTracker()">
+        <button [disabled]="currentOrders===undefined" color="light" ion-button icon-only clear="true" (click)="openTracker()">
           <ion-icon name="pin" id="pin-icon"></ion-icon>
 </button>
     </div>
@@ -35,8 +35,10 @@
   <!-- SUB HEADER -->
   <ion-toolbar  color="primary" [hidden]="!shippingByDay">
     <ion-slides pager paginationType="progress" centeredSlides="false" slidesPerView="3">
-      <ion-slide *ngFor="let orders of shippingByDay">
-        <button ion-button margin-top="1rem" class="slide-butt" clear small (click)="getDayShipping(orders)" color="light" >
+      <ion-slide *ngFor="let orders of shippingByDay;let i = index">
+        <button ion-button margin-top="1rem" 
+                [class.selected]="i===currentOrders"
+                class="slide-butt" clear small (click)="currentOrders=i" color="light" >
           {{ orders[0].shipping.when | date:'EEEE d' }}</button>
       </ion-slide>
     </ion-slides>
@@ -58,7 +60,7 @@
   <!--Actual list-->
 
   <ion-list>
-    <ion-item-sliding *ngFor="let order of results">
+    <ion-item-sliding *ngFor="let order of shippingByDay[currentOrders]  ">
 
       <ion-item>
         <ion-grid>
@@ -104,13 +106,13 @@
 
       <ion-item-options side="right">
         <button ion-button color="light">
-          <ion-icon name="person"></ion-icon>
-          Plus d'info
+          <ion-icon name="pin"></ion-icon>
+          Carte
         </button>
-        <button ion-button color="secondary" (click)="share(item)">
+        <a ion-button color="secondary" href='tel:{{order.customer.phoneNumbers[0]}}'>
           <ion-icon name="call"></ion-icon>
           Appeler
-          </button>
+        </a>
       </ion-item-options>
 
     </ion-item-sliding>

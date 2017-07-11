@@ -65,7 +65,6 @@ export class TopNavigationComponent {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
       this.isReady = true;
-      console.log(this.user);
     })
     // this.auth.getAccount().subscribe(
     //   patient =>{

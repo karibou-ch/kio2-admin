@@ -26,7 +26,8 @@ export class ShopperPage {
   myDate;
   results: Order[];
   toggledResults: Order[];
-  shippingByDay;
+  currentOrders:number;
+  shippingByDay=[];
   weekDay;
   openShippings: boolean;
   nbCabas;
@@ -68,7 +69,6 @@ export class ShopperPage {
 
   findAllOrdersForShipping(){
     this.shippingByDay = [];
-    this.results = null;
     this.toggledResults = null;
     let month = new Date(this.myDate).getMonth();
     this.orderSrv.findAllOrders({fulfillments:'fulfilled,partial', month:month+1})
@@ -79,11 +79,12 @@ export class ShopperPage {
       (err)=>console.log(err),
       ()=> {
         this.shippingByDay.reverse();
+        this.currentOrders=this.shippingByDay.length-1;
       });
 }
 
   openTracker(){
-    this.modalCtrl.create(TrackerPage, {results: this.results}).present();
+    this.modalCtrl.create(TrackerPage, {results: this.shippingByDay[this.currentOrders]}).present();
   }
 
 }

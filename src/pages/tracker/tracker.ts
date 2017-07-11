@@ -1,11 +1,12 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage,Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
-import { Order, Config, ConfigService } from 'kng2-core';
+import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
+import { Order, ConfigService } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
-import { Geolocation, Geoposition } from '@ionic-native/geolocation';
+import { Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
 import * as L from 'leaflet';
-//import 'leaflet-routing-machine';
+import 'leaflet-routing-machine';
+import 'leaflet-extra-markers';
 //import 'leaflet-usermarker';
 
 
@@ -32,11 +33,12 @@ export class TrackerPage {
   private userMarker;
   private markers: L.Marker[];
   public closestOrders;
-  private geoSub:Subscription;
-  private loader:Loading;
+  private geoSub: Subscription;
+  private loader: Loading;
   private router;
 
   constructor(
+    public actionSheetCtrl: ActionSheetController,
     private configSrv: ConfigService,
     private loadingCtrl: LoadingController,
     public navCtrl: NavController,
@@ -51,9 +53,9 @@ export class TrackerPage {
   //   console.log('ionViewDidLoad TrackerPage');
   // }
 
-  ngOnDestroy(){
-    if(this.map) this.map.off();
-    if(this.ready$) this.ready$.unsubscribe();
+  ngOnDestroy() {
+    if (this.map) this.map.off();
+    if (this.ready$) this.ready$.unsubscribe();
   }
 
   ngOnInit() {
@@ -89,9 +91,9 @@ export class TrackerPage {
       this.zone.run(() => {
         this.lat = position.coords.latitude;
         this.lng = position.coords.longitude;
-        if(!this.map) this.createMap();
+        if (!this.map) this.createMap();
         this.isReady = true;
-        if(this.loader) this.loader.dismiss();
+        if (this.loader) this.loader.dismiss();
       });
 
     });
@@ -101,27 +103,33 @@ export class TrackerPage {
   createMap() {
     this.map = L.map('map');
 
-    //  contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      attribution: '&copy; OpenStreetMap',
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom: 18,
       id: 'mapbox.streets',
-      accessToken: 'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
+      accessToken: this.config.mapBoxToken
     }).addTo(this.map);
 
     //this.map.setView([this.lat, this.lng], 10);
 
     this.markers = this.orders.map((order) => {
-      let marker = L.marker(new L.LatLng(order.shipping.geo.lat, order.shipping.geo.lng));
+      var numberMarker = L.ExtraMarkers.icon({
+        icon: 'fa-number',
+        number: order.rank,
+        markerColor: 'blue',
+        prefix: 'fa'
+      });
+      let marker = L.marker(new L.LatLng(order.shipping.geo.lat, order.shipping.geo.lng), {icon: numberMarker});
       marker.bindPopup(`
-                        <b>`+order.shipping.name+`</b><br>
-                        `+order.shipping.streetAdress+`
+                        <b><a href="tel:${order.customer.phoneNumbers[0]}">${order.shipping.name}</a></b><br>
+                          ${order.shipping.streetAdress}<br/>
+                          ${order.shipping.note}
                        `);
       return marker;
     });
     let group = L.featureGroup(this.markers).addTo(this.map);
-    this.map.fitBounds(group.getBounds().pad(0.1));
-    
+    this.map.fitBounds(group.getBounds().pad(0.0));
+
   }
 
   showLoading() {
@@ -133,26 +141,77 @@ export class TrackerPage {
   }
 
   onDismiss() {
-    if(!this.geoSub.closed) this.geoSub.unsubscribe();
+    if (!this.geoSub.closed) this.geoSub.unsubscribe();
     this.viewCtrl.dismiss();
   }
 
-  trackMe(){
+  //zoom on the user position
+  trackMe() {
     // user marker
-    if(!this.userMarker)this.userMarker = L.marker([this.lat, this.lng]);
+    if (!this.userMarker) this.userMarker = L.marker([this.lat, this.lng]);
     this.userMarker.addTo(this.map);
     // destinations markers within a radius
-    this.closestOrders = this.orders
-      .filter(order => L.latLng(this.lat, this.lng).distanceTo(L.latLng(order.shipping.geo.lat, order.shipping.geo.lng)) <= 5000 )
-      .sort((a, b)=> {return L.latLng(a.shipping.geo.lat, a.shipping.geo.lng).distanceTo([this.lat, this.lng]) - L.latLng(b.shipping.geo.lat, b.shipping.geo.lng).distanceTo([this.lat, this.lng])});
-      
+    this.closestOrders = this.getClosestOrders(5000);
+    this.map.flyTo([this.lat, this.lng], 14);
+    this.getOrderRoute(this.closestOrders[0].order);
 
-    this.map.flyTo([this.lat, this.lng], 18);
-    
   }
 
-  allOrdersZoom(){
+  //get list of the closest orders below <radius> meters
+  getClosestOrders(radius: number): any {
+    return this.orders
+      .filter((order) => this.distanceToOrder(order) <= radius)
+      .sort((a, b) => { return this.distanceToOrder(a) - this.distanceToOrder(b) })
+      .map(order => {
+        return {order: order, distance: this.distanceToOrder};
+      });
+  }
+
+  //distance between user position and an order destination position
+  distanceToOrder(order:Order):number {
+    return L.latLng(this.lat, this.lng).distanceTo(L.latLng(order.shipping.geo.lat, order.shipping.geo.lng))
+  }
+
+  //fit the screen zoom to all orders
+  allOrdersZoom() {
     this.map.flyToBounds(L.featureGroup(this.markers).getBounds());
   }
+
+  //give the path between the user and the order position
+  getOrderRoute(order: Order) {
+    if(this.router) this.router.spliceWaypoints(0,2);
+    this.router = L.Routing.control({
+      waypoints: [
+        L.latLng(this.lat, this.lng),
+        L.latLng(order.shipping.geo.lat, order.shipping.geo.lng)
+      ],
+      language: 'fr',
+      autoRoute: true
+    }).addTo(this.map);
+  }
+
+  //  presentActionSheet() {
+  //   let actionSheet = this.actionSheetCtrl.create({
+  //     title: 'Modify your album',
+  //     buttons: this.closestOrders.forEach(marker => {
+        
+  //     });
+  //       {
+  //         text: 'Destructive',
+  //         role: 'destructive',
+  //         handler: () => {
+  //           console.log('Destructive clicked');
+  //         }
+  //       },{
+  //         text: 'Archive',
+  //         handler: () => {
+  //           console.log('Archive clicked');
+  //         }
+  //       }
+  //     ]
+  //   });
+  //   actionSheet.present();
+  // }
+
 
 }

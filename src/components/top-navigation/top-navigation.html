@@ -1,8 +1,11 @@
 <ion-title [hidden]="!title">{{title}}</ion-title>
 
 <ion-buttons end>
-        <button ion-button clear [disabled]="!isReady" (click)="doDisplayAccount()"><span class="button-text">{{user?.displayName}}</span><span class="icon-profile"></span></button>
-        <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
-        <ion-icon name="log-out"></ion-icon>
-      </button>
+  <button ion-button  [disabled]="!isReady" (click)="doDisplayAccount()">
+    {{user?.displayName}}
+    <ion-icon name="contact"></ion-icon>
+  </button>
+  <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
+    <ion-icon name="log-out"></ion-icon>
+  </button>
 </ion-buttons>
