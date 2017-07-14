@@ -5,8 +5,8 @@ import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
 import * as L from 'leaflet';
-import 'leaflet-routing-machine';
-import 'leaflet-extra-markers';
+import * as Routing from 'leaflet-routing-machine';
+import * as ExtraMarkers from 'leaflet-extra-markers';
 //import 'leaflet-usermarker';
 
 
@@ -113,7 +113,7 @@ export class TrackerPage {
     //this.map.setView([this.lat, this.lng], 10);
 
     this.markers = this.orders.map((order) => {
-      var numberMarker = L.ExtraMarkers.icon({
+      var numberMarker = ExtraMarkers.icon({
         icon: 'fa-number',
         number: order.rank,
         markerColor: 'blue',
@@ -180,7 +180,7 @@ export class TrackerPage {
   //give the path between the user and the order position
   getOrderRoute(order: Order) {
     if(this.router) this.router.spliceWaypoints(0,2);
-    this.router = L.Routing.control({
+    this.router = Routing.control({
       waypoints: [
         L.latLng(this.lat, this.lng),
         L.latLng(order.shipping.geo.lat, order.shipping.geo.lng)

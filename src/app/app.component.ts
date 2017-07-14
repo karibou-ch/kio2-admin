@@ -32,6 +32,12 @@ export class MyApp {
   }
 
   ngOnInit() {
+    this.configSrc.setDefaultConfig({
+      API_SERVER:'http://localhost:4000',
+      disqus:'7e23b8cfd1ba48cdb5a3487efcbcdc56', /*karibou dev*/
+      // disqus:'a0602093a94647cd948e95fadb9b9e38'; /*karibou prod*/
+      mapBoxToken:'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
+    });
     this.loaderSrv.ready().subscribe(() => {
       //this.rootPage = this.userSrv.currentUser.isAuthenticated() ? TabsPage : LoginPage;
     });
