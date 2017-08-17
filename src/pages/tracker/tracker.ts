@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
-import { Order, ConfigService } from 'kng2-core';
+import { ConfigService, Config, LoaderService, Order  } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
@@ -24,7 +24,7 @@ import * as ExtraMarkers from 'leaflet-extra-markers';
 export class TrackerPage {
 
   private ready$;
-  private config = this.configSrv.defaultConfig;
+  private config:any;
   private orders: Order[] = this.navParams.get('results');
   public lat: number;
   public lng: number;
@@ -41,6 +41,7 @@ export class TrackerPage {
     public actionSheetCtrl: ActionSheetController,
     private configSrv: ConfigService,
     private loadingCtrl: LoadingController,
+    private loaderSrv: LoaderService,
     public navCtrl: NavController,
     public navParams: NavParams,
     public trackerSrv: TrackerProvider,
@@ -59,6 +60,10 @@ export class TrackerPage {
   }
 
   ngOnInit() {
+    this.loaderSrv.ready().subscribe((loader) => {
+      Object.assign(this.config, loader[0]);
+    })
+    
     // ============ BACKGROUND geolocalisation (can be replaced by the Hypertrack one) ====================
 
     // this.trackerSrv.backgroundLocation$.subscribe((location) => {
@@ -83,6 +88,9 @@ export class TrackerPage {
 
     // ====================== FOREGROUND geolocalisation =====================================
     this.showLoading();
+
+    
+    
     this.geoSub = this.trackerSrv.geoLocation$.subscribe((position: Geoposition) => {
 
       console.log(position);
