@@ -20,17 +20,28 @@ export class ShopperPage {
 
   @ViewChild(Content) content: Content;
 
+
   isAuthenticated:boolean;
   isReady:boolean;
   user: User = new User();
-  myDate;
   results: Order[];
   toggledResults: Order[];
-  currentOrders:number;
   shippingByDay=[];
   weekDay;
   openShippings: boolean;
   nbCabas;
+
+  OPEN  ={payment:'authorized'};
+  CLOSED={fulfillments:'fulfilled,partial'};
+
+  filtersOrder:any={
+    fulfillments:'fulfilled,partial'
+  };
+
+  selectedDate:Date=new Date();
+  currentShippingDate:Date;
+  availableOrders:Date[]=[];
+  monthOrders:Map<number,Order[]>=new Map();
 
   constructor(
     private loaderSrv: LoaderService,
@@ -40,6 +51,9 @@ export class ShopperPage {
     private orderSrv: OrderService,
     private userSrv:UserService
     ) {
+    this.currentShippingDate=Order.currentShippingDay();
+    this.currentShippingDate.setHours(0,0,0)
+
   }
 
 
@@ -48,43 +62,43 @@ export class ShopperPage {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
       this.isReady=true;
+      this.findAllOrdersForShipping();
     })
   }
 
-  getDayShipping(ordersOneDay: Order[]){
-    this.toggledResults = null;
-    this.results = this.openShippings ? ordersOneDay.filter(order => order.payment.status === EnumFinancialStatus.authorized)
-        : ordersOneDay;
-    this.content.resize();
-  }
 
   toggleFilter(){
-    if(this.openShippings){
-      this.toggledResults = this.results;
-      this.results = this.results.filter(order => order.payment.status === EnumFinancialStatus.authorized);
+
+    if(this.filtersOrder.payment){
+      this.filtersOrder=this.CLOSED;
+    }else{
+      this.filtersOrder=this.OPEN;      
     }
-    else
-      this.results = this.toggledResults;
+    this.findAllOrdersForShipping();  
   }
 
+
   findAllOrdersForShipping(){
-    this.shippingByDay = [];
-    this.toggledResults = null;
-    let month = new Date(this.myDate).getMonth();
-    this.orderSrv.findAllOrders({fulfillments:'fulfilled,partial', month:month+1})
-      .flatMap(orders => Observable.from(orders)) //transform single order[] item into Observable order sequence (for groupBy)
-      .groupBy(order=> new Date(order.shipping.when).getDate()) //group items by month
-      .flatMap(group => group.reduce((acc, curr) => [...acc, curr], []))  //create an array item for each group
-      .subscribe(ordersByDay => this.shippingByDay.push(ordersByDay),
-      (err)=>console.log(err),
-      ()=> {
-        this.shippingByDay.reverse();
-        this.currentOrders=this.shippingByDay.length-1;
+    let params={month:(this.selectedDate.getMonth())+1};
+    Object.assign(params,this.filtersOrder);
+    this.monthOrders=new Map();
+    this.availableOrders=[];
+    this.orderSrv.findAllOrders(this.filtersOrder).subscribe(orders =>{
+      orders.forEach((order:Order)=>{
+        order.shipping.when=new Date(order.shipping.when);
+        order.shipping.when.setHours(0,0,0)
+        if(!this.monthOrders[order.shipping.when.getTime()]){
+            this.monthOrders[order.shipping.when.getTime()]=[];
+            this.availableOrders.push(new Date(order.shipping.when));
+        }  
+        this.monthOrders[order.shipping.when.getTime()].push(order);
       });
+      this.currentShippingDate=Order.currentShippingDay();
+    })
 }
 
   openTracker(){
-    this.modalCtrl.create(TrackerPage, {results: this.shippingByDay[this.currentOrders]}).present();
+    this.modalCtrl.create(TrackerPage, {results: this.monthOrders[this.currentShippingDate.getTime()]}).present();
   }
 
 }

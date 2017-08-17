@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
-import { ConfigService, Config, LoaderService, Order  } from 'kng2-core';
+import { ConfigService, config, LoaderService, Order  } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
@@ -61,7 +61,7 @@ export class TrackerPage {
 
   ngOnInit() {
     this.loaderSrv.ready().subscribe((loader) => {
-      Object.assign(this.config, loader[0]);
+      Object.assign(this.config, config);
     })
     
     // ============ BACKGROUND geolocalisation (can be replaced by the Hypertrack one) ====================
