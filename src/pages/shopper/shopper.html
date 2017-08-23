@@ -21,7 +21,7 @@
     <!-- right calendar -->
     <ion-buttons end>    
       <button color="light"[disabled]="!isReady" ion-button (click)="picker.open()" clear="true" end>
-        <ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="myDate" 
+        <ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="selectedDate" 
           (ngModelChange)="findAllOrdersForShipping()" cancelText="Annuler" doneText="Fait" 
           monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
         </ion-datetime>
@@ -58,6 +58,8 @@
 <ion-content>
 
   <!--Actual list-->
+
+  <h1 [hidden]="availableOrders.length > 0">Pas de commandes {{openShippings?'ouvertes':'fermées'}} pour ce mois-ci</h1>
 
   <ion-list>
     

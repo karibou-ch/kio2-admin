@@ -27,18 +27,15 @@ export class ShopperPage {
   results: Order[];
   toggledResults: Order[];
   shippingByDay=[];
-  weekDay;
-  openShippings: boolean;
+  openShippings: boolean; //"ouvertes", "fermées"
   nbCabas;
 
-  OPEN  ={payment:'authorized'};
-  CLOSED={fulfillments:'fulfilled,partial'};
+  FLOATING  ={payment:'authorized'};  //not yet handled by producers
+  LOCKED={fulfillments:'fulfilled,partial'};  //got by the producers (sub-group of FLOATING)
 
-  filtersOrder:any={
-    fulfillments:'fulfilled,partial'
-  };
+  filtersOrder:any;
 
-  selectedDate:Date=new Date();
+  selectedDate:string=new Date().toISOString();
   currentShippingDate:Date;
   availableOrders:Date[]=[];
   monthOrders:Map<number,Order[]>=new Map();
@@ -52,7 +49,8 @@ export class ShopperPage {
     private userSrv:UserService
     ) {
     this.currentShippingDate=Order.currentShippingDay();
-    this.currentShippingDate.setHours(0,0,0)
+    this.currentShippingDate.setHours(0,0,0);
+    this.filtersOrder = this.FLOATING;
 
   }
 
@@ -70,26 +68,27 @@ export class ShopperPage {
   toggleFilter(){
 
     if(this.filtersOrder.payment){
-      this.filtersOrder=this.CLOSED;
+      this.filtersOrder=this.LOCKED;
     }else{
-      this.filtersOrder=this.OPEN;      
+      this.filtersOrder=this.FLOATING;      
     }
     this.findAllOrdersForShipping();  
   }
 
 
   findAllOrdersForShipping(){
-    let params={month:(this.selectedDate.getMonth())+1};
+    let params={month:(new Date(this.selectedDate).getMonth())+1, year: new Date(this.selectedDate).getFullYear()};
     Object.assign(params,this.filtersOrder);
     this.monthOrders=new Map();
     this.availableOrders=[];
-    this.orderSrv.findAllOrders(this.filtersOrder).subscribe(orders =>{
+    this.orderSrv.findAllOrders(params).subscribe(orders =>{
       orders.forEach((order:Order)=>{
         order.shipping.when=new Date(order.shipping.when);
         order.shipping.when.setHours(0,0,0)
         if(!this.monthOrders[order.shipping.when.getTime()]){
             this.monthOrders[order.shipping.when.getTime()]=[];
             this.availableOrders.push(new Date(order.shipping.when));
+            console.log("availableOrders",this.availableOrders);
         }  
         this.monthOrders[order.shipping.when.getTime()].push(order);
       });
