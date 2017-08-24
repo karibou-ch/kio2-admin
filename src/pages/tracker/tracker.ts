@@ -1,13 +1,10 @@
 import { Component, NgZone } from '@angular/core';
 import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
-import { ConfigService, config, LoaderService, Order  } from 'kng2-core';
+import { ConfigService, LoaderService, Order  } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
-import * as L from 'leaflet';
-import * as Routing from 'leaflet-routing-machine';
-import * as ExtraMarkers from 'leaflet-extra-markers';
-//import 'leaflet-usermarker';
+declare var google;
 
 
 /**
@@ -23,15 +20,16 @@ import * as ExtraMarkers from 'leaflet-extra-markers';
 })
 export class TrackerPage {
 
+  private RADIUS = 2000;
+  private config;
   private ready$;
-  private config:any;
   private orders: Order[] = this.navParams.get('results');
   public lat: number;
   public lng: number;
   private isReady;
   private map;
   private userMarker;
-  private markers: L.Marker[];
+  private markers = [];
   public closestOrders;
   private geoSub: Subscription;
   private loader: Loading;
@@ -55,13 +53,14 @@ export class TrackerPage {
   // }
 
   ngOnDestroy() {
-    if (this.map) this.map.off();
-    if (this.ready$) this.ready$.unsubscribe();
+    // if (this.map) this.map.off();
+    // if (this.ready$) this.ready$.unsubscribe();
   }
 
   ngOnInit() {
     this.loaderSrv.ready().subscribe((loader) => {
-      Object.assign(this.config, config);
+      this.config = loader[0];
+      //Object.assign(this.config, new Config);
     })
     
     // ============ BACKGROUND geolocalisation (can be replaced by the Hypertrack one) ====================
@@ -109,34 +108,53 @@ export class TrackerPage {
   }
 
   createMap() {
-    this.map = L.map('map');
-
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom: 18,
-      id: 'mapbox.streets',
-      accessToken: this.config.mapBoxToken
-    }).addTo(this.map);
-
-    //this.map.setView([this.lat, this.lng], 10);
-
-    this.markers = this.orders.map((order) => {
-      var numberMarker = ExtraMarkers.icon({
-        icon: 'fa-number',
-        number: order.rank,
-        markerColor: 'blue',
-        prefix: 'fa'
+      this.map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: this.lat, lng: this.lng},
+        zoom: 10
       });
-      let marker = L.marker(new L.LatLng(order.shipping.geo.lat, order.shipping.geo.lng), {icon: numberMarker});
-      marker.bindPopup(`
-                        <b><a href="tel:${order.customer.phoneNumbers[0]}">${order.shipping.name}</a></b><br>
-                          ${order.shipping.streetAdress}<br/>
-                          ${order.shipping.note}
-                       `);
-      return marker;
+      this.userMarker = new google.maps.Marker({
+          position: {lat:this.lat, lng:this.lng},
+          map: this.map
+        });
+    
+    this.closestOrders = this.getClosestOrders(this.RADIUS);
+
+    this.closestOrders.forEach((point, i) => {
+      this.markers.push(new google.maps.Marker({
+          position: {lat:point.order.shipping.geo.lat, lng:point.order.shipping.geo.lng},
+          map: this.map,
+          label: (i+1).toString()
+        }))
     });
-    let group = L.featureGroup(this.markers).addTo(this.map);
-    this.map.fitBounds(group.getBounds().pad(0.0));
+    
+    // this.map = L.map('map');
+
+    // L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    //   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    //   maxZoom: 18,
+    //   id: 'mapbox.streets',
+    //   accessToken: this.config.mapBoxToken
+    // }).addTo(this.map);
+
+    // //this.map.setView([this.lat, this.lng], 10);
+
+    // this.markers = this.orders.map((order) => {
+    //   var numberMarker = ExtraMarkers.icon({
+    //     icon: 'fa-number',
+    //     number: order.rank,
+    //     markerColor: 'blue',
+    //     prefix: 'fa'
+    //   });
+    //   let marker = L.marker(new L.LatLng(order.shipping.geo.lat, order.shipping.geo.lng), {icon: numberMarker});
+    //   marker.bindPopup(`
+    //                     <b><a href="tel:${order.customer.phoneNumbers[0]}">${order.shipping.name}</a></b><br>
+    //                       ${order.shipping.streetAdress}<br/>
+    //                       ${order.shipping.note}
+    //                    `);
+    //   return marker;
+    // });
+    // let group = L.featureGroup(this.markers).addTo(this.map);
+    // this.map.fitBounds(group.getBounds().pad(0.0));
 
   }
 
@@ -153,50 +171,51 @@ export class TrackerPage {
     this.viewCtrl.dismiss();
   }
 
-  //zoom on the user position
-  trackMe() {
-    // user marker
-    if (!this.userMarker) this.userMarker = L.marker([this.lat, this.lng]);
-    this.userMarker.addTo(this.map);
-    // destinations markers within a radius
-    this.closestOrders = this.getClosestOrders(5000);
-    this.map.flyTo([this.lat, this.lng], 14);
-    this.getOrderRoute(this.closestOrders[0].order);
+  // //zoom on the user position
+  // trackMe() {
+  //   // user marker
+  //   if (!this.userMarker) this.userMarker = L.marker([this.lat, this.lng]);
+  //   this.userMarker.addTo(this.map);
+  //   // destinations markers within a radius
+  //   this.closestOrders = this.getClosestOrders(5000);
+  //   this.map.flyTo([this.lat, this.lng], 14);
+  //   this.getOrderRoute(this.closestOrders[0].order);
 
-  }
+  // }
 
-  //get list of the closest orders below <radius> meters
+  // //get list of the closest orders below <radius> meters
   getClosestOrders(radius: number): any {
+    let rad = radius > this.RADIUS ? this.RADIUS : radius;
     return this.orders
-      .filter((order) => this.distanceToOrder(order) <= radius)
+      .filter((order) => this.distanceToOrder(order) <= rad)
       .sort((a, b) => { return this.distanceToOrder(a) - this.distanceToOrder(b) })
       .map(order => {
         return {order: order, distance: this.distanceToOrder};
       });
   }
 
-  //distance between user position and an order destination position
+  // //distance between user position and an order destination position
   distanceToOrder(order:Order):number {
-    return L.latLng(this.lat, this.lng).distanceTo(L.latLng(order.shipping.geo.lat, order.shipping.geo.lng))
+    return google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.lat, this.lng), new google.maps.LatLng(order.shipping.geo.lat, order.shipping.geo.lng));
   }
 
-  //fit the screen zoom to all orders
-  allOrdersZoom() {
-    this.map.flyToBounds(L.featureGroup(this.markers).getBounds());
-  }
+  // //fit the screen zoom to all orders
+  // allOrdersZoom() {
+  //   this.map.flyToBounds(L.featureGroup(this.markers).getBounds());
+  // }
 
-  //give the path between the user and the order position
-  getOrderRoute(order: Order) {
-    if(this.router) this.router.spliceWaypoints(0,2);
-    this.router = Routing.control({
-      waypoints: [
-        L.latLng(this.lat, this.lng),
-        L.latLng(order.shipping.geo.lat, order.shipping.geo.lng)
-      ],
-      language: 'fr',
-      autoRoute: true
-    }).addTo(this.map);
-  }
+  // //give the path between the user and the order position
+  // getOrderRoute(order: Order) {
+  //   if(this.router) this.router.spliceWaypoints(0,2);
+  //   this.router = Routing.control({
+  //     waypoints: [
+  //       L.latLng(this.lat, this.lng),
+  //       L.latLng(order.shipping.geo.lat, order.shipping.geo.lng)
+  //     ],
+  //     language: 'fr',
+  //     autoRoute: true
+  //   }).addTo(this.map);
+  // }
 
   //  presentActionSheet() {
   //   let actionSheet = this.actionSheetCtrl.create({
