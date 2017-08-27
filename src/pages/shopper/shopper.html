@@ -10,8 +10,8 @@
 
   <ion-navbar color="primary">
     <!-- left toggle -->
-    <ion-toggle color="light"  [(ngModel)]="openShippings" (ionChange)="toggleFilter()"></ion-toggle>
-    <span class="toggle-label">{{openShippings?'ouvertes':'fermées'}}</span>
+    <ion-toggle color="light"  [(ngModel)]="closedShippings" (ionChange)="toggleFilter()"></ion-toggle>
+    <span class="toggle-label">{{closedShippings?'paid':'authorized'}}</span>
     <div class="title">
         <button [disabled]="monthOrders[currentShippingDate?.getTime()]===undefined" color="light" ion-button icon-only clear="true" (click)="openTracker()">
           <ion-icon name="pin" id="pin-icon"></ion-icon>
@@ -25,7 +25,7 @@
           (ngModelChange)="findAllOrdersForShipping()" cancelText="Annuler" doneText="Fait" 
           monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
         </ion-datetime>
-        <span class="calendar-label">{{ myDate | date:"MMMM y" }}</span>
+        <span class="calendar-label">{{ selectedDate | date:"MMMM y" }}</span>
         <ion-icon name="calendar"></ion-icon>
       </button>
     </ion-buttons>
@@ -33,7 +33,7 @@
   </ion-navbar>
 
   <!-- SUB HEADER -->
-  <ion-toolbar  color="primary" [hidden]="!shippingByDay">
+  <ion-toolbar  color="primary">
     <ion-slides pager paginationType="progress" centeredSlides="false" slidesPerView="3">
       <ion-slide *ngFor="let shipping of availableOrders;let i = index">
         <button ion-button margin-top="1rem" 

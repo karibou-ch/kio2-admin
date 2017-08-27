@@ -21,24 +21,20 @@ export class ShopperPage {
   @ViewChild(Content) content: Content;
 
 
-  isAuthenticated:boolean;
   isReady:boolean;
   user: User = new User();
-  results: Order[];
-  toggledResults: Order[];
-  shippingByDay=[];
-  openShippings: boolean; //"ouvertes", "fermées"
+  closedShippings: boolean; //"ouvertes", "fermées"
   nbCabas;
 
-  FLOATING  ={payment:'authorized'};  //not yet handled by producers
-  LOCKED={fulfillments:'fulfilled,partial'};  //got by the producers (sub-group of FLOATING)
+  FLOATING = {payment:'authorized'};  //not yet handled by producers
+  LOCKED = {fulfillments:'fulfilled,partial'};  //got by the producers (sub-group of FLOATING)
 
   filtersOrder:any;
 
   selectedDate:string=new Date().toISOString();
   currentShippingDate:Date;
-  availableOrders:Date[]=[];
-  monthOrders:Map<number,Order[]>=new Map();
+  availableOrders:Date[] = [];
+  monthOrders:Map<number,Order[] >= new Map();
 
   constructor(
     private loaderSrv: LoaderService,
@@ -80,7 +76,7 @@ export class ShopperPage {
     let params={month:(new Date(this.selectedDate).getMonth())+1, year: new Date(this.selectedDate).getFullYear()};
     Object.assign(params,this.filtersOrder);
     this.monthOrders=new Map();
-    this.availableOrders=[];
+    this.availableOrders = [];
     this.orderSrv.findAllOrders(params).subscribe(orders =>{
       orders.forEach((order:Order)=>{
         order.shipping.when=new Date(order.shipping.when);

@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
-import { ConfigService, LoaderService, Order  } from 'kng2-core';
+import { ConfigService, LoaderService, Order } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
@@ -53,8 +53,8 @@ export class TrackerPage {
   // }
 
   ngOnDestroy() {
-    // if (this.map) this.map.off();
-    // if (this.ready$) this.ready$.unsubscribe();
+    if (this.map) this.map.off();
+    if (this.ready$) this.ready$.unsubscribe();
   }
 
   ngOnInit() {
@@ -62,7 +62,7 @@ export class TrackerPage {
       this.config = loader[0];
       //Object.assign(this.config, new Config);
     })
-    
+
     // ============ BACKGROUND geolocalisation (can be replaced by the Hypertrack one) ====================
 
     // this.trackerSrv.backgroundLocation$.subscribe((location) => {
@@ -88,11 +88,9 @@ export class TrackerPage {
     // ====================== FOREGROUND geolocalisation =====================================
     this.showLoading();
 
-    
-    
+
     this.geoSub = this.trackerSrv.geoLocation$.subscribe((position: Geoposition) => {
 
-      console.log(position);
 
       // Run update inside of Angular's zone to trigger change detection
       this.zone.run(() => {
@@ -104,29 +102,35 @@ export class TrackerPage {
       });
 
     });
+    console.log("geosub", this.trackerSrv.geoLocation$);
 
   }
 
   createMap() {
-      this.map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: this.lat, lng: this.lng},
-        zoom: 10
-      });
-      this.userMarker = new google.maps.Marker({
-          position: {lat:this.lat, lng:this.lng},
-          map: this.map
-        });
-    
+    this.map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: this.lat, lng: this.lng }
+    });
+    this.userMarker = new google.maps.Marker({
+      position: { lat: this.lat, lng: this.lng },
+      map: this.map
+    });
+
+    let markerBounds = new google.maps.LatLngBounds();
+
     this.closestOrders = this.getClosestOrders(this.RADIUS);
 
     this.closestOrders.forEach((point, i) => {
+      let pos = new google.maps.LatLng(point.order.shipping.geo.lat, point.order.shipping.geo.lng);
       this.markers.push(new google.maps.Marker({
-          position: {lat:point.order.shipping.geo.lat, lng:point.order.shipping.geo.lng},
-          map: this.map,
-          label: (i+1).toString()
-        }))
+        position: pos,
+        map: this.map,
+        label: (i + 1).toString()
+      }))
+      markerBounds.extend(pos); //extend markerBounds with each marker (for the zoom)
     });
-    
+
+    this.map.fitBounds(markerBounds);   //zoom over all the markers
+
     // this.map = L.map('map');
 
     // L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -190,12 +194,12 @@ export class TrackerPage {
       .filter((order) => this.distanceToOrder(order) <= rad)
       .sort((a, b) => { return this.distanceToOrder(a) - this.distanceToOrder(b) })
       .map(order => {
-        return {order: order, distance: this.distanceToOrder};
+        return { order: order, distance: this.distanceToOrder };
       });
   }
 
   // //distance between user position and an order destination position
-  distanceToOrder(order:Order):number {
+  distanceToOrder(order: Order): number {
     return google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.lat, this.lng), new google.maps.LatLng(order.shipping.geo.lat, order.shipping.geo.lng));
   }
 
@@ -221,7 +225,7 @@ export class TrackerPage {
   //   let actionSheet = this.actionSheetCtrl.create({
   //     title: 'Modify your album',
   //     buttons: this.closestOrders.forEach(marker => {
-        
+
   //     });
   //       {
   //         text: 'Destructive',
