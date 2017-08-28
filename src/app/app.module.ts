@@ -23,6 +23,7 @@ import { TopNavigationComponent } from '../components/top-navigation/top-navigat
 import { TrackerProvider } from '../providers/tracker/tracker.provider';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation } from '@ionic-native/geolocation';
+import { LogisticHeaderComponent } from '../components/logistic-header/logistic-header';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { Geolocation } from '@ionic-native/geolocation';
     TabsPage,
     TrackerPage,
     ShopperItemComponent,
-    TopNavigationComponent
+    TopNavigationComponent,
+    LogisticHeaderComponent
   ],
   imports: [
     BrowserModule,
