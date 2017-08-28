@@ -53,7 +53,6 @@ export class TrackerPage {
   // }
 
   ngOnDestroy() {
-    if (this.map) this.map.off();
     if (this.ready$) this.ready$.unsubscribe();
   }
 
@@ -108,24 +107,42 @@ export class TrackerPage {
 
   createMap() {
     this.map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat: this.lat, lng: this.lng }
+      disableDefaultUI: true,
+      mapTypeControl: true
     });
     this.userMarker = new google.maps.Marker({
       position: { lat: this.lat, lng: this.lng },
-      map: this.map
+      map: this.map,
+      animation: google.maps.Animation.DROP
     });
 
+    //getting and grouping orders markers
     let markerBounds = new google.maps.LatLngBounds();
 
     this.closestOrders = this.getClosestOrders(this.RADIUS);
 
     this.closestOrders.forEach((point, i) => {
       let pos = new google.maps.LatLng(point.order.shipping.geo.lat, point.order.shipping.geo.lng);
-      this.markers.push(new google.maps.Marker({
+      let marker = new google.maps.Marker({
         position: pos,
         map: this.map,
-        label: (i + 1).toString()
-      }))
+        icon: 'http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.8|0|00FF88|13|b|' + (point.order.rank).toString()
+      });
+      this.markers.push(marker);
+      //set popup window on marker
+      var infowindow = new google.maps.InfoWindow({
+        content: `<b><a href="tel:${point.order.customer.phoneNumbers[0]}">${point.order.shipping.name}</a></b><br>
+                  ${point.order.shipping.streetAdress}<br/>
+                  ${point.order.shipping.note}
+                    `
+      });
+      marker.addListener('click', () => {
+        infowindow.open(this.map, marker);
+      });
+      google.maps.event.addListener(this.map, 'click', (event) => {
+        infowindow.close();
+      });
+
       markerBounds.extend(pos); //extend markerBounds with each marker (for the zoom)
     });
 
@@ -175,6 +192,10 @@ export class TrackerPage {
     this.viewCtrl.dismiss();
   }
 
+  userZoom(){
+    this.map.setZoom(17);
+    this.map.panTo(this.userMarker.position);
+  }
   // //zoom on the user position
   // trackMe() {
   //   // user marker

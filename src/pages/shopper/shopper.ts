@@ -81,19 +81,22 @@ export class ShopperPage {
       orders.forEach((order:Order)=>{
         order.shipping.when=new Date(order.shipping.when);
         order.shipping.when.setHours(0,0,0)
-        if(!this.monthOrders[order.shipping.when.getTime()]){
-            this.monthOrders[order.shipping.when.getTime()]=[];
-            this.availableOrders.push(new Date(order.shipping.when));
-            console.log("availableOrders",this.availableOrders);
-        }  
-        this.monthOrders[order.shipping.when.getTime()].push(order);
+        // Object.keys(this.monthOrders)
+        if( !this.monthOrders.has(order.shipping.when.getTime()) ){
+            this.monthOrders.set(order.shipping.when.getTime(), []);
+            this.availableOrders.push(order.shipping.when);
+        }
+        this.monthOrders.get(order.shipping.when.getTime()).push(order);
       });
-      this.currentShippingDate=Order.currentShippingDay();
+      //set currentshipping with first key
+      this.currentShippingDate = new Date(this.monthOrders.keys().next().value);      
+      console.log('currentDate', this.currentShippingDate.getTime());
+      console.log('monthOrders', this.monthOrders);
     })
 }
 
   openTracker(){
-    this.modalCtrl.create(TrackerPage, {results: this.monthOrders[this.currentShippingDate.getTime()]}).present();
+    this.modalCtrl.create(TrackerPage, {results: this.monthOrders.get(this.currentShippingDate.getTime())}).present();
   }
 
 }

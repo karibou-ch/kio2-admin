@@ -14,7 +14,7 @@
     </ion-buttons>
     
     <ion-buttons end>
-    <button [disabled]="!isReady" ion-button icon-only clear="true">
+    <button (click)="userZoom()" [disabled]="!isReady" ion-button icon-only clear="true">
           <ion-icon name="locate" ></ion-icon>
     </button>
     </ion-buttons>
