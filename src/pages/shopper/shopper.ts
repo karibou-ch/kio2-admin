@@ -5,6 +5,7 @@ import { ShopperItemComponent } from '../../components/shopper-item/shopper-item
 import { LogisticHeaderComponent }  from '../../components/logistic-header/logistic-header';
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
+import { TrackerPage } from '../tracker/tracker';
 /**
  * Generated class for the ShopperPage page.
  *
@@ -25,12 +26,51 @@ export class ShopperPage {
   nbCabas;
 
 
+  FLOATING = { payment: 'authorized' };  //not yet handled by producers
+  LOCKED = { fulfillments: 'fulfilled,partial' };  //got by the producers (sub-group of FLOATING)
+
+  filtersOrder: any;
+
+  selectedDate: string = new Date().toISOString();
+  currentShippingDate: Date;
+  availableOrders: Date[] = [];
+  monthOrders: Map<number, Order[]> = new Map();
+
   constructor(
-
+    private loaderSrv: LoaderService,
+    private modalCtrl: ModalController,
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private orderSrv: OrderService,
+    private userSrv: UserService
   ) {
-
+    this.currentShippingDate = Order.currentShippingDay();
+    this.currentShippingDate.setHours(0, 0, 0);
+    this.filtersOrder = this.FLOATING;
 
   }
+
+
+
+  ngOnInit() {
+    this.loaderSrv.ready().subscribe((loader) => {
+      Object.assign(this.user, loader[1]);
+      this.isReady = true;
+      this.findAllOrdersForShipping();
+    });
+  }
+
+
+  toggleFilter() {
+
+    if (this.filtersOrder.payment) {
+      this.filtersOrder = this.LOCKED;
+    } else {
+      this.filtersOrder = this.FLOATING;
+    }
+    this.findAllOrdersForShipping();
+  }
+
 
   findAllOrdersForShipping() {
     let params = { month: (new Date(this.selectedDate).getMonth()) + 1, year: new Date(this.selectedDate).getFullYear() };
@@ -41,15 +81,31 @@ export class ShopperPage {
       orders.forEach((order: Order) => {
         order.shipping.when = new Date(order.shipping.when);
         order.shipping.when.setHours(0, 0, 0)
-        if (!this.monthOrders[order.shipping.when.getTime()]) {
-          this.monthOrders[order.shipping.when.getTime()] = [];
-          this.availableOrders.push(new Date(order.shipping.when));
-          console.log("availableOrders", this.availableOrders);
+        // Object.keys(this.monthOrders)
+        if (!this.monthOrders.has(order.shipping.when.getTime())) {
+          this.monthOrders.set(order.shipping.when.getTime(), []);
+          this.availableOrders.push(order.shipping.when);
         }
-        this.monthOrders[order.shipping.when.getTime()].push(order);
+        this.monthOrders.get(order.shipping.when.getTime()).push(order);
       });
-      this.currentShippingDate = Order.currentShippingDay();
+      //set currentshipping with first key
+      this.currentShippingDate = new Date(this.monthOrders.keys().next().value);
+
     })
+  }
+
+  openTracker() {
+    this.modalCtrl.create(TrackerPage, { results: this.monthOrders.get(this.currentShippingDate.getTime()) }).present();
+  }
+
+  openTracker4One(order){
+    this.modalCtrl.create(TrackerPage, { results: order }).present();
+
+  }
+
+  sortOrdersByCP(o1,o2){
+    //TODO checking type of postalCode is always a number
+    return (o1.shipping.postalCode|0)-(o2.shipping.postalCode|0);
   }
 
 
