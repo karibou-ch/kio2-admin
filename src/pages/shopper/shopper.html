@@ -64,7 +64,7 @@
 
   <ion-list>
     
-    <ion-item-sliding *ngFor="let order of monthOrders.get(currentShippingDate?.getTime())  ">
+    <ion-item-sliding *ngFor="let order of monthOrders.get(currentShippingDate?.getTime())?.sort(sortOrdersByCP)  ">
 
       <ion-item>
         <ion-grid>

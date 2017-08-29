@@ -103,4 +103,9 @@ export class ShopperPage {
 
   }
 
+  sortOrdersByCP(o1,o2){
+    //TODO checking type of postalCode is always a number
+    return (o1.shipping.postalCode|0)-(o2.shipping.postalCode|0);
+  }
+
 }
