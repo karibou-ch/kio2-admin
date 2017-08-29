@@ -4,7 +4,7 @@ import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserServ
 import { ShopperItemComponent } from '../../components/shopper-item/shopper-item'
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
-import { TrackerPage }  from '../tracker/tracker';
+import { TrackerPage } from '../tracker/tracker';
 /**
  * Generated class for the ShopperPage page.
  *
@@ -21,31 +21,31 @@ export class ShopperPage {
   @ViewChild(Content) content: Content;
 
 
-  isReady:boolean;
+  isReady: boolean;
   user: User = new User();
   closedShippings: boolean; //"ouvertes", "fermées"
   nbCabas;
 
-  FLOATING = {payment:'authorized'};  //not yet handled by producers
-  LOCKED = {fulfillments:'fulfilled,partial'};  //got by the producers (sub-group of FLOATING)
+  FLOATING = { payment: 'authorized' };  //not yet handled by producers
+  LOCKED = { fulfillments: 'fulfilled,partial' };  //got by the producers (sub-group of FLOATING)
 
-  filtersOrder:any;
+  filtersOrder: any;
 
-  selectedDate:string=new Date().toISOString();
-  currentShippingDate:Date;
-  availableOrders:Date[] = [];
-  monthOrders:Map<number,Order[] >= new Map();
+  selectedDate: string = new Date().toISOString();
+  currentShippingDate: Date;
+  availableOrders: Date[] = [];
+  monthOrders: Map<number, Order[]> = new Map();
 
   constructor(
     private loaderSrv: LoaderService,
     private modalCtrl: ModalController,
-    public navCtrl: NavController, 
+    public navCtrl: NavController,
     public navParams: NavParams,
     private orderSrv: OrderService,
-    private userSrv:UserService
-    ) {
-    this.currentShippingDate=Order.currentShippingDay();
-    this.currentShippingDate.setHours(0,0,0);
+    private userSrv: UserService
+  ) {
+    this.currentShippingDate = Order.currentShippingDay();
+    this.currentShippingDate.setHours(0, 0, 0);
     this.filtersOrder = this.FLOATING;
 
   }
@@ -55,49 +55,52 @@ export class ShopperPage {
   ngOnInit() {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
-      this.isReady=true;
+      this.isReady = true;
       this.findAllOrdersForShipping();
     })
   }
 
 
-  toggleFilter(){
+  toggleFilter() {
 
-    if(this.filtersOrder.payment){
-      this.filtersOrder=this.LOCKED;
-    }else{
-      this.filtersOrder=this.FLOATING;      
+    if (this.filtersOrder.payment) {
+      this.filtersOrder = this.LOCKED;
+    } else {
+      this.filtersOrder = this.FLOATING;
     }
-    this.findAllOrdersForShipping();  
+    this.findAllOrdersForShipping();
   }
 
 
-  findAllOrdersForShipping(){
-    let params={month:(new Date(this.selectedDate).getMonth())+1, year: new Date(this.selectedDate).getFullYear()};
-    Object.assign(params,this.filtersOrder);
-    this.monthOrders=new Map();
+  findAllOrdersForShipping() {
+    let params = { month: (new Date(this.selectedDate).getMonth()) + 1, year: new Date(this.selectedDate).getFullYear() };
+    Object.assign(params, this.filtersOrder);
+    this.monthOrders = new Map();
     this.availableOrders = [];
-    this.orderSrv.findAllOrders(params).subscribe(orders =>{
-      orders.forEach((order:Order)=>{
-        order.shipping.when=new Date(order.shipping.when);
-        order.shipping.when.setHours(0,0,0)
+    this.orderSrv.findAllOrders(params).subscribe(orders => {
+      orders.forEach((order: Order) => {
+        order.shipping.when = new Date(order.shipping.when);
+        order.shipping.when.setHours(0, 0, 0)
         // Object.keys(this.monthOrders)
-        if( !this.monthOrders.has(order.shipping.when.getTime()) ){
-            this.monthOrders.set(order.shipping.when.getTime(), []);
-            this.availableOrders.push(order.shipping.when);
+        if (!this.monthOrders.has(order.shipping.when.getTime())) {
+          this.monthOrders.set(order.shipping.when.getTime(), []);
+          this.availableOrders.push(order.shipping.when);
         }
         this.monthOrders.get(order.shipping.when.getTime()).push(order);
       });
       //set currentshipping with first key
-      this.currentShippingDate = new Date(this.monthOrders.keys().next().value);      
-      
-      console.log('monthOrders', this.monthOrders);
-    })
-}
+      this.currentShippingDate = new Date(this.monthOrders.keys().next().value);
 
-  openTracker(){
-    console.log('currentDate', this.monthOrders.get(this.currentShippingDate.getTime()));
-    this.modalCtrl.create(TrackerPage, {results: this.monthOrders.get(this.currentShippingDate.getTime())}).present();
+    })
+  }
+
+  openTracker() {
+    this.modalCtrl.create(TrackerPage, { results: this.monthOrders.get(this.currentShippingDate.getTime()) }).present();
+  }
+
+  openTracker4One(order){
+    this.modalCtrl.create(TrackerPage, { results: order }).present();
+
   }
 
 }

@@ -114,7 +114,6 @@ export class TrackerPage {
     this.userMarker = new google.maps.Marker({
       position: { lat: this.lat, lng: this.lng },
       map: this.map,
-      animation: google.maps.Animation.DROP
     });
 
     this.setMapMarkers(this.orders);
