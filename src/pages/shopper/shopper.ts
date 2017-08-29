@@ -1,9 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { Content, IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Content, IonicPage, ModalController, NavController, NavParams } from 'ionic-angular';
 import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserService } from 'kng2-core';
 import { ShopperItemComponent } from '../../components/shopper-item/shopper-item'
 import 'rxjs/Rx';
 import { Observable } from 'rxjs/Rx';
+import { TrackerPage } from '../tracker/tracker';
 /**
  * Generated class for the ShopperPage page.
  *
@@ -19,24 +20,34 @@ export class ShopperPage {
 
   @ViewChild(Content) content: Content;
 
-  isAuthenticated:boolean;
-  isReady:boolean;
+
+  isReady: boolean;
   user: User = new User();
-  myDate;
-  results: Order[];
-  toggledResults: Order[];
-  shippingByDay;
-  weekDay;
-  openShippings: boolean;
+  closedShippings: boolean; //"ouvertes", "fermées"
   nbCabas;
+
+  FLOATING = { payment: 'authorized' };  //not yet handled by producers
+  LOCKED = { fulfillments: 'fulfilled,partial' };  //got by the producers (sub-group of FLOATING)
+
+  filtersOrder: any;
+
+  selectedDate: string = new Date().toISOString();
+  currentShippingDate: Date;
+  availableOrders: Date[] = [];
+  monthOrders: Map<number, Order[]> = new Map();
 
   constructor(
     private loaderSrv: LoaderService,
-    public navCtrl: NavController, 
+    private modalCtrl: ModalController,
+    public navCtrl: NavController,
     public navParams: NavParams,
     private orderSrv: OrderService,
-    private userSrv:UserService
-    ) {
+    private userSrv: UserService
+  ) {
+    this.currentShippingDate = Order.currentShippingDay();
+    this.currentShippingDate.setHours(0, 0, 0);
+    this.filtersOrder = this.FLOATING;
+
   }
 
 
@@ -44,41 +55,57 @@ export class ShopperPage {
   ngOnInit() {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
-      this.isReady=true;
+      this.isReady = true;
+      this.findAllOrdersForShipping();
     })
   }
 
-  getDayShipping(ordersOneDay: Order[]){
-    this.toggledResults = null;
-    this.results = this.openShippings ? ordersOneDay.filter(order => order.payment.status === EnumFinancialStatus.authorized)
-        : ordersOneDay;
-    this.content.resize();
-  }
 
-  toggleFilter(){
-    if(this.openShippings){
-      this.toggledResults = this.results;
-      this.results = this.results.filter(order => order.payment.status === EnumFinancialStatus.authorized);
+  toggleFilter() {
+
+    if (this.filtersOrder.payment) {
+      this.filtersOrder = this.LOCKED;
+    } else {
+      this.filtersOrder = this.FLOATING;
     }
-    else
-      this.results = this.toggledResults;
+    this.findAllOrdersForShipping();
   }
 
-  findAllOrdersForShipping(){
-    this.shippingByDay = [];
-    this.results = null;
-    this.toggledResults = null;
-    let month = new Date(this.myDate).getMonth();
-    this.orderSrv.findAllOrders({fulfillments:'fulfilled,partial', month:month+1})
-      .flatMap(orders => Observable.from(orders)) //transform single order[] item into Observable order sequence (for groupBy)
-      .groupBy(order=> new Date(order.shipping.when).getDate()) //group items by month
-      .flatMap(group => group.reduce((acc, curr) => [...acc, curr], []))  //create an array item for each group
-      .subscribe(ordersByDay => this.shippingByDay.push(ordersByDay),
-      (err)=>console.log(err),
-      ()=> {
-        this.shippingByDay.reverse();
-      });
 
-}
+  findAllOrdersForShipping() {
+    let params = { month: (new Date(this.selectedDate).getMonth()) + 1, year: new Date(this.selectedDate).getFullYear() };
+    Object.assign(params, this.filtersOrder);
+    this.monthOrders = new Map();
+    this.availableOrders = [];
+    this.orderSrv.findAllOrders(params).subscribe(orders => {
+      orders.forEach((order: Order) => {
+        order.shipping.when = new Date(order.shipping.when);
+        order.shipping.when.setHours(0, 0, 0)
+        // Object.keys(this.monthOrders)
+        if (!this.monthOrders.has(order.shipping.when.getTime())) {
+          this.monthOrders.set(order.shipping.when.getTime(), []);
+          this.availableOrders.push(order.shipping.when);
+        }
+        this.monthOrders.get(order.shipping.when.getTime()).push(order);
+      });
+      //set currentshipping with first key
+      this.currentShippingDate = new Date(this.monthOrders.keys().next().value);
+
+    })
+  }
+
+  openTracker() {
+    this.modalCtrl.create(TrackerPage, { results: this.monthOrders.get(this.currentShippingDate.getTime()) }).present();
+  }
+
+  openTracker4One(order){
+    this.modalCtrl.create(TrackerPage, { results: order }).present();
+
+  }
+
+  sortOrdersByCP(o1,o2){
+    //TODO checking type of postalCode is always a number
+    return (o1.shipping.postalCode|0)-(o2.shipping.postalCode|0);
+  }
 
 }

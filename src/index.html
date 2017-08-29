@@ -25,6 +25,7 @@
 
   <link href="build/main.css" rel="stylesheet">
 
+   <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
 </head>
 <body>
 
@@ -36,6 +37,10 @@
 
   <!-- The bundle js is generated during the build process -->
   <script src="build/main.js"></script>
+
+  <!-- TODO for production, replace google maps CDN by actual package -->
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyCAGi2rm5I5OhtyKw63TCk9dzoi3xtv8v8"
+    ></script>
 
 </body>
 </html>

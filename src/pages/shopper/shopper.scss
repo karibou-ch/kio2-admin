@@ -1,4 +1,5 @@
 page-shopper {
+   
 
    ion-toolbar,ion-navbar {
       p {
@@ -31,7 +32,7 @@ page-shopper {
 
       ion-slides button {
          font-size: 1.2rem !important;
-         &:focus{
+         &.selected{
             background-color: color($colors, light);
             color: color($colors, primary);
          }

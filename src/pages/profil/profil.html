@@ -7,13 +7,16 @@
 <ion-header>
 
   <ion-navbar color="primary">
-    <!--<ion-title>Profil</ion-title>
+    <ion-title >Profil</ion-title>
+
     <ion-buttons end>
+      <button ion-button  [disabled]="!isReady" (click)="doDisplayAccount()">
+        {{user?.displayName}}    
+      </button>
       <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </button>
-    </ion-buttons>-->
-    <top-navigation [title]="'Profil'"></top-navigation>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>

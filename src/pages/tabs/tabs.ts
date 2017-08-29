@@ -10,9 +10,9 @@ import { ProfilPage } from '../profil/profil'
 })
 export class TabsPage {
 
-  tab1Root = ShopperPage;
-  tab2Root = CollectePage;
-  tab3Root = ProfilPage;
+  shopper = ShopperPage;
+  collect = CollectePage;
+  profil = ProfilPage;
 
   constructor() {
   }
