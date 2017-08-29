@@ -21,6 +21,8 @@ declare var google;
 export class TrackerPage {
 
   private RADIUS = 2000;
+  private toggleZoom: boolean;
+  private markerBounds;
   private config;
   private ready$;
   private orders: Order[] = this.navParams.get('results');
@@ -30,7 +32,7 @@ export class TrackerPage {
   private map;
   private userMarker;
   private markers = [];
-  public closestOrders;
+  private closestMarkers;
   private geoSub: Subscription;
   private loader: Loading;
   private router;
@@ -101,7 +103,6 @@ export class TrackerPage {
       });
 
     });
-    console.log("geosub", this.trackerSrv.geoLocation$);
 
   }
 
@@ -116,66 +117,9 @@ export class TrackerPage {
       animation: google.maps.Animation.DROP
     });
 
-    //getting and grouping orders markers
-    let markerBounds = new google.maps.LatLngBounds();
+    this.setMapMarkers(this.orders);
 
-    this.closestOrders = this.getClosestOrders(this.RADIUS);
-
-    this.closestOrders.forEach((point, i) => {
-      let pos = new google.maps.LatLng(point.order.shipping.geo.lat, point.order.shipping.geo.lng);
-      let marker = new google.maps.Marker({
-        position: pos,
-        map: this.map,
-        icon: 'http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.8|0|00FF88|13|b|' + (point.order.rank).toString()
-      });
-      this.markers.push(marker);
-      //set popup window on marker
-      var infowindow = new google.maps.InfoWindow({
-        content: `<b><a href="tel:${point.order.customer.phoneNumbers[0]}">${point.order.shipping.name}</a></b><br>
-                  ${point.order.shipping.streetAdress}<br/>
-                  ${point.order.shipping.note}
-                    `
-      });
-      marker.addListener('click', () => {
-        infowindow.open(this.map, marker);
-      });
-      google.maps.event.addListener(this.map, 'click', (event) => {
-        infowindow.close();
-      });
-
-      markerBounds.extend(pos); //extend markerBounds with each marker (for the zoom)
-    });
-
-    this.map.fitBounds(markerBounds);   //zoom over all the markers
-
-    // this.map = L.map('map');
-
-    // L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    //   attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    //   maxZoom: 18,
-    //   id: 'mapbox.streets',
-    //   accessToken: this.config.mapBoxToken
-    // }).addTo(this.map);
-
-    // //this.map.setView([this.lat, this.lng], 10);
-
-    // this.markers = this.orders.map((order) => {
-    //   var numberMarker = ExtraMarkers.icon({
-    //     icon: 'fa-number',
-    //     number: order.rank,
-    //     markerColor: 'blue',
-    //     prefix: 'fa'
-    //   });
-    //   let marker = L.marker(new L.LatLng(order.shipping.geo.lat, order.shipping.geo.lng), {icon: numberMarker});
-    //   marker.bindPopup(`
-    //                     <b><a href="tel:${order.customer.phoneNumbers[0]}">${order.shipping.name}</a></b><br>
-    //                       ${order.shipping.streetAdress}<br/>
-    //                       ${order.shipping.note}
-    //                    `);
-    //   return marker;
-    // });
-    // let group = L.featureGroup(this.markers).addTo(this.map);
-    // this.map.fitBounds(group.getBounds().pad(0.0));
+    
 
   }
 
@@ -192,31 +136,58 @@ export class TrackerPage {
     this.viewCtrl.dismiss();
   }
 
-  userZoom(){
-    this.map.setZoom(17);
-    this.map.panTo(this.userMarker.position);
+  userZoom() {
+    if (!this.toggleZoom) {
+      this.toggleZoom = true;
+      this.getClosestOrders(this.RADIUS);
+    }
+    else {
+      this.toggleZoom = false;
+      this.setMapMarkers(this.orders);
+    }
+    this.map.fitBounds(this.markerBounds);
   }
-  // //zoom on the user position
-  // trackMe() {
-  //   // user marker
-  //   if (!this.userMarker) this.userMarker = L.marker([this.lat, this.lng]);
-  //   this.userMarker.addTo(this.map);
-  //   // destinations markers within a radius
-  //   this.closestOrders = this.getClosestOrders(5000);
-  //   this.map.flyTo([this.lat, this.lng], 14);
-  //   this.getOrderRoute(this.closestOrders[0].order);
 
-  // }
+  setMapMarkers(orders: Order[]) {
+    this.deleteMarkers();
+    orders.forEach((order, i) => {
+      let pos = new google.maps.LatLng(order.shipping.geo.lat, order.shipping.geo.lng);
+      let marker = new google.maps.Marker({
+        position: pos,
+        map: this.map,
+        icon: 'http://chart.apis.google.com/chart?chst=d_map_spin&chld=0.8|0|00FF88|13|b|' + (order.rank).toString()
+      });
+      this.markers.push(marker);
+      //set popup window on marker
+      var infowindow = new google.maps.InfoWindow({
+        content: `<b><a href="tel:${order.customer.phoneNumbers[0]}">${order.shipping.name}</a></b><br>
+                  ${order.shipping.streetAdress}<br/>
+                  ${order.shipping.note}
+                    `
+      });
+      marker.addListener('click', () => {
+        infowindow.open(this.map, marker);
+      });
+      google.maps.event.addListener(this.map, 'click', (event) => {
+        infowindow.close();
+      });
+
+      this.markerBounds.extend(pos); //extend markerBounds with each marker (for the zoom)
+    });
+    this.markerBounds.extend(new google.maps.LatLng(this.lat, this.lng))  //add user marker
+    this.map.fitBounds(this.markerBounds);   //zoom over all the markers
+  }
 
   // //get list of the closest orders below <radius> meters
   getClosestOrders(radius: number): any {
-    let rad = radius > this.RADIUS ? this.RADIUS : radius;
-    return this.orders
-      .filter((order) => this.distanceToOrder(order) <= rad)
+    radius = radius > this.RADIUS ? this.RADIUS : radius;
+    this.closestMarkers = this.orders
+      .filter((order) => this.distanceToOrder(order) <= radius)
       .sort((a, b) => { return this.distanceToOrder(a) - this.distanceToOrder(b) })
       .map(order => {
         return { order: order, distance: this.distanceToOrder };
       });
+      this.setMapMarkers(this.closestMarkers.map(item => item.order));
   }
 
   // //distance between user position and an order destination position
@@ -224,46 +195,24 @@ export class TrackerPage {
     return google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(this.lat, this.lng), new google.maps.LatLng(order.shipping.geo.lat, order.shipping.geo.lng));
   }
 
-  // //fit the screen zoom to all orders
-  // allOrdersZoom() {
-  //   this.map.flyToBounds(L.featureGroup(this.markers).getBounds());
-  // }
+  // Sets the map on all markers in the array.
+  setMapOnAll(map) {
+    for (var i = 0; i < this.markers.length; i++) {
+      this.markers[i].setMap(map);
+    }
+  }
 
-  // //give the path between the user and the order position
-  // getOrderRoute(order: Order) {
-  //   if(this.router) this.router.spliceWaypoints(0,2);
-  //   this.router = Routing.control({
-  //     waypoints: [
-  //       L.latLng(this.lat, this.lng),
-  //       L.latLng(order.shipping.geo.lat, order.shipping.geo.lng)
-  //     ],
-  //     language: 'fr',
-  //     autoRoute: true
-  //   }).addTo(this.map);
-  // }
+  // Removes the markers from the map, but keeps them in the array.
+  clearMarkers() {
+    this.setMapOnAll(null);
+  }
 
-  //  presentActionSheet() {
-  //   let actionSheet = this.actionSheetCtrl.create({
-  //     title: 'Modify your album',
-  //     buttons: this.closestOrders.forEach(marker => {
-
-  //     });
-  //       {
-  //         text: 'Destructive',
-  //         role: 'destructive',
-  //         handler: () => {
-  //           console.log('Destructive clicked');
-  //         }
-  //       },{
-  //         text: 'Archive',
-  //         handler: () => {
-  //           console.log('Archive clicked');
-  //         }
-  //       }
-  //     ]
-  //   });
-  //   actionSheet.present();
-  // }
+  // Deletes all markers in the array by removing references to them.
+  deleteMarkers() {
+    this.clearMarkers();
+    this.markers = [];
+    this.markerBounds = new google.maps.LatLngBounds();
+  }
 
 
 }

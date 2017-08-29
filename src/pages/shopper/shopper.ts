@@ -90,12 +90,13 @@ export class ShopperPage {
       });
       //set currentshipping with first key
       this.currentShippingDate = new Date(this.monthOrders.keys().next().value);      
-      console.log('currentDate', this.currentShippingDate.getTime());
+      
       console.log('monthOrders', this.monthOrders);
     })
 }
 
   openTracker(){
+    console.log('currentDate', this.monthOrders.get(this.currentShippingDate.getTime()));
     this.modalCtrl.create(TrackerPage, {results: this.monthOrders.get(this.currentShippingDate.getTime())}).present();
   }
 
