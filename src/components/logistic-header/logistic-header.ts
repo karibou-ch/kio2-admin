@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Order, OrderService, Shop } from 'kng2-core';
-import { ModalController } from 'ionic-angular';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { LoaderService, Order, OrderService, Shop, User, UserService } from 'kng2-core';
+import { ModalController, NavController, NavParams } from 'ionic-angular';
 import { TrackerPage } from '../../pages/tracker/tracker';
+import 'rxjs/Rx';
 
 /**
  * Generated class for the LogisticHeaderComponent component.
@@ -15,15 +16,14 @@ import { TrackerPage } from '../../pages/tracker/tracker';
 })
 export class LogisticHeaderComponent {
 
-  @Input() availableDates: Date[] = [];
-  @Input() 
-  @Output() getResults = new EventEmitter<boolean>(); //execute data fetcher function of parent component
+  @Output() ordersToPage = new EventEmitter<Order[]>(); //execute data fetcher function of parent component
   closedShippings: boolean;
   monthCommands: Map<number, Shop[]> = new Map();
   monthOrders: Map<number, Order[]> = new Map();
   currentShippingDate: Date;
   selectedDate: string = new Date().toISOString();
-  
+  availableDates: Date[] = [];
+  private isReady;
  
 
   filtersOrder: any;
@@ -38,7 +38,7 @@ export class LogisticHeaderComponent {
     public navCtrl: NavController, 
     public navParams: NavParams,
     private orderSrv: OrderService,
-    private userSrv:UserService
+    //private userSrv:UserService
   ) {
     this.currentShippingDate = Order.currentShippingDay();
     this.currentShippingDate.setHours(0, 0, 0);
@@ -47,7 +47,7 @@ export class LogisticHeaderComponent {
 
   ngOnInit() {
     this.loaderSrv.ready().subscribe((loader) => {
-      Object.assign(this.user, loader[1]);
+      //Object.assign(this.user, loader[1]);
       this.isReady=true;
       this.findAllOrdersForShipping();
     })
@@ -62,10 +62,34 @@ export class LogisticHeaderComponent {
     this.findAllOrdersForShipping();
   }
 
-  
-
-  openTracker() {
-    this.modalCtrl.create(TrackerPage, { results: this.monthOrders[this.currentShippingDate.getTime()] }).present();
+  findAllOrdersForShipping() {
+    let params = { month: (new Date(this.selectedDate).getMonth()) + 1, year: new Date(this.selectedDate).getFullYear() };
+    Object.assign(params, this.filtersOrder);
+    this.monthOrders = new Map();
+    this.availableDates = [];
+    this.orderSrv.findAllOrders(params).subscribe(orders => {
+      orders.forEach((order: Order) => {
+        order.shipping.when = new Date(order.shipping.when);
+        order.shipping.when.setHours(0, 0, 0)
+        // Object.keys(this.monthOrders)
+        if (!this.monthOrders.has(order.shipping.when.getTime())) {
+          this.monthOrders.set(order.shipping.when.getTime(), []);
+          this.availableDates.push(order.shipping.when);
+        }
+        this.monthOrders.get(order.shipping.when.getTime()).push(order);
+      });
+      //set currentshipping with first key
+      this.currentShippingDate = new Date(this.monthOrders.keys().next().value);
+      this.displayOrders(this.currentShippingDate);
+    })
   }
 
+  displayOrders(shipping:Date){
+    this.currentShippingDate = shipping;
+    this.ordersToPage.emit(this.monthOrders.get(this.currentShippingDate.getTime()));
+  }
+  
+  openTracker() {
+    this.modalCtrl.create(TrackerPage, { results: this.monthOrders.get(this.currentShippingDate.getTime()) }).present();
+  }
 }

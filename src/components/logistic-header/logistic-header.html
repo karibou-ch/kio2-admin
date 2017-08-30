@@ -2,8 +2,9 @@
   <!-- left toggle -->
   <ion-toggle color="light" [(ngModel)]="closedShippings" (ionChange)="toggleFilter()"></ion-toggle>
   <span class="toggle-label">{{closedShippings?'paid':'authorized'}}</span>
+
   <div class="title">
-    <button [disabled]="monthOrders[currentShippingDate?.getTime()]===undefined" color="light" ion-button icon-only clear="true"
+    <button [disabled]="monthOrders.get(currentShippingDate?.getTime()) === undefined" color="light" ion-button icon-only clear="true"
       (click)="openTracker()">
           <ion-icon name="pin" id="pin-icon"></ion-icon>
 </button>
@@ -27,7 +28,7 @@
 <ion-toolbar color="primary">
   <ion-slides pager paginationType="progress" centeredSlides="false" slidesPerView="3">
     <ion-slide *ngFor="let shipping of availableDates;let i = index">
-      <button ion-button margin-top="1rem" [class.selected]="shipping===currentShippingDate" class="slide-butt" clear small (click)="currentShippingDate=shipping"
+      <button ion-button margin-top="1rem" [class.selected]="shipping.getTime()===currentShippingDate.getTime()" class="slide-butt" clear small (click)="displayOrders(shipping)"
         color="light">
           {{ shipping | date:'EEEE d' }}</button>
     </ion-slide>
