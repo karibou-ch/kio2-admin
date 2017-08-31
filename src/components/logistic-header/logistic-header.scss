@@ -1,3 +1,16 @@
 logistic-header {
 
+  ion-toolbar{
+    padding-top:0!important;
+    padding-bottom:0!important;
+
+    div.swiper-pagination{
+      top: -20px;
+      bottom: unset;      
+    }
+  }
+
+  ion-slide button{
+    margin-top:6px!important;
+  }
 }

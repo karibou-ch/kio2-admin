@@ -22,46 +22,32 @@
     <ion-item-sliding *ngFor="let order of orders?.sort(sortOrdersByCP)  ">
 
       <ion-item>
-        <ion-grid>
-          <ion-row>
-            <ion-col col-2 text-center>
-              <ion-badge color="primary">{{ order.rank }}</ion-badge>
-            </ion-col>
-            <ion-col col-6>
-              <h2>{{ order.shipping.name }}</h2>
-            </ion-col>
-            <ion-col col-4>
-              <!--<ion-label>Cabas:~</ion-label>
-              <ion-select [(ngModel)]="nbCabas">
-                <ion-option value="1">1</ion-option>
-                <ion-option value="2">2</ion-option>
-                <ion-option value="3">3</ion-option>
-                <ion-option value="4">4</ion-option>
-              </ion-select>-->
-            </ion-col>
-          </ion-row>
-
-          <ion-row wrap text-wrap>
-            <ion-col col-2 text-center>
-              <ion-icon name="pin" color="grey-icon"></ion-icon>
-            </ion-col>
-            <ion-col>
-              <p>{{ order.shipping.streetAdress }}, {{order.shipping.region}} <b>{{order.shipping.postalCode}}</b>
-                <br><b>Etage:</b> {{order.shipping.floor}} </p>
-            </ion-col>
-          </ion-row>
-
-          <ion-row wrap text-wrap>
-            <ion-col col-2 text-center>
-              <ion-icon name="information-circle"></ion-icon>
-            </ion-col>
-            <ion-col>
-              <p>{{ order.shipping.note }}</p>
-            </ion-col>
-          </ion-row>
-
-        </ion-grid>
+        <ion-note item-end>
+          {{order.shipping.postalCode}}
+          <!--<ion-label>Cabas:~</ion-label>
+          <ion-select [(ngModel)]="nbCabas">
+            <ion-option value="1">1</ion-option>
+            <ion-option value="2">2</ion-option>
+            <ion-option value="3">3</ion-option>
+            <ion-option value="4">4</ion-option>
+          </ion-select>-->
+          
+        </ion-note>        
+        <ion-avatar item-start>
+          <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
+          <span class="rank">{{ order.rank }}</span>
+          <span class="bag" [hidden]="!order.shipping.bags">{{ order.shipping.bags }}</span>
+        </ion-avatar>
+        <h3 text-capitalize>{{ order.shipping.name }}</h3>
+        <h2>{{ order.shipping.streetAdress }}, étage: {{order.shipping.floor}} </h2>
+        <p>{{ order.shipping.note }}</p>
       </ion-item>
+      <ion-item-options side="left">
+        <button  ion-button color="secondary">
+          <ion-icon name="bicycle"></ion-icon>
+          Réserver
+        </button>
+      </ion-item-options>
 
       <ion-item-options side="right">
         <button (click)="openTracker4One([order])" ion-button color="light">

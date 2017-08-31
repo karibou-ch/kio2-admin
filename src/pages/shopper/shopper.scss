@@ -80,4 +80,45 @@ page-shopper {
       align-items: flex-start !important;
    }
 
+   ion-item {
+     h2{
+       font-size:1.4rem!important;
+     }
+     p{
+       font-size:1.2rem!important;
+       white-space:initial;
+     }
+     ion-avatar {
+      position: relative;
+      span.rank{
+        position: absolute;
+        top: 00%;
+        left: 0;
+        color: white;
+        font-weight: 900;
+        background: color($colors,secondary);
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        line-height: 40px;
+        text-align: center;
+      }
+      span.bag{
+        position: absolute;
+        font-size: 1.0rem;
+        bottom: -5px;
+        right: -5px;
+        color: white;
+        font-weight: 900;
+        background: color($colors,danger);
+        padding: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        line-height: 14px;
+        text-align: center;
+      }      
+     }
+   }
 }
