@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { LoaderService, Order, OrderService, Shop, User, UserService } from 'kng2-core';
+import { LoaderService, Order, OrderService, Shop, User } from 'kng2-core';
 import { ModalController, NavController, NavParams } from 'ionic-angular';
 import { TrackerPage } from '../../pages/tracker/tracker';
 import 'rxjs/Rx';

@@ -28,7 +28,7 @@
 <ion-toolbar color="primary">
   <ion-slides pager paginationType="none" centeredSlides="false" slidesPerView="3">
     <ion-slide *ngFor="let shipping of availableDates;let i = index">
-      <button ion-button margin-top="1rem" [class.selected]="shipping.getTime()===currentShippingDate.getTime()" class="slide-butt" clear small (click)="displayOrders(shipping)"
+      <button ion-button margin-top="1rem" [class.selected]="shipping.getTime()===currentShippingDate.getTime()" clear small (click)="displayOrders(shipping)"
         color="light">
           {{ shipping | date:'EEEE d' }}</button>
     </ion-slide>

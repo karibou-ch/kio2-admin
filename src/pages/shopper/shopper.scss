@@ -1,44 +1,5 @@
 page-shopper {
    
-
-   ion-toolbar,ion-navbar {
-      p {
-         color : color($colors, light);
-         font-weight: bold;
-         text-transform: uppercase;
-         font-size: 1.3rem;
-      }
-
-      .title{
-        position: absolute;
-        top: 4px;
-        left: 45%;        
-      }
-
-      .calendar-label{
-        font-size: 80%;
-        margin-right: 10px;        
-      }
-
-      .toggle-label{
-        font-size: 90%;
-        margin-left: 10px;        
-        position: absolute;
-        top: 35%;
-        left: 50px;
-        color: color($colors, light);        
-      }
-
-
-      ion-slides button {
-         font-size: 1.2rem !important;
-         &.selected{
-            background-color: color($colors, light);
-            color: color($colors, primary);
-         }
-      }
-   }
-
    h2 {
       color: color($colors, info);
       font-weight: bold;
@@ -48,77 +9,51 @@ page-shopper {
       font-size: 1.8rem;
    }
 
-   #first-grid {
-      ion-col {
-      margin-top: 1.1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      p {
-         margin-top:0;
-         
-      }
-   }
-      ion-icon {
-         font-size: 2.8rem !important;
-      }
-   }
 
-      ion-datetime {
-         display: none;
-      }
+  ion-datetime {
+      display: none;
+  }
 
-   .slide-butt {
-      width: 8.5rem;
-   }
 
-   ion-slides {
-      height: auto;
-   }
-
-   ion-slide {
-      align-items: flex-start !important;
-   }
-
-   ion-item {
-     h2{
-       font-size:1.4rem!important;
-     }
-     p{
-       font-size:1.2rem!important;
-       white-space:initial;
-     }
-     ion-avatar {
-      position: relative;
-      span.rank{
-        position: absolute;
-        top: 00%;
-        left: 0;
-        color: white;
-        font-weight: 900;
-        background: color($colors,secondary);
-        padding: 0;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        line-height: 40px;
-        text-align: center;
-      }
-      span.bag{
-        position: absolute;
-        font-size: 1.0rem;
-        bottom: -5px;
-        right: -5px;
-        color: white;
-        font-weight: 900;
-        background: color($colors,danger);
-        padding: 0;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        line-height: 14px;
-        text-align: center;
-      }      
-     }
-   }
+  ion-item {
+    h2{
+      font-size:1.4rem!important;
+    }
+    p{
+      font-size:1.2rem!important;
+      white-space:initial;
+    }
+    ion-avatar {
+    position: relative;
+    span.rank{
+      position: absolute;
+      top: 00%;
+      left: 0;
+      color: white;
+      font-weight: 900;
+      background: color($colors,secondary);
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      line-height: 40px;
+      text-align: center;
+    }
+    span.bag{
+      position: absolute;
+      font-size: 1.0rem;
+      bottom: -5px;
+      right: -5px;
+      color: white;
+      font-weight: 900;
+      background: color($colors,danger);
+      padding: 0;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      line-height: 14px;
+      text-align: center;
+    }      
+    }
+  }
 }

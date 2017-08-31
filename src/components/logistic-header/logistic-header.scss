@@ -10,7 +10,48 @@ logistic-header {
     }
   }
 
+  ion-toolbar,ion-navbar {
+
+      .title{
+        position: absolute;
+        top: 4px;
+        left: 45%;        
+      }
+
+      .calendar-label{
+        font-size: 80%;
+        margin-right: 10px;        
+      }
+
+      .toggle-label{
+        font-size: 90%;
+        margin-left: 10px;        
+        position: absolute;
+        top: 35%;
+        left: 50px;
+        color: color($colors, light);        
+      }
+
+      ion-slides button {
+         font-size: 1.2rem !important;
+         &.selected{
+            background-color: color($colors, light);
+            color: color($colors, primary);
+         }
+      }
+   }
+
+  ion-slides {
+      height: auto;
+   }
+
+   ion-slide {
+      align-items: flex-start !important;
+   }
+
   ion-slide button{
     margin-top:6px!important;
+    width: 8.5rem;
   }
+
 }

@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
-import { Content, IonicPage, ModalController,  } from 'ionic-angular';
-import { LoaderService, Order, OrderService, EnumFinancialStatus, User, UserService } from 'kng2-core';
+import { IonicPage, ModalController,  } from 'ionic-angular';
+import { Order} from 'kng2-core';
 import { ShopperItemComponent } from '../../components/shopper-item/shopper-item';
 import { LogisticHeaderComponent }  from '../../components/logistic-header/logistic-header';
 import { TrackerPage } from '../../pages/tracker/tracker';
@@ -22,9 +22,7 @@ export class ShopperPage {
   private orders: Order[] = [];
 
   constructor(
-    private loaderSrv: LoaderService,
     private modalCtrl: ModalController,
-    private orderSrv: OrderService,
   ) {
   }
 
@@ -33,7 +31,7 @@ export class ShopperPage {
     this.orders = orders;
   }
 
-  openTracker4One(order){
+  openTracker4One(order:Order){
     this.modalCtrl.create(TrackerPage, { results: order }).present();
 
   }
