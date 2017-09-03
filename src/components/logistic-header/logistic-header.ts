@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { LoaderService, Order, OrderService, Shop, User } from 'kng2-core';
-import { ModalController, NavController, NavParams } from 'ionic-angular';
+import { ModalController, NavController } from 'ionic-angular';
 import { TrackerPage } from '../../pages/tracker/tracker';
 import 'rxjs/Rx';
 
@@ -18,7 +18,6 @@ export class LogisticHeaderComponent {
 
   @Output() ordersToPage = new EventEmitter<Order[]>(); //execute data fetcher function of parent component
   closedShippings: boolean;
-  monthCommands: Map<number, Shop[]> = new Map();
   monthOrders: Map<number, Order[]> = new Map();
   currentShippingDate: Date;
   selectedDate: string = new Date().toISOString();
@@ -36,7 +35,6 @@ export class LogisticHeaderComponent {
     private modalCtrl: ModalController,
     private loaderSrv: LoaderService,
     public navCtrl: NavController, 
-    public navParams: NavParams,
     private orderSrv: OrderService,
     //private userSrv:UserService
   ) {
@@ -49,6 +47,7 @@ export class LogisticHeaderComponent {
     this.loaderSrv.ready().subscribe((loader) => {
       //Object.assign(this.user, loader[1]);
       this.isReady=true;
+      console.log("acrive page", this.navCtrl.getActive().name);
       this.findAllOrdersForShipping();
     })
   }
