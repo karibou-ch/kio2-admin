@@ -8,7 +8,7 @@ import { LoaderService, User, UserService } from 'kng2-core';
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
-@IonicPage()
+@IonicPage({name:'collect'})
 @Component({
   selector: 'page-collecte',
   templateUrl: 'collecte.html',

@@ -11,7 +11,7 @@ import { TrackerPage } from '../tracker/tracker';
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
-@IonicPage()
+@IonicPage({name:'shopper'})
 @Component({
   selector: 'page-shopper',
   templateUrl: 'shopper.html'

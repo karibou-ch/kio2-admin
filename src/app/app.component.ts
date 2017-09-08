@@ -3,12 +3,10 @@ import { Platform, NavController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ConfigService, LoaderService, User, UserService } from 'kng2-core';
-import { TabsPage } from '../pages/tabs/tabs';
-import { LoginPage } from '../pages/login/login';
-import { HomePage } from '../pages/home/home'
+//import { TabsPage } from '../pages/tabs/tabs';
 
     ConfigService.setDefaultConfig({
-      API_SERVER:'http://localhost:4000',
+      API_SERVER:'https://api.karibou.ch',
       disqus:'7e23b8cfd1ba48cdb5a3487efcbcdc56', /*karibou dev*/
       // disqus:'a0602093a94647cd948e95fadb9b9e38'; /*karibou prod*/
       mapBoxToken:'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
@@ -18,16 +16,15 @@ import { HomePage } from '../pages/home/home'
 @Component({
   templateUrl: 'app.html'
 })
-export class MyApp {
-  rootPage: any = LoginPage;
-  @ViewChild('myNav') nav: NavController;
+export class Kio2Aadmin {
+  rootPage: any = 'login';
+  @ViewChild('adminNavigation') nav: NavController;
   constructor(
     platform: Platform,
     statusBar: StatusBar,
     splashScreen: SplashScreen,
-    private configSrc: ConfigService,
-    private loaderSrv: LoaderService,
-    private userSrv: UserService
+    private $loader: LoaderService,
+    private $user: UserService
   ) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
@@ -41,14 +38,14 @@ export class MyApp {
 
   ngOnInit() {
 
-    this.loaderSrv.ready().subscribe(() => {
-      //this.rootPage = this.userSrv.currentUser.isAuthenticated() ? TabsPage : LoginPage;
+    this.$loader.ready().subscribe(() => {
+      //this.rootPage = this.$user.currentUser.isAuthenticated() ? TabsPage : LoginPage;
     });
   }
 
   logout() {
-    this.userSrv.logout().subscribe(() =>
-      this.rootPage = LoginPage
+    this.$user.logout().subscribe(() =>
+      this.rootPage = 'login'
     );
   }
 }
