@@ -23,11 +23,11 @@ import { Geolocation } from '@ionic-native/geolocation';
   ],
   imports: [
     BrowserModule,
+    Kng2CoreModule,
+    HttpModule,
     IonicModule.forRoot(Kio2Aadmin,{
       preloadModules: false
-    }),
-    Kng2CoreModule,
-    HttpModule
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

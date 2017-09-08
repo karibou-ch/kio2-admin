@@ -3,7 +3,6 @@ import { IonicPage, ModalController,  } from 'ionic-angular';
 import { Order} from 'kng2-core';
 import { ShopperItemComponent } from '../../components/shopper-item/shopper-item';
 import { LogisticHeaderComponent }  from '../../components/logistic-header/logistic-header';
-import { TrackerPage } from '../../pages/tracker/tracker';
 /**
  * Generated class for the ShopperPage page.
  *
@@ -32,7 +31,7 @@ export class ShopperPage {
   }
 
   openTracker4One(order:Order){
-    this.modalCtrl.create(TrackerPage, { results: order }).present();
+    this.modalCtrl.create('tracker', { results: order }).present();
 
   }
 

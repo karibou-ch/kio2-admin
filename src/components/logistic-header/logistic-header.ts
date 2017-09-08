@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { LoaderService, Order, OrderService, Shop, User } from 'kng2-core';
 import { ModalController, NavController } from 'ionic-angular';
-import { TrackerPage } from '../../pages/tracker/tracker';
 import 'rxjs/Rx';
 
 /**
@@ -89,6 +88,6 @@ export class LogisticHeaderComponent {
   }
   
   openTracker() {
-    this.modalCtrl.create(TrackerPage, { results: this.monthOrders.get(this.currentShippingDate.getTime()) }).present();
+    this.modalCtrl.create('tracker', { results: this.monthOrders.get(this.currentShippingDate.getTime()) }).present();
   }
 }
