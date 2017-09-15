@@ -6,9 +6,9 @@ import { Component } from '@angular/core';
 })
 export class TabsPage {
 
-  shopper = 'shopper';
-  collect = 'collect';
-  profil = 'profile';
+  shopper = 'ShopperPage';
+  collect = 'CollectPage';
+  profil = 'ProfilPage';
 
   constructor() {
   }

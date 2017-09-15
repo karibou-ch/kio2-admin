@@ -1,5 +1,9 @@
 logistic-header {
-
+  button.fab{
+    position: fixed;
+    bottom: 30px;
+    right: 20px;    
+  }
   ion-toolbar{
     padding-top:0!important;
     padding-bottom:0!important;
@@ -11,26 +15,6 @@ logistic-header {
   }
 
   ion-toolbar,ion-navbar {
-
-      .title{
-        position: absolute;
-        top: 4px;
-        left: 45%;        
-      }
-
-      .calendar-label{
-        font-size: 80%;
-        margin-right: 10px;        
-      }
-
-      .toggle-label{
-        font-size: 90%;
-        margin-left: 10px;        
-        position: absolute;
-        top: 35%;
-        left: 50px;
-        color: color($colors, light);        
-      }
 
       ion-slides button {
          font-size: 1.2rem !important;

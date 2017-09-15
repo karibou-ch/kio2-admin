@@ -4,7 +4,7 @@ import { LogisticHeaderComponent } from './logistic-header/logistic-header';
 
 @NgModule({
   declarations: [
-    LogisticHeaderComponent,
+    LogisticHeaderComponent
   ],
   imports: [
     IonicModule,

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AlertController, IonicPage, Loading, LoadingController, NavController, NavParams } from 'ionic-angular';
+import { ToastController, IonicPage, Loading, LoadingController, NavController, NavParams } from 'ionic-angular';
 import { LoaderService, User, UserService } from 'kng2-core';
 import { TabsPage } from '../tabs/tabs';
 
@@ -10,7 +10,7 @@ import { TabsPage } from '../tabs/tabs';
  * on Ionic pages and navigation.
  */
 @IonicPage({
-  name:'login'
+  name:'LoginPage'
 })
 @Component({
   selector: 'page-login',
@@ -25,7 +25,7 @@ export class LoginPage {
   loader:Loading;
 
   constructor(
-    private alertCtrl: AlertController,
+    private alertCtrl: ToastController,
     private loaderSrv: LoaderService,
     public loadingCtrl: LoadingController,
     public navCtrl: NavController, 
@@ -38,11 +38,7 @@ export class LoginPage {
   ngOnInit() {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
-      this.isReady=true;
-
-      if(this.userSrv.currentUser.isAuthenticated()) this.navCtrl.setRoot(TabsPage);
-        
-    
+      this.isReady=true;        
     });
     
   }
@@ -56,12 +52,12 @@ export class LoginPage {
       email: this.model.email,
       password: this.model.password,
       provider: "local"
-    }).subscribe(
-    (allowed) => {
-        if (this.userSrv.currentUser.isAuthenticated()) this.navCtrl.setRoot(TabsPage);
-        else this.showError('Login invalide');
+    }).subscribe((user:User) => {
+      if(user.id!==''){
+        return this.navCtrl.setRoot(TabsPage);
       }
-    );  
+      this.showError("Erreur d'authentification :-((")
+    });  
   }
 
 
@@ -74,15 +70,12 @@ export class LoginPage {
     this.loader.present();
   }
 
-  showError(text) {
-    this.loader.dismiss();
- 
-    let alert = this.alertCtrl.create({
-      title: 'Error de connexion',
-      subTitle: text,
-      buttons: ['OK']
-    });
-    alert.present(prompt);
+  showError(msg) {
+    this.loader.dismiss(); 
+    this.alertCtrl.create({
+      message: msg,
+      duration: 3000
+    }).present();
   }
 
 }

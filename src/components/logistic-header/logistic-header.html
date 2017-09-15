@@ -1,37 +1,43 @@
 <ion-navbar color="primary">
-  <!-- left toggle -->
-  <ion-toggle color="light" [(ngModel)]="closedShippings" (ionChange)="toggleFilter()"></ion-toggle>
-  <span class="toggle-label">{{closedShippings?'paid':'authorized'}}</span>
+  <!-- left  -->
+  <ion-buttons start>
+  <button color="light" hidden
+          [disabled]="!isReady" 
+          icon-only
+          ion-button (click)="picker.open()" clear="true" >
+          <ion-icon name="calendar"></ion-icon>
+  </button>      
+  <button color="light" 
+          [disabled]="!isReady" 
+          icon-only
+          ion-button (click)="openCollect()" clear="true" >
+          <ion-icon name="paper-plane"></ion-icon>
+  </button>      
+  </ion-buttons>
 
-  <div class="title">
-    <button [disabled]="monthOrders.get(currentShippingDate?.getTime()) === undefined" color="light" ion-button icon-only clear="true"
-      (click)="openTracker()">
-          <ion-icon name="pin" id="pin-icon"></ion-icon>
-</button>
-  </div>
+  <!-- title  -->
+  <ion-title (click)="picker.open()">{{ currentShippingDate | date:"d MMM y" }}</ion-title>
 
-  <!-- right calendar -->
+  <!-- right -->
   <ion-buttons end>
-    <button color="light" [disabled]="!isReady" ion-button (click)="picker.open()" clear="true" end>
-        <ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="selectedDate" 
-          (ngModelChange)="findAllOrdersForShipping()" cancelText="Annuler" doneText="Fait" 
-          monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
-        </ion-datetime>
-        <span class="calendar-label">{{ selectedDate | date:"MMMM y" }}</span>
-        <ion-icon name="calendar"></ion-icon>
-      </button>
+    <button ion-button icon-only (click)="openSettings($event)">
+      <ion-icon name="more"></ion-icon>
+    </button>
   </ion-buttons>
 
 </ion-navbar>
 
-<!-- SUB HEADER -->
-<ion-toolbar color="primary">
-  <ion-slides pager paginationType="none" centeredSlides="false" slidesPerView="3">
-    <ion-slide *ngFor="let shipping of availableDates;let i = index">
-      <button ion-button margin-top="1rem" [class.selected]="shipping.getTime()===currentShippingDate.getTime()" clear small (click)="displayOrders(shipping)"
-        color="light">
-          {{ shipping | date:'EEEE d' }}</button>
-    </ion-slide>
-  </ion-slides>
 
-</ion-toolbar>
+<!-- MAP BUTTON -->
+<button ion-fab  class="fab"
+        [disabled]="monthOrders.get(currentShippingDate?.getTime()) === undefined"
+        (click)="openMap()">          
+    <ion-icon name="pin" id="pin-icon"></ion-icon>
+</button>
+
+<!-- DATE PICKER BUTTON -->
+<ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="pickerShippingDate" 
+  (ngModelChange)="updateDateFromPicker()" cancelText="Annuler" doneText="Fait" 
+  monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
+</ion-datetime>        
+

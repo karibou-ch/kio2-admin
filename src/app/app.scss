@@ -14,3 +14,19 @@
 // To declare rules for a specific mode, create a child rule
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
+
+
+[class^="kico-"],
+[class*=" kico-"] {
+  display: inline-block;
+  width: 60px;
+  height: 54px;
+  margin-right: 10px;
+  text-indent: -9999em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.kico-k {
+  background-image: url('../assets/img/k.svg');
+}

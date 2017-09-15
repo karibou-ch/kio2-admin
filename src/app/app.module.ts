@@ -14,7 +14,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { TrackerProvider } from '../providers/tracker/tracker.provider';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
-import { Geolocation } from '@ionic-native/geolocation';
+import { Geolocation,  } from '@ionic-native/geolocation';
+import { ConfigService } from 'kng2-core';
 
 @NgModule({
   declarations: [
@@ -44,4 +45,14 @@ import { Geolocation } from '@ionic-native/geolocation';
     TrackerProvider
   ]
 })
-export class AppModule {}
+export class AppModule {
+  constructor(){
+    ConfigService.setDefaultConfig({
+      API_SERVER:'https://api.karibou.ch',
+      disqus:'7e23b8cfd1ba48cdb5a3487efcbcdc56', /*karibou dev*/
+      // disqus:'a0602093a94647cd948e95fadb9b9e38'; /*karibou prod*/
+      mapBoxToken:'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
+    });
+    
+  }
+}

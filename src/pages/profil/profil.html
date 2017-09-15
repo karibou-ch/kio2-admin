@@ -7,12 +7,9 @@
 <ion-header>
 
   <ion-navbar color="primary">
-    <ion-title >Profil</ion-title>
+    <ion-title >{{user?.displayName}}</ion-title>
 
     <ion-buttons end>
-      <button ion-button  [disabled]="!isReady" (click)="doDisplayAccount()">
-        {{user?.displayName}}    
-      </button>
       <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
         <ion-icon name="log-out"></ion-icon>
       </button>
@@ -24,7 +21,7 @@
 
 <ion-content padding>
   <ion-list>
-    
+
     <ion-item>
       <h2>Nom</h2>
       <p text-capitalize>{{ user?.name.familyName }}</p>
@@ -37,13 +34,26 @@
       <h2>Email</h2>
       <p>{{ user?.email.address }}</p>
     </ion-item>
-    <ion-item>
+    <ion-item *ngFor="let phone of user?.phoneNumbers">
       <h2>Telephone</h2>
-      <p *ngFor="let phone of user?.phoneNumbers">{{ phone }}</p>
+      <p>{{ phone.number }}</p>
     </ion-item>
+    <ion-list-header>
+      Logistique
+    </ion-list-header>
     <ion-item *ngIf="user.logistic?.PostalCode?.length > 0">
       <h2>Code Postaux</h2>
       <p *ngFor="let postal of user?.logistic?.PostalCode">{{ postal }}</p>
+    </ion-item>
+    <ion-item>
+      <button ion-button block round large outline icon-left color="danger" (click)="logout()">
+        <ion-icon name="user"></ion-icon> Logout
+      </button>
+    </ion-item>
+    <ion-item>
+      <button ion-button block round large outline icon-left color="info" (click)="devMode()">
+        <ion-icon name="settings"></ion-icon> Dev Mode
+      </button>
     </ion-item>
   </ion-list>
 </ion-content>

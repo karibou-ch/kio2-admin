@@ -1,7 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, ElementRef, Output, ViewChild } from '@angular/core';
 import { LoaderService, Order, OrderService, Shop, User } from 'kng2-core';
-import { ModalController, NavController } from 'ionic-angular';
-import 'rxjs/Rx';
+import { Events, NavController, NavParams, PopoverController } from 'ionic-angular';
 
 /**
  * Generated class for the LogisticHeaderComponent component.
@@ -16,10 +15,12 @@ import 'rxjs/Rx';
 export class LogisticHeaderComponent {
 
   @Output() ordersToPage = new EventEmitter<Order[]>(); //execute data fetcher function of parent component
+  @Output() ordersToTrack = new EventEmitter<Order[]>(); //execute data fetcher function of parent component
+  
   closedShippings: boolean;
   monthOrders: Map<number, Order[]> = new Map();
   currentShippingDate: Date;
-  selectedDate: string = new Date().toISOString();
+  pickerShippingDate:string;
   availableDates: Date[] = [];
   private isReady;
  
@@ -31,27 +32,35 @@ export class LogisticHeaderComponent {
   
 
   constructor(
-    private modalCtrl: ModalController,
-    private loaderSrv: LoaderService,
+    public events: Events,
+    private $loader: LoaderService,
     public navCtrl: NavController, 
     private orderSrv: OrderService,
+    private popoverCtrl:PopoverController
     //private userSrv:UserService
   ) {
-    this.currentShippingDate = Order.currentShippingDay();
-    this.currentShippingDate.setHours(0, 0, 0);
-    this.filtersOrder = this.FLOATING;
+    // most init values depends on config and the loader
   }
 
   ngOnInit() {
-    this.loaderSrv.ready().subscribe((loader) => {
-      //Object.assign(this.user, loader[1]);
+    this.$loader.ready().subscribe((loader) => {
+      this.currentShippingDate = Order.currentShippingDay();
+      this.pickerShippingDate = this.currentShippingDate.toISOString();
+      this.currentShippingDate.setHours(0, 0, 0,0);
+      this.filtersOrder = this.FLOATING;
       this.isReady=true;
-      console.log("acrive page", this.navCtrl.getActive().name);
       this.findAllOrdersForShipping();
     })
+
+    this.events.subscribe('refresh',()=>{
+      this.findAllOrdersForShipping();
+    })
+
   }
 
-  toggleFilter() {
+  //
+  // on toggle orders filter
+  toggleShippingFilter() {
     if (this.filtersOrder.payment) {
       this.filtersOrder = this.LOCKED;
     } else {
@@ -60,34 +69,73 @@ export class LogisticHeaderComponent {
     this.findAllOrdersForShipping();
   }
 
+  //
+  // on selected date
+  updateDateFromPicker(){
+    let selected=new Date(this.pickerShippingDate);
+    this.currentShippingDate=new Date(this.pickerShippingDate);
+    this.currentShippingDate.setHours(0, 0, 0,0);
+    this.findAllOrdersForShipping();
+  }
+
+  //
+  // this header component provide data for all pages
   findAllOrdersForShipping() {
-    let params = { month: (new Date(this.selectedDate).getMonth()) + 1, year: new Date(this.selectedDate).getFullYear() };
+    let params = { month: (new Date(this.currentShippingDate).getMonth()) + 1, year: new Date(this.currentShippingDate).getFullYear() };
     Object.assign(params, this.filtersOrder);
     this.monthOrders = new Map();
     this.availableDates = [];
     this.orderSrv.findAllOrders(params).subscribe(orders => {
-      orders.forEach((order: Order) => {
+      orders.forEach((order: Order) => {        
         order.shipping.when = new Date(order.shipping.when);
-        order.shipping.when.setHours(0, 0, 0)
+        order.shipping.when.setHours(0, 0, 0,0)
         // Object.keys(this.monthOrders)
-        if (!this.monthOrders.has(order.shipping.when.getTime())) {
+        if (!this.monthOrders.get(order.shipping.when.getTime())) {
           this.monthOrders.set(order.shipping.when.getTime(), []);
           this.availableDates.push(order.shipping.when);
         }
         this.monthOrders.get(order.shipping.when.getTime()).push(order);
       });
       //set currentshipping with first key
-      this.currentShippingDate = new Date(this.monthOrders.keys().next().value);
-      this.displayOrders(this.currentShippingDate);
+      let shipping=(this.monthOrders.get(this.currentShippingDate.getTime()))?
+            this.currentShippingDate:this.monthOrders.keys().next().value;
+      this.displayOrders(shipping);
     })
   }
 
-  displayOrders(shipping:Date){
-    this.currentShippingDate = shipping;
+
+  displayOrders(shipping?){
+    if(!shipping){
+      return this.ordersToPage.emit([]);
+    }
+    this.currentShippingDate = new Date(shipping);
+    this.currentShippingDate.setHours(0, 0, 0, 0);
     this.ordersToPage.emit(this.monthOrders.get(this.currentShippingDate.getTime()));
   }
   
-  openTracker() {
-    this.modalCtrl.create('tracker', { results: this.monthOrders.get(this.currentShippingDate.getTime()) }).present();
+
+  openCollect(){
+    this.navCtrl.push('CollectPage');
   }
+
+  //
+  // fire event to display Map
+  openMap() {
+    let orders=this.monthOrders.get(this.currentShippingDate.getTime());
+    this.ordersToTrack.emit(orders);
+  }
+
+  //
+  // http://ionicframework.com/docs/components/#popovers
+  openSettings(event) {
+    this.navCtrl.push('LogisticSettingsPage',{
+      shipping:this.availableDates,
+      current:this.currentShippingDate,
+      toggle:(this.filtersOrder===this.FLOATING),
+      component:this
+    })
+    // let popover = this.popoverCtrl.create(LogisticSettingsComponent);
+    // popover.present();
+  }  
 }
+

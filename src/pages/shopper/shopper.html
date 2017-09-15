@@ -7,54 +7,82 @@
 
 <ion-header no-border>
   <logistic-header
-    (ordersToPage)="displayOrders($event)">
+    (ordersToPage)="displayOrders($event)"
+    (ordersToTrack)="trackOrders($event)">
     </logistic-header>
 </ion-header>
 
 <ion-content>
 
-  <!--Actual list-->
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <h1 [hidden]="orders?.length > 0">Pas de commandes {{openShippings?'ouvertes':'fermées'}} pour ce mois-ci</h1>
+  <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes {{openShippings?'livrées':'en préparation'}} pour ce mois-ci</h1>
 
   <ion-list>
-    
+
+    <!-- FITER BASED ON PLANNING -->
+    <ion-item [hidden]="!planning.length" class="header">
+      <p>
+      <button ion-button 
+              round color="light"  [class.selected]="currentPlanning===plan"
+              outline small (click)="togglePlanning(plan)"
+              *ngFor="let plan of planning  "><b>{{plan}}</b>
+      </button>
+      </p>
+    </ion-item>
+
+    <!-- DISPLAY ORDERS -->
     <ion-item-sliding *ngFor="let order of orders?.sort(sortOrdersByCP)  ">
 
-      <ion-item>
+      <ion-item (click)="toggleOrder(order)" 
+                [class.selected]="isOrderSelected(order)"
+                [hidden]="currentPlanning&&currentPlanning!==order.shipping.priority">
         <ion-note item-end>
           {{order.shipping.postalCode}}
-          <!--<ion-label>Cabas:~</ion-label>
-          <ion-select [(ngModel)]="nbCabas">
-            <ion-option value="1">1</ion-option>
-            <ion-option value="2">2</ion-option>
-            <ion-option value="3">3</ion-option>
-            <ion-option value="4">4</ion-option>
-          </ion-select>-->
+          <span class="bag" [hidden]="!order.shipping.bags">{{ order.shipping.bags }}</span>
+          <span class="price" [hidden]="order.shipping.bags">{{order.getSubTotal()|number:'1.0-0'}} fr</span>
           
         </ion-note>        
         <ion-avatar item-start>
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
-          <span class="rank">{{ order.rank }}</span>
-          <span class="bag" [hidden]="!order.shipping.bags">{{ order.shipping.bags }}</span>
+          <span class="rank">{{order.rank}}</span>
+          <span class="priority" [hidden]="!order.shipping.priority">{{order.shipping.priority}}</span>
         </ion-avatar>
         <h3 text-capitalize>{{ order.shipping.name }}</h3>
-        <h2>{{ order.shipping.streetAdress }}, étage: {{order.shipping.floor}} </h2>
+        <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
         <p>{{ order.shipping.note }}</p>
       </ion-item>
       <ion-item-options side="left">
-        <button  ion-button color="secondary">
+        <div>
+        <ion-label class="shopper"  color="secondary">
           <ion-icon name="bicycle"></ion-icon>
           Réserver
-        </button>
+        </ion-label>
+        <ion-select [(ngModel)]="order.shipping.priority" 
+                      (ngModelChange)="selectShipping(order,$event)"
+                      interface="action-sheet">
+          <ion-option value="1">1 tournée</ion-option>
+          <ion-option value="2">2 tournée</ion-option>
+          <ion-option value="3">3 tournée</ion-option>
+        </ion-select>        
+        </div>
       </ion-item-options>
 
       <ion-item-options side="right">
-        <button (click)="openTracker4One([order])" ion-button color="light">
-          <ion-icon name="pin"></ion-icon>
-          Carte
-        </button>
-        <a ion-button color="secondary" href='tel:{{order.customer.phoneNumbers[0]}}'>
+        <div [hidden]="!user.isAdmin()">
+          <ion-label class="bags">Nb sacs</ion-label>
+          <ion-select [(ngModel)]="order.shipping.bags"                       
+                       (ngModelChange)="updateBag(order,$event)"
+                       interface="action-sheet">
+            <ion-option value="1">1 sac</ion-option>
+            <ion-option value="2">2 sac</ion-option>
+            <ion-option value="3">3 sac</ion-option>
+            <ion-option value="4">4 sac</ion-option>
+          </ion-select>
+        </div>
+        <a ion-button color="danger" href='tel:{{order.customer.phoneNumbers[0]?.number}}'>
           <ion-icon name="call"></ion-icon>
           Appeler
         </a>

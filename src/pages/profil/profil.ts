@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { App, IonicPage, NavController, NavParams } from 'ionic-angular';
-import { LoaderService, User, UserService } from 'kng2-core';
+import { ConfigService,LoaderService, User, UserService } from 'kng2-core';
 
 /**
  * Generated class for the ProfilPage page.
@@ -8,7 +8,7 @@ import { LoaderService, User, UserService } from 'kng2-core';
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
-@IonicPage({name:'profile'})
+@IonicPage({name:'ProfilPage'})
 @Component({
   selector: 'page-profil',
   templateUrl: 'profil.html',
@@ -31,16 +31,23 @@ export class ProfilPage {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
       this.isReady = true;
-      console.log(this.user);
     })
+  }
+
+  devMode(){
+    ConfigService.setDefaultConfig({
+      API_SERVER:'https://api.karibou.evaletolab.ch',
+    });
+    
   }
 
   logout() {
     this.userSrv.logout().subscribe(() =>
       //this.navCtrl.setRoot(LoginPage)
-      this._app.getRootNav().setRoot('login')
+      this._app.getRootNav().setRoot('LoginPage')
     );
   }
+
 
 
 }
