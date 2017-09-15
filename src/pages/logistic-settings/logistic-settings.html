@@ -1,0 +1,49 @@
+<!--
+  Generated template for the LogisticSettingsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>Options</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-list-header>
+      <ion-icon item-start name="cog"></ion-icon>
+      Filtres
+    </ion-list-header>
+    <ion-item>
+      <ion-icon name="plane" item-start color="danger"></ion-icon>      
+      <ion-label color="dark"> Livraisons en préparation</ion-label>
+      <ion-toggle  [checked]="toggle" [(ngModel)]="toggle" (ngModelChange)="toggleShippingFilter()"></ion-toggle>
+    </ion-item>
+    <ion-list-header>
+      <ion-icon item-start name="paper-plane"></ion-icon>
+      Livraisons du mois
+    </ion-list-header>
+    <ion-item *ngFor="let shipping of availableDates;let i = index" 
+            [class.selected]="shipping.getTime()===currentShippingDate.getTime()"  
+            (click)="displayOrders(shipping)">
+      <ion-icon name="ionic" item-start color="primary"></ion-icon>
+      <ion-label>{{ shipping | date:'MMM EEEE d' }}</ion-label>
+      <ion-note  item-end>Ouvir</ion-note>
+    </ion-item>    
+
+    <ion-list-header>
+      <ion-icon item-start name="settings"></ion-icon>
+      Options
+    </ion-list-header>
+    <ion-item>
+      <ion-icon name="ionic" item-start color="primary"></ion-icon>
+      <ion-label>Votre profil</ion-label>
+      <button ion-button outline item-end (click)="openProfile()">Modifier</button>
+    </ion-item>
+  </ion-list>  
+</ion-content>

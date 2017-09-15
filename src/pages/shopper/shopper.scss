@@ -1,5 +1,11 @@
 page-shopper {
    
+   h1.info{
+    color: gray;
+    padding: 50px;
+    text-align: center;     
+   }
+
    h2 {
       color: color($colors, info);
       font-weight: bold;
@@ -10,7 +16,28 @@ page-shopper {
    }
 
 
+
   ion-item {
+    &.header{
+      min-height: 1.9rem;
+      background: color($colors, primary);
+      ion-label{
+        margin: 0;
+      }
+      button{
+        height: 1.7rem;
+        border: none;
+        &.selected{
+          background:color($colors,info);
+          color:color($colors,dark);
+        }
+        background:#fff;
+        color: color($colors, primary);
+      }
+    }
+    &.selected{
+      background-color: color($colors, light);
+    }
     h2{
       font-size:1.4rem!important;
     }
@@ -18,37 +45,71 @@ page-shopper {
       font-size:1.2rem!important;
       white-space:initial;
     }
-    ion-avatar {
-    position: relative;
-    span.rank{
-      position: absolute;
-      top: 00%;
-      left: 0;
-      color: white;
-      font-weight: 900;
-      background: color($colors,secondary);
-      padding: 0;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      line-height: 40px;
-      text-align: center;
-    }
-    span.bag{
+      
+    span.bag, 
+    span.price, 
+    span.priority{
       position: absolute;
       font-size: 1.0rem;
-      bottom: -5px;
-      right: -5px;
+      top: 10px;
+      right: 15px;
       color: white;
       font-weight: 900;
-      background: color($colors,danger);
+      background: color($colors,info);
       padding: 0;
       width: 14px;
       height: 14px;
-      border-radius: 50%;
+      border-radius: 7px;
       line-height: 14px;
       text-align: center;
-    }      
+    } 
+
+    span.price{
+      background: transparent;
+      color: #ddd;
+      width: 40px;
+      right: 10px;
+    }
+
+    span.priority{
+      left: -5px;
+      top:-5px;
+      width: 14px;
+      border-radius: 50%;
+      background: color($colors,danger);
+    } 
+
+    ion-avatar {
+      position: relative;
+
+      span.rank{
+        position: absolute;
+        top: 00%;
+        left: 0;
+        color: white;
+        font-weight: 900;
+        background: color($colors,primary);
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        line-height: 40px;
+        text-align: center;
+      }
     }
   }
+  ion-label.shopper,
+  ion-label.bags{
+    background: color($colors,primary);
+    color: white;
+    font-weight: 700;
+    font-size: 120%; 
+    height: 97%;
+    margin: 1px auto;
+    text-align: center;
+    padding:20px;
+    padding-top: 20px;
+  }     
+
+  
 }

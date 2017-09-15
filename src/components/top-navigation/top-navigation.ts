@@ -7,10 +7,10 @@ import { ProfilPage } from '../../pages/profil/profil';
 import { Subscription } from 'rxjs';
 
 
-@Component({
-  selector: 'top-navigation',
-  templateUrl: 'top-navigation.html'
-})
+// @Component({
+//   selector: 'top-navigation',
+//   templateUrl: 'top-navigation.html'
+// })
 export class TopNavigationComponent {
 
 

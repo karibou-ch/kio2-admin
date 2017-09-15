@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ViewController } from 'ionic-angular';
+import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ToastController, ViewController } from 'ionic-angular';
 import { ConfigService, LoaderService, Order } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geoposition } from '@ionic-native/geolocation';
@@ -13,7 +13,7 @@ declare var google;
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
-@IonicPage()
+@IonicPage({name:'tracker'})
 @Component({
   selector: 'page-tracker',
   templateUrl: 'tracker.html',
@@ -25,9 +25,9 @@ export class TrackerPage {
   private markerBounds;
   private config;
   private ready$;
-  private orders: Order[] = this.navParams.get('results');
-  public lat: number;
-  public lng: number;
+  private orders: Order[];
+  public lat: number=46.200472;
+  public lng: number=6.1316835;
   private isReady;
   private map;
   private userMarker;
@@ -41,13 +41,15 @@ export class TrackerPage {
     public actionSheetCtrl: ActionSheetController,
     private configSrv: ConfigService,
     private loadingCtrl: LoadingController,
-    private loaderSrv: LoaderService,
+    private $loader: LoaderService,
     public navCtrl: NavController,
     public navParams: NavParams,
-    public trackerSrv: TrackerProvider,
+    public $tracker: TrackerProvider,
+    private toast:ToastController,
     private viewCtrl: ViewController,
     public zone: NgZone
   ) {
+    this.orders = this.navParams.get('results');
   }
 
   // ionViewDidLoad() {
@@ -59,14 +61,15 @@ export class TrackerPage {
   }
 
   ngOnInit() {
-    this.loaderSrv.ready().subscribe((loader) => {
+    this.$loader.ready().subscribe((loader) => {
       this.config = loader[0];
-      //Object.assign(this.config, new Config);
+      if (!this.map) this.createMap();
+      this.isReady = true;
     })
 
     // ============ BACKGROUND geolocalisation (can be replaced by the Hypertrack one) ====================
 
-    // this.trackerSrv.backgroundLocation$.subscribe((location) => {
+    // this.$tracker.backgroundLocation$.subscribe((location) => {
 
     //   console.log('BackgroundGeolocation:  ' + location.latitude + ',' + location.longitude);
 
@@ -84,50 +87,60 @@ export class TrackerPage {
     // });
 
     // Turn ON the background-geolocation system.
-    // this.trackerSrv.backgroundGeolocation.start();
+    // this.$tracker.backgroundGeolocation.start();
 
     // ====================== FOREGROUND geolocalisation =====================================
-    this.showLoading();
 
+    this.showLoading("loading position ...");
 
-    this.geoSub = this.trackerSrv.geoLocation$.subscribe((position: Geoposition) => {
+    this.$tracker.currentPosition$.then((position) => {
+        this.updateUserMarker(position.coords);
+    }).catch((error) => {
+      this.showLoading("Error :"+error.message);
+    });
 
+    this.geoSub = this.$tracker.geoLocation$.subscribe((position: Geoposition) => {
 
       // Run update inside of Angular's zone to trigger change detection
       this.zone.run(() => {
-        this.lat = position.coords.latitude;
-        this.lng = position.coords.longitude;
-        if (!this.map) this.createMap();
-        this.isReady = true;
-        if (this.loader) this.loader.dismiss();
+        this.updateUserMarker(position.coords);
       });
 
     });
 
   }
 
+  updateUserMarker(coords){
+    this.lat = coords.latitude;
+    this.lng = coords.longitude;
+    if(!this.userMarker){
+      return this.userMarker = new google.maps.Marker({
+        position: { lat: coords.latitude, lng: coords.longitude },
+        map: this.map
+      });
+    }
+    this.userMarker.setPosition( new google.maps.LatLng( coords.latitude, coords.longitude ) );
+    //this.map.panTo( new google.maps.LatLng( coords.latitude, coords.longitude ) );
+
+  }
+
   createMap() {
+    var bikeLayer = new google.maps.BicyclingLayer();
     this.map = new google.maps.Map(document.getElementById('map'), {
       disableDefaultUI: true,
       mapTypeControl: true
     });
-    this.userMarker = new google.maps.Marker({
-      position: { lat: this.lat, lng: this.lng },
-      map: this.map,
-    });
 
+    bikeLayer.setMap(this.map);
     this.setMapMarkers(this.orders);
-
-    
 
   }
 
-  showLoading() {
-    this.loader = this.loadingCtrl.create({
-      spinner: "crescent",
-      content: "Chargement de la carte"
-    });
-    this.loader.present();
+  showLoading(msg:string) {
+    this.toast.create({
+      message: msg,
+      duration: 3000
+    }).present()
   }
 
   onDismiss() {
@@ -150,6 +163,9 @@ export class TrackerPage {
   setMapMarkers(orders: Order[]) {
     this.deleteMarkers();
     orders.forEach((order, i) => {
+      if(!order.shipping.geo){
+        return;
+      }
       let pos = new google.maps.LatLng(order.shipping.geo.lat, order.shipping.geo.lng);
       let marker = new google.maps.Marker({
         position: pos,
@@ -159,7 +175,7 @@ export class TrackerPage {
       this.markers.push(marker);
       //set popup window on marker
       var infowindow = new google.maps.InfoWindow({
-        content: `<b><a href="tel:${order.customer.phoneNumbers[0]}">${order.shipping.name}</a></b><br>
+        content: `<b><a href="tel:${order.customer.phoneNumbers[0].number}">${order.shipping.name}</a></b><br>
                   ${order.shipping.streetAdress}<br/>
                   ${order.shipping.note}
                     `

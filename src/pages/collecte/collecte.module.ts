@@ -1,16 +1,19 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { CollectePage } from './collecte';
+import { CollectPage } from './collecte';
+
+import { ComponentsModule } from '../../components/components.module';
 
 @NgModule({
   declarations: [
-    CollectePage,
+    CollectPage,
   ],
   imports: [
-    IonicPageModule.forChild(CollectePage),
+    ComponentsModule,
+    IonicPageModule.forChild(CollectPage),
   ],
   exports: [
-    CollectePage
+    CollectPage
   ]
 })
-export class CollectePageModule {}
+export class CollectPageModule {}

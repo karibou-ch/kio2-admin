@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { IonicModule } from 'ionic-angular';
-import { LogisticHeaderComponent } from './logistic-header';
+import { LogisticHeaderComponent } from './logistic-header/logistic-header';
 
 @NgModule({
   declarations: [
-    LogisticHeaderComponent,
+    LogisticHeaderComponent
   ],
   imports: [
     IonicModule,
@@ -13,4 +13,4 @@ import { LogisticHeaderComponent } from './logistic-header';
     LogisticHeaderComponent
   ]
 })
-export class LogisticHeaderComponentModule {}
+export class ComponentsModule {}

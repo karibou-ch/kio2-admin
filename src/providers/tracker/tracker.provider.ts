@@ -16,6 +16,7 @@ export class TrackerProvider {
   public watch: any;
   public backgroundLocation$;
   public geoLocation$;
+  public currentPosition$;
 
   constructor(
     public backgroundGeolocation: BackgroundGeolocation,
@@ -44,10 +45,12 @@ export class TrackerProvider {
 
     // Foreground Tracking
     let options = {
-      frequency: 3000
+      enableHighAccuracy:true,
+      frequency: 1000
     };
 
     this.geoLocation$ = this.geolocation.watchPosition(options).filter((p) => p.coords !== undefined);
+    this.currentPosition$ = this.geolocation.getCurrentPosition(options);
   }
 
 

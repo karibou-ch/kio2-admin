@@ -1,59 +1,39 @@
 import { LOCALE_ID, NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { MyApp } from './app.component';
+import { Kio2Aadmin } from './app.component';
 
 import { Kng2CoreModule } from 'kng2-core';
 import { HttpModule } from '@angular/http';
-
-import { ShopperPage }  from '../pages/shopper/shopper';
-import { CollectePage }  from '../pages/collecte/collecte';
-import { ProfilPage }  from '../pages/profil/profil';
-import { LoginPage } from '../pages/login/login';
-import { TrackerPage }  from '../pages/tracker/tracker';
 
 import { TabsPage } from '../pages/tabs/tabs';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
-import { ShopperItemComponent } from '../components/shopper-item/shopper-item';
-import { TopNavigationComponent } from '../components/top-navigation/top-navigation';
 
 import { TrackerProvider } from '../providers/tracker/tracker.provider';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
-import { Geolocation } from '@ionic-native/geolocation';
-import { LogisticHeaderComponent } from '../components/logistic-header/logistic-header';
+import { Geolocation,  } from '@ionic-native/geolocation';
+import { ConfigService } from 'kng2-core';
 
 @NgModule({
   declarations: [
-    MyApp,
-    ShopperPage,
-    CollectePage,
-    ProfilPage,
-    LoginPage,
-    TabsPage,
-    TrackerPage,
-    ShopperItemComponent,
-    TopNavigationComponent,
-    LogisticHeaderComponent
+    Kio2Aadmin,
+    TabsPage
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp),
     Kng2CoreModule,
-    HttpModule
+    HttpModule,
+    IonicModule.forRoot(Kio2Aadmin,{
+      preloadModules: false
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp,
-    ShopperPage,
-    CollectePage,
-    ProfilPage,
-    LoginPage,
-    TabsPage,
-    TrackerPage
-
+    Kio2Aadmin,
+    TabsPage
   ],
   providers: [
     { provide: LOCALE_ID, useValue: "fr-FR" },  //set locale to french (dates, etc. )
@@ -65,4 +45,14 @@ import { LogisticHeaderComponent } from '../components/logistic-header/logistic-
     TrackerProvider
   ]
 })
-export class AppModule {}
+export class AppModule {
+  constructor(){
+    ConfigService.setDefaultConfig({
+      API_SERVER:'https://api.karibou.ch',
+      disqus:'7e23b8cfd1ba48cdb5a3487efcbcdc56', /*karibou dev*/
+      // disqus:'a0602093a94647cd948e95fadb9b9e38'; /*karibou prod*/
+      mapBoxToken:'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA'
+    });
+    
+  }
+}
