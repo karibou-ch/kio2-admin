@@ -1,0 +1,174 @@
+page-order-items {
+  .toolbar-title{
+    font-size:1.4rem;
+  }
+   h1.info{
+    color: gray;
+    padding: 50px;
+    text-align: center;     
+   }
+  
+  ion-content{
+    background: color($colors,light)!important;    
+  }
+  ion-list{
+    background: color($colors,light)!important;
+  }
+  ion-list-header{
+    left: 0px;
+    margin: 0px!important;
+    width: 100%;
+    background: white!important;
+    margin: 8px 0!important;
+    margin-bottom: 15px!important;
+    padding-bottom: 20px;
+
+    ion-icon.rank{
+      margin-left: -5px!important;
+      font-family: sans-serif;
+      background: color($colors,primary);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      padding-top: 6px;
+      color: white; 
+      font-size: 1.6rem;
+      font-weight: 900;      
+    }
+
+    h2{
+      text-transform: capitalize;
+    }
+    .item-inner{
+      margin-left:8px!important; 
+      p{
+        font-size: 1.2rem;        
+      }
+    }
+  }
+
+  ion-item.item-block{
+    div[item-content]{
+      height:100%;
+    }
+    ion-label{
+      display: none;
+    }
+    padding: 1px;
+    min-height: 6.6rem;
+    display: flex;
+    width: 100%;
+    position: relative;
+    .title{
+      font-size: 1.6rem;
+      position: absolute;
+      width: 100%;
+      top:4px;
+      left: 12px;
+      color: color($colors,primary);
+    }
+    .quantity{
+      font-size: 1.4rem;
+      position: absolute;
+      top:34px;
+      color: color($colors,info);      
+      left: 12px;
+      width: 80px;
+      text-align: left;
+    }
+    .price{
+      &.fulfilled{
+        color:color($colors,info)!important;
+      }
+      position: absolute;
+      top:34px;
+      right: 80px;
+      width: 90px;
+      .input-price{
+        border:0px;
+        border: 1px solid #eee;
+        border-radius: 1px;
+        max-width: 70px;
+        padding: 4px 0;
+        float: right;
+        font-weight:500;
+        margin-top: -7px;
+        padding-right: 13px;
+        text-align: right;        
+        margin-right: 5px;
+      }
+      span.suffix{
+        color:#ccc;
+        margin-left:-10px;
+        float: right;
+        transform:translate(-69%, -2px);
+      }
+      
+    }
+
+    .actions{
+      position: absolute;
+      right: 0;
+      top: 19px;      
+    }
+
+    // 
+    // 
+    // https://css-tricks.com/snippets/css/complete-guide-grid/
+    // grid-template-columns: 1fr 1fr 80px 80px;
+    // grid-template-rows: 1fr 1fr 1fr;
+    // grid-template-areas: 
+    //     "title title title diff"
+    //     "quantity price validate avoid"
+    //     "quantity price validate avoid";    
+
+    // .item-inner{
+    //   padding-right: 0!important;
+    // }
+    // ion-label{
+    //   margin-right: 0!important;
+    //   div.price{
+    //     transform:translateY(15px);
+    //     .input-price{
+    //       border:0px;
+    //       border-bottom: 1px solid #ddd;
+    //       border-radius: 0px;
+    //       max-width: 75px;
+    //       padding: 4px;
+    //       float: right;
+    //       font-weight:700;
+    //       margin-top: -10px;
+    //       padding-right: 18px;
+    //       text-align: right;        
+    //       margin-right: 5px;
+    //     }
+    //     span.suffix{
+    //       color:#ccc;
+    //       margin-left:-10px;
+    //       float: right;
+    //       transform:translate(-69%, -6px);
+    //     }
+    //   }
+    // }
+
+    button.item-button{
+      border-radius: 2px;
+      margin-left:0;
+      width: 27px;      
+      height: 27px!important;
+      font-size: 1.6rem!important;  
+      box-shadow: initial;    
+    }
+    button.item-button.button-cancel {
+        border-color: #e93a3a;
+        color: white;
+        background-color: #e93a3a;
+    }
+
+    button.item-button.button-validate {
+        border-color: #0d716c;
+        color: white;
+        background-color: #0d716c;
+    }
+  }
+}

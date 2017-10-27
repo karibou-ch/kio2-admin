@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, ElementRef, Input, Output, ViewChild } from '@angular/core';
 import { LoaderService, Order, OrderService, Shop, User } from 'kng2-core';
 import { Events, NavController, NavParams, PopoverController } from 'ionic-angular';
 
@@ -14,12 +14,13 @@ import { Events, NavController, NavParams, PopoverController } from 'ionic-angul
 })
 export class LogisticHeaderComponent {
 
-  @Output() ordersToPage = new EventEmitter<Order[]>(); //execute data fetcher function of parent component
-  @Output() ordersToTrack = new EventEmitter<Order[]>(); //execute data fetcher function of parent component
+  @Input() currentShippingDate: Date;
+  @Input('hide-collect') hideCollect:boolean=false;
+  @Output() doInitOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
+  @Output() doSelectedOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
   
   closedShippings: boolean;
   monthOrders: Map<number, Order[]> = new Map();
-  currentShippingDate: Date;
   pickerShippingDate:string;
   availableDates: Date[] = [];
   private isReady;
@@ -44,7 +45,7 @@ export class LogisticHeaderComponent {
 
   ngOnInit() {
     this.$loader.ready().subscribe((loader) => {
-      this.currentShippingDate = Order.currentShippingDay();
+      this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
       this.pickerShippingDate = this.currentShippingDate.toISOString();
       this.currentShippingDate.setHours(0, 0, 0,0);
       this.filtersOrder = this.FLOATING;
@@ -99,30 +100,32 @@ export class LogisticHeaderComponent {
       //set currentshipping with first key
       let shipping=(this.monthOrders.get(this.currentShippingDate.getTime()))?
             this.currentShippingDate:this.monthOrders.keys().next().value;
-      this.displayOrders(shipping);
+      this.initOrders(shipping);
     })
   }
 
 
-  displayOrders(shipping?){
+  initOrders(shipping?){
     if(!shipping){
-      return this.ordersToPage.emit([]);
+      return this.doInitOrders.emit([[],this.currentShippingDate]);
     }
     this.currentShippingDate = new Date(shipping);
     this.currentShippingDate.setHours(0, 0, 0, 0);
-    this.ordersToPage.emit(this.monthOrders.get(this.currentShippingDate.getTime()));
+    this.doInitOrders.emit([this.monthOrders.get(this.currentShippingDate.getTime()),this.currentShippingDate]);
   }
   
 
   openCollect(){
-    this.navCtrl.push('CollectPage');
+    this.navCtrl.push('CollectPage',{
+      shipping:this.currentShippingDate
+    });
   }
 
   //
   // fire event to display Map
   openMap() {
     let orders=this.monthOrders.get(this.currentShippingDate.getTime());
-    this.ordersToTrack.emit(orders);
+    this.doSelectedOrders.emit([orders,this.currentShippingDate]);
   }
 
   //

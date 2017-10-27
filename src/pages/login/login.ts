@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { ToastController, IonicPage, Loading, LoadingController, NavController, NavParams } from 'ionic-angular';
 import { LoaderService, User, UserService } from 'kng2-core';
-import { TabsPage } from '../tabs/tabs';
 
 /**
  * Generated class for the LoginPage page.
@@ -39,11 +38,13 @@ export class LoginPage {
     this.loaderSrv.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
       this.isReady=true;        
+      //
+      // use localstorage
+      // https://stackoverflow.com/questions/37318472/ionic-2-app-remember-user-on-the-device      
     });
     
   }
 
-  //TODO checker rôle à la connexion. Modifier comportement si non logistique | admin
 
   login() {
     this.isReady = false;  //to hide submit button after submitting
@@ -53,8 +54,8 @@ export class LoginPage {
       password: this.model.password,
       provider: "local"
     }).subscribe((user:User) => {
-      if(user.id!==''){
-        return this.navCtrl.setRoot(TabsPage);
+      if(user.isAuthenticated()){
+        return ;
       }
       this.showError("Erreur d'authentification :-((")
     });  

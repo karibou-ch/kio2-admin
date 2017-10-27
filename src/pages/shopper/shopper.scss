@@ -27,6 +27,8 @@ page-shopper {
       button{
         height: 1.7rem;
         border: none;
+        width: 17px;
+        margin-right: 0;
         &.selected{
           background:color($colors,info);
           color:color($colors,dark);
@@ -46,6 +48,7 @@ page-shopper {
       white-space:initial;
     }
       
+
     span.bag, 
     span.price, 
     span.priority{
@@ -57,8 +60,8 @@ page-shopper {
       font-weight: 900;
       background: color($colors,info);
       padding: 0;
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       border-radius: 7px;
       line-height: 14px;
       text-align: center;
@@ -66,18 +69,32 @@ page-shopper {
 
     span.price{
       background: transparent;
-      color: #ddd;
-      width: 40px;
+      color: white;
+      width: 37px;
       right: 10px;
+      padding-top: 1px;
+      border-radius: 1px;
+      background: color($colors,info);
+      right: 15px;
     }
 
+    span.bag{
+      right: 15px;
+      top: 10px;
+      width: 13px;
+      border-radius: 1px;
+      padding-top: 1px;
+    }
+
+
     span.priority{
-      left: -5px;
-      top:-5px;
-      width: 14px;
-      border-radius: 50%;
+      right: 1px;
+      top: 10px;
+      border-radius: 1px;
+      padding-top: 1px;
+      z-index: -1;      
       background: color($colors,danger);
-    } 
+    }
 
     ion-avatar {
       position: relative;

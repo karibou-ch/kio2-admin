@@ -7,48 +7,55 @@
 
 <ion-header no-border>
   <logistic-header
-    (ordersToPage)="displayOrders($event)"
-    (ordersToTrack)="trackOrders($event)">
+    (doInitOrders)="onInitOrders($event)"
+    (doSelectedOrders)="onSelectedOrders($event)">
     </logistic-header>
 </ion-header>
 
 <ion-content>
 
-  <ion-refresher (ionRefresh)="doRefresh($event)">
+  <ion-refresher 
+    [enabled]="!reorder"
+    (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
   <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes {{openShippings?'livrées':'en préparation'}} pour ce mois-ci</h1>
 
-  <ion-list>
+  <ion-list >
 
     <!-- FITER BASED ON PLANNING -->
     <ion-item [hidden]="!planning.length" class="header">
-      <p>
       <button ion-button 
               round color="light"  [class.selected]="currentPlanning===plan"
               outline small (click)="togglePlanning(plan)"
               *ngFor="let plan of planning  "><b>{{plan}}</b>
       </button>
-      </p>
+      <button ion-button item-end round color="light" outline small 
+              [class.selected]="reorder"
+              (click)="toggleReorder()"><b><ion-icon name="reorder"></ion-icon></b>
+      </button>
     </ion-item>
 
+    <!-- REORDERING -->
+    <ion-item-group [reorder]="reorder" (ionItemReorder)="reorderItems($event)">
+
     <!-- DISPLAY ORDERS -->
-    <ion-item-sliding *ngFor="let order of orders?.sort(sortOrdersByCP)  ">
+    <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersBySort)  ">
 
       <ion-item (click)="toggleOrder(order)" 
                 [class.selected]="isOrderSelected(order)"
                 [hidden]="currentPlanning&&currentPlanning!==order.shipping.priority">
         <ion-note item-end>
           {{order.shipping.postalCode}}
-          <span class="bag" [hidden]="!order.shipping.bags">{{ order.shipping.bags }}</span>
+          <span class="price" [hidden]="!order.shipping.bags">{{ order.shipping.bags }} sac</span>
           <span class="price" [hidden]="order.shipping.bags">{{order.getSubTotal()|number:'1.0-0'}} fr</span>
+          <span class="priority" [hidden]="!order.shipping.priority">{{order.shipping.priority}}</span>
           
         </ion-note>        
         <ion-avatar item-start>
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <span class="rank">{{order.rank}}</span>
-          <span class="priority" [hidden]="!order.shipping.priority">{{order.shipping.priority}}</span>
         </ion-avatar>
         <h3 text-capitalize>{{ order.shipping.name }}</h3>
         <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
@@ -61,7 +68,7 @@
           Réserver
         </ion-label>
         <ion-select [(ngModel)]="order.shipping.priority" 
-                      (ngModelChange)="selectShipping(order,$event)"
+                      (ngModelChange)="setShippingPriority(order,$event)"
                       interface="action-sheet">
           <ion-option value="1">1 tournée</ion-option>
           <ion-option value="2">2 tournée</ion-option>
@@ -72,6 +79,7 @@
 
       <ion-item-options side="right">
         <div [hidden]="!user.isAdmin()">
+          
           <ion-label class="bags">Nb sacs</ion-label>
           <ion-select [(ngModel)]="order.shipping.bags"                       
                        (ngModelChange)="updateBag(order,$event)"
@@ -81,6 +89,7 @@
             <ion-option value="3">3 sac</ion-option>
             <ion-option value="4">4 sac</ion-option>
           </ion-select>
+
         </div>
         <a ion-button color="danger" href='tel:{{order.customer.phoneNumbers[0]?.number}}'>
           <ion-icon name="call"></ion-icon>
@@ -90,6 +99,7 @@
 
     </ion-item-sliding>
 
+    </ion-item-group>
   </ion-list>
 
 </ion-content>

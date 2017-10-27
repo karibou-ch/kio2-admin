@@ -36,12 +36,15 @@ export class TrackerProvider {
       stationaryRadius: 20,
       // The minimum distance (measured in meters) a device must move horizontally before an update event is generated.
       distanceFilter: 10,
-      debug: true,
-      interval: 5000
+      debug: false,
+      interval: 20000
     };
     
     this.backgroundLocation$ = this.backgroundGeolocation.configure(config);
     
+  }
+
+  start(){
 
     // Foreground Tracking
     let options = {
@@ -51,13 +54,12 @@ export class TrackerProvider {
 
     this.geoLocation$ = this.geolocation.watchPosition(options).filter((p) => p.coords !== undefined);
     this.currentPosition$ = this.geolocation.getCurrentPosition(options);
+    this.backgroundGeolocation.start();
+
   }
 
-
-  stopTracking() {
-    console.log('stopTracking');
-    // this.backgroundGeolocation.finish();
-    // this.backgroundLocation$.unsubscribe();
+  stop() {
+    this.backgroundGeolocation.finish();
   }
 
 

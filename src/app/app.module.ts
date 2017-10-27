@@ -6,8 +6,6 @@ import { Kio2Aadmin } from './app.component';
 import { Kng2CoreModule } from 'kng2-core';
 import { HttpModule } from '@angular/http';
 
-import { TabsPage } from '../pages/tabs/tabs';
-
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -19,8 +17,7 @@ import { ConfigService } from 'kng2-core';
 
 @NgModule({
   declarations: [
-    Kio2Aadmin,
-    TabsPage
+    Kio2Aadmin
   ],
   imports: [
     BrowserModule,
@@ -32,8 +29,7 @@ import { ConfigService } from 'kng2-core';
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    Kio2Aadmin,
-    TabsPage
+    Kio2Aadmin
   ],
   providers: [
     { provide: LOCALE_ID, useValue: "fr-FR" },  //set locale to french (dates, etc. )

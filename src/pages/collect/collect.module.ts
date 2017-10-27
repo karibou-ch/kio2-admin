@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { CollectPage } from './collecte';
+import { CollectPage } from './collect';
 
 import { ComponentsModule } from '../../components/components.module';
 
