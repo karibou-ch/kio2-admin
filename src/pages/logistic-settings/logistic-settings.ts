@@ -32,7 +32,7 @@ export class LogisticSettingsPage {
   }
 
   displayOrders(shipping){
-    this.parent.displayOrders(shipping);
+    this.parent.initOrders(shipping);
     this.navCtrl.pop();
   }
 

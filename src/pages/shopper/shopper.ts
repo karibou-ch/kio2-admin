@@ -23,8 +23,10 @@ export class ShopperPage {
   private user:User=new User();
   private isReady:boolean=false;
   private orders: Order[] = [];
+  private shipping:Date;
   private planning=[];
   private currentPlanning;
+  private reorder:boolean=false;
 
   constructor(
     public events: Events,
@@ -75,8 +77,10 @@ export class ShopperPage {
     return this.selectedOrder[order.oid];
   }
 
-  selectShipping(order:Order){
-    this.$order.updateShippingShopper(order,order.shipping.priority)
+  setShippingPriority(order:Order){
+    let position=order.shipping.position;
+    let priority=order.shipping.priority;
+    this.$order.updateShippingShopper(order,priority,position)
         .subscribe(ok=>{
           this.onDone("Livraison planifiée")
           this.trackPlanning(this.orders);
@@ -96,18 +100,33 @@ export class ShopperPage {
   //   });
   // };
 
-  displayOrders(orders: Order[]){
-    this.orders = orders;
+  onInitOrders([orders,shipping]:[Order[],Date]){
+    //
+    // set default order value based on postalCode
+    this.orders = orders||[];
+    this.shipping= shipping;
     this.isReady=true;
     this.trackPlanning(orders);  
   }
 
-  togglePlanning(plan){
-    if(this.currentPlanning===plan){
-      return this.currentPlanning=undefined;
-    }
-    this.currentPlanning=plan;
+
+  reorderItems(index){
+    let order=this.orders[index.from];
+    let position=order.shipping.position;
+    let priority=order.shipping.priority;
+
+    order.shipping.position=this.orders[index.to].shipping.position-1;    
+    this.orders = this.orders.sort(this.sortOrdersBySort);
+    this.$order.updateShippingShopper(order,priority,position)
+      .subscribe(ok=>{
+      },error=>this.onError(error.text()))
+
   }
+
+  toggleReorder(){
+    this.reorder=!this.reorder;
+  }
+
 
   trackPlanning(orders: Order[]){
     this.planning=orders.reduce((planning,order,i)=>{
@@ -120,7 +139,7 @@ export class ShopperPage {
 
   }
 
-  trackOrders(orders:Order[]){
+  onSelectedOrders([orders,shipping]:[Order[],Date]){
     // count available selection
     let oids=Object.keys(this.selectedOrder).reduce((count,oid)=>{
       return this.selectedOrder[oid]?count+1:count;
@@ -128,20 +147,43 @@ export class ShopperPage {
     let selectedOrders=(order)=>{
       return this.selectedOrder[order.oid]|| (!oids);
     }
-    let selected=orders.filter(selectedOrders);
+    //
+    // filter orders to display, 
+    let selected=orders.filter(selectedOrders).filter(this.filterByPlan.bind(this));
     this.modalCtrl.create('tracker', { results: selected  }).present();
   }
 
+  onEditCustomer(customer){
+
+  }
 
   openTracker4One(order:Order){
     this.modalCtrl.create('tracker', { results: order }).present();
   }
+
+  togglePlanning(plan){
+    if(this.currentPlanning===plan){
+      return this.currentPlanning=undefined;
+    }
+    this.currentPlanning=plan;
+  }
+
 
   sortOrdersByCP(o1,o2){
     //TODO checking type of postalCode is always a number
     return (o1.shipping.postalCode|0)-(o2.shipping.postalCode|0);
   }
 
+  sortOrdersBySort(o1,o2){
+    //TODO checking type of postalCode is always a number
+    return (o1.shipping.position)-(o2.shipping.position);
+  }
+
+
+  filterByPlan(order:Order){
+    if(!this.currentPlanning) return true;
+    return (this.currentPlanning===order.shipping.priority);
+  }
 
 
 

@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
-import { ActionSheetController, IonicPage, Loading, LoadingController, NavController, NavParams, ToastController, ViewController } from 'ionic-angular';
-import { ConfigService, LoaderService, Order } from 'kng2-core';
+import { ActionSheetController, IonicPage, NavController, NavParams, ToastController, ViewController } from 'ionic-angular';
+import { LoaderService, Order } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { Geoposition } from '@ionic-native/geolocation';
 import { Subscription } from "rxjs";
@@ -34,13 +34,11 @@ export class TrackerPage {
   private markers = [];
   private closestMarkers;
   private geoSub: Subscription;
-  private loader: Loading;
-  private router;
+  private directionsDisplay;
+  private directionsService;
 
   constructor(
     public actionSheetCtrl: ActionSheetController,
-    private configSrv: ConfigService,
-    private loadingCtrl: LoadingController,
     private $loader: LoaderService,
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -50,6 +48,7 @@ export class TrackerPage {
     public zone: NgZone
   ) {
     this.orders = this.navParams.get('results');
+    this.directionsService = new google.maps.DirectionsService();
   }
 
   // ionViewDidLoad() {
@@ -66,6 +65,12 @@ export class TrackerPage {
       if (!this.map) this.createMap();
       this.isReady = true;
     })
+  }
+
+
+  //
+  // refresh standby state
+  ionViewWillEnter(){
 
     // ============ BACKGROUND geolocalisation (can be replaced by the Hypertrack one) ====================
 
@@ -92,9 +97,16 @@ export class TrackerPage {
     // ====================== FOREGROUND geolocalisation =====================================
 
     this.showLoading("loading position ...");
-
+    this.$tracker.start();
     this.$tracker.currentPosition$.then((position) => {
         this.updateUserMarker(position.coords);
+
+        //
+        // display route when only one is selected
+        if(this.orders.length===1){
+          this.directionRoute(this.orders[0]);
+        }
+        
     }).catch((error) => {
       this.showLoading("Error :"+error.message);
     });
@@ -110,6 +122,16 @@ export class TrackerPage {
 
   }
 
+  //ionViewDidLeave(){
+  onDismiss() {
+    this.$tracker.stop();
+    //if (!this.geoSub.closed) this.geoSub.unsubscribe();
+    if (this.geoSub) this.geoSub.unsubscribe();
+    this.deleteMarkers();
+    this.viewCtrl.dismiss();
+  }
+  
+
   updateUserMarker(coords){
     this.lat = coords.latitude;
     this.lng = coords.longitude;
@@ -120,6 +142,7 @@ export class TrackerPage {
       });
     }
     this.userMarker.setPosition( new google.maps.LatLng( coords.latitude, coords.longitude ) );
+
     //this.map.panTo( new google.maps.LatLng( coords.latitude, coords.longitude ) );
 
   }
@@ -128,11 +151,14 @@ export class TrackerPage {
     var bikeLayer = new google.maps.BicyclingLayer();
     this.map = new google.maps.Map(document.getElementById('map'), {
       disableDefaultUI: true,
-      mapTypeControl: true
+      mapTypeControl: false
     });
 
     bikeLayer.setMap(this.map);
     this.setMapMarkers(this.orders);
+
+    this.directionsDisplay = new google.maps.DirectionsRenderer({map:this.map});
+    //this.directionsDisplay.setMap(this.map);    
 
   }
 
@@ -143,9 +169,18 @@ export class TrackerPage {
     }).present()
   }
 
-  onDismiss() {
-    if (!this.geoSub.closed) this.geoSub.unsubscribe();
-    this.viewCtrl.dismiss();
+
+  directionRoute(order:Order){
+    let request = {
+      origin: new google.maps.LatLng(this.lat, this.lng),
+      destination: new google.maps.LatLng(order.shipping.geo.lat, order.shipping.geo.lng),
+      travelMode: 'BICYCLING'
+    };
+    this.directionsService.route(request, (result, status)=> {
+      if (status == 'OK') {
+        this.directionsDisplay.setDirections(result);
+      }
+    });
   }
 
   userZoom() {
@@ -174,9 +209,10 @@ export class TrackerPage {
       });
       this.markers.push(marker);
       //set popup window on marker
-      var infowindow = new google.maps.InfoWindow({
-        content: `<b><a href="tel:${order.customer.phoneNumbers[0].number}">${order.shipping.name}</a></b><br>
-                  ${order.shipping.streetAdress}<br/>
+      let phone=order.customer.phoneNumbers[0]?order.customer.phoneNumbers[0].number:'';
+      let infowindow = new google.maps.InfoWindow({
+        content: `<b><a href="tel:${phone}">${order.shipping.name}</a></b><br>
+                  ${order.shipping.streetAdress}, é:${order.shipping.floor}<br/>
                   ${order.shipping.note}
                     `
       });

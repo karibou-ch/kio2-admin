@@ -30,10 +30,13 @@ export class Kio2Aadmin {
   ngOnInit() {
 
     this.$loader.ready().subscribe((loader) => {
+      //console.log('---------------- app',loader[1])
       Object.assign(this.currentUser,loader[1]);
       if(!this.currentUser.isAuthenticated()){
         return this.rootPage='LoginPage';
       }
+      this.rootPage='ShopperPage';
+      
       //
       // manage shop admin
     });

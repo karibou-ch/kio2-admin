@@ -12,7 +12,7 @@ $font-path: "../assets/fonts";
 $app-direction: ltr;
 
 //FIXME, use dynamic istallation from NPM ASAP!!
-@import "./leaflet.extra-markers.scss";
+//@import "./ionicicons.scss";
 @import "ionic.globals";
 
 
@@ -36,7 +36,7 @@ $app-direction: ltr;
 
 $colors: (
   //primary:    #488aff,
-  primary:    #00a79d,
+  primary:    #006a64,
   secondary:  #32db64,
   danger:     #f53d3d,
   light:      #f4f4f4,

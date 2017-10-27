@@ -1,8 +1,8 @@
 {
     "name": "ionic-hello-world",
-    "version": "0.0.0",
-    "author": "Ionic Framework",
-    "homepage": "http://ionicframework.com/",
+    "version": "0.9.0",
+    "author": "Karibou team",
+    "homepage": "https://karibou.ch/",
     "private": true,
     "scripts": {
         "clean": "ionic-app-scripts clean",
@@ -57,7 +57,7 @@
         "cordova-plugin-splashscreen"
     ],
     "cordovaPlatforms": [],
-    "description": "kio2-logistic: An Ionic project",
+    "description": "kio2-admin: An karibou.ch project",
     "cordova": {
         "plugins": {
             "cordova-plugin-console": {},

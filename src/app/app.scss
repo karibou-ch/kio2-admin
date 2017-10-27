@@ -30,3 +30,14 @@
 .kico-k {
   background-image: url('../assets/img/k.svg');
 }
+
+.red{
+  color:red!important;
+}
+.bold{
+  font-weight: 900!important;
+}
+
+.link{
+  border-bottom: 1px dotted color($colors,light)
+}
