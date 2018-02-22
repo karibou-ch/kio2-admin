@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Events, IonicPage, ModalController, ToastController  } from 'ionic-angular';
 import { LoaderService, Order, OrderService, User } from 'kng2-core';
-import { ShopperItemComponent } from '../../components/shopper-item/shopper-item';
+import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { LogisticHeaderComponent }  from '../../components/logistic-header/logistic-header';
 /**
  * Generated class for the ShopperPage page.
@@ -33,6 +33,7 @@ export class ShopperPage {
     private $loader: LoaderService,
     private $order: OrderService,
     private modalCtrl: ModalController,
+    public $tracker: TrackerProvider,
     private toast:ToastController
   ) {
   }
@@ -40,7 +41,12 @@ export class ShopperPage {
   ngOnInit() {
     this.$loader.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
+      this.$tracker.start();    
     });
+  }
+
+  ngOnDestroy() {
+    this.$tracker.stop();    
   }
 
   onDone(msg){
@@ -107,17 +113,23 @@ export class ShopperPage {
     this.shipping= shipping;
     this.isReady=true;
     this.trackPlanning(orders);  
+    // this.orders.forEach(o=>{
+    //   console.log('-----',o.rank,o.shipping.position)
+    // })
   }
 
 
+  //
+  // manual reorder of items 
   reorderItems(index){
     let order=this.orders[index.from];
-    let position=order.shipping.position;
     let priority=order.shipping.priority;
-
-    order.shipping.position=this.orders[index.to].shipping.position-1;    
+    let gt=order.shipping.position>this.orders[index.to].shipping.position;    
+    order.shipping.position=(gt)?
+      this.orders[index.to].shipping.position-1:this.orders[index.to].shipping.position+1;    
     this.orders = this.orders.sort(this.sortOrdersBySort);
-    this.$order.updateShippingShopper(order,priority,position)
+    
+    this.$order.updateShippingShopper(order,priority,order.shipping.position)
       .subscribe(ok=>{
       },error=>this.onError(error.text()))
 

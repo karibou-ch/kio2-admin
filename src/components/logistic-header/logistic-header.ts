@@ -1,6 +1,6 @@
-import { Component, EventEmitter, ElementRef, Input, Output, ViewChild } from '@angular/core';
-import { LoaderService, Order, OrderService, Shop, User } from 'kng2-core';
-import { Events, NavController, NavParams, PopoverController } from 'ionic-angular';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { LoaderService, Order, OrderService } from 'kng2-core';
+import { Events, NavController } from 'ionic-angular';
 
 /**
  * Generated class for the LogisticHeaderComponent component.
@@ -36,8 +36,7 @@ export class LogisticHeaderComponent {
     public events: Events,
     private $loader: LoaderService,
     public navCtrl: NavController, 
-    private orderSrv: OrderService,
-    private popoverCtrl:PopoverController
+    private orderSrv: OrderService
     //private userSrv:UserService
   ) {
     // most init values depends on config and the loader
@@ -73,7 +72,7 @@ export class LogisticHeaderComponent {
   //
   // on selected date
   updateDateFromPicker(){
-    let selected=new Date(this.pickerShippingDate);
+    // let selected=new Date(this.pickerShippingDate);
     this.currentShippingDate=new Date(this.pickerShippingDate);
     this.currentShippingDate.setHours(0, 0, 0,0);
     this.findAllOrdersForShipping();

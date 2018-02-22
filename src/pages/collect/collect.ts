@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Events, IonicPage, NavController, ToastController, NavParams } from 'ionic-angular';
-import { EnumFulfillments, LoaderService, Order, OrderItem,OrderEnum, OrderService, User, UserService } from 'kng2-core';
-import { LogisticHeaderComponent }  from '../../components/logistic-header/logistic-header';
+import { EnumFulfillments, Order, OrderItem, OrderService, User } from 'kng2-core';
 
 /**
  * Generated class for the CollectPage page.
@@ -28,12 +27,10 @@ export class CollectPage {
 
   constructor(
     public events: Events,
-    private loaderSrv: LoaderService,
     public navCtrl: NavController,
     public navParams: NavParams,
     private $order: OrderService,
-    private toast:ToastController,
-    private userSrv: UserService
+    private toast:ToastController
   ) {
     this.vendors.list=[];
     this.shipping=this.navParams.get('shipping');

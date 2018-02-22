@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Events, IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 
-import { Order, OrderItem,EnumFulfillments, OrderService, User, UserService } from 'kng2-core';
+import { Order,EnumFulfillments, OrderService } from 'kng2-core';
 
 /**
  * Generated class for the OrderItemsPage page.

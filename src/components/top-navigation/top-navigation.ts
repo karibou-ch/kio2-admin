@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Input } from '@angular/core';
 import { AlertController, App, NavController, Events, LoadingController, Loading, Platform } from 'ionic-angular';
 import { LoaderService, User, UserService } from 'kng2-core';
 
