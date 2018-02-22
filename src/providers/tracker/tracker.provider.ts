@@ -2,7 +2,7 @@ import { Injectable, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
-import 'rxjs/add/operator/map';
+import { Events } from 'ionic-angular';
 
 /*
   Generated class for the TrackerProvider provider.
@@ -16,14 +16,28 @@ export class TrackerProvider {
   public watch: any;
   public backgroundLocation$;
   public geoLocation$;
-  public currentPosition$;
+  public currentPosition;
+
+  options = {
+    enableHighAccuracy:true,
+    frequency: 3000
+  };
 
   constructor(
     public backgroundGeolocation: BackgroundGeolocation,
+    public events: Events,
     public geolocation: Geolocation,
     public http: Http,
     public zone: NgZone
   ) {
+  }
+
+  fetch(){
+    this.geolocation.getCurrentPosition(this.options).then(position=>{
+      this.zone.run(() => this.events.publish('location',position.coords));      
+    })    
+  }
+  start(){
     // Background Tracking
     // see configuration values at : https://github.com/mauron85/cordova-plugin-background-geolocation
     let config = {
@@ -37,29 +51,58 @@ export class TrackerProvider {
       // The minimum distance (measured in meters) a device must move horizontally before an update event is generated.
       distanceFilter: 10,
       debug: false,
-      interval: 20000
-    };
-    
-    this.backgroundLocation$ = this.backgroundGeolocation.configure(config);
-    
-  }
-
-  start(){
-
-    // Foreground Tracking
-    let options = {
-      enableHighAccuracy:true,
-      frequency: 1000
+      interval: 10000
     };
 
-    this.geoLocation$ = this.geolocation.watchPosition(options).filter((p) => p.coords !== undefined);
-    this.currentPosition$ = this.geolocation.getCurrentPosition(options);
-    this.backgroundGeolocation.start();
+    this.watch = this.geolocation.watchPosition(this.options).filter((p: any) => p.code === undefined).subscribe((position: Geoposition) => {
+      this.zone.run(() => this.events.publish('location',position.coords));
+    });
+    
+    this.geolocation.getCurrentPosition(this.options).then(position=>{
+      this.zone.run(() => this.events.publish('location',position.coords));      
+    })
+    
+    // this.geoLocation$=Observable.combineLatest(
+    //     this.backgroundGeolocation.configure(config).map(p=>p),
+    //     this.geolocation.watchPosition(options).filter((p) => p.coords !== undefined).map(p=>p)
+    //   )
+    
+    //this.currentPosition=this.geolocation.getCurrentPosition(options);
+    
+    
+    //
+    // combine observable 
+    // this.geoLocation$=this.backgroundGeolocation.configure(config);
+    //   // simple transformation
+    //   .map(p=>p)
+    //   //
+    //   // transform observable to ConnectableObservable (multicasting)
+    //   .publishReplay(1)
+    //   //
+    //   // used to auto-connect to the source when there is >= 1 subscribers
+    //   .refCount();
 
+    // this.backgroundGeolocation.configure(config).subscribe(location =>{
+    // // Run update inside of Angular's zone
+    
+    //   this.zone.run(() => this.events.publish('location',location));
+    // }, (err) => {
+    //   //
+    //   // inform errors
+    //   this.zone.run(() => this.events.publish('location',{error:err}))  ;
+    // });
+
+
+
+    //this.backgroundGeolocation.start();
   }
 
   stop() {
-    this.backgroundGeolocation.finish();
+    //this.backgroundGeolocation.finish();
+    if(this.watch){
+      this.watch.unsubscribe();
+      this.watch=null;
+    }
   }
 
 
