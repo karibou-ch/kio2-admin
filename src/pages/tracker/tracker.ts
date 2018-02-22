@@ -1,9 +1,8 @@
 import { Component, NgZone } from '@angular/core';
-import { ActionSheetController, IonicPage, NavController, NavParams, ToastController, ViewController } from 'ionic-angular';
+import { Platform, ActionSheetController, Events, IonicPage, NavController, NavParams, ToastController, ViewController } from 'ionic-angular';
 import { LoaderService, Order } from 'kng2-core';
-import { TrackerProvider } from '../../providers/tracker/tracker.provider';
-import { Geoposition } from '@ionic-native/geolocation';
-import { Subscription } from "rxjs";
+import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator';
+//import { Subscription } from "rxjs";
 declare var google;
 
 
@@ -11,6 +10,7 @@ declare var google;
  * Generated class for the TrackerPage page.
  *
  * See http://ionicframework.com/docs/components/#navigation for more info
+ * See https://developers.google.com/maps/documentation/urls/guide#directions-action for direction options
  * on Ionic pages and navigation.
  */
 @IonicPage({name:'tracker'})
@@ -33,16 +33,18 @@ export class TrackerPage {
   private userMarker;
   private markers = [];
   private closestMarkers;
-  private geoSub: Subscription;
+  // private geoSub: Subscription;
   private directionsDisplay;
   private directionsService;
 
   constructor(
     public actionSheetCtrl: ActionSheetController,
+    private events:Events,
+    private launchNavigator: LaunchNavigator,
     private $loader: LoaderService,
     public navCtrl: NavController,
     public navParams: NavParams,
-    public $tracker: TrackerProvider,
+    public platform: Platform,
     private toast:ToastController,
     private viewCtrl: ViewController,
     public zone: NgZone
@@ -65,70 +67,49 @@ export class TrackerPage {
       if (!this.map) this.createMap();
       this.isReady = true;
     })
+
+    //
+    //
+    this.platform.pause.subscribe(()=>{
+
+    });
+    this.platform.resume.subscribe(()=>{
+
+    });
+    
+    
   }
 
 
   //
   // refresh standby state
-  ionViewWillEnter(){
-
-    // ============ BACKGROUND geolocalisation (can be replaced by the Hypertrack one) ====================
-
-    // this.$tracker.backgroundLocation$.subscribe((location) => {
-
-    //   console.log('BackgroundGeolocation:  ' + location.latitude + ',' + location.longitude);
-
-    //   // Run update inside of Angular's zone
-    //   this.zone.run(() => {
-    //     this.lat = location.latitude;
-    //     this.lng = location.longitude;
-    //     this.isReady = true;
-    //   });
-
-    // }, (err) => {
-
-    //   console.log(err);
-
-    // });
-
-    // Turn ON the background-geolocation system.
-    // this.$tracker.backgroundGeolocation.start();
-
-    // ====================== FOREGROUND geolocalisation =====================================
-
-    this.showLoading("loading position ...");
-    this.$tracker.start();
-    this.$tracker.currentPosition$.then((position) => {
-        this.updateUserMarker(position.coords);
-
-        //
-        // display route when only one is selected
-        if(this.orders.length===1){
-          this.directionRoute(this.orders[0]);
-        }
-        
-    }).catch((error) => {
-      this.showLoading("Error :"+error.message);
-    });
-
-    this.geoSub = this.$tracker.geoLocation$.subscribe((position: Geoposition) => {
-
-      // Run update inside of Angular's zone to trigger change detection
-      this.zone.run(() => {
-        this.updateUserMarker(position.coords);
-      });
-
+  //ionViewWillEnter(){
+  ionViewDidLoad(){
+    //
+    // background
+    let computedRoute=false;
+    this.events.subscribe('location',(position)=>{
+      this.showLoading("updating position ...",1500);
+      this.updateUserMarker(position);
+      //
+      // display route when only one is selected
+      if(this.orders.length===1&&!computedRoute){
+        this.directionRoute(this.orders[0]);
+      }
+      computedRoute=true;
     });
 
   }
 
-  //ionViewDidLeave(){
-  onDismiss() {
-    this.$tracker.stop();
-    //if (!this.geoSub.closed) this.geoSub.unsubscribe();
-    if (this.geoSub) this.geoSub.unsubscribe();
+  ionViewDidLeave(){
+    this.events.unsubscribe('location');    
+    // if (!this.geoSub.closed) this.geoSub.unsubscribe();
     this.deleteMarkers();
-    this.viewCtrl.dismiss();
+  }
+
+
+  onDismiss() {
+    this.viewCtrl.dismiss();    
   }
   
 
@@ -162,10 +143,10 @@ export class TrackerPage {
 
   }
 
-  showLoading(msg:string) {
+  showLoading(msg:string,ttl?) {
     this.toast.create({
       message: msg,
-      duration: 3000
+      duration: (ttl||3000)
     }).present()
   }
 
@@ -183,7 +164,34 @@ export class TrackerPage {
     });
   }
 
+  openDirection(){
+    // launchnavigator.APP.GOOGLE_MAPS
+    // TRANSPORT_MODE => this.launchNavigator.TRANSPORT_MODE.BICYCLING
+    // 
+    let options: LaunchNavigatorOptions = {
+      app:this.launchNavigator.APP.GOOGLE_MAPS,
+      destinationName:this.orders[0].shipping.name,
+      transportMode:this.launchNavigator.TRANSPORT_MODE.BICYCLING,
+      enableDebug:true
+    };
+
+    let destination=(this.orders[0].shipping.geo)?
+      this.orders[0].shipping.streetAdress+","+this.orders[0].shipping.postalCode+","+this.orders[0].shipping.region:
+      [this.orders[0].shipping.geo.lat,this.orders[0].shipping.geo.lng];
+
+    //console.log('direction',destination)
+    //this.launchNavigator.navigate(destination, options)
+    this.launchNavigator.navigate(destination)
+        .then(
+            success => {},
+            error => alert('Error launching navigator: ' + error)
+    );
+  }
+
   userZoom() {
+    if(this.orders.length < 2){
+     return this.map.setCenter(new google.maps.LatLng(this.lat, this.lng)); 
+    }
     if (!this.toggleZoom) {
       this.toggleZoom = true;
       this.getClosestOrders(this.RADIUS);

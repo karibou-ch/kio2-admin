@@ -41,7 +41,7 @@
     <ion-item-group [reorder]="reorder" (ionItemReorder)="reorderItems($event)">
 
     <!-- DISPLAY ORDERS -->
-    <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersBySort)  ">
+    <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersByPosition)  ">
 
       <ion-item (click)="toggleOrder(order)" 
                 [class.selected]="isOrderSelected(order)"

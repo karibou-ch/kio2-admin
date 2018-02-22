@@ -14,7 +14,7 @@
     </ion-buttons>
     
     <ion-buttons end>
-    <button (click)="userZoom()" [disabled]="!isReady || !markerBounds || this.orders.length <= 1" ion-button icon-only clear="true">
+    <button (click)="userZoom()" [disabled]="!isReady || !markerBounds " ion-button icon-only clear="true">
           <ion-icon name="locate" ></ion-icon>
     </button>
     </ion-buttons>
@@ -24,6 +24,13 @@
 
 
 <ion-content >
+
+<!-- MAP BUTTON -->
+<button ion-fab  class="fab"
+        [hidden]="orders.length>1"
+        (click)="openDirection()">          
+    <ion-icon name="pin" id="pin-icon"></ion-icon>
+</button>
 
   
 

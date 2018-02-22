@@ -1,15 +1,21 @@
 page-tracker {
+  button.fab{
+    position: fixed;
+    bottom: 30px;
+    right: 40px;    
+    z-index: 1;
+  }
 
-   #map {
+  #map {
     position: absolute;
     top: 0px;
     bottom: 0;
     width: 100%;
-   }
+  }
 
-   #closestOrders{
+  #closestOrders{
       position: absolute;
       top: 50%;
-   }
+  }
 
 }

@@ -1,6 +1,6 @@
 {
   "name": "kio2-admin",
-  "app_id": "",
+  "app_id": "fbc2276b",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}

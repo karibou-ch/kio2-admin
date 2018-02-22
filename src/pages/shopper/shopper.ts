@@ -3,6 +3,9 @@ import { Events, IonicPage, ModalController, ToastController  } from 'ionic-angu
 import { LoaderService, Order, OrderService, User } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { LogisticHeaderComponent }  from '../../components/logistic-header/logistic-header';
+
+import 'rxjs/add/operator/filter';
+
 /**
  * Generated class for the ShopperPage page.
  *
@@ -75,9 +78,6 @@ export class ShopperPage {
     }, 2000);    
   }
 
-  toggleOrder(order){
-    this.selectedOrder[order.oid]=!this.selectedOrder[order.oid];
-  }
 
   isOrderSelected(order){
     return this.selectedOrder[order.oid];
@@ -109,14 +109,19 @@ export class ShopperPage {
   onInitOrders([orders,shipping]:[Order[],Date]){
     //
     // set default order value based on postalCode
-    this.orders = orders||[];
+    this.orders = orders.sort(this.sortOrdersByPosition);
     this.shipping= shipping;
     this.isReady=true;
-    this.trackPlanning(orders);  
-    // this.orders.forEach(o=>{
-    //   console.log('-----',o.rank,o.shipping.position)
-    // })
+    this.trackPlanning(this.orders);  
+    this.debug();
   }
+
+  debug(){
+    this.orders.forEach(o=>{
+      console.log('-----init orders rans',o.rank,'position',o.shipping.position)
+    })    
+  }
+
 
 
   //
@@ -127,12 +132,24 @@ export class ShopperPage {
     let gt=order.shipping.position>this.orders[index.to].shipping.position;    
     order.shipping.position=(gt)?
       this.orders[index.to].shipping.position-1:this.orders[index.to].shipping.position+1;    
-    this.orders = this.orders.sort(this.sortOrdersBySort);
+    this.orders = this.orders.sort(this.sortOrdersByPosition);
     
     this.$order.updateShippingShopper(order,priority,order.shipping.position)
       .subscribe(ok=>{
       },error=>this.onError(error.text()))
 
+  }
+  toggleOrder(order){
+    this.selectedOrder[order.oid]=!this.selectedOrder[order.oid];
+    this.debug();
+  }
+
+
+  togglePlanning(plan){
+    if(this.currentPlanning===plan){
+      return this.currentPlanning=undefined;
+    }
+    this.currentPlanning=plan;
   }
 
   toggleReorder(){
@@ -173,12 +190,6 @@ export class ShopperPage {
     this.modalCtrl.create('tracker', { results: order }).present();
   }
 
-  togglePlanning(plan){
-    if(this.currentPlanning===plan){
-      return this.currentPlanning=undefined;
-    }
-    this.currentPlanning=plan;
-  }
 
 
   sortOrdersByCP(o1,o2){
@@ -186,9 +197,14 @@ export class ShopperPage {
     return (o1.shipping.postalCode|0)-(o2.shipping.postalCode|0);
   }
 
-  sortOrdersBySort(o1,o2){
+  sortOrdersByPosition(o1,o2){
     //TODO checking type of postalCode is always a number
-    return (o1.shipping.position)-(o2.shipping.position);
+    //console.log('sort',(o1.shipping.position*10+o1.rank),(o2.shipping.position*10+o2.rank))
+    let delta=((o1.shipping.position|0))-((o2.shipping.position|0));
+    if(delta===0){
+      return o1.rank-o2.rank;
+    }
+    return delta;
   }
 
 

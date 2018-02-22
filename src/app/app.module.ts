@@ -14,6 +14,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { TrackerProvider } from '../providers/tracker/tracker.provider';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation  } from '@ionic-native/geolocation';
+import { LaunchNavigator } from '@ionic-native/launch-navigator';
+
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
@@ -53,7 +55,8 @@ import 'rxjs/add/observable/of';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     BackgroundGeolocation,
     Geolocation,
-    TrackerProvider
+    TrackerProvider,
+    LaunchNavigator
   ]
 })
 export class AppModule {
