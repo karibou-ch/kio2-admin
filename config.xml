@@ -90,5 +90,5 @@
     </plugin>
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
     <plugin name="uk.co.workingedge.phonegap.plugin.launchnavigator" spec="^3.2.2" />
-    <engine name="android" spec="^6.2.3" />
+    <engine name="android" spec="^7.1.0" />
 </widget>

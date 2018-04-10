@@ -1,0 +1,58 @@
+
+<ion-header no-border>
+    <logistic-header
+      [stock]="true"
+      (doInitOrders)="onInitOrders($event)"
+      (doSelectedOrders)="onSelectedOrders($event)">
+      </logistic-header>
+  </ion-header>
+  
+
+<ion-content >
+    <ion-searchbar
+    [(ngModel)]="cache.search"
+    [debounce]="500"
+    (ionInput)="onSearchInput($event)"
+    (ionClear)="onSearchCancel($event)">
+  </ion-searchbar>  
+  <ion-list>
+    <ion-item-sliding *ngFor="let product of products">    
+        <ion-item >
+          <ion-avatar item-start>
+            <img [src]="thumbnail(product)">
+          </ion-avatar>      
+          <h2>{{product.title}}</h2>      
+          <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}} </h3>
+          <span item-end>
+              <button class="action" [hidden]="!product.attributes.available" ><ion-icon name="square-outline"></ion-icon> </button>
+              <button class="action" [hidden]="product.attributes.available" ><ion-icon name="checkbox-outline"></ion-icon> </button>              
+          </span>
+          <span item-end [class.red]="product.pricing.stock<6">
+              {{product.pricing.stock}}
+          </span>          
+        </ion-item>
+        <ion-item-options side="right">
+          <a ion-button color="danger" >
+            <ion-icon name="call"></ion-icon>
+            Désactiver
+          </a>        
+          <ion-select [(ngModel)]="product.pricing.stock" 
+          (ngModelChange)="updateStock(product,$event)"
+          interface="action-sheet">
+            <ion-option value="0">O en stock</ion-option>
+            <ion-option value="10">10 en stock</ion-option>
+            <ion-option value="50">50 en stock</ion-option>
+          </ion-select>        
+
+        </ion-item-options>
+      </ion-item-sliding>    
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [position]="'bottom'">
+      <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Chargement des produits ...">
+    </ion-infinite-scroll-content>    
+  </ion-infinite-scroll>  
+
+</ion-content>

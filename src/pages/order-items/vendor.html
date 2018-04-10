@@ -1,0 +1,13 @@
+
+<ion-header no-border>
+  <logistic-header
+    [stock]="true"
+    (doInitOrders)="onInitOrders($event)"
+    (doSelectedOrders)="onSelectedOrders($event)">
+    </logistic-header>
+</ion-header>
+
+
+<kio2-order-items [header]="false" [orders]="orders">
+  
+</kio2-order-items>

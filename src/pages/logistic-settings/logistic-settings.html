@@ -30,8 +30,18 @@
 
     <ion-list-header>
       <ion-icon item-start name="settings"></ion-icon>
-      Options
+      <h2>Options</h2>
     </ion-list-header>
+    <ion-item [hidden]="!user.isAdmin()">
+      <ion-icon name="ionic" item-start ></ion-icon>
+      <ion-label>Les commandes</ion-label>
+      <button ion-button outline item-end (click)="openOrders()">Ouvrir</button>
+    </ion-item>      
+    <ion-item [hidden]="!user.isAdmin()">
+      <ion-icon name="ionic" item-start ></ion-icon>
+      <ion-label>Les produits</ion-label>
+      <button ion-button outline item-end (click)="openProducts()">Ouvrir</button>
+    </ion-item>      
     <ion-item>
       <ion-icon name="ionic" item-start ></ion-icon>
       <ion-label>Votre profil</ion-label>

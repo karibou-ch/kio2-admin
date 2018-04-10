@@ -1,6 +1,10 @@
-page-shopper {
+kio2-order-customers {
+  button.fab{
+    display: none;
+  }
+
    
-   h1.info{
+  h1.info{
     color: gray;
     padding: 50px;
     text-align: center;     
@@ -49,52 +53,32 @@ page-shopper {
     }
       
 
-    span.bag, 
-    span.price, 
-    span.priority{
+    span.price{
       position: absolute;
       font-size: 1.6rem;
       top: 10px;
-      right: 15px;
       color: white;
       font-weight: 900;
-      background: color($colors,info);
       padding: 0;
       width: 18px;
       height: 18px;
-      border-radius: 7px;
       line-height: 15px;
       text-align: center;
-    } 
-
-    span.price{
-      background: transparent;
-      color: white;
       width: 55px;
       padding-top: 1px;
       border-radius: 3px;
       background: color($colors,info);
       right: 10px;
+      
+    } 
+
+    span.progress{
+      position: absolute;
+      bottom: 10px;
+      right: 10px;        
     }
 
-    span.bag{
-      right: 15px;
-      top: 10px;
-      width: 13px;
-      border-radius: 1px;
-      padding-top: 1px;
-    }
-
-
-    span.priority{
-      right: 2px;
-      top: 10px;
-      border-radius: 0px 3px 3px 0px;
-      padding-top: 1px;
-      z-index: -1;      
-      background: color($colors,grey-icon);
-    }
-
+   
     ion-avatar {
       position: relative;
 
@@ -113,19 +97,5 @@ page-shopper {
         text-align: center;
       }
     }
-  }
-  ion-label.shopper,
-  ion-label.bags{
-    background: color($colors,primary);
-    color: white;
-    font-weight: 700;
-    font-size: 120%; 
-    height: 97%;
-    margin: 1px auto;
-    text-align: center;
-    padding:20px;
-    padding-top: 20px;
-  }     
-
-  
+  }  
 }

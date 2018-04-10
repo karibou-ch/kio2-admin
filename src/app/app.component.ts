@@ -4,6 +4,11 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { LoaderService, User, UserService } from 'kng2-core';
 
+import localeFr from '@angular/common/locales/fr';
+//
+// the second parameter 'fr' is optional
+import { registerLocaleData } from '@angular/common';
+registerLocaleData(localeFr, 'fr');
 
 
 @Component({
@@ -11,34 +16,46 @@ import { LoaderService, User, UserService } from 'kng2-core';
 })
 export class Kio2Aadmin {
   currentUser:User=new User();
-  rootPage: any = 'ShopperPage';
+  rootPage: any ;
   @ViewChild('adminNavigation') nav: NavController;
   constructor(
-    platform: Platform,
-    statusBar: StatusBar,
-    splashScreen: SplashScreen,
     private $loader: LoaderService,
-    private $user: UserService
+    private platform: Platform,
+    private statusBar: StatusBar,
+    private splashScreen: SplashScreen,
+    private $user:UserService
   ) {
-    platform.ready().then(() => {
-      statusBar.styleDefault();
-      splashScreen.hide();
+    this.platform.ready().then(() => {
+      this.statusBar.styleDefault();
+      this.splashScreen.hide();
 
     });
+  }
+
+  onInit(user:User){
+    console.log('uuser subscribe',user)
+    if(!user.isAuthenticated()){
+      return this.rootPage='LoginPage';
+    }
+
+    //
+    // if admin||logistic => shopper
+    if(user.isAdmin()||user.hasRole('logistic')){
+      return this.rootPage='ShopperPage';
+    }
+
+    this.rootPage='OrderCustomersPage';
+    //
+    // if vendor => orders
   }
 
   ngOnInit() {
 
     this.$loader.ready().subscribe((loader) => {
-      //console.log('---------------- app',loader[1])
       Object.assign(this.currentUser,loader[1]);
-      if(!this.currentUser.isAuthenticated()){
-        return this.rootPage='LoginPage';
-      }
-      this.rootPage='ShopperPage';
-      
-      //
-      // manage shop admin
+      this.onInit(this.currentUser);
     });
+
+    this.$user.subscribe(this.onInit);
   }
 }

@@ -1,4 +1,4 @@
-page-order-items {
+kio2-order-items {
   .toolbar-title{
     font-size:1.4rem;
   }
@@ -18,10 +18,10 @@ page-order-items {
     left: 0px;
     margin: 0px!important;
     width: 100%;
-    background: white!important;
+    background: rgba(0, 105, 99, 0.1) !important;
     margin: 8px 0!important;
-    margin-bottom: 15px!important;
-    padding-bottom: 20px;
+    margin-bottom: 1px!important;
+    border-top: 1px solid #006963!important;
 
     ion-icon.rank{
       margin-left: -5px!important;
@@ -60,6 +60,7 @@ page-order-items {
     width: 100%;
     position: relative;
     .title{
+      padding: 3px 0;
       font-size: 1.6rem;
       position: absolute;
       width: 100%;

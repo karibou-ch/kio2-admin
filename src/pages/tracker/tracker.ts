@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { Platform, ActionSheetController, Events, IonicPage, NavController, NavParams, ToastController, ViewController } from 'ionic-angular';
-import { LoaderService, Order } from 'kng2-core';
+import { LoaderService, Order, Config } from 'kng2-core';
 import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator';
 //import { Subscription } from "rxjs";
 declare var google;
@@ -23,12 +23,12 @@ export class TrackerPage {
   private RADIUS = 2000;
   private toggleZoom: boolean;
   private markerBounds;
-  private config;
+  private config:Config;
   private ready$;
   private orders: Order[];
   public lat: number=46.200472;
   public lng: number=6.1316835;
-  private isReady;
+  private isReady:boolean;
   private map;
   private userMarker;
   private markers = [];
@@ -49,6 +49,7 @@ export class TrackerPage {
     private viewCtrl: ViewController,
     public zone: NgZone
   ) {
+    this.isReady=false;
     this.orders = this.navParams.get('results');
     this.directionsService = new google.maps.DirectionsService();
   }
@@ -168,12 +169,12 @@ export class TrackerPage {
     // launchnavigator.APP.GOOGLE_MAPS
     // TRANSPORT_MODE => this.launchNavigator.TRANSPORT_MODE.BICYCLING
     // 
-    let options: LaunchNavigatorOptions = {
-      app:this.launchNavigator.APP.GOOGLE_MAPS,
-      destinationName:this.orders[0].shipping.name,
-      transportMode:this.launchNavigator.TRANSPORT_MODE.BICYCLING,
-      enableDebug:true
-    };
+    // let options: LaunchNavigatorOptions = {
+    //   app:this.launchNavigator.APP.GOOGLE_MAPS,
+    //   destinationName:this.orders[0].shipping.name,
+    //   transportMode:this.launchNavigator.TRANSPORT_MODE.BICYCLING,
+    //   enableDebug:true
+    // };
 
     let destination=(this.orders[0].shipping.geo)?
       this.orders[0].shipping.streetAdress+","+this.orders[0].shipping.postalCode+","+this.orders[0].shipping.region:
@@ -241,7 +242,7 @@ export class TrackerPage {
   getClosestOrders(radius: number): any {
     radius = radius > this.RADIUS ? this.RADIUS : radius;
     this.closestMarkers = this.orders
-      .filter((order) => this.distanceToOrder(order) <= radius)
+      .filter((order) => order.shipping.geo && this.distanceToOrder(order) <= radius)
       .sort((a, b) => { return this.distanceToOrder(a) - this.distanceToOrder(b) })
       .map(order => {
         return { order: order, distance: this.distanceToOrder };

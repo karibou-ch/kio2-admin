@@ -1,0 +1,33 @@
+
+<ion-header no-border>
+  <logistic-header
+    [stock]="true"
+    (doInitOrders)="onInitOrders($event)"
+    (doSelectedOrders)="onSelectedOrders($event)">
+  </logistic-header>
+</ion-header>
+
+<ion-content >
+  <h1 class="info" [hidden]="!isReady||orders.length">Pas de commandes  pour la boutique {{vendor}} </h1>
+
+  <!-- DISPLAY ORDERS -->
+  <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersByPosition);let i=index;">
+    <ion-item [class.selected]="isOrderSelected(order)" (click)="openOrder(order)">
+      <ion-note item-end>
+        <span class="price">{{order.getSubTotal()|number:'1.0-0'}} fr</span>            
+        <span class="progress" [class.red]="!isFulfilled(order)">{{order.getProgress()|number:'1.0-0'}} %</span>            
+      </ion-note>        
+      <ion-avatar item-start>
+        <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
+        <span class="rank">{{order.rank}}</span>
+      </ion-avatar>
+      <h3 text-capitalize>{{ order.oid }} - {{ order.shipping.name }}</h3>
+      <h2>{{i+1}} - {{order.getFulfilledProgress()}}/{{order.items.length}} </h2>
+    </ion-item>
+    <ion-item-options side="left">
+      <button ion-button expandable (click)="validateAll(order)">
+        <ion-icon name="star"></ion-icon>
+      </button>          
+    </ion-item-options>    
+  </ion-item-sliding>
+</ion-content>

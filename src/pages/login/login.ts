@@ -27,15 +27,14 @@ export class LoginPage {
 
   constructor(
     private alertCtrl: ToastController,
-    private loaderSrv: LoaderService,
+    private $loader: LoaderService,
     public loadingCtrl: LoadingController,
     private nativeStorage: NativeStorage,
     public navCtrl: NavController, 
     public navParams: NavParams,
     public platform: Platform,
-    private userSrv: UserService
-              
-              ) {
+    private $user: UserService
+  ) {
   }
 
   ngOnInit() {
@@ -48,7 +47,7 @@ export class LoginPage {
       });
     });
 
-    this.loaderSrv.ready().subscribe((loader) => {
+    this.$loader.ready().subscribe((loader) => {
       Object.assign(this.user, loader[1]);
       this.isReady=true;        
       //
@@ -62,7 +61,7 @@ export class LoginPage {
   login() {
     this.isReady = false;  //to hide submit button after submitting
     this.showLoading();
-    this.userSrv.login({
+    this.$user.login({
       email: this.model.email,
       password: this.model.password,
       provider: "local"

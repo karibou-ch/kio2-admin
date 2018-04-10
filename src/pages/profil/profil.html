@@ -38,8 +38,18 @@
       <h2>Telephone</h2>
       <p>{{ phone.number }}</p>
     </ion-item>
+    <ion-item item-content>
+      <h2>Rôle</h2>
+      <ul>
+
+        <li [hidden]="!user.hasRole('logistic')" color="secondary">Logistic</li>      
+        <li [hidden]="!user.isAdmin()" color="secondary">Admin</li>
+        <li [hidden]="!user.shops.length" color="secondary">Vendor</li>
+        <li color="secondary">Utilisateur</li>    
+      </ul>
+    </ion-item>
     <ion-list-header>
-      Logistique
+      <h3>Logistique</h3>
     </ion-list-header>
     <ion-item *ngIf="user.logistic?.PostalCode?.length > 0">
       <h2>Code Postaux</h2>

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { LoaderService, Order, OrderService } from 'kng2-core';
+import { LoaderService, Order, OrderService, User } from 'kng2-core';
 import { Events, NavController } from 'ionic-angular';
 
 /**
@@ -15,10 +15,12 @@ import { Events, NavController } from 'ionic-angular';
 export class LogisticHeaderComponent {
 
   @Input() currentShippingDate: Date;
+  @Input() stock:boolean;
   @Input('hide-collect') hideCollect:boolean=false;
   @Output() doInitOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
   @Output() doSelectedOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
   
+  user:User;
   closedShippings: boolean;
   monthOrders: Map<number, Order[]> = new Map();
   pickerShippingDate:string;
@@ -36,7 +38,7 @@ export class LogisticHeaderComponent {
     public events: Events,
     private $loader: LoaderService,
     public navCtrl: NavController, 
-    private orderSrv: OrderService
+    private $order: OrderService
     //private userSrv:UserService
   ) {
     // most init values depends on config and the loader
@@ -44,12 +46,19 @@ export class LogisticHeaderComponent {
 
   ngOnInit() {
     this.$loader.ready().subscribe((loader) => {
+      this.user=loader[1];
       this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
       this.pickerShippingDate = this.currentShippingDate.toISOString();
       this.currentShippingDate.setHours(0, 0, 0,0);
       this.filtersOrder = this.FLOATING;
       this.isReady=true;
       this.findAllOrdersForShipping();
+
+      //
+      // the case of hiding collect button
+      if(!this.hideCollect&&!this.user.isAdmin()&&!this.user.hasRole('logistic')){
+        this.hideCollect=true;
+      }
     })
 
     this.events.subscribe('refresh',()=>{
@@ -81,11 +90,21 @@ export class LogisticHeaderComponent {
   //
   // this header component provide data for all pages
   findAllOrdersForShipping() {
+    let Orders;
     let params = { month: (new Date(this.currentShippingDate).getMonth()) + 1, year: new Date(this.currentShippingDate).getFullYear() };
     Object.assign(params, this.filtersOrder);
     this.monthOrders = new Map();
     this.availableDates = [];
-    this.orderSrv.findAllOrders(params).subscribe(orders => {
+
+    //
+    // check orders source
+    if(this.user.shops.length){
+      Orders=this.$order.findOrdersByShop(null,params);
+    }else{
+      Orders=this.$order.findAllOrders(params);      
+    }
+    
+    Orders.subscribe(orders => {
       orders.forEach((order: Order) => {        
         order.shipping.when = new Date(order.shipping.when);
         order.shipping.when.setHours(0, 0, 0,0)
@@ -120,6 +139,10 @@ export class LogisticHeaderComponent {
     });
   }
 
+  openStock(){
+    this.navCtrl.push('ProductsPage');
+  }
+  
   //
   // fire event to display Map
   openMap() {

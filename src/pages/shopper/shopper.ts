@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Events, IonicPage, ModalController, ToastController  } from 'ionic-angular';
-import { LoaderService, Order, OrderService, User } from 'kng2-core';
+import { LoaderService, Order, OrderService, User, UserService } from 'kng2-core';
 import { TrackerProvider } from '../../providers/tracker/tracker.provider';
 import { LogisticHeaderComponent }  from '../../components/logistic-header/logistic-header';
 
@@ -24,7 +24,7 @@ export class ShopperPage {
   @ViewChild(LogisticHeaderComponent) header: LogisticHeaderComponent;
   
   private user:User=new User();
-  private isReady:boolean=false;
+  private isReady:boolean;
   private orders: Order[] = [];
   private shipping:Date;
   private planning=[];
@@ -37,8 +37,10 @@ export class ShopperPage {
     private $order: OrderService,
     private modalCtrl: ModalController,
     public $tracker: TrackerProvider,
+    private $user:UserService,
     private toast:ToastController
   ) {
+    this.isReady=false;
   }
 
   ngOnInit() {
@@ -46,6 +48,9 @@ export class ShopperPage {
       Object.assign(this.user, loader[1]);
       this.$tracker.start();    
     });
+
+    //
+    this.$user.subscribe(user=>Object.assign(this.user,user));
   }
 
   ngOnDestroy() {
@@ -117,9 +122,9 @@ export class ShopperPage {
   }
 
   debug(){
-    this.orders.forEach(o=>{
-      console.log('-----init orders rans',o.rank,'position',o.shipping.position)
-    })    
+    // this.orders.forEach(o=>{
+    //   console.log('-----init orders rans',o.rank,'position',o.shipping.position)
+    // })    
   }
 
 

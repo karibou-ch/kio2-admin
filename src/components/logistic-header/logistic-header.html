@@ -1,12 +1,22 @@
 <ion-navbar color="primary">
   <!-- left  -->
   <ion-buttons start>
+  <!-- DISPLAY STOCK -->
+  <button color="light" 
+          [hidden]="!stock"
+          [disabled]="!isReady" 
+          icon-only
+          ion-button (click)="openStock()" clear="true" >
+          <ion-icon name="cube"></ion-icon>
+  </button>      
+      
+  <!-- DISPLAY LOGISTIC -->
   <button color="light" 
           [hidden]="hideCollect"
           [disabled]="!isReady" 
           icon-only
           ion-button (click)="openCollect()" clear="true" >
-          <ion-icon name="bicycle"></ion-icon>
+          <ion-icon name="list"></ion-icon>
   </button>      
   </ion-buttons>
 

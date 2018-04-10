@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { Events } from 'ionic-angular';
@@ -20,14 +20,14 @@ export class TrackerProvider {
 
   options = {
     enableHighAccuracy:true,
-    frequency: 3000
+    frequency: 12000
   };
 
   constructor(
     public backgroundGeolocation: BackgroundGeolocation,
     public events: Events,
     public geolocation: Geolocation,
-    public http: Http,
+    public http: HttpClient,
     public zone: NgZone
   ) {
   }
@@ -40,19 +40,20 @@ export class TrackerProvider {
   start(){
     // Background Tracking
     // see configuration values at : https://github.com/mauron85/cordova-plugin-background-geolocation
-    let config = {
-      // Desired accuracy in meters. Possible values [0, 10, 100, 1000]. 
-      // The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings. 
-      // 1000 results in lowest power drain and least accurate readings.
-      desiredAccuracy: 100, 
-      // Stationary radius in meters. When stopped, the minimum distance the device must move 
-      // beyond the stationary location for aggressive background-tracking to engage.
-      stationaryRadius: 20,
-      // The minimum distance (measured in meters) a device must move horizontally before an update event is generated.
-      distanceFilter: 10,
-      debug: false,
-      interval: 10000
-    };
+
+    // let config = {
+    //   // Desired accuracy in meters. Possible values [0, 10, 100, 1000]. 
+    //   // The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings. 
+    //   // 1000 results in lowest power drain and least accurate readings.
+    //   desiredAccuracy: 100, 
+    //   // Stationary radius in meters. When stopped, the minimum distance the device must move 
+    //   // beyond the stationary location for aggressive background-tracking to engage.
+    //   stationaryRadius: 20,
+    //   // The minimum distance (measured in meters) a device must move horizontally before an update event is generated.
+    //   distanceFilter: 10,
+    //   debug: false,
+    //   interval: 10000
+    // };
 
     this.watch = this.geolocation.watchPosition(this.options).filter((p: any) => p.code === undefined).subscribe((position: Geoposition) => {
       this.zone.run(() => this.events.publish('location',position.coords));

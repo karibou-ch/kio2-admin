@@ -4,7 +4,7 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { Kio2Aadmin } from './app.component';
 
 import { Kng2CoreModule } from 'kng2-core';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 
 import { NativeStorage } from '@ionic-native/native-storage';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -32,7 +32,7 @@ import 'rxjs/add/observable/of';
   ],
   imports: [
     BrowserModule,
-    HttpModule,
+    HttpClientModule,
     Kng2CoreModule.forRoot({
       API_SERVER:'https://api.karibou.ch',
       disqus:'7e23b8cfd1ba48cdb5a3487efcbcdc56', /*karibou dev*/

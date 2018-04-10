@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Events, IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 
 import { Order,EnumFulfillments, OrderService } from 'kng2-core';
@@ -11,21 +11,25 @@ import { Order,EnumFulfillments, OrderService } from 'kng2-core';
  */
 @IonicPage()
 @Component({
-  selector: 'page-order-items',
+  selector: 'kio2-order-items',
   templateUrl: 'order-items.html',
 })
 export class OrderItemsPage {
-  orders:Order[];
-  vendor:string;
-  shipping:Date;
-  isReady:boolean=true;
+  public vendor:string;
+  public shipping:Date;
+  public isReady:boolean;
+
+  //
+  // input props
+  @Input() orders:Order[];
+  @Input() header:boolean=true;
 
   constructor(
     public events: Events,
     public navCtrl: NavController, 
     public navParams: NavParams,
     public $order:OrderService,
-    private toast:ToastController
+    public toast:ToastController
   ) {
 
     //
@@ -33,6 +37,7 @@ export class OrderItemsPage {
     this.orders = this.navParams.get('orders')||[];
     this.vendor = this.navParams.get('vendor')||'';
     this.shipping = this.navParams.get('shipping');
+    
   }
 
 
@@ -91,7 +96,9 @@ export class OrderItemsPage {
     }
   }
 
-  ionViewDidLoad() {
+  ngOnInit() {
+    this.isReady= (this.orders.length>0)|| (this.vendor!='') || (this.shipping!=null);
+    //console.log('-----',this.orders,(this.orders.length>0),(this.vendor!='') , (this.shipping!=null))
   }
 
   ionViewDidLeave(){
