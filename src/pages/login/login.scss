@@ -22,6 +22,14 @@ page-login {
       font-size: 2rem;
       font-weight: 500;
     }
+    .keep{
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      color: #ddd;
+      align-items:center;
+      display: flex;
+    }
 
     .input-login {
       position: relative;
@@ -55,6 +63,7 @@ page-login {
         font-weight: 500;
         color: color($colors,primary);
       }
+
     }
   }
 }

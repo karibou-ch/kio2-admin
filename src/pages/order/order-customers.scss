@@ -19,6 +19,14 @@ kio2-order-customers {
       font-size: 1.8rem;
    }
 
+   ion-item-options{
+    display: flex;
+    align-content: center;
+    align-items: center;
+    background: rgba(0, 105, 99, 0.35);        
+    &.shipping{
+    }      
+  }
 
 
   ion-item {
@@ -52,7 +60,17 @@ kio2-order-customers {
       white-space:initial;
     }
       
-
+    span.label{
+      background: rgba(0, 105, 99, 0.34);
+      background: #ccc;
+      color: white;
+      padding: 0 2px;
+      border-radius: 0px; 
+      font-size: 85%;     
+      &.counter{
+        border-right: 1px solid #eee;
+      }
+    }
     span.price{
       position: absolute;
       font-size: 1.6rem;
@@ -97,5 +115,6 @@ kio2-order-customers {
         text-align: center;
       }
     }
+
   }  
 }

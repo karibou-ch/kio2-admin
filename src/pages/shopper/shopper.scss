@@ -39,16 +39,18 @@ page-shopper {
     }
     &.selected{
       background-color: color($colors, light);
+      background-color: rgba(0, 105, 99, 0.14);
     }
+
     h2{
       font-size:1.4rem!important;
     }
+
     p{
       font-size:1.2rem!important;
       white-space:initial;
     }
       
-
     span.bag, 
     span.price, 
     span.priority{
@@ -111,21 +113,31 @@ page-shopper {
         border-radius: 50%;
         line-height: 40px;
         text-align: center;
+        &.orphan{
+          background: #ccc;
+        }
       }
     }
   }
   ion-label.shopper,
   ion-label.bags{
-    background: color($colors,primary);
     color: white;
     font-weight: 700;
     font-size: 120%; 
-    height: 97%;
     margin: 1px auto;
     text-align: center;
     padding:20px;
-    padding-top: 20px;
   }     
 
+  ion-item-options{
+    max-width: 50%;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    background: rgba(0, 105, 99, 0.75);        
+    div.select{
+
+    }
+  }
   
 }

@@ -2,8 +2,15 @@ kio2-products {
   button.fab{
     display: none;
   }
-  ion-searchbar{
-    background-color: #056962!important;
+  div.metabar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(5, 105, 98, 0.8) !important;
+    ion-searchbar{
+      max-width: 80vw;
+      background-color: rgba(5, 105, 98, 0.1) !important;
+    }
   }
 
   button.action{

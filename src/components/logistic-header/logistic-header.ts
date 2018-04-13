@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { LoaderService, Order, OrderService, User } from 'kng2-core';
-import { Events, NavController } from 'ionic-angular';
+import { LoaderService, Order, OrderService, User, UserService } from 'kng2-core';
+import { Events, NavController, ToastController } from 'ionic-angular';
 
 /**
  * Generated class for the LogisticHeaderComponent component.
@@ -16,11 +16,11 @@ export class LogisticHeaderComponent {
 
   @Input() currentShippingDate: Date;
   @Input() stock:boolean;
-  @Input('hide-collect') hideCollect:boolean=false;
+  @Input('collect') hideCollect:boolean=false;
   @Output() doInitOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
   @Output() doSelectedOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
   
-  user:User;
+  user:User=new User();
   closedShippings: boolean;
   monthOrders: Map<number, Order[]> = new Map();
   pickerShippingDate:string;
@@ -38,15 +38,33 @@ export class LogisticHeaderComponent {
     public events: Events,
     private $loader: LoaderService,
     public navCtrl: NavController, 
-    private $order: OrderService
+    private $order: OrderService,
+    private toast:ToastController,
+    private $user:UserService
+
     //private userSrv:UserService
   ) {
     // most init values depends on config and the loader
   }
 
+  displayMsg(msg:string){
+    this.toast.create({
+      message: msg,
+      duration: 3000
+    }).present();
+  }
+
   ngOnInit() {
+    // keep in touch! shop1@karibou.ch
+    this.$user.subscribe(user=>{
+      Object.assign(this.user,user);
+    });
+
     this.$loader.ready().subscribe((loader) => {
-      this.user=loader[1];
+      //
+      // FIXME issue with stream ordering (test right fter a login)
+      this.user=(this.user.id)?this.user:loader[1];
+
       this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
       this.pickerShippingDate = this.currentShippingDate.toISOString();
       this.currentShippingDate.setHours(0, 0, 0,0);
@@ -63,7 +81,8 @@ export class LogisticHeaderComponent {
 
     this.events.subscribe('refresh',()=>{
       this.findAllOrdersForShipping();
-    })
+    });
+
 
   }
 
@@ -98,6 +117,7 @@ export class LogisticHeaderComponent {
 
     //
     // check orders source
+    // console.log('------------load ',this.user)
     if(this.user.shops.length){
       Orders=this.$order.findOrdersByShop(null,params);
     }else{
@@ -119,6 +139,9 @@ export class LogisticHeaderComponent {
       let shipping=(this.monthOrders.get(this.currentShippingDate.getTime()))?
             this.currentShippingDate:this.monthOrders.keys().next().value;
       this.initOrders(shipping);
+    },error=>{
+      //Cette fonctionalité est réservée à la logistique
+      this.displayMsg(error.text());
     })
   }
 

@@ -5,7 +5,10 @@
     <author email="hello@karibou.ch" href="https://karibou.ch">Karibou.ch Dev Team</author>
     <content src="index.html" />
     <access origin="*" />
-    <allow-navigation href="http://ionic.local/*" />
+    <allow-navigation href="*" />
+    <allow-navigation href="http://*/*" />
+    <allow-navigation href="https://*/*" />
+    <allow-navigation href="data:*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
@@ -90,5 +93,7 @@
     </plugin>
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
     <plugin name="uk.co.workingedge.phonegap.plugin.launchnavigator" spec="^3.2.2" />
+    <plugin name="cordova-plugin-dialogs" spec="^2.0.1" />
     <engine name="android" spec="^7.1.0" />
+    <engine name="browser" spec="~5.0.3" />
 </widget>

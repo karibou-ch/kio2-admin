@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform,ToastController, IonicPage, Loading, LoadingController, NavController, NavParams } from 'ionic-angular';
-import { LoaderService, User, UserService } from 'kng2-core';
+import { LoaderService, User, UserService, ConfigKeyStoreEnum } from 'kng2-core';
 
 import { NativeStorage } from '@ionic-native/native-storage';
 
@@ -22,8 +22,11 @@ export class LoginPage {
   user: User = new User();
   model: any = {};
   status;
+  keep:boolean;
   isReady:boolean=false;
   loader:Loading;
+
+  KIO2_LOGIN_REMEMBER:string=ConfigKeyStoreEnum[ConfigKeyStoreEnum.KIO2_LOGIN_REMEMBER];
 
   constructor(
     private alertCtrl: ToastController,
@@ -39,11 +42,12 @@ export class LoginPage {
 
   ngOnInit() {
     this.platform.ready().then(() => {
-      this.nativeStorage.getItem('kio2.login.remember').then(remember=>{
-        this.model.email=remember.mail;
-        //this.model.password=remember.password;
+      this.nativeStorage.getItem(this.KIO2_LOGIN_REMEMBER).then(remember=>{
+        this.model.email=remember.mail;        
+        this.model.password=remember.password;
       },(error)=>{
         // using ionic serve --livereload & nativestorage doesnt work 
+        console.log('-- ERROR get',this.KIO2_LOGIN_REMEMBER,error)
       });
     });
 
@@ -71,9 +75,10 @@ export class LoginPage {
       // save remember  
       var remember:any={};
       remember.mail=this.model.email;
-      //remember.password=this.model.password;
-      this.nativeStorage.setItem('kio2.login.remember', remember)
+      this.model.password=(this.keep)? remember.password:'';      
+      this.nativeStorage.setItem(this.KIO2_LOGIN_REMEMBER, remember)
       .catch(error=>{
+        console.log('-- ERROR set',this.KIO2_LOGIN_REMEMBER,error)
         // using ionic serve --livereload & nativestorage doesnt work 
       });
 
@@ -81,7 +86,7 @@ export class LoginPage {
       if(user.isAuthenticated()){
         return ;
       }
-      this.showError("Erreur d'authentification :-((")
+      this.showError("Erreur d'authentification :-((");
     });  
   }
 

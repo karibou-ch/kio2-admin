@@ -1,0 +1,184 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>{{title}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content >
+  <ion-list *ngIf="product">
+    <ion-list-header color="primary">
+      Information
+    </ion-list-header>
+    <ion-item>
+      <ion-label color="primary">
+        Produit actif à la vente
+      </ion-label>
+      <ion-toggle color="positive" [(ngModel)]="product.attributes.available"></ion-toggle>
+    </ion-item>
+    
+    <ion-item class="input-toggle">
+      <ion-label stacked color="primary">
+        Titre
+      </ion-label>
+      <ion-input type="text" placeholder="titre" [(ngModel)]="product.title"></ion-input>
+    </ion-item>
+    <ion-item color="none">
+      <ion-thumbnail item-left>
+        <img [src]="'https:'+product?.photo.url+'/-/resize/128x/'"/>
+      </ion-thumbnail>
+      <ion-textarea placeholder="description" autocorrect="true" #desc rows="8"  [(ngModel)]="product.details.description"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" stacked>Ingrédients </ion-label> 
+      <ion-textarea  rows="4"  placeholder="ex, olive(Grèce), pâte(Italie)... " [(ngModel)]="product.details.origin" required></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" stacked>Péremption</ion-label>
+      <ion-input type="text" placeholder="ex. Se conserve 3 jours"  [(ngModel)]="product.shelflife.comment"></ion-input>    
+      <ion-toggle color="positive" item-end [(ngModel)]="product.shelflife.display"></ion-toggle>        
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" stacked>Quantité</ion-label>
+      <ion-input type="text"  placeholder="ex. Convient pour 1-2 personnes" [(ngModel)]="product.quantity.comment"></ion-input>    
+      <ion-toggle color="positive" item-end [(ngModel)]="product.quantity.display"></ion-toggle>        
+    </ion-item>
+    
+    <ion-item>
+      <ion-label color="primary" stacked>
+        En stock
+      </ion-label>
+      <ion-input type="text" placeholder="0-1000" [(ngModel)]="product.pricing.stock"></ion-input>
+      <button ion-button outline large item-end (click)="product.pricing.stock=0">0</button>
+      <button ion-button outline large item-end (click)="product.pricing.stock=40">40 </button>
+      <button ion-button outline large item-end (click)="product.pricing.stock=100">100 (qty)</button>
+      
+    </ion-item>
+    <ion-item (click)="detailled=true">
+      <ion-label>Editer tous les paramètres </ion-label>
+      <button ion-button item-end (click)="detailled=true">Afficher</button>
+    </ion-item>
+  </ion-list>
+
+  <!-- PRICE -->
+  <ion-list *ngIf="product" [hidden]="!detailled">
+    <ion-list-header color="primary">
+      Prix
+    </ion-list-header>
+    <ion-item>
+      <ion-label color="primary" stacked>
+        Prix (TVA inc.)
+      </ion-label>
+      <ion-input type="number" placeholder="0.00" [(ngModel)]="product.pricing.price"></ion-input>
+    </ion-item>
+    <ion-item class="promotion">
+      <ion-label color="danger" stacked>
+        Prix pendant promotion (activer la promotion à droite)
+      </ion-label>
+      <ion-input type="number" placeholder="0.00" [(ngModel)]="product.pricing.discount"></ion-input>
+      <ion-toggle color="positive" item-end [(ngModel)]="product.attributes.discount"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <!-- LABELS -->
+  <ion-list *ngIf="product" [hidden]="!detailled">    
+      <ion-list-header color="primary">
+        Labels
+      </ion-list-header>
+      
+      <ion-item>
+        <ion-label>Certifié GRTA </ion-label>
+        <ion-checkbox [(ngModel)]="product.details.grta"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Certifié Bio </ion-label>
+        <ion-checkbox [(ngModel)]="product.details.bio"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label> Biodynamie </ion-label>
+        <ion-checkbox [(ngModel)]="product.details.biodynamics"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label> Bioconversion </ion-label>
+        <ion-checkbox [(ngModel)]="product.details.bioconvertion"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Production Locale </ion-label>
+        <ion-checkbox [(ngModel)]="product.details.local"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Fabrication artisanale</ion-label>      
+        <ion-checkbox [(ngModel)]="product.details.homemade"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+          <ion-label>Sans chimie de synthèse </ion-label>
+          <ion-checkbox [(ngModel)]="product.details.natural"></ion-checkbox>
+        </ion-item>
+      <ion-item>
+        <ion-label>Sans gluten </ion-label>
+        <ion-checkbox [(ngModel)]="product.details.gluten"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Sans lactose </ion-label>
+        <ion-checkbox [(ngModel)]="product.details.lactose"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Végétarien </ion-label>    
+        <ion-checkbox [(ngModel)]="product.details.vegetarian"></ion-checkbox>
+      </ion-item>
+    </ion-list>
+    
+  <ion-list radio-group [(ngModel)]="product.pricing.tva" [hidden]="!detailled">
+    <ion-item >
+      <ion-label color="primary">TVA 0%</ion-label>
+      <ion-radio value="0.0"></ion-radio>
+    </ion-item>        
+    <ion-item>
+      <ion-label color="primary">TVA 2.5%</ion-label>
+      <ion-radio value="0.025"></ion-radio>
+    </ion-item>        
+    <ion-item>
+      <ion-label color="primary">TVA 8%</ion-label>
+      <ion-radio value="0.08"></ion-radio>
+    </ion-item>                
+  </ion-list>
+
+  <!-- NAV -->  
+  <ion-list [hidden]="!detailled">
+    <ion-list-header color="primary">
+      Navigation
+    </ion-list-header>
+    <ion-item>
+      <ion-label>
+        Vendeur 
+      </ion-label>
+      <ion-select [(ngModel)]="product.vendor">
+        <ion-option *ngFor="let shop of shops"  [value]="shop._id">{{shop.name}}</ion-option>        
+      </ion-select>
+    </ion-item>
+      
+    <ion-item>
+      <ion-label>
+        Categorie (principale)
+      </ion-label>
+      <ion-select [(ngModel)]="product.categories">
+        <ion-option *ngFor="let cat of getCategories()"  [value]="cat._id">{{cat.name}}</ion-option>        
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>
+        Categorie (secondaire)
+      </ion-label>
+      <ion-select name="">
+        <ion-option>Pas encore disponible :-((</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  <ion-list>
+    <ion-item>
+        <button ion-button block outline large color="primary" (click)="doExit()">Annuler</button>            
+        <button ion-button block large color="primary" (click)="doSave()">Enregistrer</button>
+    </ion-item>      
+  </ion-list>
+
+</ion-content>

@@ -50,6 +50,64 @@ export class CollectPage {
     }).present()
   }
   
+  filterOrderItemsByVendor(vendor){
+    return this.orders.map(order=>{      
+      let o=new Order(order);
+      o.items=order.items.filter(order=>order.vendor===vendor)
+      return o;
+    }).filter(o=>o.items.length);
+  }
+
+  filterByDisplay(order){
+    if(!this.toggleDisplay){
+      return true;
+    }
+    return (order.items.filter(i=>i.fulfillment.status!==EnumFulfillments[EnumFulfillments.fulfilled]).length)>0;
+  }
+  
+
+  //
+  // count items validated vs total items 
+  getFulfilled(vendor:string):number{
+    return this.vendors[vendor].items.reduce((count,item)=>{
+      return (item.fulfillment.status===EnumFulfillments[EnumFulfillments.fulfilled])?(count+1):count;
+    },0)
+  }
+
+
+
+  getAmount(vendor:string):number{
+    return this.vendors[vendor].items.reduce((amount,item)=>
+      (item.fulfillment.status!==EnumFulfillments[EnumFulfillments.failure])?(amount+item.finalprice):amount
+    ,0).toFixed(2);
+  }
+  
+  // ionViewCanEnter() {
+  //   return this.userSrv.currentUser.isAuthenticated();
+  // }
+
+  // ionViewDidLoad() {
+  //   // this.loaderSrv.ready().subscribe((loader) => {
+  //   //   Object.assign(this.user, loader[1]);
+  //   //   this.isReady = true;
+  //   // })
+  // }
+
+  isFulfilled(vendor:string):boolean{
+    return this.vendors[vendor].items.find(i=>i.fulfillment.status!==EnumFulfillments[EnumFulfillments.fulfilled]);
+  }  
+  //
+  // check if current vendor is already collected
+  isCollected(vendor:string):boolean{
+    let vendors={};
+    this.orders.forEach(order=>{
+          order.vendors.forEach(vendor=>{
+            vendors[vendor.slug]=vendor.collected;
+          });
+    });
+    return vendors[vendor];
+  }
+
 
   //
   // groupd by vendors to prepare collect
@@ -79,32 +137,6 @@ export class CollectPage {
     this.toggleDisplay=!this.toggleDisplay;
   }  
 
-  //
-  // check if current vendor is already collected
-  isCollected(vendor:string):boolean{
-    let vendors={};
-    this.orders.forEach(order=>{
-          order.vendors.forEach(vendor=>{
-            vendors[vendor.slug]=vendor.collected;
-          });
-    });
-    return vendors[vendor];
-  }
-
-  filterOrderItemsByVendor(vendor){
-    return this.orders.map(order=>{      
-      let o=new Order(order);
-      o.items=order.items.filter(order=>order.vendor===vendor)
-      return o;
-    }).filter(o=>o.items.length);
-  }
-
-  filterByDisplay(order){
-    if(!this.toggleDisplay){
-      return true;
-    }
-    return (order.items.filter(i=>i.fulfillment.status!==EnumFulfillments[EnumFulfillments.fulfilled]).length)>0;
-  }
 
   openVendorItems(vendor:string){
     this.navCtrl.push('OrderItemsPage',{
@@ -123,47 +155,6 @@ export class CollectPage {
     
   }
 
-  //
-  // count items validated vs total items 
-  getFulfilled(vendor:string):number{
-    return this.vendors[vendor].items.reduce((count,item)=>{
-      return (item.fulfillment.status===EnumFulfillments[EnumFulfillments.fulfilled])?(count+1):count;
-    },0)
-  }
-
-  isFulfilled(vendor:string):boolean{
-    return this.vendors[vendor].items.find(i=>i.fulfillment.status!==EnumFulfillments[EnumFulfillments.fulfilled]);
-  }
-
-
-  getAmount(vendor:string):number{
-    return this.vendors[vendor].items.reduce((amount,item)=>
-      (item.fulfillment.status!==EnumFulfillments[EnumFulfillments.failure])?(amount+item.finalprice):amount
-    ,0).toFixed(2);
-  }
-
-  // ionViewCanEnter() {
-  //   return this.userSrv.currentUser.isAuthenticated();
-  // }
-
-  ionViewDidLoad() {
-    // this.loaderSrv.ready().subscribe((loader) => {
-    //   Object.assign(this.user, loader[1]);
-    //   this.isReady = true;
-    // })
-  }
-
-  updateCollect(vendor) {
-    let when=this.vendors[vendor].shipping.when;
-    when.setHours(22,0,0,0);
-    this.$order.updateCollect(vendor,true,when)
-      .subscribe(ok=>{
-        this.doToast("Collecte enregistrée");
-        this.setCollected(vendor);
-      },error=>this.doToast(error.text()))
-  };
-
-
 
   //
   //
@@ -176,5 +167,19 @@ export class CollectPage {
     // $scope.selected.items=$scope.shops[shop];
     // $scope.selected.shop=shop;
   };
+  
+
+
+  updateCollect(vendor) {
+    let when=this.vendors[vendor].shipping.when;
+    when.setHours(22,0,0,0);
+    this.$order.updateCollect(vendor,true,when)
+      .subscribe(ok=>{
+        this.doToast("Collecte enregistrée");
+        this.setCollected(vendor);
+      },error=>this.doToast(error.text()))
+  };
+
+
 
 }

@@ -18,7 +18,11 @@
       <ion-input class="input-login" [(ngModel)]="model.password" type="password" placeholder="Mot de passe" name="password" required></ion-input>
     </ion-item>
     <button class="btn" ion-button clear [disabled]="!loginForm.form.valid || !isReady" type="submit" block>Soumettre</button>
-    
+    <div class="keep">
+        <ion-label>Se souvenir</ion-label>
+        <ion-checkbox [(ngModel)]="keep" name="keep"></ion-checkbox>
+    </div>
+      
   </form>
-
+  
 </ion-content>

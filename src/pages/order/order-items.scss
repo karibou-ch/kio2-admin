@@ -1,6 +1,5 @@
 kio2-order-items {
   .toolbar-title{
-    font-size:1.4rem;
   }
    h1.info{
     color: gray;
@@ -11,7 +10,9 @@ kio2-order-items {
   ion-content{
     background: color($colors,light)!important;    
   }
+
   ion-list{
+    margin-top: -4px;
     background: color($colors,light)!important;
   }
   ion-list-header{
@@ -21,7 +22,7 @@ kio2-order-items {
     background: rgba(0, 105, 99, 0.1) !important;
     margin: 8px 0!important;
     margin-bottom: 1px!important;
-    border-top: 1px solid #006963!important;
+    -border-top: 1px solid #006963!important;
 
     ion-icon.rank{
       margin-left: -5px!important;
@@ -46,6 +47,8 @@ kio2-order-items {
       }
     }
   }
+
+  
 
   ion-item.item-block{
     div[item-content]{

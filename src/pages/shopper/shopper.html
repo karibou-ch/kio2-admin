@@ -47,14 +47,13 @@
         </ion-note>        
         <ion-avatar item-start>
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
-          <span class="rank">{{order.rank}}</span>
+          <span class="rank" [class.orphan]="!order.shipping.priority">{{order.rank}}</span>
         </ion-avatar>
         <h3 text-capitalize>{{ order.shipping.name }}</h3>
         <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
         <p>{{ order.shipping.note }}</p>
       </ion-item>
       <ion-item-options side="left">
-        <div>
         <ion-label class="shopper"  color="secondary">
           <ion-icon name="bicycle"></ion-icon>
           Réserver
@@ -65,8 +64,8 @@
           <ion-option value="1">1 tournée</ion-option>
           <ion-option value="2">2 tournée</ion-option>
           <ion-option value="3">3 tournée</ion-option>
+          <ion-option value="4">4 tournée</ion-option>
         </ion-select>        
-        </div>
       </ion-item-options>
 
       <ion-item-options side="right">

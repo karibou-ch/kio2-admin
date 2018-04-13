@@ -7,7 +7,7 @@
 <ion-header [hidden]="!header">
 
   <ion-navbar color="primary">
-    <ion-title>{{shipping| date:"d MMM"}}, {{vendor}}</ion-title>
+    <ion-title>{{shipping| date:"d MMM"}} {{vendor}}</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -17,7 +17,7 @@
 
   <h1 class="info" [hidden]="orders.length">Pas de commandes  pour la boutique {{vendor}} </h1>
 
-  <ion-list *ngFor="let order of orders  ">
+  <ion-list *ngFor="let order of orders">
     <ion-list-header>
       <ion-icon item-start class="rank">{{order.rank}}</ion-icon>
       <h2>
@@ -31,8 +31,9 @@
         </div>-->
   
       </p>
-      <ion-note item-end hidden>
-        {{order.oid}}
+
+      <ion-note item-end >
+        {{order.getSubTotal()|currency:'CHF'}}
       </ion-note>
       <a item-end color="info" round ion-button outline href="tel:{{order.customer.phoneNumbers[0]?.number}}"><ion-icon name="call"> </ion-icon> </a>
       <a item-end color="info" round ion-button outline href="mailto:{{order.email}}"> <ion-icon name="mail"> </ion-icon></a>
@@ -41,7 +42,7 @@
     <ion-item-sliding *ngFor="let item of order.items">    
       <ion-item >
         <div item-content >
-          <div class="title">
+          <div class="title" (click)="doOpenProduct(item)">
               {{item.title}} 
             <span [hidden]="!item.variant" class="red link">
               ({{item.variant?.title}})
@@ -60,10 +61,15 @@
                     (click)="doValidate(order, item)">
               <ion-icon name="checkmark" ></ion-icon>
             </button>
-            <button class="avoid" ion-button outline item-end [class.button-cancel]="isItemCancel(item)"
+            <button class="avoid" ion-button outline item-end [class.button-cancel]="isItemCancel(item)" [hidden]="isPaid(order)"
                     (click)="doCancel(order,item)">
               <ion-icon name="close" ></ion-icon>
             </button>
+            <button class="avoid" ion-button outline item-end [class.button-cancel]="isItemCancel(item)" [hidden]="!isPaid(order)"
+                    (click)="doRefund(order,item)">
+              <ion-icon name="card" ></ion-icon>
+            </button>
+            
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Events, IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 
-import { Order,EnumFulfillments, OrderService } from 'kng2-core';
+import { Order,EnumFulfillments, OrderService, Product, OrderItem, ProductService } from 'kng2-core';
 
 /**
  * Generated class for the OrderItemsPage page.
@@ -29,6 +29,7 @@ export class OrderItemsPage {
     public navCtrl: NavController, 
     public navParams: NavParams,
     public $order:OrderService,
+    public $product:ProductService,
     public toast:ToastController
   ) {
 
@@ -42,13 +43,26 @@ export class OrderItemsPage {
 
 
   isItemValid(item){
-    return(item.fulfillment.status==='fulfilled');
+    return(item.fulfillment.status=='fulfilled');
 //      'primary':'light';
   }
 
   isItemCancel(item){
-    return(item.fulfillment.status==='failure');
+    return(item.fulfillment.status=='failure');
 //      'danger':'light';
+  }
+
+  isPaid(order:Order){
+    return (['paid'].indexOf(order.payment.status)>-1);
+  } 
+
+  doRefund(order:Order,item:OrderItem){
+
+    this.$order.refund(order,item.finalprice).subscribe(
+      ()=>{
+        this.doToast("Montant: "+item.finalprice.toFixed(2)+" remboursé")
+      },error=>this.doToast(error.text())      
+    )
   }
 
   doValidate(order, item){
@@ -73,6 +87,17 @@ export class OrderItemsPage {
       },error=>this.doToast(error.text()));
   }
 
+ 
+  doOpenProduct(item:OrderItem){
+    this.$product.get(item.sku).subscribe(
+      (product:Product)=>{
+        this.navCtrl.push('ProductDetailPage',{
+          product:product
+        });    
+      }
+    )
+  }
+  
   doToast(msg){
     this.toast.create({
       message: msg,

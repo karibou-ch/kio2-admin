@@ -25,7 +25,9 @@
 
   <!-- right -->
   <ion-buttons end>
-    <button ion-button icon-only (click)="openSettings($event)">
+    <button ion-button icon-only 
+            [class.supergreen]="user.isAdmin()"
+            (click)="openSettings($event)">
       <ion-icon name="more"></ion-icon>
     </button>
   </ion-buttons>

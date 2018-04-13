@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Events, ToastController } from 'ionic-angular';
 
-import { EnumFulfillments, 
-         Order, 
+import { Order, 
          OrderService , 
          User, 
          UserService } from 'kng2-core';

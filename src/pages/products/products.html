@@ -1,48 +1,51 @@
 
 <ion-header no-border>
-    <logistic-header
-      [stock]="true"
-      (doInitOrders)="onInitOrders($event)"
-      (doSelectedOrders)="onSelectedOrders($event)">
-      </logistic-header>
-  </ion-header>
-  
+  <logistic-header
+    [stock]="false"
+    [collect]="true"
+    (doInitOrders)="onInitOrders($event)"
+    (doSelectedOrders)="onSelectedOrders($event)">
+    </logistic-header>
+</ion-header>
+
 
 <ion-content >
+  <div class="metabar">
     <ion-searchbar
-    [(ngModel)]="cache.search"
-    [debounce]="500"
-    (ionInput)="onSearchInput($event)"
-    (ionClear)="onSearchCancel($event)">
-  </ion-searchbar>  
+      [(ngModel)]="cache.search"
+      [debounce]="500"
+      (ionInput)="onSearchInput($event)"
+      (ionClear)="onSearchCancel($event)">
+    </ion-searchbar>  
+    <ion-toggle [(ngModel)]="cache.active"></ion-toggle>
+      
+  </div>
   <ion-list>
     <ion-item-sliding *ngFor="let product of products">    
-        <ion-item >
+        <ion-item (click)="openDetails(product)" [hidden]="cache.active!=product.attributes.available">
           <ion-avatar item-start>
-            <img [src]="thumbnail(product)">
+            <img [src]="'https:'+product.photo.url+'/-/resize/128x/'">
           </ion-avatar>      
           <h2>{{product.title}}</h2>      
-          <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}} </h3>
-          <span item-end>
-              <button class="action" [hidden]="!product.attributes.available" ><ion-icon name="square-outline"></ion-icon> </button>
-              <button class="action" [hidden]="product.attributes.available" ><ion-icon name="checkbox-outline"></ion-icon> </button>              
-          </span>
+          <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}}</h3>
+          <p>{{getStateLabel(product)}}</p>
           <span item-end [class.red]="product.pricing.stock<6">
               {{product.pricing.stock}}
           </span>          
         </ion-item>
         <ion-item-options side="right">
-          <a ion-button color="danger" >
-            <ion-icon name="call"></ion-icon>
-            Désactiver
+          <a ion-button [color]="product.attributes.available?'danger':'secondary'" (click)="toggleActive(product)">
+            <ion-icon name="basket"></ion-icon>
+            <span [hidden]="!product.attributes.available">Désactiver</span>
+            <span [hidden]="product.attributes.available">Activer</span>
           </a>        
-          <ion-select [(ngModel)]="product.pricing.stock" 
+          <!-- <ion-select [(ngModel)]="product.pricing.stock" 
           (ngModelChange)="updateStock(product,$event)"
           interface="action-sheet">
             <ion-option value="0">O en stock</ion-option>
             <ion-option value="10">10 en stock</ion-option>
             <ion-option value="50">50 en stock</ion-option>
-          </ion-select>        
+          </ion-select>         -->
 
         </ion-item-options>
       </ion-item-sliding>    

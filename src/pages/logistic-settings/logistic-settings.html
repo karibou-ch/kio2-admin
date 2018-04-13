@@ -16,21 +16,21 @@
 <ion-content padding>
   <ion-list>
     <ion-item>
-      <ion-icon name="plane" item-start ></ion-icon>      
-      <ion-label color="dark"> Livraisons en préparation</ion-label>
+      <ion-icon name="bicycle" item-start ></ion-icon>      
+      <ion-label color="dark"> Les commandes en préparation (vs fermées)</ion-label>
       <ion-toggle  [checked]="toggle" [(ngModel)]="toggle" (ngModelChange)="toggleShippingFilter()"></ion-toggle>
     </ion-item>
     <ion-item *ngFor="let shipping of availableDates;let i = index" 
             [class.selected]="shipping.getTime()===currentShippingDate.getTime()"  
             (click)="displayOrders(shipping)">
-      <ion-icon name="ionic" item-start ></ion-icon>
+      <ion-icon name="calendar" item-start ></ion-icon>
       <ion-label>{{ shipping | date:'MMM EEEE d' }}</ion-label>
       <ion-note  item-end>Ouvir</ion-note>
     </ion-item>    
 
     <ion-list-header>
       <ion-icon item-start name="settings"></ion-icon>
-      <h2>Options</h2>
+      Options
     </ion-list-header>
     <ion-item [hidden]="!user.isAdmin()">
       <ion-icon name="ionic" item-start ></ion-icon>

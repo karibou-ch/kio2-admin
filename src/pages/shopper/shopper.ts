@@ -80,7 +80,7 @@ export class ShopperPage {
     this.events.publish('refresh');    
     setTimeout(() => {
       refresher.complete();
-    }, 2000);    
+    }, 1000);    
   }
 
 

@@ -1,45 +1,32 @@
-<!--
-  Generated template for the ProfilPage page.
 
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
-
   <ion-navbar color="primary">
     <ion-title >{{user?.displayName}}</ion-title>
-
-    <ion-buttons end>
-      <button *ngIf="user.isAuthenticated()" ion-button (click)="logout()">
-        <ion-icon name="log-out"></ion-icon>
-      </button>
-    </ion-buttons>
   </ion-navbar>
-
 </ion-header>
 
 
 <ion-content padding>
   <ion-list>
-
     <ion-item>
-      <h2>Nom</h2>
+      <h2 color="primary">Nom</h2>
       <p text-capitalize>{{ user?.name.familyName }}</p>
     </ion-item>
     <ion-item>
-      <h2>Prenom</h2>
+      <h2 color="primary">Prenom</h2>
       <p text-capitalize>{{ user?.name.givenName }}</p>
     </ion-item>
     <ion-item>
-      <h2>Email</h2>
+      <h2 color="primary">Email</h2>
       <p>{{ user?.email.address }}</p>
     </ion-item>
     <ion-item *ngFor="let phone of user?.phoneNumbers">
-      <h2>Telephone</h2>
+      <h2 color="primary">Telephone</h2>
       <p>{{ phone.number }}</p>
     </ion-item>
-    <ion-item item-content>
-      <h2>Rôle</h2>
+      
+    <ion-item>
+      <h2 color="primary">Rôle</h2>
       <ul>
 
         <li [hidden]="!user.hasRole('logistic')" color="secondary">Logistic</li>      
@@ -48,22 +35,40 @@
         <li color="secondary">Utilisateur</li>    
       </ul>
     </ion-item>
-    <ion-list-header>
-      <h3>Logistique</h3>
-    </ion-list-header>
-    <ion-item *ngIf="user.logistic?.PostalCode?.length > 0">
-      <h2>Code Postaux</h2>
-      <p *ngFor="let postal of user?.logistic?.PostalCode">{{ postal }}</p>
-    </ion-item>
     <ion-item>
       <button ion-button block round large outline icon-left color="danger" (click)="logout()">
         <ion-icon name="user"></ion-icon> Logout
       </button>
     </ion-item>
     <ion-item>
-      <button ion-button block round large outline icon-left color="info" (click)="devMode()">
-        <ion-icon name="settings"></ion-icon> Dev Mode
+      <ion-label color="primary" floating>Serveur K.</ion-label>
+      <ion-input type="text"  [(ngModel)]="server" name="server"></ion-input>
+      <button ion-button item-end  outline color="info" (click)="devMode()">
+        <ion-icon name="settings"></ion-icon> 
       </button>
+        
+      
     </ion-item>
+  </ion-list>
+  <ion-list *ngIf="user.isAdmin()||user.hasRole('logistic')">
+    <ion-list-header color="primary">
+      Logistique, vos codes postaux
+    </ion-list-header>
+    <ion-item (click)="toggleAll()">
+        <ion-label>Tous les codes postaux</ion-label>
+        <ion-toggle [checked]="isToggleAll()" (click)="toggleAll()"></ion-toggle>
+    </ion-item>    
+    
+    <ion-item *ngFor="let postal of postalCodes" (click)="togglePC(postal)">
+        <ion-label>{{postal}}</ion-label>
+        <ion-toggle [checked]="isPC(postal)" (click)="toggleAll()"></ion-toggle>
+    </ion-item>    
+
+    <!-- 
+    <ion-item *ngFor="let postal of user.logistic?.PostalCode">
+      <h2 color="primary">Code Postaux</h2>
+      <p >{{ postal }}</p>
+    </ion-item> -->
+            
   </ion-list>
 </ion-content>
