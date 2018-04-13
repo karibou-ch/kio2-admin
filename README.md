@@ -43,6 +43,12 @@ Kio2-admin is a:
   * to deploy the application, follow the rules https://ionicframework.com/docs/intro/deploying/
 ```  
 
+# Publih for www
+```bash
+  $ ionic cordova build browser --prod
+  $ rsync -avziu --delete-after -e 'ssh -p22' platforms/browser/www/ $user@$server:$path 
+```
+
 # Debug
 ```bash
   $ adb logcat CordovaLog:D *:S
