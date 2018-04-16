@@ -21,6 +21,8 @@ export class ProductDetailPage {
   product:Product;
   shops:Shop[];
   defaultProduct:Product=new Product();
+  detailled:boolean=false;
+  
   @ViewChild('desc') desc: ElementRef;
 
   constructor(
