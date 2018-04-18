@@ -1,6 +1,7 @@
 
 <ion-header no-border>
   <logistic-header
+    [vendor]="false"
     [stock]="false"
     [collect]="true"
     (doInitOrders)="onInitOrders($event)"
@@ -17,9 +18,9 @@
       (ionInput)="onSearchInput($event)"
       (ionClear)="onSearchCancel($event)">
     </ion-searchbar>  
-    <ion-toggle [(ngModel)]="cache.active"></ion-toggle>
-      
+    <ion-toggle [(ngModel)]="cache.active"></ion-toggle>      
   </div>
+
   <ion-list>
     <ion-item-sliding *ngFor="let product of products">    
         <ion-item (click)="openDetails(product)" [hidden]="cache.active!=product.attributes.available">

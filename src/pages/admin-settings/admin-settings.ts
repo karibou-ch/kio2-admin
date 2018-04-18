@@ -2,19 +2,12 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { User, UserService } from 'kng2-core';
 
-
-/**
- * Generated class for the LogisticSettingsPage page.
- *
- * See http://ionicframework.com/docs/components/#navigation for more info
- * on Ionic pages and navigation.
- */
-@IonicPage({name:'LogisticSettingsPage'})
+@IonicPage({name:'AdminSettingsPage'})
 @Component({
-  selector: 'page-logistic-settings',
-  templateUrl: 'logistic-settings.html',
+  selector: 'kio2-admin-settings',
+  templateUrl: 'admin-settings.html',
 })
-export class LogisticSettingsPage {
+export class AdminSettingsPage {
   availableDates:Date[]=[];
   currentShippingDate:Date;
   toggle:boolean;
@@ -59,5 +52,9 @@ export class LogisticSettingsPage {
  
   openOrders(){
     this.navCtrl.push('OrderCustomersPage');    
+  }
+
+  openVendors(){
+    this.navCtrl.push('VendorPage');        
   }
 }

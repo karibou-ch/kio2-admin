@@ -1,0 +1,111 @@
+
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>{{shop.name}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content  [class.inactive]="!shop.status">
+  <ion-list >
+    <ion-item>
+      <ion-label color="primary" >
+        Boutique active pour la vente
+      </ion-label>
+      <ion-toggle color="positive" [(ngModel)]="shop.status" [disabled]="!user.isAdmin()"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" floating>Description </ion-label> 
+      <ion-textarea  rows="4"  placeholder="votre histoire... " [(ngModel)]="shop.description" required></ion-textarea>
+    </ion-item>
+    <ion-item >
+      <ion-label>Grouper la liste des produits commandés</ion-label>
+      <ion-toggle color="positive" [(ngModel)]="shop.info.detailledOrder" ></ion-toggle>
+    </ion-item>
+    
+  </ion-list>      
+  
+  <ion-list>
+      <ion-list-header color="primary">
+        Informez vos clients
+      </ion-list-header>
+      <ion-item>
+        <ion-label [class.red]="shop.available.active">Ma boutique est fermée</ion-label>
+        <ion-toggle color="positive" [(ngModel)]="shop.available.active" ></ion-toggle>
+      </ion-item>
+      <ion-item [class.inactive]="!shop.available.active">
+        <ion-label >Le jour de fermeture</ion-label>
+        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="shop.available.from"></ion-datetime>
+      </ion-item>
+  
+      <ion-item [class.inactive]="!shop.available.active">
+        <ion-label >Le jour de ré-ouverture</ion-label>
+        <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="shop.available.to"></ion-datetime>
+      </ion-item>
+        
+    </ion-list>
+  
+    <!-- Photos -->
+    <!-- Admin BM -->
+    <!-- Livraisons disponibles -->
+    <!-- Adresse de collecte -->
+  
+
+  <!-- BUSINESS -->
+  <ion-list [class.discount]="shop.discount.active">
+    <ion-list-header color="primary">
+        Fidéliser le client en lui offrant un rabais à la quantité      
+    </ion-list-header>
+    <ion-item>
+      <ion-label color="primary">
+        Activer le rabais
+      </ion-label>
+      <ion-toggle color="positive" [(ngModel)]="shop.discount.active"></ion-toggle>
+    </ion-item>
+    <ion-item [class.inactive]="!shop.discount.active">
+        <ion-label color="primary" stacked>
+            Le volume d'achat pour obtenir un rabais
+        </ion-label> 
+        <ion-input type="number" placeholder="Si le montant d'achat dépasse X.XX CHF" [(ngModel)]="shop.discount.threshold"></ion-input>              
+    </ion-item>
+
+    <ion-item [class.inactive]="!shop.discount.active">
+        <ion-label color="primary" stacked>
+            Combien offrez-vous au client (CHF)
+        </ion-label> 
+        <ion-input type="number" placeholder="Votre participation en  X.XX CHF" [(ngModel)]="shop.discount.amount"></ion-input>              
+    </ion-item>    
+  </ion-list>
+
+  <!-- BUSINESS -->
+  <!-- <ion-list>
+    <ion-list-header color="primary">
+      Business
+    </ion-list-header>
+    <ion-item>
+        <ion-label color="primary" stacked>Information TVA</ion-label> 
+        <ion-input type="text" placeholder="... TVA" [(ngModel)]="shop.account.tva.number"></ion-input>              
+    </ion-item>
+    <ion-item>
+        <ion-label>
+
+        </ion-label>
+        <div item-content>
+            <h2>Boutique créée le {{shop.created|date:'mediumDate'}} dans la catégorie {{shop.catalog.name}}</h2>
+            <h2>Business model à {{shop.account.fees*100|number:2}}%</h2>
+            <p>
+              boutique validée le {{shop.account.updated|date:'mediumDate'}}
+              (poids) {{shop.scoring.weight}}
+            </p>
+        </div>
+    </ion-item>
+    
+  </ion-list>     -->
+
+  <ion-list>
+    <ion-item>
+        <button ion-button block outline large color="primary" (click)="doSave()">Enregistrer</button>
+      </ion-item>      
+  </ion-list>
+    
+</ion-content>

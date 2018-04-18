@@ -75,7 +75,7 @@ export class LoginPage {
       // save remember  
       var remember:any={};
       remember.mail=this.model.email;
-      this.model.password=(this.keep)? remember.password:'';      
+      remember.password=(this.keep)? this.model.password:'';      
       this.nativeStorage.setItem(this.KIO2_LOGIN_REMEMBER, remember)
       .catch(error=>{
         console.log('-- ERROR set',this.KIO2_LOGIN_REMEMBER,error)

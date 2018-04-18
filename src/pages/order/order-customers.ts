@@ -11,12 +11,6 @@ import { EnumFulfillments,
          LoaderService,
          EnumCancelReason} from 'kng2-core';
 
-/**
- * Generated class for the VendorPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 
 @IonicPage()
 @Component({

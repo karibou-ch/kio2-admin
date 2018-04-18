@@ -1,0 +1,35 @@
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>Vos boutiques</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content>
+  <div class="metabar">
+    <ion-searchbar
+      [(ngModel)]="cache.search"
+      [debounce]="500"
+      (ionInput)="onSearchInput($event)"
+      (ionClear)="onSearchCancel($event)">
+    </ion-searchbar>  
+    <ion-toggle [(ngModel)]="cache.active"></ion-toggle>      
+  </div>
+
+  <ion-list>
+    <ion-item-sliding *ngFor="let shop of shops" [hidden]="shop.status!=cache.active">    
+        <ion-item (click)="openDetails(shop)" [class.inactive]="shop.available.active">
+          <ion-avatar item-start>
+            <img [src]="'https:'+shop.photo.owner+'/-/resize/128x/'">
+          </ion-avatar>      
+          <h2>{{shop.name}}</h2>      
+          <h3 class="red" [hidden]="!shop.available.active">Boutique fermée jusqu'à {{shop.available.to|date:'mediumDate':'GMT+1':'fr'}}</h3>
+          <p></p>
+          <span item-end [class.red]="">
+             
+          </span>          
+        </ion-item>
+      </ion-item-sliding>    
+  </ion-list>
+</ion-content>

@@ -7,9 +7,6 @@
 
 <ion-content >
   <ion-list *ngIf="product">
-    <ion-list-header color="primary">
-      Information
-    </ion-list-header>
     <ion-item>
       <ion-label color="primary">
         Produit actif à la vente
@@ -48,7 +45,7 @@
       <ion-label color="primary" stacked>
         En stock
       </ion-label>
-      <ion-input type="text" placeholder="0-1000" [(ngModel)]="product.pricing.stock"></ion-input>
+      <ion-input type="text" min="0" placeholder="0-1000" [(ngModel)]="product.pricing.stock"></ion-input>
       <button ion-button outline large item-end (click)="product.pricing.stock=0">0</button>
       <button ion-button outline large item-end (click)="product.pricing.stock=40">40 </button>
       <button ion-button outline large item-end (click)="product.pricing.stock=100">100 (qty)</button>
@@ -69,13 +66,13 @@
       <ion-label color="primary" stacked>
         Prix (TVA inc.)
       </ion-label>
-      <ion-input type="number" placeholder="0.00" [(ngModel)]="product.pricing.price"></ion-input>
+      <ion-input type="number" min="0" placeholder="0.00" [(ngModel)]="product.pricing.price"></ion-input>
     </ion-item>
     <ion-item class="promotion">
       <ion-label color="danger" stacked>
         Prix pendant promotion (activer la promotion à droite)
       </ion-label>
-      <ion-input type="number" placeholder="0.00" [(ngModel)]="product.pricing.discount"></ion-input>
+      <ion-input type="number" min="0" placeholder="0.00" [(ngModel)]="product.pricing.discount"></ion-input>
       <ion-toggle color="positive" item-end [(ngModel)]="product.attributes.discount"></ion-toggle>
     </ion-item>
   </ion-list>

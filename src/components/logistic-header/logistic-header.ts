@@ -1,6 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LoaderService, Order, OrderService, User, UserService } from 'kng2-core';
 import { Events, NavController, ToastController } from 'ionic-angular';
+import { Network } from '@ionic-native/network';
+import { Subscription } from 'rxjs';
+
 
 /**
  * Generated class for the LogisticHeaderComponent component.
@@ -16,6 +19,7 @@ export class LogisticHeaderComponent {
 
   @Input() currentShippingDate: Date;
   @Input() stock:boolean;
+  @Input() vendor:boolean;
   @Input('collect') hideCollect:boolean=false;
   @Output() doInitOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
   @Output() doSelectedOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
@@ -25,9 +29,9 @@ export class LogisticHeaderComponent {
   monthOrders: Map<number, Order[]> = new Map();
   pickerShippingDate:string;
   availableDates: Date[] = [];
-  private isReady;
- 
-
+  isReady;
+  isNetworkReady:boolean;
+  netSubs:Subscription;
   filtersOrder: any;
   FLOATING = { payment: 'authorized' };  //not yet handled by producers
   LOCKED = { fulfillments: 'fulfilled,partial' };  //got by the producers (sub-group of FLOATING)
@@ -38,6 +42,7 @@ export class LogisticHeaderComponent {
     public events: Events,
     private $loader: LoaderService,
     public navCtrl: NavController, 
+    private $network: Network,
     private $order: OrderService,
     private toast:ToastController,
     private $user:UserService
@@ -54,10 +59,18 @@ export class LogisticHeaderComponent {
     }).present();
   }
 
+  ngOnDestroy(){
+    this.netSubs.unsubscribe();
+  }
+
   ngOnInit() {
     // keep in touch! shop1@karibou.ch
     this.$user.subscribe(user=>{
       Object.assign(this.user,user);
+    });
+
+    this.netSubs=this.$network.onchange().subscribe(() => {
+      this.isNetworkReady=(this.$network.type!='none');
     });
 
     this.$loader.ready().subscribe((loader) => {
@@ -165,7 +178,11 @@ export class LogisticHeaderComponent {
   openStock(){
     this.navCtrl.push('ProductsPage');
   }
-  
+
+  openVendor(){
+    this.navCtrl.push('VendorPage');
+  }
+    
   //
   // fire event to display Map
   openMap() {
@@ -176,7 +193,7 @@ export class LogisticHeaderComponent {
   //
   // http://ionicframework.com/docs/components/#popovers
   openSettings(event) {
-    this.navCtrl.push('LogisticSettingsPage',{
+    this.navCtrl.push('AdminSettingsPage',{
       shipping:this.availableDates,
       current:this.currentShippingDate,
       toggle:(this.filtersOrder===this.FLOATING),

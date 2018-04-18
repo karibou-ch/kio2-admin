@@ -1,6 +1,15 @@
 <ion-navbar color="primary">
   <!-- left  -->
   <ion-buttons start>
+  <!-- DISPLAY VENDOR -->
+  <button color="light" 
+          [hidden]="!vendor"
+          [disabled]="!isReady" 
+          icon-only
+          ion-button (click)="openVendor()" clear="true" >
+          <ion-icon name="home"></ion-icon>
+  </button>      
+    
   <!-- DISPLAY STOCK -->
   <button color="light" 
           [hidden]="!stock"
@@ -21,7 +30,7 @@
   </ion-buttons>
 
   <!-- title  -->
-  <ion-title (click)="picker.open()">{{ currentShippingDate | date:"d MMM y" }}</ion-title>
+  <ion-title (click)="picker.open()">{{ currentShippingDate | date:"d MMM y" }} {{isNetworkReady?'':'Attention plus de réseau!'}}</ion-title>
 
   <!-- right -->
   <ion-buttons end>

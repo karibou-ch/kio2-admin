@@ -6,19 +6,13 @@ import { Order,
          User, 
          UserService } from 'kng2-core';
 
-/**
- * Generated class for the VendorPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 
 @IonicPage()
 @Component({
   selector: 'kio2-vendor',
-  templateUrl: 'vendor.html',
+  templateUrl: 'vendor-items.html',
 })
-export class VendorPage {
+export class VendorItemsPage {
 
   orders:Order[];
 

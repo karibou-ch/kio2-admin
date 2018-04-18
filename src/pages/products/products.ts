@@ -89,15 +89,7 @@ export class ProductsPage {
       message: msg,
       duration: 3000
     }).present();
-
   }
-  onError(msg){
-    this.toast.create({
-      message: msg,
-      duration: 3000
-    }).present();
-  }
-
 
   onInitOrders([orders,shipping]:[Order[],Date]){
   }  
@@ -162,7 +154,7 @@ export class ProductsPage {
         this.onDone('Enregistré');
       },
       (error)=>{
-        this.onError(error.text())
+        this.onDone(error.text())
       }
     )
   }  

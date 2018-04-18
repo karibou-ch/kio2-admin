@@ -8,6 +8,8 @@ import localeFr from '@angular/common/locales/fr';
 //
 // the second parameter 'fr' is optional
 import { registerLocaleData } from '@angular/common';
+import { Network } from '@ionic-native/network';
+import { Dialogs } from '@ionic-native/dialogs';
 registerLocaleData(localeFr, 'fr');
 
 
@@ -20,7 +22,9 @@ export class Kio2Aadmin {
   @ViewChild('adminNavigation') nav: NavController;
 
   constructor(
+    private dialogs:Dialogs,
     private $loader: LoaderService,
+    private $network: Network,
     private zone:NgZone,
     private platform: Platform,
     private statusBar: StatusBar,
@@ -53,12 +57,27 @@ export class Kio2Aadmin {
   }
 
   ngOnInit() {
-
+  
+    //
+    // checking network on start!
+    setTimeout(()=>{
+      if(this.$network.type=='none'){
+        return this.dialogs.alert("Il n'y a pas d'accès au réseau actuellement").then(()=>{
+          this.platform.exitApp();
+        })
+      }  
+    },1000);
     this.$loader.ready().subscribe((loader) => {
       Object.assign(this.currentUser,loader[1]);
       this.onInit(this.currentUser);
+    },error=>{
+      this.dialogs.alert("Un problème empêche l'accès au service..").then(()=>{
+        this.platform.exitApp();        
+      })
     });
 
-    this.$user.subscribe(this.onInit.bind(this));
+    this.$user.subscribe(user=>{
+      this.onInit(user);
+    });
   }
 }
