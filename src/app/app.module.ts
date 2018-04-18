@@ -1,4 +1,5 @@
-import { LOCALE_ID, NgModule, ErrorHandler } from '@angular/core';
+import { Pro } from '@ionic/pro';
+import { LOCALE_ID, NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { Kio2Aadmin } from './app.component';
@@ -25,6 +26,38 @@ import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
+
+//
+// make value sync with their sources
+import * as ionic from '../../ionic.config.json';
+import * as npm from '../../package.json';
+
+
+Pro.init((<any>ionic).app_id, {
+  appVersion: (<any>npm).verion
+})
+
+@Injectable()
+export class Kio2AdminErrorHandler implements ErrorHandler {
+  ionicErrorHandler: IonicErrorHandler;
+
+  constructor(injector: Injector) {
+    try {
+      this.ionicErrorHandler = injector.get(IonicErrorHandler);
+    } catch(e) {
+      // Unable to get the IonicErrorHandler provider, ensure
+      // IonicErrorHandler has been added to the providers list below
+    }
+  }
+
+  handleError(err: any): void {
+    Pro.monitoring.handleNewError(err);
+    // Remove this if you want to disable Ionic's auto exception handling
+    // in development mode.
+    this.ionicErrorHandler && this.ionicErrorHandler.handleError(err);
+  }
+}
+
 
 @NgModule({
   declarations: [
@@ -53,8 +86,10 @@ import 'rxjs/add/observable/of';
     Kio2Aadmin
   ],
   providers: [
-    { provide: LOCALE_ID, useValue: "fr-FR" },  //set locale to french (dates, etc. )
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    // set locale to french (for dates, etc. )
+    { provide: LOCALE_ID, useValue: "fr-FR" },  
+    // {provide: ErrorHandler, useClass: IonicErrorHandler},
+    {provide: ErrorHandler, useClass: Kio2AdminErrorHandler },    
     BackgroundGeolocation,
     Dialogs,
     Geolocation,
