@@ -45,6 +45,9 @@ export class LoginPage {
       this.nativeStorage.getItem(this.KIO2_LOGIN_REMEMBER).then(remember=>{
         this.model.email=remember.mail;        
         this.model.password=remember.password;
+        if(remember.password&&remember.password!=''){
+          this.keep=true;
+        }
       },(error)=>{
         // using ionic serve --livereload & nativestorage doesnt work 
         console.log('-- ERROR get',this.KIO2_LOGIN_REMEMBER,error)
