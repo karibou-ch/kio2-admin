@@ -30,7 +30,10 @@
   </ion-buttons>
 
   <!-- title  -->
-  <ion-title (click)="picker.open()">{{ currentShippingDate | date:"d MMM y" }} {{isNetworkReady?'':'Attention plus de réseau!'}}</ion-title>
+  <ion-title (click)="picker.open()">
+    {{ currentShippingDate | date:"d MMM y" }} 
+    <span class="network" [hidden]="isNetworkReady">  <ion-icon name="alert"></ion-icon> pas de réseau!</span>
+  </ion-title>
 
   <!-- right -->
   <ion-buttons end>
