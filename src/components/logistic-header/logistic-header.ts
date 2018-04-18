@@ -30,7 +30,7 @@ export class LogisticHeaderComponent {
   pickerShippingDate:string;
   availableDates: Date[] = [];
   isReady;
-  isNetworkReady:boolean;
+  isNetworkReady:boolean=true;
   netSubs:Subscription;
   filtersOrder: any;
   FLOATING = { payment: 'authorized' };  //not yet handled by producers
