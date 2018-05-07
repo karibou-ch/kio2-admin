@@ -51,10 +51,6 @@
       <button ion-button outline large item-end (click)="product.pricing.stock=100">100 (qty)</button>
       
     </ion-item>
-    <ion-item (click)="detailled=true">
-      <ion-label>Editer tous les paramètres </ion-label>
-      <button ion-button item-end (click)="detailled=true">Afficher</button>
-    </ion-item>
   </ion-list>
 
   <!-- PRICE -->
@@ -173,6 +169,10 @@
   </ion-list>
   <ion-list>
     <ion-item>
+        <button ion-button block outline large color="primary" (click)="detailled=true">
+            Editer tous les paramètres 
+          </button>
+          
         <button ion-button block outline large color="primary" (click)="doExit()">Annuler</button>            
         <button ion-button block large color="primary" (click)="doSave()">Enregistrer</button>
     </ion-item>      
