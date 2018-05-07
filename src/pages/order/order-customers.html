@@ -19,14 +19,16 @@
   <!-- DISPLAY ORDERS -->
   <ion-list>
     <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersByPosition);let i=index;">
-      <ion-item [class.selected]="isOrderSelected(order)" (click)="openOrder(order)">
+      <ion-item [class.selected]="isOrderSelected(order)" 
+                [class.in-progress]="!isFulfilled(order)"
+                (click)="openOrder(order)">
         <ion-note item-end>
           <span class="price">{{order.getSubTotal()|number:'1.0-0'}} fr</span>            
-          <span class="progress" [class.red]="!isFulfilled(order)">{{order.getProgress()|number:'1.0-0'}} %</span>            
+          <span class="progress">{{order.getProgress()|number:'1.0-0'}} %</span>            
         </ion-note>        
         <ion-avatar item-start>
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
-          <span class="rank">{{order.rank}}</span>
+          <span class="rank" >{{order.rank}}</span>
         </ion-avatar>
         <h3 text-capitalize>{{ order.oid }} - {{ order.shipping.name }}</h3>
         <h2><span class="label counter">{{i+1}}</span><span class="label">{{order.payment.status}}</span> {{order.getFulfilledProgress()}}/{{order.items.length}} </h2>

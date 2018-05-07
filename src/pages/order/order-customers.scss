@@ -52,7 +52,17 @@ kio2-order-customers {
     &.selected{
       background-color: color($colors, light);
     }
+    &.in-progress{
+      span.progress{
+        color: red!important;
+      }
+      span.rank{
+        background-color:#ddd!important;
+      }
+
+    }
     h2{
+      color: green;
       font-size:1.4rem!important;
     }
     p{
@@ -85,12 +95,13 @@ kio2-order-customers {
       width: 55px;
       padding-top: 1px;
       border-radius: 3px;
-      background: color($colors,info);
+      background: color($colors,primary);
       right: 10px;
       
     } 
 
     span.progress{
+      color: green;
       position: absolute;
       bottom: 10px;
       right: 10px;        
