@@ -41,27 +41,18 @@ export class OrderItemsPage {
     
   }
 
-
-  isItemValid(item){
-    return(item.fulfillment.status=='fulfilled');
-//      'primary':'light';
+  ngOnInit() {
+    this.isReady= (this.orders.length>0)|| (this.vendor!='') || (this.shipping!=null);
+    //console.log('-----',this.orders,(this.orders.length>0),(this.vendor!='') , (this.shipping!=null))
   }
 
-  isItemCancel(item){
-    return(item.fulfillment.status=='failure');
-//      'danger':'light';
-  }
-
-  isPaid(order:Order){
-    return (['paid'].indexOf(order.payment.status)>-1);
-  } 
-
+  
   doRefund(order:Order,item:OrderItem){
 
     this.$order.refund(order,item.finalprice).subscribe(
       ()=>{
         this.doToast("Montant: "+item.finalprice.toFixed(2)+" remboursé")
-      },error=>this.doToast(error.text())      
+      },error=>this.doToast(error.error)      
     )
   }
 
@@ -73,7 +64,7 @@ export class OrderItemsPage {
         // when admin, we should remove other vendor items
         Object.assign(order,ok);
         order.items=order.items.filter(i=>i.vendor===item.vendor)
-      },error=>this.doToast(error.text()));
+      },error=>this.doToast(error.error));
   }
   
   doCancel(order, item){
@@ -84,7 +75,7 @@ export class OrderItemsPage {
         // when admin, we should remove other vendor items
         Object.assign(order,ok);
         order.items=order.items.filter(i=>i.vendor===item.vendor)
-      },error=>this.doToast(error.text()));
+      },error=>this.doToast(error.error));
   }
 
  
@@ -119,12 +110,30 @@ export class OrderItemsPage {
     if(kcode===13){
       this.doValidate(order,item);
     }
+  }  
+
+  getPhoneNumber(order:Order){
+    if(!order||!order.customer.phoneNumbers||!order.customer.phoneNumbers.length){
+      return false;
+    }
+    return order.customer.phoneNumbers[0].number;
+  }
+  
+
+  isItemValid(item){
+    return(item.fulfillment.status=='fulfilled');
+//      'primary':'light';
   }
 
-  ngOnInit() {
-    this.isReady= (this.orders.length>0)|| (this.vendor!='') || (this.shipping!=null);
-    //console.log('-----',this.orders,(this.orders.length>0),(this.vendor!='') , (this.shipping!=null))
+  isItemCancel(item){
+    return(item.fulfillment.status=='failure');
+//      'danger':'light';
   }
+
+  isPaid(order:Order){
+    return (['paid'].indexOf(order.payment.status)>-1);
+  } 
+
 
   ionViewDidLeave(){
     this.events.publish('refresh');        

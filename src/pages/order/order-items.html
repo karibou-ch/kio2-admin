@@ -35,7 +35,8 @@
       <ion-note item-end >
         {{order.getSubTotal()|currency:'CHF'}}
       </ion-note>
-      <a item-end color="info" round ion-button outline href="tel:{{order.customer.phoneNumbers[0]?.number}}"><ion-icon name="call"> </ion-icon> </a>
+      <a [hidden]="!getPhoneNumber()"
+         item-end color="info" round ion-button outline href="tel:{{getPhoneNumber()}}"><ion-icon name="call"> </ion-icon> </a>
       <a item-end color="info" round ion-button outline href="mailto:{{order.email}}"> <ion-icon name="mail"> </ion-icon></a>
     </ion-list-header>
 
@@ -49,6 +50,8 @@
             </span>
           </div>
           <div class="quantity" [class.red.bold]="item.quantity>1">{{item.quantity}}x <span class="part">{{item.part}}</span></div>
+
+  
           <div class="price {{item.fulfillment.status}}" >
             <span class="suffix">fr</span>
             <input type="number" class="input-price" 
@@ -65,7 +68,7 @@
                     (click)="doCancel(order,item)">
               <ion-icon name="close" ></ion-icon>
             </button>
-            <button class="avoid" ion-button outline item-end [class.button-cancel]="isItemCancel(item)" [hidden]="!isPaid(order)"
+            <button class="avoid" color="danger" ion-button outline item-end [class.button-cancel]="isItemCancel(item)" [hidden]="!isPaid(order)"
                     (click)="doRefund(order,item)">
               <ion-icon name="card" ></ion-icon>
             </button>
