@@ -154,7 +154,7 @@ export class LogisticHeaderComponent {
       this.initOrders(shipping);
     },error=>{
       //Cette fonctionalité est réservée à la logistique
-      this.displayMsg(error.text());
+      this.displayMsg(error.error);
     })
   }
 

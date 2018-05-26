@@ -177,7 +177,7 @@ export class CollectPage {
       .subscribe(ok=>{
         this.doToast("Collecte enregistrée");
         this.setCollected(vendor);
-      },error=>this.doToast(error.text()))
+      },error=>this.doToast(error.error))
   };
 
 

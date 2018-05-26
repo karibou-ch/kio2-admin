@@ -17,6 +17,7 @@ import { LoaderService, Order, User, ProductService, Product } from 'kng2-core';
 export class ProductsPage {
 
   isReady: boolean;
+  noShop:boolean;
   user: User = new User();
   products:Product[];
   cache:any;
@@ -72,6 +73,10 @@ export class ProductsPage {
       if(this.user.shops.length){
         params['shopname']=this.user.shops.map(shop=>shop.urlpath);
       }
+      if(!this.user.isAdmin()&&!this.user.shops.length){
+        params['shopname']=['no-shop-to-list'];
+        this.noShop=true;
+      }
 
       this.$product.select(params).subscribe(
         (products:Product[])=>{
@@ -97,7 +102,8 @@ export class ProductsPage {
 
   openDetails(product:Product){
     this.navCtrl.push('ProductDetailPage',{
-      product:product
+      product:product,
+      user:this.user
     });
 
   }
@@ -154,7 +160,7 @@ export class ProductsPage {
         this.onDone('Enregistré');
       },
       (error)=>{
-        this.onDone(error.text())
+        this.onDone(error.error)
       }
     )
   }  

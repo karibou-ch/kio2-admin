@@ -85,7 +85,7 @@ export class ProfilPage {
       },
       error=>{
         this.toast.create({
-          message: error.text(),
+          message: error.error,
           duration: 3000
         }).present();
 
