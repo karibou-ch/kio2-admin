@@ -83,6 +83,12 @@ export class ShopperPage {
     }, 1000);    
   }
 
+  getPhoneNumber(order:Order){
+    if(!order||!order.customer.phoneNumbers||!order.customer.phoneNumbers.length){
+      return false;
+    }
+    return order.customer.phoneNumbers[0].number;
+  }
 
   isOrderSelected(order){
     return this.selectedOrder[order.oid];
@@ -95,13 +101,13 @@ export class ShopperPage {
         .subscribe(ok=>{
           this.onDone("Livraison planifiée")
           this.trackPlanning(this.orders);
-        },error=>this.onError(error.text()))
+        },error=>this.onError(error.error))
   }
 
   updateBag(order,count){
     this.$order.updateBagsCount(order,count).subscribe(ok=>{
           this.onDone("Nombre sac enregistré")        
-    },(error)=>this.onError(error.text()));
+    },(error)=>this.onError(error.error));
   }
 
   // $scope.updateShippingPrice=function(order,amount){
@@ -110,12 +116,22 @@ export class ShopperPage {
   //     order.wrap(o);
   //   });
   // };
+  getShopperInfo(order:Order){
+    if(!order||!order.shipping.shopper){
+      return '';
+    }
+    // priority and initials from emails 
+    let initials=order.shipping.shopper.split('@')[0];
+    initials=initials[0]+'**'+initials[initials.length-1];
+    return '('+order.shipping.priority+')('+initials+')';
+  }
 
   onInitOrders([orders,shipping]:[Order[],Date]){
     //
     // set default order value based on postalCode
     this.orders = orders.sort(this.sortOrdersByPosition);
     this.shipping= shipping;
+    console.log('--',this.orders[0].shipping)
     this.isReady=true;
     this.trackPlanning(this.orders);  
     this.debug();
@@ -141,7 +157,7 @@ export class ShopperPage {
     
     this.$order.updateShippingShopper(order,priority,order.shipping.position)
       .subscribe(ok=>{
-      },error=>this.onError(error.text()))
+      },error=>this.onError(error.error))
 
   }
   toggleOrder(order){
