@@ -33,6 +33,10 @@ import * as ionic from '../../ionic.config.json';
 import * as npm from '../../package.json';
 
 
+// let SERVER='http://api.karibou.evaletolab.ch';
+let SERVER='https://api.karibou.ch';
+//let SERVER='http://api.beta.boulangerie-bretzel.ch';
+
 Pro.init((<any>ionic).app_id, {
   appVersion: (<any>npm).verion
 })
@@ -51,6 +55,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
   }
 
   handleError(err: any): void {
+    console.log('----',err)
     Pro.monitoring.handleNewError(err);
     // Remove this if you want to disable Ionic's auto exception handling
     // in development mode.
@@ -67,10 +72,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     BrowserModule,
     HttpClientModule,
     Kng2CoreModule.forRoot({
-      API_SERVER:'https://api.karibou.ch',
-      disqus:'7e23b8cfd1ba48cdb5a3487efcbcdc56', /*karibou dev*/
-      // disqus:'a0602093a94647cd948e95fadb9b9e38'; /*karibou prod*/
-      mapBoxToken:'pk.eyJ1IjoiZ29uemFsZCIsImEiOiJjajR3cW5ybHQwZ3RrMzJvNXJrOWdkbXk5In0.kMW6xbKtCLEYAEo2_BdMjA',
+      API_SERVER:SERVER,
       loader:[
         "categories",
         "shops"
