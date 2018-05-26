@@ -52,6 +52,9 @@
         <h3 text-capitalize>{{ order.shipping.name }}</h3>
         <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
         <p>{{ order.shipping.note }}</p>
+        <div class="shopper-info" >
+          {{getShopperInfo(order)}}
+        </div>
       </ion-item>
       <ion-item-options side="left">
         <ion-label class="shopper"  color="secondary">
@@ -79,10 +82,12 @@
             <ion-option value="2">2 sac</ion-option>
             <ion-option value="3">3 sac</ion-option>
             <ion-option value="4">4 sac</ion-option>
+            <ion-option value="5">5 sac</ion-option>
           </ion-select>
 
         </div>
-        <a ion-button color="danger" href='tel:{{order.customer.phoneNumbers[0]?.number}}'>
+        <a ion-button color="danger" [hidden]="!getPhoneNumber()" 
+           href='tel:{{getPhoneNumber(order)}}'>
           <ion-icon name="call"></ion-icon>
           Appeler
         </a>
