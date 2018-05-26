@@ -1,6 +1,12 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
-import { LoaderService, Product, ProductService, User, Category, Shop } from 'kng2-core';
+
+import { LoaderService, 
+         Product, 
+         ProductService, 
+         User, 
+         Category, 
+         Shop } from 'kng2-core';
 
 /**
  * Generated class for the ProductDetailPage page.
@@ -33,6 +39,9 @@ export class ProductDetailPage {
     private toast:ToastController
   ) {
     this.product = this.navParams.get('product')||this.defaultProduct;
+    this.user = this.navParams.get('user')||new User();    
+    this.shops=this.user.shops||[];
+    
     this.title=this.product.title;
 
     //
@@ -42,17 +51,13 @@ export class ProductDetailPage {
 
 
     this.$loader.ready().subscribe((loader) => {
-      this.user=loader[1];
       //
       // only interrested by active category
       this.categories=(loader[2]||[]).filter(c=>c.type==='Category'&&c.active);
-
       //
       // admin can move a product to all shops
       if(this.user.isAdmin()){
         this.shops=loader[3].sort((s1,s2)=>s1.urlpath.localeCompare(s2.urlpath));
-      }else{
-        this.shops=this.user.shops;
       }
     });
     
@@ -75,7 +80,7 @@ export class ProductDetailPage {
       },
       error=>{
         this.toast.create({
-          message: error.text(),
+          message: error.error,
           duration: 3000
         }).present();
 
