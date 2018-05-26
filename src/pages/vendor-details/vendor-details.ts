@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 
 import { User, 
          Shop,
-         ShopService} from 'kng2-core';
+         ShopService,
+         Category} from 'kng2-core';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 
 @IonicPage()
@@ -16,10 +18,12 @@ export class VendorDetailsPage {
   user:User;
   defaultShop:Shop=new Shop();
   shop:Shop;
+  categories:Category[];
   title:string;
+  weekdays={};
+  tvaId;
 
   constructor(
-    private events: Events,
     private navCtrl: NavController, 
     private navParams: NavParams,
     private $shop:ShopService,
@@ -27,7 +31,17 @@ export class VendorDetailsPage {
   ) {
     this.shop = this.navParams.get('shop')||this.defaultShop;
     this.user = this.navParams.get('user')||new User();    
+    this.categories = this.navParams.get('categories')||[];
 
+    //
+    // TVA
+    if(!this.shop.account.tva){
+      this.shop.account.tva={}
+    }
+    this.tvaId=this.shop.account.tva.number||'';
+    //
+    // model for weekdays
+    (this.shop.available.weekdays||[]).map(day=>this.weekdays[day]=true);
   }
 
 
@@ -38,7 +52,16 @@ export class VendorDetailsPage {
 
   }
 
+
   doSave(){
+    console.log('----',this.shop)
+    //
+    // sync TVA
+    this.shop.account.tva.number=this.tvaId;
+
+    //
+    // sync weekdays
+    this.shop.available.weekdays=Object.keys(this.weekdays).filter(day=>this.weekdays[day]).map(day=>(parseInt(day)));
     this.$shop.save(this.shop).subscribe(
       (shop:Shop)=>{
         this.toast.create({
@@ -50,7 +73,7 @@ export class VendorDetailsPage {
       },
       error=>{
         this.toast.create({
-          message: error.text(),
+          message: error.error,
           duration: 3000
         }).present();
       }     
@@ -61,5 +84,7 @@ export class VendorDetailsPage {
     this.navCtrl.pop();
   }
 
-
+  getCatalog(){
+    return this.categories.filter(cat=>cat.active&&cat.type=='Catalog');
+  }
 }

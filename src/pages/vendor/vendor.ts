@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
-import { LoaderService, ShopService, User, Shop } from 'kng2-core';
+import { LoaderService, ShopService, User, Shop, Category } from 'kng2-core';
 
 
 @IonicPage()
@@ -14,6 +14,7 @@ export class VendorPage {
   isReady:boolean;
   cache:any;
   shops:Shop[];
+  categories:Category[];
 
   constructor(
     public navCtrl: NavController, 
@@ -39,6 +40,7 @@ export class VendorPage {
     this.$loader.ready().subscribe((loader) => {
       this.isReady=true;
       Object.assign(this.user, loader[1]);
+      this.categories=(loader[2]||[]);
 
       //
       // all available shops      
@@ -73,7 +75,9 @@ export class VendorPage {
 
   openDetails(shop:Shop){
     this.navCtrl.push('VendorDetailsPage',{
-      shop:shop,user:this.user
+      shop:shop,
+      user:this.user,
+      categories:this.categories
     });
   }
 

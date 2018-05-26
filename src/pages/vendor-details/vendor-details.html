@@ -77,30 +77,85 @@
     </ion-item>    
   </ion-list>
 
-  <!-- BUSINESS -->
-  <!-- <ion-list>
+  <!-- SHIPPING DAYS -->
+  <ion-list >    
+    <ion-list-header color="primary">
+      Livraison
+    </ion-list-header>    
+    <ion-item>
+      <ion-label>Lundi </ion-label>
+      <ion-checkbox [(ngModel)]="weekdays[1]"></ion-checkbox>
+    </ion-item>
+    <ion-item>
+      <ion-label>Mardi </ion-label>
+      <ion-checkbox [(ngModel)]="weekdays[2]"></ion-checkbox>
+    </ion-item>
+    <ion-item>
+      <ion-label>Mercredi </ion-label>
+      <ion-checkbox [(ngModel)]="weekdays[3]"></ion-checkbox>
+    </ion-item>
+    <ion-item>
+      <ion-label>Jeudi </ion-label>
+      <ion-checkbox [(ngModel)]="weekdays[4]"></ion-checkbox>
+    </ion-item>
+    <ion-item>
+      <ion-label>Vendredi </ion-label>
+      <ion-checkbox [(ngModel)]="weekdays[5]"></ion-checkbox>
+    </ion-item>
+    <ion-item>
+      <ion-label>Samedi </ion-label>
+      <ion-checkbox [(ngModel)]="weekdays[6]"></ion-checkbox>
+    </ion-item>
+    <ion-item>
+      <ion-label>Dimanche</ion-label>
+      <ion-checkbox [(ngModel)]="weekdays[0]"></ion-checkbox>
+    </ion-item>
+  </ion-list>
+
+    <!-- BUSINESS -->
+  <ion-list>
     <ion-list-header color="primary">
       Business
     </ion-list-header>
     <ion-item>
-        <ion-label color="primary" stacked>Information TVA</ion-label> 
-        <ion-input type="text" placeholder="... TVA" [(ngModel)]="shop.account.tva.number"></ion-input>              
+        <ion-label color="primary" stacked>Votre identité TVA</ion-label> 
+        <ion-input type="text" placeholder="ID TVA" [(ngModel)]="tvaId"></ion-input>              
     </ion-item>
-    <ion-item>
-        <ion-label>
 
-        </ion-label>
-        <div item-content>
-            <h2>Boutique créée le {{shop.created|date:'mediumDate'}} dans la catégorie {{shop.catalog.name}}</h2>
-            <h2>Business model à {{shop.account.fees*100|number:2}}%</h2>
-            <p>
-              boutique validée le {{shop.account.updated|date:'mediumDate'}}
-              (poids) {{shop.scoring.weight}}
-            </p>
-        </div>
+    <!-- SHOP FEES -->
+    <ion-item [class.inactive]="!user.isAdmin()">
+      <ion-label color="primary" stacked>
+        Commission à la vente {{shop.account.fees|percent}}
+      </ion-label> 
+      <ion-input type="number" [disabled]="!user.isAdmin()" placeholder="Commission sur chaque transaction" [(ngModel)]="shop.account.fees"></ion-input>              
+    </ion-item>
+
+    <!-- SHOP WEIGHT -->
+    <ion-item [class.inactive]="!user.isAdmin()">
+      <ion-label color="primary" stacked>
+        Poids de la boutique {{shop.scoring.weight}}
+      </ion-label> 
+      <ion-input type="number" [disabled]="!user.isAdmin()" placeholder="Poids de la boutique" [(ngModel)]="shop.scoring.weight"></ion-input>              
     </ion-item>
     
-  </ion-list>     -->
+    <ion-item>
+        <ion-label class="bold">
+          Boutique créée le {{shop.created|date:'mediumDate'}} dans la catégorie {{shop.catalog?.name}}<br/>
+          Validée le {{shop.account.updated|date:'mediumDate'}}
+        </ion-label>
+    </ion-item>
+  </ion-list>    
+
+  <!-- CATALOG -->
+  <ion-item>
+    <ion-label>
+      Catlogue
+    </ion-label>
+    <ion-select [(ngModel)]="shop.catalog">
+      <ion-option *ngFor="let cat of getCatalog()"  [value]="cat">{{cat.name}}</ion-option>        
+    </ion-select>
+  </ion-item>
+
 
   <ion-list>
     <ion-item>

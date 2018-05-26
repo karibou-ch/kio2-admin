@@ -45,6 +45,11 @@ $colors: (
   grey-icon:  #a2a2a2
 );
 
+.hidden-sm{
+  @media  (max-width:426px){
+    display: none!important;
+  }
+}
 
 // App iOS Variables
 // --------------------------------------------------
