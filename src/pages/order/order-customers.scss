@@ -48,7 +48,7 @@ kio2-order-customers {
         background:#fff;
         color: color($colors, primary);
       }
-    }
+    }    
     &.selected{
       background-color: color($colors, light);
     }
@@ -59,8 +59,17 @@ kio2-order-customers {
       span.rank{
         background-color:#ddd!important;
       }
-
     }
+
+    button.capture{
+      position: absolute;
+      top: 5px;
+      right: 80px;
+      bottom: 5px;
+      box-shadow: none;
+      -height: 40px!important;      
+    }
+    
     h2{
       color: green;
       font-size:1.4rem!important;

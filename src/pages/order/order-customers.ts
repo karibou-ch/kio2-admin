@@ -81,7 +81,7 @@ export class OrderCustomersPage {
         this.onDone("Commande payée");
       },
       error=>{
-        this.onDone(error.text());
+        this.onDone(error.error);
       }
     );
     
@@ -98,7 +98,7 @@ export class OrderCustomersPage {
           this.onDone("Commande annulée");
         },
         error=>{
-          this.onDone(error.text());
+          this.onDone(error.error);
         }
       );
         
@@ -111,7 +111,7 @@ export class OrderCustomersPage {
         this.onDone("Livraison modifiée");
       },
       error=>{
-        this.onDone(error.text());
+        this.onDone(error.error);
       }
     );
   }
