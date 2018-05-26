@@ -27,6 +27,9 @@ export class AdminSettingsPage {
 
   ngOnInit(){
     Object.assign(this.user,this.$user.currentUser);
+    this.$user.user$.subscribe(user=>{
+      Object.assign(this.user,user)
+    })
   }
 
   ionViewDidLoad() {
@@ -43,7 +46,9 @@ export class AdminSettingsPage {
   }
 
   openProducts(){
-    this.navCtrl.push('ProductsPage');    
+    this.navCtrl.push('ProductsPage',{
+      user:this.user      
+    });    
   }
 
   openProfile(){
@@ -55,6 +60,8 @@ export class AdminSettingsPage {
   }
 
   openVendors(){
-    this.navCtrl.push('VendorPage');        
+    this.navCtrl.push('VendorPage',{
+      user:this.user      
+    });        
   }
 }
