@@ -76,7 +76,7 @@ export class LogisticHeaderComponent {
     this.$loader.ready().subscribe((loader) => {
       //
       // FIXME issue with stream ordering (test right fter a login)
-      this.user=(this.user.id)?this.user:loader[1];
+      this.user=loader[1];
 
       this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
       this.pickerShippingDate = this.currentShippingDate.toISOString();
@@ -96,6 +96,12 @@ export class LogisticHeaderComponent {
       this.findAllOrdersForShipping();
     });
 
+
+    this.$loader.update().subscribe(emit=>{
+      if(emit.user){
+        this.user=emit.user;
+      }
+    });
 
   }
 
@@ -176,11 +182,15 @@ export class LogisticHeaderComponent {
   }
 
   openStock(){
-    this.navCtrl.push('ProductsPage');
+    this.navCtrl.push('ProductsPage',{
+      user:this.user
+    });
   }
 
   openVendor(){
-    this.navCtrl.push('VendorPage');
+    this.navCtrl.push('VendorPage',{
+      user:this.user      
+    });
   }
     
   //

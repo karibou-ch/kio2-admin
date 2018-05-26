@@ -38,6 +38,8 @@ export class ProductsPage {
       step:50,
       start:0
     }
+
+    this.user = this.navParams.get('user');    
   }
 
 
@@ -66,7 +68,6 @@ export class ProductsPage {
     };
     this.$loader.ready().subscribe((loader) => {
       this.isReady=true;
-      Object.assign(this.user, loader[1]);
 
       //
       // get select products

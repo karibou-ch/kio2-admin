@@ -30,6 +30,7 @@ export class VendorPage {
       step:50,
       start:0
     }
+    this.user = this.navParams.get('user');    
     
   }
 
@@ -39,7 +40,6 @@ export class VendorPage {
     };
     this.$loader.ready().subscribe((loader) => {
       this.isReady=true;
-      Object.assign(this.user, loader[1]);
       this.categories=(loader[2]||[]);
 
       //
