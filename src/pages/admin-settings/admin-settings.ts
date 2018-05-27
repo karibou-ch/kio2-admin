@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { User, UserService } from 'kng2-core';
+import { Pro } from '@ionic/pro';
 
 @IonicPage({name:'AdminSettingsPage'})
 @Component({
@@ -13,6 +14,7 @@ export class AdminSettingsPage {
   toggle:boolean;
   parent:any;
   user:User=new User();
+  version:string='';
 
   constructor(
     public navCtrl: NavController, 
@@ -23,13 +25,15 @@ export class AdminSettingsPage {
     this.availableDates=this.navParams.get('shipping');
     this.parent=this.navParams.get('component');
     this.toggle=this.navParams.get('toggle');
+    this.user=this.navParams.get('user');
   }
 
   ngOnInit(){
     Object.assign(this.user,this.$user.currentUser);
     this.$user.user$.subscribe(user=>{
       Object.assign(this.user,user)
-    })
+    });
+    this.version=' (v'+Pro.getApp().version+')';
   }
 
   ionViewDidLoad() {

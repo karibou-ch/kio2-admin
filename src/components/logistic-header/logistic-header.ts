@@ -207,7 +207,8 @@ export class LogisticHeaderComponent {
       shipping:this.availableDates,
       current:this.currentShippingDate,
       toggle:(this.filtersOrder===this.FLOATING),
-      component:this
+      component:this,
+      user:this.user
     })
     // let popover = this.popoverCtrl.create(LogisticSettingsComponent);
     // popover.present();
