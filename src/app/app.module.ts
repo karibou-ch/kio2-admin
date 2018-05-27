@@ -33,12 +33,17 @@ import * as ionic from '../../ionic.config.json';
 import * as npm from '../../package.json';
 
 
+// console.log('---',process.env)
+// if(process.env.NODE_ENV){
+
+// }
+
 // let SERVER='http://api.karibou.evaletolab.ch';
 let SERVER='https://api.karibou.ch';
 //let SERVER='http://api.beta.boulangerie-bretzel.ch';
 
 Pro.init((<any>ionic).app_id, {
-  appVersion: (<any>npm).verion
+  appVersion: (<any>npm).version
 })
 
 @Injectable()
@@ -55,7 +60,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
   }
 
   handleError(err: any): void {
-    console.log('----',err)
+    console.log('---- Kio2AdminErrorHandler',(<any>npm).version,err)
     Pro.monitoring.handleNewError(err);
     // Remove this if you want to disable Ionic's auto exception handling
     // in development mode.

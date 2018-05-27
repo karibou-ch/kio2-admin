@@ -66,6 +66,7 @@ export class LoginPage {
 
 
   login() {
+    console.log('-------------LOGIN.1');
     this.isReady = false;  //to hide submit button after submitting
     this.showLoading();
     this.$user.login({
@@ -81,7 +82,7 @@ export class LoginPage {
       remember.password=(this.keep)? this.model.password:'';      
       this.nativeStorage.setItem(this.KIO2_LOGIN_REMEMBER, remember)
       .catch(error=>{
-        console.log('-- ERROR set',this.KIO2_LOGIN_REMEMBER,error)
+        console.log('-- LOGIN ERROR storage',this.KIO2_LOGIN_REMEMBER,error)
         // using ionic serve --livereload & nativestorage doesnt work 
       });
 
@@ -90,7 +91,7 @@ export class LoginPage {
         return ;
       }
       this.showError("Erreur d'authentification :-((");
-    });  
+    },error=>console.log('-------------LOGIN.2',error));  
   }
 
 
