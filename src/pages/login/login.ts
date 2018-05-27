@@ -66,7 +66,6 @@ export class LoginPage {
 
 
   login() {
-    console.log('-------------LOGIN.1');
     this.isReady = false;  //to hide submit button after submitting
     this.showLoading();
     this.$user.login({

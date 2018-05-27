@@ -38,7 +38,7 @@ import * as npm from '../../package.json';
 
 // }
 
-// let SERVER='http://api.karibou.evaletolab.ch';
+//let SERVER='http://api.karibou.evaletolab.ch';
 let SERVER='https://api.karibou.ch';
 //let SERVER='http://api.beta.boulangerie-bretzel.ch';
 
@@ -59,7 +59,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     }
   }
 
-  handleError(err: any): void {
+  handleError(err: any): void {    
     console.log('---- Kio2AdminErrorHandler',(<any>npm).version,err)
     Pro.monitoring.handleNewError(err);
     // Remove this if you want to disable Ionic's auto exception handling

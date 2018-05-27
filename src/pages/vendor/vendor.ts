@@ -41,6 +41,7 @@ export class VendorPage {
     this.$loader.ready().subscribe((loader) => {
       this.isReady=true;
       this.categories=(loader[2]||[]);
+      this.user=(this.user)?this.user:loader[1];
 
       //
       // all available shops      

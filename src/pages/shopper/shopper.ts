@@ -129,10 +129,9 @@ export class ShopperPage {
   onInitOrders([orders,shipping]:[Order[],Date]){
     //
     // set default order value based on postalCode
-    this.orders = orders.sort(this.sortOrdersByPosition);
     this.shipping= shipping;
-    console.log('--',this.orders[0].shipping)
-    this.isReady=true;
+    this.orders = orders.sort(this.sortOrdersByPosition);
+    this.isReady=true;    
     this.trackPlanning(this.orders);  
     this.debug();
   }

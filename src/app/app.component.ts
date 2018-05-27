@@ -34,6 +34,7 @@ export class Kio2Aadmin {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      console.log('INIT APP isCore,isMobileweb',this.platform.is('core'),this.platform.is('mobileweb'))
 
     });
   }
