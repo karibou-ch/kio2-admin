@@ -90,7 +90,9 @@ export class LoginPage {
         return ;
       }
       this.showError("Erreur d'authentification :-((");
-    },error=>console.log('-------------LOGIN.2',error));  
+    },error=>{
+      this.showError(error.error);
+    });  
   }
 
 
