@@ -1,4 +1,4 @@
-import { Component, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Platform, NavController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -25,7 +25,6 @@ export class Kio2Aadmin {
     private dialogs:Dialogs,
     private $loader: LoaderService,
     private $network: Network,
-    private zone:NgZone,
     private platform: Platform,
     private statusBar: StatusBar,
     private splashScreen: SplashScreen,
