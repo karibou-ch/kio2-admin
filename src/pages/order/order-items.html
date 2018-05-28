@@ -35,8 +35,8 @@
       <ion-note item-end >
         {{order.getSubTotal()|currency:'CHF'}}
       </ion-note>
-      <a [hidden]="!getPhoneNumber()"
-         item-end color="info" round ion-button outline href="tel:{{getPhoneNumber()}}"><ion-icon name="call"> </ion-icon> </a>
+      <a [hidden]="!getPhoneNumber(order)"
+         item-end color="info" round ion-button outline href="tel:{{getPhoneNumber(order)}}"><ion-icon name="call"> </ion-icon> </a>
       <a item-end color="info" round ion-button outline href="mailto:{{order.email}}"> <ion-icon name="mail"> </ion-icon></a>
     </ion-list-header>
 
