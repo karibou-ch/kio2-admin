@@ -60,7 +60,9 @@ export class LogisticHeaderComponent {
   }
 
   ngOnDestroy(){
-    this.netSubs.unsubscribe();
+    if(this.netSubs){
+      this.netSubs.unsubscribe();
+    }
   }
 
   ngOnInit() {
@@ -74,7 +76,7 @@ export class LogisticHeaderComponent {
         this.isNetworkReady=(this.$network.type!='none');
       });  
     }catch(e){
-      console.log('----- $network service error',e)
+      console.log('----- $network service error',e.message)
     }
 
     this.$loader.ready().subscribe((loader) => {
