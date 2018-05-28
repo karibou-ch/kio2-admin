@@ -69,9 +69,13 @@ export class LogisticHeaderComponent {
       Object.assign(this.user,user);
     });
 
-    this.netSubs=this.$network.onchange().subscribe(() => {
-      this.isNetworkReady=(this.$network.type!='none');
-    });
+    try{
+      this.netSubs=this.$network.onchange().subscribe(() => {
+        this.isNetworkReady=(this.$network.type!='none');
+      });  
+    }catch(e){
+      console.log('----- $network service error',e)
+    }
 
     this.$loader.ready().subscribe((loader) => {
       //
