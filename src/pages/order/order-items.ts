@@ -97,10 +97,17 @@ export class OrderItemsPage {
   }
 
   doSelectAllPrice(event){
-    //console.log('----',event);
     if(event.inputElement){
+      setTimeout(function() {
+        event.inputElement.setSelectionRange(0, 9999);
+      }, 1);            
       return event.inputElement.select();
     }
+
+    // check this on safari
+    setTimeout(function() {
+      event.target.setSelectionRange(0, 9999);
+    }, 1);            
     event.target.select();
   }
 

@@ -70,6 +70,10 @@ kio2-order-items {
       top:4px;
       left: 12px;
       color: color($colors,primary);
+      >div{
+        margin-left: 80px;
+        margin-top: 5px;        
+      }
     }
     .quantity{
       font-size: 1.4rem;

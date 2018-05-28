@@ -45,11 +45,13 @@
         <div item-content >
           <div class="title" (click)="doOpenProduct(item)">
               {{item.title}} 
-            <span [hidden]="!item.variant" class="red link">
-              ({{item.variant?.title}})
-            </span>
+            <div [hidden]="!item.variant" class="dark-green link">
+              // {{item.variant?.title}}
+            </div>
           </div>
-          <div class="quantity" [class.red.bold]="item.quantity>1">{{item.quantity}}x <span class="part">{{item.part}}</span></div>
+          <div class="quantity" [class.red.bold]="item.quantity>1">
+            {{item.quantity}}x <span class="part">{{item.part}}</span>
+          </div>
 
   
           <div class="price {{item.fulfillment.status}}" >
