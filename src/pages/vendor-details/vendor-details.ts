@@ -5,7 +5,6 @@ import { User,
          Shop,
          ShopService,
          Category} from 'kng2-core';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 
 @IonicPage()
@@ -22,6 +21,7 @@ export class VendorDetailsPage {
   title:string;
   weekdays={};
   tvaId;
+  catalog;
 
   constructor(
     private navCtrl: NavController, 
@@ -32,6 +32,16 @@ export class VendorDetailsPage {
     this.shop = this.navParams.get('shop')||this.defaultShop;
     this.user = this.navParams.get('user')||new User();    
     this.categories = this.navParams.get('categories')||[];
+    this.$shop.get(this.shop.urlpath).subscribe(shop=>{
+      Object.assign(this.shop,shop);
+    })
+    this.initShop();    
+  }
+
+  initShop(){
+    //
+    // Catalog
+    this.catalog=this.shop.catalog._id||this.shop.catalog;
 
     //
     // TVA
@@ -42,8 +52,8 @@ export class VendorDetailsPage {
     //
     // model for weekdays
     (this.shop.available.weekdays||[]).map(day=>this.weekdays[day]=true);
-  }
 
+  }
 
   onDateFrom(){
 
@@ -54,7 +64,13 @@ export class VendorDetailsPage {
 
 
   doSave(){
-    console.log('----',this.shop)
+    //
+    // sync catalog
+    if(this.catalog!=this.shop.catalog){
+      this.shop.catalog=this.categories.find(c=>c._id==this.catalog);
+    }
+    
+
     //
     // sync TVA
     this.shop.account.tva.number=this.tvaId;

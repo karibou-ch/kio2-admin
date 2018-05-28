@@ -151,8 +151,8 @@
     <ion-label>
       Catlogue
     </ion-label>
-    <ion-select [(ngModel)]="shop.catalog">
-      <ion-option *ngFor="let cat of getCatalog()"  [value]="cat">{{cat.name}}</ion-option>        
+    <ion-select [(ngModel)]="catalog">
+      <ion-option *ngFor="let cat of getCatalog()"  [value]="cat._id">{{cat.name}}</ion-option>        
     </ion-select>
   </ion-item>
 
