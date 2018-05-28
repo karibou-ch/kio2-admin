@@ -62,7 +62,7 @@ export class OrderCustomersPage {
       return false;
     }
     if(this.cache[order.oid]===undefined){
-      this.cache[order.oid]=order.getProgress();
+      this.cache[order.oid]=(order.getProgress());
     }
     return this.cache[order.oid]>=99.9;
   }

@@ -29,7 +29,9 @@
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <span class="rank" >{{order.rank}}</span>
         </ion-avatar>
-        <h3 text-capitalize>{{ order.oid }} - {{ order.shipping.name }}</h3>
+        <h3 text-capitalize (click)="openOrder(order)">
+          {{ order.oid }} - {{ order.shipping.name }}
+        </h3>
         <h2><span class="label counter">{{i+1}}</span><span class="label">{{order.payment.status}}</span> {{order.getFulfilledProgress()}}/{{order.items.length}} </h2>
         <button ion-button expandable color="danger" class="hidden-sm capture"
                 (click)="orderCapture(order)" 
