@@ -41,8 +41,10 @@ export class VendorDetailsPage {
   initShop(){
     //
     // Catalog
-    this.catalog=this.shop.catalog._id||this.shop.catalog;
-
+    if(this.shop.catalog){
+      this.catalog=(this.shop.catalog._id)||this.shop.catalog;
+    }
+    
     //
     // TVA
     if(!this.shop.account.tva){
@@ -64,6 +66,7 @@ export class VendorDetailsPage {
 
 
   doSave(){
+
     //
     // sync catalog
     if(this.catalog!=this.shop.catalog){
