@@ -32,7 +32,11 @@
         <h3 text-capitalize (click)="openOrder(order)">
           {{ order.oid }} - {{ order.shipping.name }}
         </h3>
-        <h2><span class="label counter">{{i+1}}</span><span class="label">{{order.payment.status}}</span> {{order.getFulfilledProgress()}}/{{order.items.length}} </h2>
+        <h2>
+          <span class="label counter">{{i+1}}</span>
+          <span class="label">{{order.payment.status}}</span> 
+          {{order.getFulfilledProgress()}}/{{order.items.length}} 
+        </h2>
         <button ion-button expandable color="danger" class="hidden-sm capture"
                 (click)="orderCapture(order)" 
                 [hidden]="!user.isAdmin()||!isOrderCapturable(order)">
