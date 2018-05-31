@@ -50,12 +50,16 @@ export class OrderCustomersPage {
   
   isOrderCapturable(order:Order){
     // admin test should be outside 
-    return (['voided','paid','invoice'].indexOf(order.payment.status)===-1) && (order.fulfillments.status==='fulfilled');
+    return (['voided','paid','partially_refunded','manually_refunded','invoice'].indexOf(order.payment.status)===-1) && (order.fulfillments.status==='fulfilled');
   }
-
+  
   isOrderSelected(order:Order){
 
   }
+
+  isPaid(order:Order){
+    return (['paid','partially_refunded','manually_refunded'].indexOf(order.payment.status)>-1);
+  } 
   
   isFulfilled(order:Order){
     if(!order){
@@ -78,6 +82,7 @@ export class OrderCustomersPage {
   orderCapture(order:Order){
     this.$order.capture(order).subscribe(
       (ok)=>{
+        Object.assign(order,ok);
         this.onDone("Commande payée");
       },
       error=>{
@@ -95,6 +100,7 @@ export class OrderCustomersPage {
       }
       this.$order.cancelWithReason(order,EnumCancelReason.customer).subscribe(
         (ok)=>{
+          Object.assign(order,ok);
           this.onDone("Commande annulée");
         },
         error=>{
