@@ -67,6 +67,7 @@ export class LogisticHeaderComponent {
 
   ngOnInit() {
     // keep in touch! shop1@karibou.ch
+
     this.$user.subscribe(user=>{
       Object.assign(this.user,user);
     });
@@ -86,7 +87,7 @@ export class LogisticHeaderComponent {
 
       this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
       this.pickerShippingDate = this.currentShippingDate.toISOString();
-      this.currentShippingDate.setHours(0, 0, 0,0);
+      this.currentShippingDate.setHours(0, 0, 0, 0);
       this.filtersOrder = this.FLOATING;
       this.isReady=true;
       this.findAllOrdersForShipping();
@@ -125,8 +126,15 @@ export class LogisticHeaderComponent {
   //
   // on selected date
   updateDateFromPicker(){
-    // let selected=new Date(this.pickerShippingDate);
+    // FIXME in ioa-datetime BUG with last day month
+    this.pickerShippingDate=this.pickerShippingDate.replace("2018-01-31T08","2018-01-30T08");
+    this.pickerShippingDate=this.pickerShippingDate.replace("2018-04-31T08","2018-04-30T08");
+    this.pickerShippingDate=this.pickerShippingDate.replace("2018-06-31T08","2018-06-30T08");
+    this.pickerShippingDate=this.pickerShippingDate.replace("2018-08-31T08","2018-08-30T08");
+    this.pickerShippingDate=this.pickerShippingDate.replace("2018-09-31T08","2018-09-30T08");
+    this.pickerShippingDate=this.pickerShippingDate.replace("2018-11-31T08","2018-11-30T08");
     this.currentShippingDate=new Date(this.pickerShippingDate);
+
     this.currentShippingDate.setHours(0, 0, 0,0);
     this.findAllOrdersForShipping();
   }
@@ -135,7 +143,11 @@ export class LogisticHeaderComponent {
   // this header component provide data for all pages
   findAllOrdersForShipping() {
     let Orders;
-    let params = { month: (new Date(this.currentShippingDate).getMonth()) + 1, year: new Date(this.currentShippingDate).getFullYear() };
+    let params = { 
+      month: (new Date(this.currentShippingDate).getMonth()) + 1, 
+      year: new Date(this.currentShippingDate).getFullYear(),
+      padding:true
+    };
     Object.assign(params, this.filtersOrder);
     this.monthOrders = new Map();
     this.availableDates = [];
