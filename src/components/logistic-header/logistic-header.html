@@ -56,7 +56,10 @@
 
 <!-- DATE PICKER BUTTON -->
 <ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="pickerShippingDate" 
-  (ngModelChange)="updateDateFromPicker()" cancelText="Annuler" doneText="Fait" 
+  (ngModelChange)="updateDateFromPicker()" 
+  cancelText="Annuler" 
+  doneText="Fait" 
+  dayValues="1"
   monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
 </ion-datetime>        
 
