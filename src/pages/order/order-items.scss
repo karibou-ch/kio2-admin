@@ -81,8 +81,12 @@ kio2-order-items {
       top:34px;
       color: color($colors,info);      
       left: 12px;
-      width: 80px;
+      width: 180px;
       text-align: left;
+      .issue{
+        position: relative;
+        color: red;
+      }
     }
     .price{
       &.fulfilled{

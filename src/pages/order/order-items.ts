@@ -49,7 +49,7 @@ export class OrderItemsPage {
   
   doRefund(order:Order,item:OrderItem){
 
-    this.$order.refund(order,item.finalprice).subscribe(
+    this.$order.refund(order,item).subscribe(
       ()=>{
         this.doToast("Montant: "+item.finalprice.toFixed(2)+" remboursé")
       },error=>this.doToast(error.error)      
@@ -138,7 +138,7 @@ export class OrderItemsPage {
   }
 
   isPaid(order:Order){
-    return (['paid'].indexOf(order.payment.status)>-1);
+    return (['paid','partially_refunded','manually_refunded'].indexOf(order.payment.status)>-1);
   } 
 
 

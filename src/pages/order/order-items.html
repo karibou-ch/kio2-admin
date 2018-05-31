@@ -50,7 +50,8 @@
             </div>
           </div>
           <div class="quantity" [class.red.bold]="item.quantity>1">
-            {{item.quantity}}x <span class="part">{{item.part}}</span>
+            {{item.quantity}}x <span class="part">{{item.part}}</span> 
+            <span class="issue" [hidden]="!item.fulfillment.refunded">remboursé</span>
           </div>
 
   
@@ -66,11 +67,15 @@
                     (click)="doValidate(order, item)">
               <ion-icon name="checkmark" ></ion-icon>
             </button>
-            <button class="avoid" ion-button outline item-end [class.button-cancel]="isItemCancel(item)" [hidden]="isPaid(order)"
+            <button class="avoid" ion-button outline item-end 
+                    [class.button-cancel]="isItemCancel(item)" [hidden]="isPaid(order)"
                     (click)="doCancel(order,item)">
               <ion-icon name="close" ></ion-icon>
             </button>
-            <button class="avoid" color="danger" ion-button outline item-end [class.button-cancel]="isItemCancel(item)" [hidden]="!isPaid(order)"
+            <button class="avoid" color="danger" ion-button outline item-end 
+                    [class.button-cancel]="isItemCancel(item)" 
+                    [disabled]="item.fulfillment.refunded"
+                    [hidden]="!isPaid(order)"
                     (click)="doRefund(order,item)">
               <ion-icon name="card" ></ion-icon>
             </button>
