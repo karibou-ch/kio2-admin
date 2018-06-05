@@ -4,13 +4,15 @@
     [vendor]="true"
     [stock]="true"
     [collect]="true"
+    [orders]="true"
     (doInitOrders)="onInitOrders($event)"
     (doSelectedOrders)="onSelectedOrders($event)">
   </logistic-header>
 </ion-header>
 
 <ion-content >
-  <h1 class="info" [hidden]="!isReady||orders.length">Pas de commandes  pour la boutique {{vendor}} </h1>
+  <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes</h1>
+  
   <ion-refresher 
     (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>

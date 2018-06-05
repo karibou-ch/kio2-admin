@@ -23,6 +23,7 @@ export class OrderCustomersPage {
   shipping:Date;
   orders:Order[];
   cache:any;
+  isReady:boolean;
 
   constructor(
     public dialogs:Dialogs,
@@ -132,6 +133,7 @@ export class OrderCustomersPage {
   onInitOrders([orders,shipping]:[Order[],Date]){
     this.orders = orders.sort(this.sortOrdersByRank);
     this.shipping=shipping;
+    this.isReady=true;
   }
 
   sortOrdersByRank(o1,o2){

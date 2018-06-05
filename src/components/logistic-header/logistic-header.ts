@@ -20,6 +20,7 @@ export class LogisticHeaderComponent {
   @Input() currentShippingDate: Date;
   @Input() stock:boolean;
   @Input() vendor:boolean;
+  @Input('orders') hideOrders:boolean=false;
   @Input('collect') hideCollect:boolean=false;
   @Output() doInitOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
   @Output() doSelectedOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
@@ -96,6 +97,11 @@ export class LogisticHeaderComponent {
       // the case of hiding collect button
       if(!this.hideCollect&&!this.user.isAdmin()&&!this.user.hasRole('logistic')){
         this.hideCollect=true;
+      }
+      //
+      // case of orders button
+      if(!this.hideOrders&&!this.user.isAdmin()){
+        this.hideOrders=true;
       }
     })
 
@@ -197,6 +203,10 @@ export class LogisticHeaderComponent {
     this.navCtrl.push('CollectPage',{
       shipping:this.currentShippingDate
     });
+  }
+
+  openOrders(){
+    this.navCtrl.push('OrderCustomersPage');    
   }
 
   openStock(){

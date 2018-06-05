@@ -18,7 +18,16 @@
           ion-button (click)="openStock()" clear="true" >
           <ion-icon name="cube"></ion-icon>
   </button>      
-      
+
+  <!-- DISPLAY ORDERS -->
+  <button color="light" 
+          [hidden]="hideOrders"
+          [disabled]="!isReady" 
+          icon-only
+          ion-button (click)="openOrders()" clear="true" >
+          <ion-icon name="contacts"></ion-icon>
+  </button>      
+  
   <!-- DISPLAY LOGISTIC -->
   <button color="light" 
           [hidden]="hideCollect"
