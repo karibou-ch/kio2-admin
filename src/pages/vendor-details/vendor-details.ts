@@ -54,7 +54,7 @@ export class VendorDetailsPage {
     //
     // model for weekdays
     (this.shop.available.weekdays||[]).map(day=>this.weekdays[day]=true);
-
+    
   }
 
   onDateFrom(){
@@ -73,9 +73,11 @@ export class VendorDetailsPage {
       this.shop.catalog=this.categories.find(c=>c._id==this.catalog);
     }
     
-
     //
     // sync TVA
+    if(!this.shop.account.tva){
+      this.shop.account.tva={}
+    }
     this.shop.account.tva.number=this.tvaId;
 
     //
