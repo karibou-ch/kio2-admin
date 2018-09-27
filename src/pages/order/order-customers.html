@@ -20,6 +20,21 @@
 
   <!-- DISPLAY ORDERS -->
   <ion-list>
+    <ion-item class="in-progress" [hidden]="(orders?.length < 1)">
+        <ion-avatar item-start >
+          <span class="rank" ><ion-icon name="stats"></ion-icon></span>
+        </ion-avatar>
+        <h3 >
+          {{orders.length}} cmds / <b>{{orderTotal|number:'1.0-0'}} fr</b>
+          <span [hidden]="orders.length<2">, AVG <b>{{orderAvg|number:'1.0-0'}} fr</b></span>
+        </h3>
+        <ion-note item-end>
+          <button ion-button small color="primary" outline 
+                  (click)="emailVendors()">
+            <ion-icon name="send"></ion-icon>&nbsp;email
+          </button>           
+        </ion-note>                  
+    </ion-item>    
     <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersByPosition);let i=index;">
       <ion-item [class.selected]="isOrderSelected(order)" 
                 [class.in-progress]="!isFulfilled(order)">

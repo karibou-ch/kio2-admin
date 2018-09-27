@@ -182,11 +182,25 @@ export class TrackerPage {
 
     //console.log('direction',destination)
     //this.launchNavigator.navigate(destination, options)
-    this.launchNavigator.navigate(destination)
-        .then(
-            success => {},
-            error => alert('Error launching navigator: ' + error)
-    );
+
+    //
+    // https://github.com/dpa99c/phonegap-launch-navigator/issues/158
+    // if(this.platform.is('core') || this.platform.is('mobileweb')){
+    //   window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination.toString()}&dir_action=navigate`)
+    //   return;
+    // }
+
+    // this.launchNavigator.navigate(destination)
+    //     .then(
+    //         success => {},
+    //         error => alert('Error launching navigator: ' + error)
+    // );
+    try{
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination.toString()}&dir_action=navigate`);
+    }catch(error){
+      
+    }
+
   }
 
   userZoom() {
@@ -207,6 +221,7 @@ export class TrackerPage {
   setMapMarkers(orders: Order[]) {
     this.deleteMarkers();
     orders.forEach((order, i) => {
+      console.log('---- tracker',order.oid,order.shipping.geo,this.map)
       if(!order.shipping.geo){
         return;
       }

@@ -45,8 +45,9 @@ Kio2-admin is a:
 
 # Publih for www
 ```bash
-  $ ionic cordova build browser --prod
+  $ ionic cordova build browser --prod --env=bretzel
   $ rsync -avziu --delete-after -e 'ssh -p22' platforms/browser/www/ $user@$server:$path 
+  $ rsync -avziu --stats --progress --delete-after -e 'ssh -p22' platforms/browser/www/ evaleto@evaletolab.ch:www/admin.boulangerie-bretzel.ch/
 ```
 
 # Debug

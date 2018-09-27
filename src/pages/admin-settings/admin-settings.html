@@ -8,12 +8,21 @@
 
 
 <ion-content padding>
-  <ion-list>
+  <ion-list  radio-group [(ngModel)]="toggle" (ngModelChange)="toggleShippingFilter()">
+    <ion-item>
+        <ion-icon name="menu" item-start ></ion-icon>      
+        Menu principale {{version}}
+    </ion-item>
     <ion-item>
       <ion-icon name="bicycle" item-start ></ion-icon>      
-      <ion-label color="dark"> Les commandes en préparation (vs fermées)</ion-label>
-      <ion-toggle  [checked]="toggle" [(ngModel)]="toggle" (ngModelChange)="toggleShippingFilter()"></ion-toggle>
+      <ion-label color="dark"> Les commandes en cours </ion-label>
+      <ion-radio value="true" [checked]="toggle"></ion-radio>
     </ion-item>
+    <ion-item>
+        <ion-icon name="time" item-start ></ion-icon>      
+        <ion-label color="dark"> Les commandes précédentes </ion-label>
+        <ion-radio value="false" [checked]="!toggle"></ion-radio>
+    </ion-item>  
     <ion-item *ngFor="let shipping of availableDates;let i = index" 
             [class.selected]="shipping.getTime()===currentShippingDate.getTime()"  
             (click)="displayOrders(shipping)">
@@ -21,11 +30,50 @@
       <ion-label>{{ shipping | date:'MMM EEEE d' }}</ion-label>
       <ion-note  item-end>Ouvir</ion-note>
     </ion-item>    
+    <ion-item>
+      <ion-row>
+        <ion-col [hidden]="!(user?.isAdmin())" (click)="openOrders()">
+          <ion-icon name="contacts" color="grey-icon"></ion-icon>
+          <div>Commandes</div>
+        </ion-col>
 
-    <ion-list-header>
-      <ion-icon item-start name="settings"></ion-icon>
-      Options {{version}}
-    </ion-list-header>
+        <ion-col [hidden]="!(user?.shops||[]).length&&!user?.isAdmin()" (click)="openCustomers()">
+          <ion-icon  name="people" color="grey-icon"></ion-icon>
+          <div>Clients</div>
+        </ion-col>
+
+        <ion-col [hidden]="!(user?.shops||[]).length&&!user?.isAdmin()" (click)="openReports()">
+          <ion-icon name="attach" color="grey-icon"></ion-icon>
+          <div>Rapports</div>
+        </ion-col>
+        
+        <ion-col [hidden]="!(user?.isAdmin())" (click)="openProducts()">
+          <ion-icon name="cube" color="grey-icon"></ion-icon>
+          <div>Produits</div>
+        </ion-col>
+      
+        <ion-col [hidden]="!(user?.isAdmin())" (click)="openVendors()">
+          <ion-icon name="home" color="grey-icon"></ion-icon>
+          <div>Boutiques</div>
+        </ion-col>
+
+        <ion-col (click)="openProfile()">
+          <ion-icon name="contact" color="grey-icon"></ion-icon>
+          <div>Profil</div>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+
+    <!-- <ion-item [hidden]="!(user?.shops||[]).length&&!user?.isAdmin()">
+      <ion-icon name="ionic" item-start ></ion-icon>
+      <ion-label>Les rapports</ion-label>
+      <button ion-button outline item-end (click)="openReports()">Ouvrir</button>
+    </ion-item>          
+    <ion-item [hidden]="!(user?.shops||[]).length&&!user?.isAdmin()">
+      <ion-icon name="ionic" item-start ></ion-icon>
+      <ion-label>Les clients</ion-label>
+      <button ion-button outline item-end (click)="openCustomers()">Ouvrir</button>
+    </ion-item>                  
     <ion-item [hidden]="!user.isAdmin()">
       <ion-icon name="ionic" item-start ></ion-icon>
       <ion-label>Les boutiques</ion-label>
@@ -45,6 +93,7 @@
       <ion-icon name="ionic" item-start ></ion-icon>
       <ion-label>Votre profil</ion-label>
       <button ion-button outline item-end (click)="openProfile()">Modifier</button>
-    </ion-item>
+    </ion-item> -->
+
   </ion-list>  
 </ion-content>

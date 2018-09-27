@@ -122,7 +122,7 @@ export class ShopperPage {
     }
     // priority and initials from emails 
     let initials=order.shipping.shopper.split('@')[0];
-    initials=initials[0]+'**'+initials[initials.length-1];
+    initials=initials[0]+initials[1];
     return '('+order.shipping.priority+')('+initials+')';
   }
 

@@ -11,7 +11,10 @@
 
 
 <ion-content >
-  <div class="metabar">
+  <div class="metabar" [hidden]="loadError">
+    <button ion-button icon-only (click)="doCreateProduct()">
+      <ion-icon name="add"></ion-icon>
+    </button>    
     <ion-searchbar
       [(ngModel)]="cache.search"
       [debounce]="500"
@@ -21,11 +24,16 @@
     <ion-toggle [(ngModel)]="cache.active"></ion-toggle>      
   </div>
 
+  <div *ngIf="loadError" class="error">
+    <b>Ouups!</b> <br/>
+    Il y a eu une erreur, veuillez recharger l'application
+  </div>
+
   <ion-list>
     <ion-item-sliding *ngFor="let product of products">    
         <ion-item (click)="openDetails(product)" [hidden]="cache.active!=product.attributes.available">
           <ion-avatar item-start>
-            <img [src]="'https:'+product.photo.url+'/-/resize/128x/'">
+            <img [src]="getAvatar(product)">
           </ion-avatar>      
           <h2>{{product.title}}</h2>      
           <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}}</h3>

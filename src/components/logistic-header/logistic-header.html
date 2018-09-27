@@ -1,4 +1,4 @@
-<ion-navbar color="primary">
+<ion-navbar color="primary" class="hidden-print">
   <!-- left  -->
   <ion-buttons start>
   <!-- DISPLAY VENDOR -->
@@ -40,7 +40,7 @@
 
   <!-- title  -->
   <ion-title (click)="picker.open()">
-    {{ currentShippingDate | date:"d MMM y" }} 
+    {{title}} {{ currentShippingDate | date:format }} 
     <span class="network" [hidden]="isNetworkReady">  <ion-icon name="alert"></ion-icon> pas de réseau!</span>
   </ion-title>
 
@@ -57,7 +57,7 @@
 
 
 <!-- MAP BUTTON -->
-<button ion-fab  class="fab"
+<button ion-fab  class="fab hidden-print"
         [disabled]="monthOrders.get(currentShippingDate?.getTime()) === undefined"
         (click)="openMap()">          
     <ion-icon [name]="fabIcon||'pin'" id="pin-icon"></ion-icon>

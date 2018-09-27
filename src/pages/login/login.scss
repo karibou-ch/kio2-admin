@@ -1,15 +1,20 @@
 page-login {
 
+  .sitename{
+    color: #bbb;
+    font-size: 12px;    
+  }
+  
   .landing-k {
     position: relative;
     display: inline-block;
     background-repeat: no-repeat;
     background-position: center 10%;
-    background-size: auto 50vw;
+    background-size: auto 350px;
     background-image: url('../assets/img/k.svg');
   }
   form{
-    margin-top:70%; 
+    margin-top:40vh; 
     padding: 30px;
     .btn {
       height: 50px;
@@ -29,6 +34,17 @@ page-login {
       color: #ddd;
       align-items:center;
       display: flex;
+    }
+    .reset{
+      position: fixed;
+      bottom: 15px;
+      right: 35px;
+      color: #ddd;
+      align-items:center;
+      display: flex;
+      height: 50px;
+      font-size: small;
+      width: 120px;      
     }
 
     .input-login {

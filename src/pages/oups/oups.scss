@@ -1,0 +1,23 @@
+page-oups {
+  .scroll-content{
+    padding: 50px!important;
+    color: #888;  
+    h1{
+      margin-bottom: 50px;
+    }
+
+    button{
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
+
+    img{
+      margin: auto;
+      width: 150px;
+      position: absolute;
+      bottom: 50px;
+      right: 30%;
+      opacity: .1;        
+    }
+  }
+}

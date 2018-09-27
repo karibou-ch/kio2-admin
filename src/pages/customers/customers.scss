@@ -1,0 +1,86 @@
+page-customers {
+  button.fab{
+    display: none;
+  }
+  
+  ion-item {
+      
+    ion-label{
+      padding-top:7px;
+    }
+
+    span.light{
+      color: #999;      
+      font-size: small;
+      padding-right: 3px;      
+    }
+    span.stats{
+      position: absolute;
+      right: 10px;
+      top:15px;
+      font-size: small;
+      -color: black;
+    }
+    span.label{
+      -background: rgba(0, 105, 99, 0.34);
+      -background: #555;
+      -color: white;
+      -font-size: 85%;  
+      padding: 2px 4px;
+      border-radius: 0px; 
+      position: absolute;
+      right: 5px;
+      margin-top: -7px;   
+      &.counter{
+        border-right: 1px solid #eee;
+      }
+    }
+
+    span.price{
+      position: absolute;
+      font-size: 1.6rem;
+      top: 10px;
+      color: white;
+      font-weight: 900;
+      padding: 0;
+      width: 18px;
+      height: 18px;
+      line-height: 15px;
+      text-align: center;
+      width: 55px;
+      padding-top: 1px;
+      border-radius: 3px;
+      background: color($colors,primary);
+      right: 10px;
+      
+    } 
+
+    span.progress{
+      color: green;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;        
+    }
+
+   
+    ion-avatar {
+      position: relative;
+      span.rank{
+        position: absolute;
+        top: 00%;
+        left: 0;
+        color: white;
+        font-weight: 900;
+        background: color($colors,primary);
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        line-height: 40px;
+        text-align: center;
+      }
+    }
+
+  }  
+
+}

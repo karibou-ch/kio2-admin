@@ -51,7 +51,8 @@
           </div>
           <div class="quantity" [class.red.bold]="item.quantity>1">
             {{item.quantity}}x <span class="part">{{item.part}}</span> 
-            <span class="issue" [hidden]="!item.fulfillment.refunded">remboursé</span>
+            <span class="issue" [hidden]="!item.fulfillment.request">problème:{{item.fulfillment.request}} </span>
+            <span class="issue" [hidden]="!item.fulfillment.refunded"><span [hidden]="item.finalprice==0">partiellement</span> remboursé </span>
           </div>
 
   
@@ -63,7 +64,8 @@
                    (focus)="doSelectAllPrice($event)"/>
           </div>
           <div class="actions">
-            <button class="validate" ion-button outline item-end [class.button-validate]="isItemValid(item)"
+            <button class="validate" ion-button outline item-end 
+                    [class.button-validate]="isItemValid(item)" [hidden]="isPaid(order)"
                     (click)="doValidate(order, item)">
               <ion-icon name="checkmark" ></ion-icon>
             </button>
@@ -71,24 +73,18 @@
                     [class.button-cancel]="isItemCancel(item)" [hidden]="isPaid(order)"
                     (click)="doCancel(order,item)">
               <ion-icon name="close" ></ion-icon>
-            </button>
-            <button class="avoid" color="danger" ion-button outline item-end 
-                    [class.button-cancel]="isItemCancel(item)" 
-                    [disabled]="item.fulfillment.refunded"
-                    [hidden]="!isPaid(order)"
-                    (click)="doRefund(order,item)">
-              <ion-icon name="card" ></ion-icon>
-            </button>
+            </button>            
             
           </div>
         </div>
 
       </ion-item>
-      <ion-item-options side="right">
-        <a ion-button color="danger" href='tel:shop.address.phone'>
-          <ion-icon name="call"></ion-icon>
-          Appeler
-        </a>        
+      <ion-item-options side="right" [hidden]="!isPaid(order)">
+            <button class="avoid button-refund" color="danger" ion-button item-end 
+                    [disabled]="item.finalprice==0"                    
+                    (click)="doRefund(order,item)">
+              <ion-icon name="card" ></ion-icon>&nbsp;refund
+            </button>
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>

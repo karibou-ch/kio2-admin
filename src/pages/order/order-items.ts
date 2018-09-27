@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Events, IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { Events, IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 
 import { Order,EnumFulfillments, OrderService, Product, OrderItem, ProductService } from 'kng2-core';
 
@@ -25,6 +25,7 @@ export class OrderItemsPage {
   @Input() header:boolean=true;
 
   constructor(
+    public alertCtrl: AlertController,
     public events: Events,
     public navCtrl: NavController, 
     public navParams: NavParams,
@@ -32,6 +33,7 @@ export class OrderItemsPage {
     public $product:ProductService,
     public toast:ToastController
   ) {
+
 
     //
     // OrderItems[] for this vendor
@@ -46,14 +48,43 @@ export class OrderItemsPage {
     //console.log('-----',this.orders,(this.orders.length>0),(this.vendor!='') , (this.shipping!=null))
   }
 
+  ngOnDestroy(){
+    this.events.publish('refresh');        
+  }
+
   
   doRefund(order:Order,item:OrderItem){
+    this.alertCtrl.create({
+      title: 'Rembousement partiel',
+      subTitle: item.quantity+'x '+item.title+' '+item.finalprice+' fr',      
+      inputs:[{
+        name: 'amount',
+        placeholder: 'Max '+item.finalprice+' fr',
+        type: 'number'
+      }],
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel',
+          handler: data => {
+          }
+        },{
+          text: 'Rembouser',
+          handler: data => {
+            let tosave=Object.assign({},item);
+            tosave.finalprice=tosave.finalprice-data.amount
+            this.$order.refund(order,tosave).subscribe(
+              ()=>{
+                item.finalprice=tosave.finalprice;
+                item.fulfillment=tosave.fulfillment;
+                this.doToast("Montant: "+data.amount+" remboursé")
+              },error=>this.doToast(error.error)      
+            )        
+          }
+        }
+      ]
+    }).present();
 
-    this.$order.refund(order,item).subscribe(
-      ()=>{
-        this.doToast("Montant: "+item.finalprice.toFixed(2)+" remboursé")
-      },error=>this.doToast(error.error)      
-    )
   }
 
   doValidate(order, item){
@@ -99,14 +130,14 @@ export class OrderItemsPage {
   doSelectAllPrice(event){
     if(event.inputElement){
       setTimeout(function() {
-        event.inputElement.setSelectionRange(0, 9999);
+          try{event.inputElement.setSelectionRange(0, 9999);}catch(e){}
       }, 1);            
       return event.inputElement.select();
     }
 
     // check this on safari
     setTimeout(function() {
-      event.target.setSelectionRange(0, 9999);
+      try{event.target.setSelectionRange(0, 9999);}catch(e){}
     }, 1);            
     event.target.select();
   }
@@ -142,8 +173,5 @@ export class OrderItemsPage {
   } 
 
 
-  ionViewDidLeave(){
-    this.events.publish('refresh');        
-  }
 
 }

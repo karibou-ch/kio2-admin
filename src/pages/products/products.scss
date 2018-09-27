@@ -1,4 +1,9 @@
 kio2-products {
+  .error{
+    padding: 50px;
+    font-size: 30px;
+    color: #aaa;    
+  }
   button.fab{
     display: none;
   }
@@ -8,7 +13,7 @@ kio2-products {
     justify-content: center;
     background-color: rgba(5, 105, 98, 0.8) !important;
     ion-searchbar{
-      max-width: 80vw;
+      max-width: 65vw;
       background-color: rgba(5, 105, 98, 0.1) !important;
     }
   }

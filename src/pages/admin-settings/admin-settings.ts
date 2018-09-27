@@ -15,6 +15,7 @@ export class AdminSettingsPage {
   parent:any;
   user:User=new User();
   version:string='';
+  sub:any;
 
   constructor(
     public navCtrl: NavController, 
@@ -25,15 +26,24 @@ export class AdminSettingsPage {
     this.availableDates=this.navParams.get('shipping');
     this.parent=this.navParams.get('component');
     this.toggle=this.navParams.get('toggle');
-    this.user=this.navParams.get('user');
+    this.user=this.navParams.get('user')||this.user;
   }
 
   ngOnInit(){
-    Object.assign(this.user,this.$user.currentUser);
+    Object.assign(this.user,this.$user.currentUser||this.user);
     this.$user.user$.subscribe(user=>{
       Object.assign(this.user,user)
     });
     this.version=' (v'+Pro.getApp().version+')';
+    this.sub=this.parent.doInitOrders.subscribe(([orders,when,dates])=>{
+      this.availableDates=dates;
+    })
+  }
+
+  ngOnDestroy(){
+    if(this.sub){
+      this.sub.unsubscribe();
+    }
   }
 
   ionViewDidLoad() {
@@ -46,26 +56,42 @@ export class AdminSettingsPage {
 
   toggleShippingFilter(){
     this.parent.toggleShippingFilter();
-    this.navCtrl.pop();
   }
 
+  openCustomers(){
+    this.navCtrl.pop();
+    this.navCtrl.push('CustomersPage');
+  }
+  
   openProducts(){
+    this.navCtrl.pop();
     this.navCtrl.push('ProductsPage',{
       user:this.user      
     });    
   }
 
   openProfile(){
+    this.navCtrl.pop();
     this.navCtrl.push('ProfilPage');
   }
  
   openOrders(){
+    this.navCtrl.pop();
     this.navCtrl.push('OrderCustomersPage');    
   }
 
   openVendors(){
+    this.navCtrl.pop();
     this.navCtrl.push('VendorPage',{
       user:this.user      
     });        
   }
+
+  openReports(){
+    this.navCtrl.pop();
+    this.navCtrl.push('ReportPage',{
+      user:this.user      
+    });        
+  }
+  
 }

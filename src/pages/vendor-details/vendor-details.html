@@ -8,7 +8,7 @@
 
 <ion-content  [class.inactive]="!shop.status">
   <ion-list >
-    <ion-item>
+    <ion-item [hidden]="!(user?.isAdmin())">
       <ion-label color="primary" >
         Boutique active pour la vente
       </ion-label>

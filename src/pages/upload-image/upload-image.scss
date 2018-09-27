@@ -1,0 +1,15 @@
+kio2-upload-image {
+
+  ion-header{
+    background: black;
+
+    .modal-button{
+      margin: 0 6px;
+      min-width: 36px;      
+    }
+  }
+  .uploadcare--widget,
+  .uploadcare--widget__button{
+    width: 100%;
+  }
+}

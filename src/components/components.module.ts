@@ -1,16 +1,19 @@
 import { NgModule } from '@angular/core';
 import { IonicModule } from 'ionic-angular';
 import { LogisticHeaderComponent } from './logistic-header/logistic-header';
+import { UcWidgetComponent } from './uc-widget/uc-widget';
 
 @NgModule({
   declarations: [
-    LogisticHeaderComponent
+    LogisticHeaderComponent,
+    UcWidgetComponent
   ],
   imports: [
     IonicModule,
   ],
   exports: [
-    LogisticHeaderComponent
+    LogisticHeaderComponent,
+    UcWidgetComponent
   ]
 })
 export class ComponentsModule {}

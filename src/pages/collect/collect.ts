@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Events, IonicPage, NavController, ToastController, NavParams } from 'ionic-angular';
-import { EnumFulfillments, Order, OrderItem, OrderService, User } from 'kng2-core';
+import { EnumFulfillments, Order, OrderItem, OrderService, User, Shop } from 'kng2-core';
 
 /**
  * Generated class for the CollectPage page.
@@ -34,6 +34,13 @@ export class CollectPage {
   ) {
     this.vendors.list=[];
     this.shipping=this.navParams.get('shipping');
+  }
+
+  getShopPhone(shop:Shop){
+    if(!shop||!shop.owner.phoneNumbers||!shop.owner.phoneNumbers.length){
+      return 'NONE';
+    }
+    return shop.owner.phoneNumbers[0].number;
   }
 
   doRefresh(refresher){

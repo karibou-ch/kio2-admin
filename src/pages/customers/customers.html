@@ -1,0 +1,45 @@
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>Les Clients</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content >
+  <ion-list>
+    <ion-item-sliding *ngFor="let customer of customers;let i=index;">
+      <ion-item>
+        <ion-note item-end >
+          <span class="stats">          
+            ERR: {{customer.errors}} - REMB: {{customer.refunds}}
+          </span>
+          <span class="label">{{customer.amount|currency:'CHF'}} </span>
+
+        </ion-note>
+        <ion-avatar item-start>
+          <span class="rank">{{customer.orders}}</span>
+        </ion-avatar>
+        <h2 >
+            {{customer._id}} 
+        </h2>
+        <h3>
+          <span class="">
+            <span class="light">fréquence d'achat:</span> 
+            {{customer.last1Month}}<span class="light">/mois</span>, 
+            {{customer.last3Month}}<span class="light">/3mois</span> 
+            {{customer.last6Month}}<span class="light">/6mois</span></span>
+        </h3>
+      </ion-item>
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [position]="'bottom'">
+      <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Chargement des clients ...">
+    </ion-infinite-scroll-content>    
+  </ion-infinite-scroll>  
+  
+</ion-content>

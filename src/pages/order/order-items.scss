@@ -81,7 +81,7 @@ kio2-order-items {
       top:34px;
       color: color($colors,info);      
       left: 12px;
-      width: 180px;
+      width: 230px;
       text-align: left;
       .issue{
         position: relative;
@@ -171,6 +171,13 @@ kio2-order-items {
       font-size: 1.6rem!important;  
       box-shadow: initial;    
     }
+    button.item-button.button-refund {
+      border-color: #e93a3a;
+      color: #e93a3a;
+      width: 70px;
+      font-size: small!important;
+  }
+
     button.item-button.button-cancel {
         border-color: #e93a3a;
         color: white;

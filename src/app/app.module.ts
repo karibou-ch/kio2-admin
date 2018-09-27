@@ -1,10 +1,10 @@
 import { Pro } from '@ionic/pro';
-import { LOCALE_ID, NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
+import { LOCALE_ID, NgModule, ErrorHandler, Injectable, Injector, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { Kio2Aadmin } from './app.component';
 
-import { Kng2CoreModule } from 'kng2-core';
+import { Kng2CoreModule, ConfigService, LoaderService } from 'kng2-core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { NativeStorage } from '@ionic-native/native-storage';
@@ -29,21 +29,16 @@ import 'rxjs/add/observable/of';
 
 //
 // make value sync with their sources
-import * as ionic from '../../ionic.config.json';
-import * as npm from '../../package.json';
 
+var NPM_VERSION=require('../../package.json').version;
+var IONIC_APPID=require('../../ionic.config.json').prod_id;
 
-// console.log('---',process.env)
 // if(process.env.NODE_ENV){
 
 // }
 
-//let SERVER='http://api.karibou.evaletolab.ch';
-let SERVER='https://api.karibou.ch';
-//let SERVER='http://api.beta.boulangerie-bretzel.ch';
-
-Pro.init((<any>ionic).app_id, {
-  appVersion: (<any>npm).version
+Pro.init(IONIC_APPID, {
+  appVersion: NPM_VERSION
 })
 
 @Injectable()
@@ -60,7 +55,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
   }
 
   handleError(err: any): void {    
-    console.log('---- Kio2AdminErrorHandler',(<any>npm).version,err)
+    console.log('---- Kio2AdminErrorHandler',NPM_VERSION,err)
     Pro.monitoring.handleNewError(err);
     // Remove this if you want to disable Ionic's auto exception handling
     // in development mode.
@@ -68,6 +63,18 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
   }
 }
 
+//
+// dynamic server settings
+
+var SERVER:boolean|string=false;
+//SERVER="http://localhost:4000";
+//SERVER='http://api.karibou.evaletolab.ch';
+//SERVER='https://api.karibou.ch';
+//SERVER='http://api.boulangerie-bretzel.ch';
+
+// export function bootstrap($loader: LoaderService) {
+//   return () => $loader.ready();
+// }
 
 @NgModule({
   declarations: [
@@ -93,6 +100,9 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     Kio2Aadmin
   ],
   providers: [
+    // preload
+    // { provide: APP_INITIALIZER, useFactory: bootstrap, deps: [LoaderService], multi: true },
+
     // set locale to french (for dates, etc. )
     { provide: LOCALE_ID, useValue: "fr-FR" },  
     // {provide: ErrorHandler, useClass: IonicErrorHandler},

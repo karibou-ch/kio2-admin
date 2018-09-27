@@ -3,6 +3,7 @@ import { Platform,ToastController, IonicPage, Loading, LoadingController, NavCon
 import { LoaderService, User, UserService, ConfigKeyStoreEnum } from 'kng2-core';
 
 import { NativeStorage } from '@ionic-native/native-storage';
+import { Pro } from '@ionic/pro';
 
 /**
  * Generated class for the LoginPage page.
@@ -19,6 +20,8 @@ import { NativeStorage } from '@ionic-native/native-storage';
 })
 export class LoginPage {
 
+  VERSION:string="";
+  siteName:string="";
   user: User = new User();
   model: any = {};
   status;
@@ -41,6 +44,9 @@ export class LoginPage {
   }
 
   ngOnInit() {
+    if(Pro.getApp()){
+      this.VERSION="- version "+Pro.getApp().version;
+    }
     this.platform.ready().then(() => {
       this.nativeStorage.getItem(this.KIO2_LOGIN_REMEMBER).then(remember=>{
         this.model.email=remember.mail;        
@@ -55,6 +61,7 @@ export class LoginPage {
     });
 
     this.$loader.ready().subscribe((loader) => {
+      this.siteName=loader[0].shared.home.siteName.fr;
       Object.assign(this.user, loader[1]);
       this.isReady=true;        
       //
@@ -64,6 +71,10 @@ export class LoginPage {
     
   }
 
+
+  isValidEmail(){
+    return /\S+@\S+\.\S+/.test(this.model.email||'');
+  }
 
   login() {
     this.isReady = false;  //to hide submit button after submitting
@@ -95,8 +106,20 @@ export class LoginPage {
     });  
   }
 
+  resetPassword(){
+    this.$user.recover(this.model.email).subscribe(()=>{
+      this.alertCtrl.create({
+        message: "Nouveau mot de passe envoyé à "+this.model.email,
+        duration: 5000
+      }).present();  
+    },error=>{
+      this.showError(error.error);
+    })
+  }
+
 
   showLoading() {
+    this.isReady=true;
     this.loader = this.loadingCtrl.create({
       spinner: "crescent",
       content: "Connexion en cours...",
@@ -106,6 +129,7 @@ export class LoginPage {
   }
 
   showError(msg) {
+    this.isReady=true;
     this.loader.dismiss(); 
     this.alertCtrl.create({
       message: msg,

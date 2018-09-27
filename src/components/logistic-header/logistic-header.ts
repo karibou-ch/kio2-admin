@@ -17,14 +17,20 @@ import { Subscription } from 'rxjs';
 })
 export class LogisticHeaderComponent {
 
+  @Input() format:string="d MMM y";
+  @Input() title:string="";
   @Input() currentShippingDate: Date;
   @Input() stock:boolean;
   @Input() vendor:boolean;
   @Input('orders') hideOrders:boolean=false;
   @Input('collect') hideCollect:boolean=false;
-  @Output() doInitOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
+  @Output() doInitOrders = new EventEmitter<[Order[],Date,Date[]]>(); //execute data fetcher function of parent component
   @Output() doSelectedOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
-  
+
+  // Keep options in memory cross windows
+  static filtersOrder: any;
+
+
   user:User=new User();
   closedShippings: boolean;
   monthOrders: Map<number, Order[]> = new Map();
@@ -32,10 +38,10 @@ export class LogisticHeaderComponent {
   availableDates: Date[] = [];
   isReady;
   isNetworkReady:boolean=true;
+  inAdvance:number;
   netSubs:Subscription;
-  filtersOrder: any;
-  FLOATING = { payment: 'authorized' };  //not yet handled by producers
-  LOCKED = { fulfillments: 'fulfilled,partial' };  //got by the producers (sub-group of FLOATING)
+  OPEN = { payment: 'authorized' };  //not yet handled by producers
+  LOCKED = { fulfillments: 'fulfilled,partial' };  //got by the producers (sub-group of OPEN)
 
   
 
@@ -61,13 +67,16 @@ export class LogisticHeaderComponent {
   }
 
   ngOnDestroy(){
+    //
+    // IMPORTANT
+    this.events.unsubscribe("refresh");
     if(this.netSubs){
       this.netSubs.unsubscribe();
     }
   }
 
   ngOnInit() {
-    // keep in touch! shop1@karibou.ch
+    // keep in touch! 
 
     this.$user.subscribe(user=>{
       Object.assign(this.user,user);
@@ -82,15 +91,15 @@ export class LogisticHeaderComponent {
     }
 
     this.$loader.ready().subscribe((loader) => {
+      LogisticHeaderComponent.filtersOrder = LogisticHeaderComponent.filtersOrder||this.OPEN;
       //
       // FIXME issue with stream ordering (test right fter a login)
-      this.user=loader[1];
-
+      this.user=this.user.id?this.user:loader[1];      
       this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
       this.pickerShippingDate = this.currentShippingDate.toISOString();
       this.currentShippingDate.setHours(0, 0, 0, 0);
-      this.filtersOrder = this.FLOATING;
-      this.isReady=true;
+
+
       this.findAllOrdersForShipping();
 
       //
@@ -103,28 +112,22 @@ export class LogisticHeaderComponent {
       if(!this.hideOrders&&!this.user.isAdmin()){
         this.hideOrders=true;
       }
+      this.isReady=true;      
     })
 
-    this.events.subscribe('refresh',()=>{
-      this.findAllOrdersForShipping();
-    });
-
-
-    this.$loader.update().subscribe(emit=>{
-      if(emit.user){
-        this.user=emit.user;
-      }
-    });
+    //
+    // refresh
+    this.events.subscribe('refresh',this.findAllOrdersForShipping.bind(this));
 
   }
 
   //
   // on toggle orders filter
   toggleShippingFilter() {
-    if (this.filtersOrder.payment) {
-      this.filtersOrder = this.LOCKED;
+    if (LogisticHeaderComponent.filtersOrder.payment) {
+      LogisticHeaderComponent.filtersOrder = this.LOCKED;
     } else {
-      this.filtersOrder = this.FLOATING;
+      LogisticHeaderComponent.filtersOrder = this.OPEN;
     }
     this.findAllOrdersForShipping();
   }
@@ -148,19 +151,19 @@ export class LogisticHeaderComponent {
   //
   // this header component provide data for all pages
   findAllOrdersForShipping() {
+
     let Orders;
     let params = { 
       month: (new Date(this.currentShippingDate).getMonth()) + 1, 
       year: new Date(this.currentShippingDate).getFullYear(),
       padding:true
     };
-    Object.assign(params, this.filtersOrder);
+    Object.assign(params, LogisticHeaderComponent.filtersOrder);
     this.monthOrders = new Map();
     this.availableDates = [];
 
     //
     // check orders source
-    // console.log('------------load ',this.user)
     if(this.user.shops.length){
       Orders=this.$order.findOrdersByShop(null,params);
     }else{
@@ -171,13 +174,14 @@ export class LogisticHeaderComponent {
       orders.forEach((order: Order) => {        
         order.shipping.when = new Date(order.shipping.when);
         order.shipping.when.setHours(0, 0, 0,0)
-        // Object.keys(this.monthOrders)
         if (!this.monthOrders.get(order.shipping.when.getTime())) {
           this.monthOrders.set(order.shipping.when.getTime(), []);
           this.availableDates.push(order.shipping.when);
         }
         this.monthOrders.get(order.shipping.when.getTime()).push(order);
       });
+
+      //
       //set currentshipping with first key
       let shipping=(this.monthOrders.get(this.currentShippingDate.getTime()))?
             this.currentShippingDate:this.monthOrders.keys().next().value;
@@ -190,12 +194,17 @@ export class LogisticHeaderComponent {
 
 
   initOrders(shipping?){
+    let current=Order.currentShippingDay();
     if(!shipping){
-      return this.doInitOrders.emit([[],this.currentShippingDate]);
+      return this.doInitOrders.emit([[],this.currentShippingDate,this.availableDates]);
     }
     this.currentShippingDate = new Date(shipping);
     this.currentShippingDate.setHours(0, 0, 0, 0);
-    this.doInitOrders.emit([this.monthOrders.get(this.currentShippingDate.getTime()),this.currentShippingDate]);
+    if(this.currentShippingDate>current){
+
+    }
+    this.doInitOrders.emit([this.monthOrders.get(this.currentShippingDate.getTime()),this.currentShippingDate,this.availableDates]);
+    
   }
   
 
@@ -234,7 +243,7 @@ export class LogisticHeaderComponent {
     this.navCtrl.push('AdminSettingsPage',{
       shipping:this.availableDates,
       current:this.currentShippingDate,
-      toggle:(this.filtersOrder===this.FLOATING),
+      toggle:(LogisticHeaderComponent.filtersOrder.payment&&true),
       component:this,
       user:this.user
     })

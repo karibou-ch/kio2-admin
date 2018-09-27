@@ -32,6 +32,7 @@ export class Kio2Aadmin {
   ) {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
+      this.statusBar.hide();
       this.splashScreen.hide();
       console.log('INIT APP isCore,isMobileweb',this.platform.is('core'),this.platform.is('mobileweb'))
 
@@ -52,6 +53,7 @@ export class Kio2Aadmin {
     }
 
     this.rootPage='OrderCustomersPage';
+
     //
     // if vendor => orders
   }
@@ -67,10 +69,15 @@ export class Kio2Aadmin {
         })
       }  
     },1000);
+
+
     this.$loader.ready().subscribe((loader) => {
+      console.log('--- init',this.rootPage,this.currentUser)
       Object.assign(this.currentUser,loader[1]);
       this.onInit(this.currentUser);
     },error=>{
+      console.log('--- ISSUE',error)
+      this.rootPage='OupsPage';
       this.dialogs.alert("Un problème empêche l'accès au service..").then(()=>{
         this.platform.exitApp();        
       })
@@ -78,6 +85,8 @@ export class Kio2Aadmin {
 
     this.$user.subscribe(user=>{
       this.onInit(user);
+    },issue=>{
+      console.log('--- ISSUE',issue)
     });
   }
 }

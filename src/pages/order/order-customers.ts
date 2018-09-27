@@ -24,20 +24,27 @@ export class OrderCustomersPage {
   orders:Order[];
   cache:any;
   isReady:boolean;
+  orderAvg:number;
+  orderTotal:number;
+  orderBaseAmount:number=0;
 
   constructor(
     public dialogs:Dialogs,
     public events: Events,
-    public $loader:LoaderService,
     public navCtrl: NavController, 
     public navParams: NavParams,
-    public $order:OrderService,
-    private toast:ToastController
+    public toast:ToastController,
+    public $loader:LoaderService,
+    public $order:OrderService
   ) {
     this.orders=[];
     this.cache={};
     this.$loader.ready().subscribe((loader)=>{
         Object.assign(this.user,loader[1]);
+        if(this.user.isAdmin()){
+          // change the average
+          this.orderBaseAmount=12;
+        }
     })
   }
 
@@ -49,6 +56,16 @@ export class OrderCustomersPage {
     }, 1000);    
   }
   
+  emailVendors(){
+    // inform all shops: 'shops'||false
+    this.$order.informShopToOrders('shops',this.shipping).subscribe(
+      (result)=>{
+        this.onDone("Mail envoyé à "+Object.keys(result).length+" destinataire(s)")
+      },err=>this.onDone(err.error)
+    );
+  }
+
+
   isOrderCapturable(order:Order){
     // admin test should be outside 
     return (['voided','paid','partially_refunded','manually_refunded','invoice'].indexOf(order.payment.status)===-1) && (order.fulfillments.status==='fulfilled');
@@ -131,9 +148,19 @@ export class OrderCustomersPage {
   }
 
   onInitOrders([orders,shipping]:[Order[],Date]){
+    console.log('---- init odrers',orders.length)
     this.orders = orders.sort(this.sortOrdersByRank);
-    this.shipping=shipping;
+
+    // 
+    // force current shipping day 
+    this.shipping=Order.currentShippingDay();
     this.isReady=true;
+    // AVG
+    this.orderTotal=this.orders.reduce((sum,order,i)=>{
+      return order.getSubTotal()+sum+this.orderBaseAmount;
+    },0);
+    this.orderAvg=this.orderTotal/this.orders.length;
+    
   }
 
   sortOrdersByRank(o1,o2){

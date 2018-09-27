@@ -2,4 +2,20 @@ kio2-product-detail {
   ion-header{
     background-color: color($colors, primary);
   }
+
+  .image{
+    cursor: pointer;
+  }
+
+  .large,
+  .stock{
+    ion-label{
+      font-weight: 600;
+    }
+    ion-input{
+      input{
+        font-size: xx-large;
+      }
+    }
+  }
 }

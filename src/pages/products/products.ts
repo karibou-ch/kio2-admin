@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, Events, ToastController, NavController, NavParams } from 'ionic-angular';
 
-import { LoaderService, Order, User, ProductService, Product } from 'kng2-core';
+import { LoaderService, Order, User, ProductService, Product, Config, UserService } from 'kng2-core';
 
 /**
  * Generated class for the ProductsPage page.
@@ -17,10 +17,18 @@ import { LoaderService, Order, User, ProductService, Product } from 'kng2-core';
 export class ProductsPage {
 
   isReady: boolean;
+  loadError:boolean;
   noShop:boolean;
+  config:Config;
   user: User = new User();
   products:Product[];
-  cache:any;
+  cache:{
+    active:boolean;
+    search:string;
+    products:Product[];
+    step:number;
+    start:number;    
+  };
   
 
   constructor(
@@ -29,7 +37,8 @@ export class ProductsPage {
     public navParams: NavParams,
     private $loader: LoaderService,
     private $product: ProductService,
-    private toast:ToastController
+    private toast:ToastController,
+    private $user:UserService
   ) {
     this.cache={
       active:true,
@@ -42,6 +51,15 @@ export class ProductsPage {
     this.user = this.navParams.get('user');    
   }
 
+  doCreateProduct(){
+    this.navCtrl.push('ProductDetailPage',{
+      product:new Product(),
+      config:this.config,
+      user:this.user,
+      create:true
+    });
+
+  }
 
   doInfinite(infiniteScroll) {
     if(this.cache.search!==''){
@@ -55,20 +73,35 @@ export class ProductsPage {
   }  
 
 
+  getAvatar(product:Product){
+    if(!product||!product.photo.url){
+      return "/assets/img/add.png";
+    }
+    return 'https:'+product.photo.url+'/-/resize/128x/';
+
+  }
+
   getStateLabel(product:Product){
     return product.attributes.available?'Disponible pour la vente':'Indisponible pour la vente';
   }
 
-  ionViewDidLoad() {
-
+  ngOnDestroy(){
+    this.events.unsubscribe('refresh-products');
   }
   
   ngOnInit() {
+    this.$user.subscribe(user=>{
+      Object.assign(this.user,user);
+    });
+
     let params={
     };
     this.$loader.ready().subscribe((loader) => {
       this.isReady=true;
-
+      this.config=loader[0];
+      //
+      // FIXME issue with stream ordering (test right fter a login)
+      this.user=this.user.id?this.user:loader[1];      
       //
       // get select products
       if(this.user.shops.length){
@@ -79,15 +112,37 @@ export class ProductsPage {
         this.noShop=true;
       }
 
-      this.$product.select(params).subscribe(
-        (products:Product[])=>{
-          //
-          // FIXME remove filter, server should clean orphan products!
-          this.cache.products=products.filter(p=>p.vendor).sort(this.sortByVendorAndStock);
-          this.products=this.sliceProducts();
-        }
-      )
+      if(!this.user.isAuthenticated()){
+        this.loadError=true;
+        return;
+      }
+      this.loadProducts(params);
     });
+
+    //
+    // update product list
+    this.events.subscribe('refresh-products',(product)=>{
+      if(product){
+        let idx=this.cache.products.findIndex(prod=>prod.sku==product.sku);
+        if(idx){
+          this.cache.products[idx]=product;
+          return;
+        }
+      }
+      this.loadProducts({});
+    });
+
+  }
+
+  loadProducts(params:any){
+    this.$product.select(params).subscribe(
+      (products:Product[])=>{
+        //
+        // FIXME remove filter, server should clean orphan products!
+        this.cache.products=products.filter(p=>p.vendor).sort(this.sortByVendorAndStock);
+        this.products=this.sliceProducts();
+      }
+    );
   }
 
   onDone(msg){
@@ -104,6 +159,7 @@ export class ProductsPage {
   openDetails(product:Product){
     this.navCtrl.push('ProductDetailPage',{
       product:product,
+      config:this.config,
       user:this.user
     });
 

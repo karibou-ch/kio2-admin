@@ -51,6 +51,33 @@ $colors: (
   }
 }
 
+@media print {
+  .hidden-print{
+    display: none!important;
+  }
+  .report{
+    border: none!important;
+    padding:5px!important; 
+    font-size: xx-small!important;
+  }
+
+  // ion-content{
+  //   overflow-y: scroll!important;
+  //   .scroll-content{
+  //     position: relative;
+  //     height: auto;
+  //     width: 100%!important;
+  //     float: left;
+  //     overflow-x: visible!important;
+  //     overflow-y: visible!important;
+  //     width: 100%!important;    
+  //   }
+      
+  // }
+}
+
+@import "md-table";
+
 // App iOS Variables
 // --------------------------------------------------
 // iOS only Sass variables can go here
