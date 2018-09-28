@@ -94,29 +94,13 @@ export class ProductsPage {
       Object.assign(this.user,user);
     });
 
-    let params={
-    };
     this.$loader.ready().subscribe((loader) => {
       this.isReady=true;
       this.config=loader[0];
       //
       // FIXME issue with stream ordering (test right fter a login)
       this.user=this.user.id?this.user:loader[1];      
-      //
-      // get select products
-      if(this.user.shops.length){
-        params['shopname']=this.user.shops.map(shop=>shop.urlpath);
-      }
-      if(!this.user.isAdmin()&&!this.user.shops.length){
-        params['shopname']=['no-shop-to-list'];
-        this.noShop=true;
-      }
-
-      if(!this.user.isAuthenticated()){
-        this.loadError=true;
-        return;
-      }
-      this.loadProducts(params);
+      this.loadProducts();
     });
 
     //
@@ -129,12 +113,28 @@ export class ProductsPage {
           return;
         }
       }
-      this.loadProducts({});
+      this.loadProducts();
     });
 
   }
 
-  loadProducts(params:any){
+  loadProducts(){
+    let params={};
+    //
+    // get select products
+    if(this.user.shops.length){
+      params['shopname']=this.user.shops.map(shop=>shop.urlpath);
+    }
+    if(!this.user.isAdmin()&&!this.user.shops.length){
+      params['shopname']=['no-shop-to-list'];
+      this.noShop=true;
+    }
+
+    if(!this.user.isAuthenticated()){
+      this.loadError=true;
+      return;
+    }
+
     this.$product.select(params).subscribe(
       (products:Product[])=>{
         //
