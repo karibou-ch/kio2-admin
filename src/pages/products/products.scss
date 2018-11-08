@@ -4,6 +4,21 @@ kio2-products {
     font-size: 30px;
     color: #aaa;    
   }
+  .boost{
+    padding: 10px 20px;
+    padding-top: 20px;
+    font-size: 20px;
+    color: #aaa;    
+    text-align:center;
+  }
+
+  .tag{
+    margin-right: 30px;
+    position: absolute;
+    right: 20px;
+    bottom: 20%;
+  }
+
   button.fab{
     display: none;
   }
@@ -13,7 +28,7 @@ kio2-products {
     justify-content: center;
     background-color: rgba(5, 105, 98, 0.8) !important;
     ion-searchbar{
-      max-width: 65vw;
+      max-width: 55vw;
       background-color: rgba(5, 105, 98, 0.1) !important;
     }
   }

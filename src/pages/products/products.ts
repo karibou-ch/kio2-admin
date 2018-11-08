@@ -24,6 +24,7 @@ export class ProductsPage {
   products:Product[];
   cache:{
     active:boolean;
+    boost:boolean;
     search:string;
     products:Product[];
     step:number;
@@ -42,6 +43,7 @@ export class ProductsPage {
   ) {
     this.cache={
       active:true,
+      boost:false,
       search:'',
       products:[],
       step:50,
@@ -72,6 +74,9 @@ export class ProductsPage {
     },100);    
   }  
 
+  filteredProducts(){
+    return (this.products||[]);
+  }
 
   getAvatar(product:Product){
     if(!product||!product.photo.url){
@@ -195,9 +200,17 @@ export class ProductsPage {
   }
 
   //
-  // infiniteScroll
+  // infiniteScroll OR filter options change
   sliceProducts(){
-    return this.cache.products.slice(0,this.cache.start+this.cache.step);
+    this.products=this.cache.products
+      .filter((product,i)=>{
+        return !this.cache.boost||product.attributes.discount|| product.attributes.home;
+      })
+      .filter((product)=>{      
+        return this.cache.active==product.attributes.available;
+      })
+      .slice(0,this.cache.start+this.cache.step);
+      return this.products;
   }
 
 
