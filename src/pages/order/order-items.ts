@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Events, IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 
-import { Order,EnumFulfillments, OrderService, Product, OrderItem, ProductService } from 'kng2-core';
+import { Order,EnumFulfillments, OrderService, Product, OrderItem, ProductService, User } from 'kng2-core';
 
 /**
  * Generated class for the OrderItemsPage page.
@@ -18,6 +18,7 @@ export class OrderItemsPage {
   public vendor:string;
   public shipping:Date;
   public isReady:boolean;
+  public user:User;
 
   //
   // input props
@@ -40,6 +41,7 @@ export class OrderItemsPage {
     this.orders = this.navParams.get('orders')||[];
     this.vendor = this.navParams.get('vendor')||'';
     this.shipping = this.navParams.get('shipping');
+    this.user = this.navParams.get('user');
     
   }
 
@@ -78,7 +80,7 @@ export class OrderItemsPage {
                 item.finalprice=tosave.finalprice;
                 item.fulfillment=tosave.fulfillment;
                 this.doToast("Montant: "+data.amount+" remboursé")
-              },error=>this.doToast(error.error)      
+              },error=>this.doToast(error.error,error.status)      
             )        
           }
         }
@@ -95,7 +97,7 @@ export class OrderItemsPage {
         // when admin, we should remove other vendor items
         Object.assign(order,ok);
         order.items=order.items.filter(i=>i.vendor===item.vendor)
-      },error=>this.doToast(error.error));
+      },error=>this.doToast(error.error,error.status));
   }
   
   doCancel(order, item){
@@ -106,7 +108,7 @@ export class OrderItemsPage {
         // when admin, we should remove other vendor items
         Object.assign(order,ok);
         order.items=order.items.filter(i=>i.vendor===item.vendor)
-      },error=>this.doToast(error.error));
+      },error=>this.doToast(error.error,error.status));
   }
 
  
@@ -114,13 +116,17 @@ export class OrderItemsPage {
     this.$product.get(item.sku).subscribe(
       (product:Product)=>{
         this.navCtrl.push('ProductDetailPage',{
-          product:product
+          product:product,
+          user:this.user
         });    
       }
     )
   }
   
-  doToast(msg){
+  doToast(msg,status?){
+    if(status==401){
+      this.events.publish('unauthorized');        
+    }
     this.toast.create({
       message: msg,
       duration: 3000

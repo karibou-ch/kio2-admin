@@ -3,11 +3,9 @@ import { IonicPage, NavController, NavParams, Events, ToastController } from 'io
 
 import { Dialogs } from '@ionic-native/dialogs';
 
-import { EnumFulfillments, 
-         Order, 
+import { Order, 
          OrderService , 
          User, 
-         UserService, 
          LoaderService,
          EnumCancelReason} from 'kng2-core';
 
@@ -143,7 +141,8 @@ export class OrderCustomersPage {
   openOrder(order){
     this.navCtrl.push('OrderItemsPage',{
       orders:[order],
-      shipping:this.shipping
+      shipping:this.shipping,
+      user:this.user
     });
   }
 
