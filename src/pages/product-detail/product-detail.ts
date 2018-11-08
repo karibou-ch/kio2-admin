@@ -24,6 +24,7 @@ export class ProductDetailPage {
   user:User;
   config:Config;
   categories:Category[]=[];
+  currentCategory:Category;
   title:string;
   product:Product;
   shops:Shop[];
@@ -55,6 +56,7 @@ export class ProductDetailPage {
     //FIXME hack category should be normalized in server side
     this.product.categories=this.product.categories['_id']||this.product.categories;
     this.product.vendor=this.product.vendor['_id']||this.product.vendor;
+    this.product.belong=this.product.belong||{name:null,weight:0};
 
 
     this.$loader.ready().subscribe((loader) => {
@@ -73,6 +75,9 @@ export class ProductDetailPage {
          (typeof this.product.vendor !='string')){
         this.product.vendor=this.shops[0]['_id'];
       }
+
+      this.currentCategory=this.categories.find(cat=>(cat._id+'')==this.product.categories);
+
     });
     
   }
@@ -81,6 +86,13 @@ export class ProductDetailPage {
   descResize(){
     this.desc.nativeElement.style.height = this.desc.nativeElement.scrollHeight + 'px';
     
+  }
+
+  getChild(){
+    if(!this.currentCategory){
+      return [];
+    }
+    return (this.currentCategory.child||[]);
   }
 
   isReady(){
@@ -130,6 +142,14 @@ export class ProductDetailPage {
       }).present();
     }
     
+    //
+    // validate belong
+    if(this.product.belong.name&&
+       this.currentCategory){
+     this.product.belong=this.currentCategory.child.find(child=>child.name==this.product.belong.name);
+     delete this.product.belong['_id'];
+    }
+
 
     //this.product.hasFixedPortion();
     let product$=(this.create)?

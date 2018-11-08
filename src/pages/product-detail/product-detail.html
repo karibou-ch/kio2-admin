@@ -18,6 +18,16 @@
       </ion-item>
 
       <ion-item>
+        <ion-label>En promotion</ion-label>
+        <ion-toggle color="positive" item-end [(ngModel)]="product.attributes.discount"></ion-toggle>
+      </ion-item>
+
+      <ion-item [hidden]="!user.isAdmin()">
+        <ion-label>Boost</ion-label>
+        <ion-toggle color="positive" item-end [(ngModel)]="product.attributes.home"></ion-toggle>
+      </ion-item>
+        
+      <ion-item>
           <button ion-button outline block large color="primary" [disabled]="!isReady()" (click)="doSave(product)">Enregistrer</button>
       </ion-item>
       
@@ -183,6 +193,15 @@
           <ion-option *ngFor="let cat of getCategories()"  [value]="cat._id">{{cat.name}}</ion-option>        
         </ion-select>
       </ion-item>
+      <ion-item>
+        <ion-label>
+          Categorie (enfant)
+        </ion-label>
+        <ion-select [(ngModel)]="product.belong.name">
+          <ion-option *ngFor="let child of getChild()" [value]="child.name" >{{child.name}}</ion-option>        
+        </ion-select>
+      </ion-item>
+
       <ion-item>
         <ion-label>
           Categorie (secondaire)
