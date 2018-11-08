@@ -1,11 +1,11 @@
 import { Pro } from '@ionic/pro';
-import { LOCALE_ID, NgModule, ErrorHandler, Injectable, Injector, APP_INITIALIZER } from '@angular/core';
+import { LOCALE_ID, NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { Kio2Aadmin } from './app.component';
 
-import { Kng2CoreModule, ConfigService, LoaderService } from 'kng2-core';
-import { HttpClientModule } from '@angular/common/http';
+import { Kng2CoreModule} from 'kng2-core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { NativeStorage } from '@ionic-native/native-storage';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -26,6 +26,7 @@ import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/of';
+import { TokenInterceptorProvider } from '../providers/token-interceptor/token-interceptor';
 
 //
 // make value sync with their sources
@@ -39,7 +40,7 @@ var IONIC_APPID=require('../../ionic.config.json').prod_id;
 
 Pro.init(IONIC_APPID, {
   appVersion: NPM_VERSION
-})
+});
 
 @Injectable()
 export class Kio2AdminErrorHandler implements ErrorHandler {
@@ -56,7 +57,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
 
   handleError(err: any): void {    
     console.log('---- Kio2AdminErrorHandler',NPM_VERSION,err)
-    Pro.monitoring.handleNewError(err);
+    // Pro.monitoring.handleNewError(err);
     // Remove this if you want to disable Ionic's auto exception handling
     // in development mode.
     this.ionicErrorHandler && this.ionicErrorHandler.handleError(err);
@@ -105,8 +106,9 @@ var SERVER:boolean|string=false;
 
     // set locale to french (for dates, etc. )
     { provide: LOCALE_ID, useValue: "fr-FR" },  
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorProvider, multi: true },
     // {provide: ErrorHandler, useClass: IonicErrorHandler},
-    {provide: ErrorHandler, useClass: Kio2AdminErrorHandler },    
+    { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },    
     BackgroundGeolocation,
     Dialogs,
     Geolocation,
@@ -115,7 +117,8 @@ var SERVER:boolean|string=false;
     Network,
     StatusBar,
     SplashScreen,
-    TrackerProvider
+    TrackerProvider,
+    TokenInterceptorProvider
   ]
 })
 export class AppModule {
