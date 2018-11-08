@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { Platform, ActionSheetController, Events, IonicPage, NavController, NavParams, ToastController, ViewController } from 'ionic-angular';
 import { LoaderService, Order, Config } from 'kng2-core';
-import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator';
+import { LaunchNavigator } from '@ionic-native/launch-navigator';
 //import { Subscription } from "rxjs";
 declare var google;
 

@@ -10,9 +10,9 @@ import {
   VERSION
 } from '@angular/core';
 
-import {
-  config
-} from 'kng2-core';
+// import {
+//   config
+// } from 'kng2-core';
 
 import uploadcare from 'uploadcare-widget';
 
