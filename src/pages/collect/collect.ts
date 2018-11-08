@@ -149,7 +149,8 @@ export class CollectPage {
     this.navCtrl.push('OrderItemsPage',{
       orders:this.filterOrderItemsByVendor(vendor),
       vendor:vendor,
-      shipping:this.shipping
+      shipping:this.shipping,
+      user:this.user
     });
   }
 
