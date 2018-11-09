@@ -117,10 +117,17 @@
     <ion-list-header color="primary">
       Business
     </ion-list-header>
+
     <ion-item>
-        <ion-label color="primary" stacked>Votre identité TVA</ion-label> 
-        <ion-input type="text" placeholder="ID TVA" [(ngModel)]="tvaId"></ion-input>              
+      <ion-label color="primary" stacked>Votre identité TVA</ion-label> 
+      <ion-input type="text" placeholder="ID TVA" [(ngModel)]="tvaId"></ion-input>              
     </ion-item>
+
+    <ion-item>
+      <ion-label color="primary" stacked>Votre IBAN</ion-label> 
+      <ion-input [class.invalid-iban]="!ibanCtrl()" type="text" placeholder="CH..." [(ngModel)]="shop.account.IBAN"></ion-input>              
+    </ion-item>
+
 
     <!-- SHOP FEES -->
     <ion-item [class.inactive]="!user.isAdmin()">

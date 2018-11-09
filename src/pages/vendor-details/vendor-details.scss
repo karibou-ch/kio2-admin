@@ -7,6 +7,10 @@ kio2-vendor-details {
     opacity: .5;
   }
   
+  .invalid-iban:not(.ng-untouched){
+    background-color: rgba(255, 0, 0, 0.1) !important;
+  }
+
   div.metabar{
     display: flex;
     align-items: center;
