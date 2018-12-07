@@ -31,6 +31,10 @@
   background-image: url('../assets/img/k.svg');
 }
 
+.align-right{
+  float: right;
+}
+
 .dark-green{
   color:#092f2b!important;
 }
@@ -46,6 +50,16 @@
   border-bottom: 1px dotted color($colors,light)
 }
 
+.toast-error{
+  .toast-top{
+    background-color: rgba(255, 220, 220, 0.85);
+
+  }
+  .toast-message{
+    color: #880000;    
+  }
+}
+
 textarea,
 input.text,
 input[type="text"],
@@ -54,4 +68,8 @@ input[type="submit"],
 .input-checkbox {
   -webkit-appearance: none;
   border-radius: 0;
+}
+
+body{
+  user-select: text;  
 }
