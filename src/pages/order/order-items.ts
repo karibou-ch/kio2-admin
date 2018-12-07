@@ -80,7 +80,7 @@ export class OrderItemsPage {
                 item.finalprice=tosave.finalprice;
                 item.fulfillment=tosave.fulfillment;
                 this.doToast("Montant: "+data.amount+" remboursé")
-              },error=>this.doToast(error.error,error.status)      
+              },error=>this.doToast(error.error,error)      
             )        
           }
         }
@@ -97,7 +97,7 @@ export class OrderItemsPage {
         // when admin, we should remove other vendor items
         Object.assign(order,ok);
         order.items=order.items.filter(i=>i.vendor===item.vendor)
-      },error=>this.doToast(error.error,error.status));
+      },error=>this.doToast(error.error,error));
   }
   
   doCancel(order, item){
@@ -108,7 +108,7 @@ export class OrderItemsPage {
         // when admin, we should remove other vendor items
         Object.assign(order,ok);
         order.items=order.items.filter(i=>i.vendor===item.vendor)
-      },error=>this.doToast(error.error,error.status));
+      },error=>this.doToast(error.error,error));
   }
 
  
@@ -123,14 +123,19 @@ export class OrderItemsPage {
     )
   }
   
-  doToast(msg,status?){
-    if(status==401){
+  doToast(msg,error?){
+    if(error&&error.status==401){
       this.events.publish('unauthorized');        
     }
-    this.toast.create({
+    let params:any={
       message: msg,
       duration: 3000
-    }).present()
+    }
+    if(error){
+      params.position='top';
+      params.cssClass='toast-error';
+    }
+    this.toast.create(params).present()
   }
 
   doSelectAllPrice(event){

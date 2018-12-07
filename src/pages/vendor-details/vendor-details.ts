@@ -146,7 +146,9 @@ export class VendorDetailsPage {
       error=>{
         this.toast.create({
           message: error.error,
-          duration: 3000
+          duration: 3000,
+          position:'top',
+          cssClass:'toast-error'
         }).present();
       }     
     )
