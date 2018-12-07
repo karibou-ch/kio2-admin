@@ -7,6 +7,13 @@
 
 
 <ion-content  [class.inactive]="!shop.status">
+  <ion-list>
+    <ion-item>
+        <button ion-button block outline large color="primary" (click)="doSave()">Enregistrer</button>
+      </ion-item>      
+  </ion-list>
+    
+  <!-- DESCRIPTION -->
   <ion-list >
     <ion-item [hidden]="!(user?.isAdmin())">
       <ion-label color="primary" >
@@ -21,9 +28,37 @@
     <ion-item >
       <ion-label>Grouper la liste des produits commandés</ion-label>
       <ion-toggle color="positive" [(ngModel)]="shop.info.detailledOrder" ></ion-toggle>
+    </ion-item>    
+  </ion-list>  
+  
+  <!-- FAQ -->
+  <ion-list >
+    <ion-item >
+      <ion-label color="primary" >
+        FAQ
+      </ion-label>
+      <button ion-button outline item-end (click)="shop.faq.push({})">Ajouter</button>
     </ion-item>
+    <div *ngFor="let faq of shop.faq;let idx=index">
+      <ion-item>
+        <ion-label stacked class="bold">Question </ion-label> 
+        <ion-textarea  rows="2"  placeholder="Question fréquente... " [(ngModel)]="faq.q" required></ion-textarea>
+      </ion-item>
+      <ion-item >
+        <ion-label stacked class="bold">Votre réponse </ion-label>
+        <ion-textarea  rows="4"  placeholder="Votre réponse... " [(ngModel)]="faq.a" required></ion-textarea>
+      </ion-item>      
+      <ion-item >
+        <ion-label color="primary" [hidden]="!faq.q">
+          {{faq.q}}
+        </ion-label>
+        <button ion-button outline item-end (click)="shop.faq.splice(idx, 1)">Supprimer</button>
+      </ion-item>
+    
+    </div>
     
   </ion-list>      
+    
   
   <ion-list>
       <ion-list-header color="primary">
