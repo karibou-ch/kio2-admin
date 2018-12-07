@@ -1,7 +1,8 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController, ModalController, Config, LoadingController, Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, ModalController, LoadingController, Events } from 'ionic-angular';
 
-import { LoaderService, 
+import { Config,
+         LoaderService, 
          Product, 
          ProductService, 
          User, 
@@ -21,16 +22,17 @@ import { LoaderService,
   templateUrl: 'product-detail.html',
 })
 export class ProductDetailPage {
-  user:User;
-  config:Config;
-  categories:Category[]=[];
-  currentCategory:Category;
-  title:string;
-  product:Product;
-  shops:Shop[];
   defaultProduct:Product=new Product();
   detailled:boolean=false;
   create:boolean=false;
+  config:Config;
+  categories:Category[]=[];
+  currentCategory:Category;
+  product:Product;
+  shops:Shop[];
+  TVAs:number[];
+  title:string;
+  user:User;
   
   @ViewChild('desc') desc: ElementRef;
 
@@ -50,10 +52,12 @@ export class ProductDetailPage {
     this.shops=this.user.shops||[];
     this.create=this.navParams.get('create');    
     
+    this.TVAs=this.config.shared.TVA;
     this.title=this.product.title;
 
     //
     //FIXME hack category should be normalized in server side
+    this.product.categories=this.product.categories||{};
     this.product.categories=this.product.categories['_id']||this.product.categories;
     this.product.vendor=this.product.vendor['_id']||this.product.vendor;
     this.product.belong=this.product.belong||{name:null,weight:0};
@@ -82,6 +86,9 @@ export class ProductDetailPage {
     
   }
 
+  categoryChange(){
+    this.currentCategory=this.categories.find(cat=>(cat._id+'')==this.product.categories);
+  }
 
   descResize(){
     this.desc.nativeElement.style.height = this.desc.nativeElement.scrollHeight + 'px';
@@ -146,7 +153,15 @@ export class ProductDetailPage {
     // validate belong
     if(this.product.belong.name&&
        this.currentCategory){
-     this.product.belong=this.currentCategory.child.find(child=>child.name==this.product.belong.name);
+     let child=this.currentCategory.child.find(child=>child.name==this.product.belong.name);
+     if(!child){
+      loading.dismiss();
+      return this.toast.create({
+        message: "La sous catégorie  n'est pas compatible",
+        duration: 3000
+      }).present();
+     }
+     this.product.belong=child;
      delete this.product.belong['_id'];
     }
 
@@ -159,6 +174,9 @@ export class ProductDetailPage {
       (product)=>{
         this.create=false;
         this.product.sku=product.sku;
+        this.product.categories=product.categories['_id']||product.categories;
+        this.product.vendor=product.vendor['_id']||product.vendor;
+    
         loading.dismiss();
         this.toast.create({
           message: "Enregistré",
@@ -169,7 +187,9 @@ export class ProductDetailPage {
         loading.dismiss();
         this.toast.create({
           message: error.error,
-          duration: 3000
+          duration: 5000,
+          position:'top',
+          cssClass:'toast-error'
         }).present();
       }
     )
