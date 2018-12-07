@@ -23,8 +23,12 @@
       </ion-item>
 
       <ion-item [hidden]="!user.isAdmin()">
-        <ion-label>Boost</ion-label>
+        <ion-label>Sélection</ion-label>
         <ion-toggle color="positive" item-end [(ngModel)]="product.attributes.home"></ion-toggle>
+      </ion-item>
+      <ion-item [hidden]="!user.isAdmin()">
+        <ion-label>Boost</ion-label>
+        <ion-toggle color="positive" item-end [(ngModel)]="product.attributes.boost"></ion-toggle>
       </ion-item>
         
       <ion-item>
@@ -157,18 +161,10 @@
       </ion-list>
       
     <ion-list radio-group [(ngModel)]="product.pricing.tva" [hidden]="!detailled">
-      <ion-item >
-        <ion-label color="primary">TVA 0%</ion-label>
-        <ion-radio value="0.0"></ion-radio>
+      <ion-item *ngFor="let tva of TVAs">
+        <ion-label color="primary">TVA {{tva|percent:'1.1-1'}}</ion-label>
+        <ion-radio [value]="tva"></ion-radio>
       </ion-item>        
-      <ion-item>
-        <ion-label color="primary">TVA 2.5%</ion-label>
-        <ion-radio value="0.025"></ion-radio>
-      </ion-item>        
-      <ion-item>
-        <ion-label color="primary">TVA 7.7%</ion-label>
-        <ion-radio value="0.077"></ion-radio>
-      </ion-item>                
     </ion-list>
 
     <!-- NAV -->  
@@ -189,20 +185,20 @@
         <ion-label>
           Categorie (principale)
         </ion-label>
-        <ion-select [(ngModel)]="product.categories">
+        <ion-select [(ngModel)]="product.categories" (ionChange)="categoryChange()">
           <ion-option *ngFor="let cat of getCategories()"  [value]="cat._id">{{cat.name}}</ion-option>        
         </ion-select>
       </ion-item>
       <ion-item>
         <ion-label>
-          Categorie (enfant)
+          Categorie (secondaire)
         </ion-label>
         <ion-select [(ngModel)]="product.belong.name">
           <ion-option *ngFor="let child of getChild()" [value]="child.name" >{{child.name}}</ion-option>        
         </ion-select>
       </ion-item>
 
-      <ion-item>
+      <ion-item hidden>
         <ion-label>
           Categorie (secondaire)
         </ion-label>
