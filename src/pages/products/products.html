@@ -52,9 +52,10 @@
           <h2>{{product.title}}</h2>      
           <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}}</h3>
           <p>
-            {{getStateLabel(product)}} 
-            <span [hidden]="!product.attributes.home" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> boost</span>
-            <span [hidden]="!product.attributes.discount" class="tag"> <ion-icon name="color-wand" color="danger"></ion-icon> promo</span>
+            {{getStateLabel(product)}} <span>// {{product.belong.name}}</span>
+            <span [hidden]="!product.attributes.boost" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #boost</span>
+            <span [hidden]="!product.attributes.home" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #select</span>
+            <span [hidden]="!product.attributes.discount" class="tag"> <ion-icon name="color-wand" color="danger"></ion-icon> #promo</span>
           </p>
           <span item-end [class.red]="product.pricing.stock<6">
               {{product.pricing.stock}}

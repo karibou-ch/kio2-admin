@@ -87,7 +87,7 @@ export class ProductsPage {
   }
 
   getStateLabel(product:Product){
-    return product.attributes.available?'Disponible pour la vente':'Indisponible pour la vente';
+    return product.attributes.available?'Disponible':'Indisponible';
   }
 
   ngOnDestroy(){
