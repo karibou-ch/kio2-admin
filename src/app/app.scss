@@ -73,3 +73,30 @@ input[type="submit"],
 body{
   user-select: text;  
 }
+
+@media print {
+    ion-header{ 
+      display: none !important; 
+    }  
+
+    body, 
+    .app-root, 
+    .split-pane, 
+    .ion-page, 
+    ion-app, 
+    ion-nav { 
+      contain: none; 
+    }
+    body, 
+    ion-nav{ 
+      overflow: initial; 
+    }
+    body{ 
+      position: static; 
+    }
+  
+    [ion-content-print]{ 
+      overflow-y: visible !important; 
+      position: relative; 
+    }    
+  }
