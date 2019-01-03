@@ -31,9 +31,9 @@ export class AdminSettingsPage {
 
   ngOnInit(){
     Object.assign(this.user,this.$user.currentUser||this.user);
-    this.$user.user$.subscribe(user=>{
-      Object.assign(this.user,user)
-    });
+    // this.$user.user$.subscribe(user=>{
+    //   Object.assign(this.user,user)
+    // });
     this.version=' (v'+Pro.getApp().version+')';
     this.sub=this.parent.doInitOrders.subscribe(([orders,when,dates])=>{
       this.availableDates=dates;
@@ -88,9 +88,14 @@ export class AdminSettingsPage {
   }
 
   openReports(){
+    let month=this.currentShippingDate.getMonth()+1;
+    let year=this.currentShippingDate.getFullYear();     
+
     this.navCtrl.pop();
     this.navCtrl.push('ReportPage',{
-      user:this.user      
+      user:this.user,      
+      month:month,
+      year:year
     });        
   }
   

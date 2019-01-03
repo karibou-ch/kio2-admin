@@ -39,7 +39,27 @@ export class Kio2Aadmin {
     });
   }
 
+
+  //
+  // if default URL/# is set
+  // QUICK FIX for report 
+  defaultPage(){
+    try{
+      if(window&&window.location.hash){
+        let hash=window.location.hash;
+        return setTimeout(()=>{
+          window.location.hash=hash;
+        },400);
+      }  
+    }catch(e){
+
+    }
+  }
+
+
+
   onInit(user:User){
+
     if(!user.isAuthenticated()){
       this.rootPage='LoginPage';
       return;
@@ -49,14 +69,28 @@ export class Kio2Aadmin {
     // if admin||logistic => shopper
     if(user.isAdmin()||user.hasRole('logistic')){
       this.rootPage='ShopperPage';
+      this.defaultPage();
       return;
     }
 
     this.rootPage='OrderCustomersPage';
+    this.defaultPage();
 
-    //
-    // if vendor => orders
   }
+
+  // ngAfterViewInit() {
+
+  //   // Convenience to route with a given nav
+  //   Deeplinks.routeWithNavController(this.navChild, {
+  //     '/about-us': AboutPage,
+  //     '/universal-links-test': AboutPage,
+  //     '/products/:productId': ProductPage
+  //   }).subscribe((match) => {
+  //     console.log('Successfully routed', match);
+  //   }, (nomatch) => {
+  //     console.warn('Unmatched Route', nomatch);
+  //   });
+  // }  
 
   ngOnInit() {
   
