@@ -19,12 +19,15 @@ export class LogisticHeaderComponent {
 
   @Input() format:string="d MMM y";
   @Input() title:string="";
+  @Input() month:number;
+  @Input() year:number;
+
   @Input() currentShippingDate: Date;
   @Input() stock:boolean;
   @Input() vendor:boolean;
   @Input('orders') hideOrders:boolean=false;
   @Input('collect') hideCollect:boolean=false;
-  @Output() doInitOrders = new EventEmitter<[Order[],Date,Date[]]>(); //execute data fetcher function of parent component
+  @Output() doInitOrders = new EventEmitter<[Order[],Date,Date[],string]>(); //execute data fetcher function of parent component
   @Output() doSelectedOrders = new EventEmitter<[Order[],Date]>(); //execute data fetcher function of parent component
 
   // Keep options in memory cross windows
@@ -91,12 +94,23 @@ export class LogisticHeaderComponent {
     }
 
     this.$loader.ready().subscribe((loader) => {
+      let pickerDate;
       LogisticHeaderComponent.filtersOrder = LogisticHeaderComponent.filtersOrder||this.OPEN;
       //
       // FIXME issue with stream ordering (test right fter a login)
       this.user=this.user.id?this.user:loader[1];      
       this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
-      this.pickerShippingDate = this.currentShippingDate.toISOString();
+      //
+      // initial picker date
+      pickerDate=new Date(this.currentShippingDate);
+      if(this.month){
+        pickerDate.setMonth((this.month)-1);
+      }
+      if(this.year){
+        pickerDate.setYear(this.year);
+      }
+
+      this.pickerShippingDate = pickerDate.toISOString();
       this.currentShippingDate.setHours(0, 0, 0, 0);
 
 
@@ -135,16 +149,12 @@ export class LogisticHeaderComponent {
   //
   // on selected date
   updateDateFromPicker(){
-    // FIXME in ioa-datetime BUG with last day month
-    this.pickerShippingDate=this.pickerShippingDate.replace("2018-01-31T08","2018-01-30T08");
-    this.pickerShippingDate=this.pickerShippingDate.replace("2018-04-31T08","2018-04-30T08");
-    this.pickerShippingDate=this.pickerShippingDate.replace("2018-06-31T08","2018-06-30T08");
-    this.pickerShippingDate=this.pickerShippingDate.replace("2018-08-31T08","2018-08-30T08");
-    this.pickerShippingDate=this.pickerShippingDate.replace("2018-09-31T08","2018-09-30T08");
-    this.pickerShippingDate=this.pickerShippingDate.replace("2018-11-31T08","2018-11-30T08");
     this.currentShippingDate=new Date(this.pickerShippingDate);
 
     this.currentShippingDate.setHours(0, 0, 0,0);
+    this.currentShippingDate.setDate(2);
+    this.pickerShippingDate = this.currentShippingDate.toISOString();
+
     this.findAllOrdersForShipping();
   }
 
@@ -196,14 +206,14 @@ export class LogisticHeaderComponent {
   initOrders(shipping?){
     let current=Order.currentShippingDay();
     if(!shipping){
-      return this.doInitOrders.emit([[],this.currentShippingDate,this.availableDates]);
+      return this.doInitOrders.emit([[],this.currentShippingDate,this.availableDates,this.pickerShippingDate]);
     }
     this.currentShippingDate = new Date(shipping);
     this.currentShippingDate.setHours(0, 0, 0, 0);
     if(this.currentShippingDate>current){
 
     }
-    this.doInitOrders.emit([this.monthOrders.get(this.currentShippingDate.getTime()),this.currentShippingDate,this.availableDates]);
+    this.doInitOrders.emit([this.monthOrders.get(this.currentShippingDate.getTime()),this.currentShippingDate,this.availableDates,this.pickerShippingDate]);
     
   }
   
