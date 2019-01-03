@@ -9,7 +9,9 @@ import { LoaderService, Order, User, ProductService, Product, Config, UserServic
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
-@IonicPage()
+@IonicPage({
+  segment:'products'
+})
 @Component({
   selector: 'kio2-products',
   templateUrl: 'products.html',
@@ -171,16 +173,7 @@ export class ProductsPage {
   }
 
   onSearchInput($event){
-    let search=this.cache.search.toLocaleLowerCase();
-    if(search.length<3){
-      return this.products=this.sliceProducts();
-    }
-    this.products=this.cache.products.filter((product:Product)=>{
-      return (product.title+
-        product.details.description+
-        product.vendor.name+
-        product.details.keywords).toLocaleLowerCase().indexOf(search)>-1;
-    });
+    this.sliceProducts();
   }
 
   onSearchCancel($event){
@@ -201,13 +194,24 @@ export class ProductsPage {
 
   //
   // infiniteScroll OR filter options change
-  sliceProducts(){
+  sliceProducts(len?){
+    let search=this.cache.search.toLocaleLowerCase();
+
     this.products=this.cache.products
       .filter((product,i)=>{
         return !this.cache.boost||product.attributes.discount|| product.attributes.home;
       })
       .filter((product)=>{      
         return this.cache.active==product.attributes.available;
+      })
+      .filter(product=>{
+        if(search==''){
+          return product;
+        }
+        return (product.title+
+          product.details.description+
+          product.vendor.name+
+          product.details.keywords).toLocaleLowerCase().indexOf(search)>-1;  
       })
       .slice(0,this.cache.start+this.cache.step);
       return this.products;
