@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, App } from 'ionic-angular';
 import { config, Order, ReportOrders, ReportingService, Config } from 'kng2-core';
 
 
@@ -10,10 +10,12 @@ import { config, Order, ReportOrders, ReportingService, Config } from 'kng2-core
  * Ionic pages and navigation.
  */
 
-@IonicPage()
+@IonicPage({
+  segment:'report/:month/:year'
+})
 @Component({
   selector: 'page-report',
-  templateUrl: 'report.html',
+  templateUrl: 'report.html'
 })
 export class ReportPage {
 
@@ -24,17 +26,33 @@ export class ReportPage {
   today:Date=new Date();
   headerImg:string="/assets/img/k-sm.jpg";
   shops:string[]=[];
+  defaultShop:string;
+  defaultTitle:string;
+
+  format:string="MMM yyyy";
+  pickerDate:string;
+  currentDate:Date;
 
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
     private $report: ReportingService,
-    private toast:ToastController
+    private toast:ToastController,
+    private $app:App
   ) {
+
     this.month=this.today.getMonth()+1;
     this.year=this.today.getFullYear();     
     this.config=config;
+    this.defaultShop=this.navParams.get('shop');
+    this.defaultTitle;
+    this.month=this.navParams.get('month')||this.month;
+    this.year=this.navParams.get('year')||this.year;
+    this.currentDate=new Date(this.year,this.month,0);
+
+    this.onInitReport();
   }
+
 
   doToast(msg){
     this.toast.create({
@@ -43,21 +61,52 @@ export class ReportPage {
     }).present()
   }
 
-  onInitOrders([orders,shipping,availableDates]:[Order[],Date,Date[]]){
-   this.month=new Date(shipping).getMonth()+1;
-   this.year=new Date(shipping).getFullYear();
+  onInitReport(){
+   this.month=new Date(this.currentDate).getMonth()+1;
+   this.year=new Date(this.currentDate).getFullYear();
+   let month=("0" + (this.month + 1)).slice(-2);
+
    this.shops=[];
    this.report=null;
    this.config=config;
    this.headerImg=config.shared.home.siteName.image||this.headerImg;
-   this.$report.getVendors(this.year,this.month).subscribe(
+   this.$report.getReport(this.year,this.month,this.defaultShop).subscribe(
     (report:ReportOrders)=>{
       this.report=report;
+      this.report.orders=this.report.orders||[];
+      this.report.shops=this.report.shops||{};
       this.shops=Object.keys(this.report.shops);
+      this.defaultTitle=month+'/'+this.year+' - karibou.ch';
+      if(this.shops.length==1){
+        this.defaultShop=this.shops[0];
+        this.defaultTitle=month+'/'+this.year+' - '+this.shops[0];
+      }
+      document.title = this.defaultTitle;
+      if(this.report.products){
+        this.report.products=this.report.products.sort((a,b)=>{
+          //sku,title,amount,count,vendor
+          return b.amount-a.amount;
+        });  
+      }
     },error=>this.doToast(error.error)
    )
   }
 
+  openReport(slug){
+    this.navCtrl.push('ReportPage',{
+      shop:slug,
+      month:this.month,
+      year:this.year
+    });        
+  }
+
+  //
+  // on selected date
+  updateDateFromPicker(){
+    this.currentDate=new Date(this.pickerDate);
+    this.pickerDate = this.currentDate.toISOString();
+    this.onInitReport();
+  }  
 
   shopName(){
     if(!this.report){
