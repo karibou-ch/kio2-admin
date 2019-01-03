@@ -4,83 +4,103 @@
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
+<ion-header>
+  <ion-navbar  class="hidden-print">  
+    <!-- title  -->
+    <ion-title (click)="picker.open()">
+      <ion-icon name="calendar"></ion-icon>
+     Rapport - {{ currentDate | date:format }} 
+    </ion-title>
 
-<ion-header no-border>
-  <logistic-header
-    format="MMM y"
-    title="Vos rapports"
-    [vendor]="false"
-    [stock]="false"
-    [collect]="true"
-    [orders]="true"
-    (doInitOrders)="onInitOrders($event)"
-    (doSelectedOrders)="onSelectedOrders($event)">
-  </logistic-header>
+    <!-- DATE PICKER BUTTON -->
+    <ion-datetime #picker displayFormat="MM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="pickerDate" 
+      (ngModelChange)="updateDateFromPicker()" 
+      cancelText="Annuler" 
+      doneText="Fait" 
+      dayValues="1"
+      monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre">
+    </ion-datetime>        
+
+  </ion-navbar>
 </ion-header>
 
+<div class="content" *ngIf="report" ion-content-print>
+  <div class=" report">
+    <address class="small">
+      <img [src]="headerImg"  />
+      <span class="text-underline bold" >{{config?.shared.home.siteName.fr}}</span> 
+      <!-- | <span class="text-capitalize">Olivier & Delphine Cluzel Evalet</span> | 
+      <span >34 route de chêne | 1208 | Genève</span>  -->
+    </address>
 
+    <address>
+      <!-- <strong class="text-capitalize">{{user.display()}}</strong><br> -->
+      <!-- <span class="text-underline bold" >{{shopGetFirst().name}}</span><br> -->
+      <!-- <span >{{shopGetFirst().address.streetAdress}}</span><br>
+      <span >{{shopGetFirst().address.postalCode}} / {{shopGetFirst().address.region}}</span><br> -->
+    </address>
 
-    <div class="content" *ngIf="report" ion-content-print>
-        <div class=" report">
-          <address class="small">
-            <img [src]="headerImg"  />
-            <span class="text-underline bold" >{{config?.shared.home.siteName.fr}}</span> 
-            <!-- | <span class="text-capitalize">Olivier & Delphine Cluzel Evalet</span> | 
-            <span >34 route de chêne | 1208 | Genève</span>  -->
-          </address>
-    
-          <address>
-            <!-- <strong class="text-capitalize">{{user.display()}}</strong><br> -->
-            <!-- <span class="text-underline bold" >{{shopGetFirst().name}}</span><br> -->
-            <!-- <span >{{shopGetFirst().address.streetAdress}}</span><br>
-            <span >{{shopGetFirst().address.postalCode}} / {{shopGetFirst().address.region}}</span><br> -->
-          </address>
-    
-          <h4 [hidden]="!report.from">Relevé d'activité du {{report.to|date:"d MMM y"}}</h4>
-          <ul >
-            <li>Date du relevé: {{today|date:"d MMM y"}}</li>
-            <li>Période comptable:  {{report.from|date:"d MMM y"}} au {{report.to|date:"d MMM y"}}</li>
-            <li>CA total <b>{{report.amount-report.discount-report.ca|currency:'CHF'}}</b>, <b>{{report.orders.length}}</b> commandes, <b>{{totalErrors()}}</b> erreurs dont <b>{{totalRefunds()}}</b> remboursement</li>
-          </ul>
-    
-          <div  >
-          <table class="mdl-data-table resume">
-            <thead>
-              <tr>
-                <th class="first-col">Transactions</th>  
-                <th>CHF</th>
-              </tr>
-            </thead>
-            <tbody *ngFor="let slug of shops" class="report-separator">
-              <tr><td>
-                CA {{report.shops[slug].items}} articles / {{report.shops[slug].orders.length}} commandes 
-                <div class="red" [hidden]="!report.shops[slug].errors">{{report.shops[slug].errors}} erreurs dont {{report.shops[slug].refunds}} remboursement </div>
-              </td><td>{{report.shops[slug].amount|currency:'CHF'}}</td></tr>
-              <tr><td>Déduction liée à la participation aux frais des clients</td><td>{{report.shops[slug].discount|currency:'CHF'}}</td></tr>
-              <tr><td>Déduction liée au service Karibou.ch  {{report.shops[slug].contractFees[0]*100}}% </td><td>{{report.shops[slug].fees|currency:'CHF'}}</td></tr>
-              <tr><td class="bold">
-                Solde en faveur de {{report.shops[slug].name}}
-              </td><td class="bold">{{report.shops[slug].amount-report.shops[slug].discount-report.shops[slug].fees|currency:'CHF'}}</td></tr>
-            </tbody>
-            <tbody *ngIf="shops.length>1" class="report-last">
-              <tr><td><b>TOTAL</b> {{report.items}} articles / {{report.orders.length}} commandes</td><td>{{report.amount|currency:'CHF'}}</td></tr>
-              <tr><td>Déduction liée à la participation aux frais des clients</td><td>{{report.discount|currency:'CHF'}}</td></tr>
-              <tr><td>Déduction lié au service {{config?.shared.home.siteName.fr}} </td><td>{{report.ca|currency:'CHF'}}</td></tr>
-              <tr><td class="bold">Solde en faveur des boutiques</td><td class="bold">{{report.amount-report.discount-report.ca|currency:'CHF'}}</td></tr>
-            </tbody>
-    
-          </table>
-    
-          </div>
-    
-          <p>
-            Avec nos meilleures salutations,<br/>
-            {{config?.shared.home.siteName.fr}}<br/>
-            {{config?.shared.home.email}}<br/>
-            {{config?.shared.home.phone}}<br/>
-          </p>
-    
-          <div class="page-break"></div>    
-        </div>    
-      </div>
+    <h4 [hidden]="!report.from">Relevé d'activité du {{report.to|date:"d MMM y"}}</h4>
+    <ul >
+      <li>Date du relevé: {{today|date:"d MMM y"}}</li>
+      <li>Période comptable:  {{report.from|date:"d MMM y"}} au {{report.to|date:"d MMM y"}}</li>
+      <li>CA total <b>{{report.amount-report.discount-report.ca|currency:'CHF'}}</b>, <b>{{report.orders.length}}</b> commandes, <b>{{totalErrors()}}</b> erreurs dont <b>{{totalRefunds()}}</b> remboursement</li>
+    </ul>
+
+    <div  >
+    <table class="mdl-data-table resume">
+      <thead>
+        <tr>
+          <th class="first-col">Transactions</th>  
+          <th>CHF</th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let slug of shops" class="report-separator">
+        <tr><td>
+          CA {{report.shops[slug].items}} articles / {{report.shops[slug].orders.length}} commandes 
+          <div class="red" [hidden]="!report.shops[slug].errors">{{report.shops[slug].errors}} erreurs dont {{report.shops[slug].refunds}} remboursement </div>
+        </td><td>{{report.shops[slug].amount|currency:'CHF'}}</td></tr>
+        <tr><td>Déduction liée à la participation aux frais des clients</td><td>{{report.shops[slug].discount|currency:'CHF'}}</td></tr>
+        <tr><td>Déduction liée au service Karibou.ch  {{report.shops[slug].contractFees[0]*100}}% </td><td>{{report.shops[slug].fees|currency:'CHF'}}</td></tr>
+        <tr><td class="bold">
+          Solde en faveur de {{report.shops[slug].name}} 
+          <a href="javascript:void(0);" (click)="openReport(slug)" [hidden]="defaultShop" class="hidden-print">open</a>
+
+        </td><td class="bold">{{report.shops[slug].amount-report.shops[slug].discount-report.shops[slug].fees|currency:'CHF'}}</td></tr>
+      </tbody>
+      <tbody *ngIf="shops.length>1" class="report-last">
+        <tr><td><b>TOTAL</b> {{report.items}} articles / {{report.orders.length}} commandes</td><td>{{report.amount|currency:'CHF'}}</td></tr>
+        <tr><td>Déduction liée à la participation aux frais des clients</td><td>{{report.discount|currency:'CHF'}}</td></tr>
+        <tr><td>Déduction lié au service {{config?.shared.home.siteName.fr}} </td><td>{{report.ca|currency:'CHF'}}</td></tr>
+        <tr><td class="bold">Solde en faveur des boutiques</td><td class="bold">{{report.amount-report.discount-report.ca|currency:'CHF'}}</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div *ngIf="defaultShop"><!-- BY PRODUCT -->
+      <h4 class="ng-scope">Les ventes par produit</h4>
+      <table class="mdl-data-table  " style="width:90vw">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Qté</th>
+            <th>CHF</th>  
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of report.products" >
+            <td>{{product.title}}</td><td>{{product.count}}</td><td >{{product.amount.toFixed(2)}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h4>Avec nos meilleures salutations,</h4>
+    <p>
+      {{config?.shared.home.siteName.fr}}<br/>
+      {{config?.shared.home.email}}<br/>
+      {{config?.shared.home.phone}}<br/>
+    </p>
+
+    <div class="page-break"></div>    
+  </div>    
+</div>
     

@@ -6,6 +6,10 @@ page-report.ion-page{
     height: auto!important;
   }
 
+  ion-datetime {
+    display: none;
+  }
+
   .content{
     height: 100%;
     width: 100%;
