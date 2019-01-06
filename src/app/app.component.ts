@@ -104,6 +104,13 @@ export class Kio2Aadmin {
       }  
     },1000);
 
+    //
+    //
+    this.$loader.update().subscribe((ctx)=>{
+      if(ctx.user){
+        this.onInit(ctx.user);
+      }
+    })
 
     this.$loader.ready().subscribe((loader) => {
       console.log('--- init',this.rootPage,this.currentUser)
@@ -117,10 +124,5 @@ export class Kio2Aadmin {
       })
     });
 
-    this.$user.subscribe(user=>{
-      this.onInit(user);
-    },issue=>{
-      console.log('--- ISSUE',issue)
-    });
   }
 }

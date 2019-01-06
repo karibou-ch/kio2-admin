@@ -98,6 +98,10 @@ export class LoginPage {
 
       
       if(user.isAuthenticated()){
+        this.loader.dismiss(); 
+        try{
+          window.location.href='/'
+        }catch(e){}
         return ;
       }
       this.showError("Erreur d'authentification :-((");
