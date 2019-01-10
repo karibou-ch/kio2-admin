@@ -161,6 +161,7 @@
       </ion-list>
       
     <ion-list radio-group [(ngModel)]="product.pricing.tva" [hidden]="!detailled">
+      <ion-item [hidden]="!product.pricing.tva">Valeur actuelle {{product.pricing.tva|percent:'1.1-1'}}</ion-item>
       <ion-item *ngFor="let tva of TVAs">
         <ion-label color="primary">TVA {{tva|percent:'1.1-1'}}</ion-label>
         <ion-radio [value]="tva"></ion-radio>
