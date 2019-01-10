@@ -6,6 +6,7 @@ import { User,
          ShopService,
          Category} from 'kng2-core';
 
+import moment from 'moment';
 
 @IonicPage()
 @Component({
@@ -44,6 +45,10 @@ export class VendorDetailsPage {
     this.initShop();    
   }
 
+
+  formatToGMT(date:Date){
+    return moment(date).format()
+  }
 
   ibanCtrl(){
     return this.isValidIBANNumber(this.shop.account.IBAN);
