@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, ToastController } from 'ionic-angular';
-import { Product, User, Config, ProductService } from 'kng2-core';
+import { Product, User, Config, ProductService, Shop } from 'kng2-core';
+
 
 /**
  * Generated class for the UploadImagePage page.
@@ -19,6 +20,8 @@ export class UploadImagePage {
   config:Config;
   user:User;
   product:Product;
+  shopfg:Shop;
+  shopowner:Shop;
   image:string;
   pubUpcare:string;
 
@@ -32,7 +35,17 @@ export class UploadImagePage {
     this.config=navParams.get('config');
     this.user=navParams.get('user');
     this.product=navParams.get('product');
-    this.image=this.product.photo.url;
+    this.shopfg=navParams.get('shopfg');
+    this.shopowner=navParams.get('shopowner');
+    if(this.product){
+      this.image=this.product.photo.url;
+    }
+    if(this.shopfg){
+      this.image=this.shopfg.photo.fg;
+    }
+    if(this.shopowner){
+      this.image=this.shopowner.photo.owner;
+    }
 
     if(this.config){
       this.pubUpcare = this.config.shared.keys.pubUpcare;
@@ -40,10 +53,11 @@ export class UploadImagePage {
   }
 
   isReady(){
-    return (this.config&&this.user&&this.product&&true);
+    return (this.config&&this.user);
   }
 
   ionViewDidLoad() {
+    
   }
 
   onDialogOpen(dialog){
@@ -56,7 +70,17 @@ export class UploadImagePage {
 
   onUpload($uc){
     // console.log('---- upload',$uc);
-    this.image=this.product.photo.url="//ucarecdn.com/"+$uc.uuid+"/";
+    this.image="//ucarecdn.com/"+$uc.uuid+"/";
+    if(this.product){
+      this.product.photo.url=this.image;
+    }
+    if(this.shopfg){
+      this.shopfg.photo.fg=this.image;
+    }
+    if(this.shopowner){
+      this.shopowner.photo.owner=this.image;
+    }
+
   }  
 
   showMsg(msg) {
@@ -67,6 +91,7 @@ export class UploadImagePage {
   }
 
   ucValidator(info){
+    console.log('DEBUG',info)
       if (info.size !== null && info.size > 150 * 1024) {
       // console.log('---- validator',info,150*1024)
       throw new Error("fileMaximumSize");

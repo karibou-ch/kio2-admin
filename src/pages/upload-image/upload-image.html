@@ -25,6 +25,9 @@
   <!-- <button ion-button block large color="primary" (click)="doUpload()">Upload Image</button> -->
 
   <ngx-uploadcare-widget 
+        preview-step="true" 
+        crop="true" 
+        image-shrink="1024x1024"
         images-only="true" 
         [value]="image" 
         [public-key]="pubUpcare" 
