@@ -13,6 +13,28 @@
       </ion-item>      
   </ion-list>
     
+
+  <!-- VACANCE -->
+  <ion-list>
+    <ion-list-header color="primary">
+      Informez vos clients
+    </ion-list-header>
+    <ion-item>
+      <ion-label [class.red]="shop.available.active">Ma boutique est fermée</ion-label>
+      <ion-toggle color="positive" [(ngModel)]="shop.available.active" ></ion-toggle>
+    </ion-item>
+    <ion-item [class.inactive]="!shop.available.active">
+      <ion-label >Le jour de fermeture</ion-label>
+      <ion-datetime displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.from=$event" [ngModel]="formatToGMT(shop.available.from)"></ion-datetime>
+    </ion-item>
+
+    <ion-item [class.inactive]="!shop.available.active">
+      <ion-label >Le jour de ré-ouverture</ion-label>
+      <ion-datetime displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.to=$event" [ngModel]="formatToGMT(shop.available.to)"></ion-datetime>
+    </ion-item>
+      
+  </ion-list>
+
   <!-- DESCRIPTION -->
   <ion-list >
     <ion-item [hidden]="!(user?.isAdmin())">
@@ -28,7 +50,29 @@
     <ion-item >
       <ion-label>Grouper la liste des produits commandés</ion-label>
       <ion-toggle color="positive" [(ngModel)]="shop.info.detailledOrder" ></ion-toggle>
+    </ion-item>        
+    <ion-item >
+      <ion-label>Ou vous trouver sur Internet</ion-label>
+      <ion-input type="url" placeholder="https:// ..." [(ngModel)]="shop.url"></ion-input>              
     </ion-item>    
+    <ion-item color="none">
+      <ion-thumbnail item-left class="image">
+        <img [hidden]="!shop?.photo.fg" [src]="'https:'+shop.photo.fg+'/-/resize/128x/'"/>
+        <img [hidden]="shop?.photo.fg" src="/assets/img/add.png"/>
+      </ion-thumbnail>
+    </ion-item>
+    <ion-item>
+      <button ion-button outline color="primary" block (click)="uploadImageFG()">Photo d'équipe (large taille)</button>
+    </ion-item>
+    <ion-item color="none">
+      <ion-thumbnail item-left class="image">
+        <img [hidden]="!shop?.photo.owner" [src]="'https:'+shop.photo.owner+'/-/resize/128x/'"/>
+        <img [hidden]="shop?.photo.owner" src="/assets/img/add.png"/>
+      </ion-thumbnail>
+    </ion-item>
+    <ion-item>
+      <button ion-button outline color="primary" block (click)="uploadImageOwner()">Avatar (petite taille)</button>
+    </ion-item>
   </ion-list>  
   
   <!-- FAQ -->
@@ -46,7 +90,7 @@
       </ion-item>
       <ion-item >
         <ion-label stacked class="bold">Votre réponse </ion-label>
-        <ion-textarea  rows="4"  placeholder="Votre réponse... " [(ngModel)]="faq.a" required></ion-textarea>
+        <ion-textarea  rows="8"  placeholder="Votre réponse... " [(ngModel)]="faq.a" required></ion-textarea>
       </ion-item>      
       <ion-item >
         <ion-label color="primary" [hidden]="!faq.q">
@@ -59,28 +103,6 @@
     
   </ion-list>      
     
-  
-  <ion-list>
-      <ion-list-header color="primary">
-        Informez vos clients
-      </ion-list-header>
-      <ion-item>
-        <ion-label [class.red]="shop.available.active">Ma boutique est fermée</ion-label>
-        <ion-toggle color="positive" [(ngModel)]="shop.available.active" ></ion-toggle>
-      </ion-item>
-      <ion-item [class.inactive]="!shop.available.active">
-        <ion-label >Le jour de fermeture</ion-label>
-        <ion-datetime displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.from=$event" [ngModel]="formatToGMT(shop.available.from)"></ion-datetime>
-      </ion-item>
-  
-      <ion-item [class.inactive]="!shop.available.active">
-        <ion-label >Le jour de ré-ouverture</ion-label>
-        <ion-datetime displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.to=$event" [ngModel]="formatToGMT(shop.available.to)"></ion-datetime>
-      </ion-item>
-        
-    </ion-list>
-  
-    <!-- Photos -->
     <!-- Admin BM -->
     <!-- Livraisons disponibles -->
     <!-- Adresse de collecte -->

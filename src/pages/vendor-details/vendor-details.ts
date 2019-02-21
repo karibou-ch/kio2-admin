@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, ModalController } from 'ionic-angular';
 
-import { User, 
+import { config, 
+         User, 
          Shop,
          ShopService,
          Category} from 'kng2-core';
@@ -25,6 +26,7 @@ export class VendorDetailsPage {
   catalog;
 
   constructor(
+    private modalCtrl: ModalController,
     private navCtrl: NavController, 
     private navParams: NavParams,
     private $shop:ShopService,
@@ -165,5 +167,21 @@ export class VendorDetailsPage {
 
   getCatalog(){
     return this.categories.filter(cat=>cat.active&&cat.type=='Catalog');
+  }
+
+  uploadImageOwner(){
+    this.modalCtrl.create("UploadImagePage",{
+      user:this.user,
+      config:config,
+      shopowner:this.shop,
+    }).present();
+  }
+
+  uploadImageFG(){
+    this.modalCtrl.create("UploadImagePage",{
+      user:this.user,
+      config:config,
+      shopfg:this.shop,
+    }).present();
   }
 }
