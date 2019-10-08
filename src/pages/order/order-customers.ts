@@ -7,8 +7,19 @@ import { Order,
          OrderService , 
          User, 
          LoaderService,
-         EnumCancelReason} from 'kng2-core';
+         EnumCancelReason,
+         OrderItem} from 'kng2-core';
 
+export class OrderByItem{
+  oid:number;
+  email:string;
+  customer:any;
+  rank:number;
+  payment:{
+    status:string;
+  };
+  item:OrderItem;
+}         
 
 @IonicPage()
 @Component({
@@ -25,6 +36,9 @@ export class OrderCustomersPage {
   orderAvg:number;
   orderTotal:number;
   orderBaseAmount:number=0;
+  items:{
+    [sku: number]: (OrderByItem[]|any);
+  };
 
   constructor(
     public dialogs:Dialogs,
@@ -37,6 +51,7 @@ export class OrderCustomersPage {
   ) {
     this.orders=[];
     this.cache={};
+    this.items={};
     this.$loader.ready().subscribe((loader)=>{
         Object.assign(this.user,loader[1]);
         if(this.user.isAdmin()){
@@ -63,6 +78,30 @@ export class OrderCustomersPage {
     );
   }
 
+  emailCustomers(){
+
+  }
+
+  //
+  // group by items,
+  // - sku, title, 
+  // - progress/length (validated customers)
+  // - status (not)
+  //
+  getOrderByItems(){
+    let keys=Object.keys(this.items||{});
+    if(!keys.length){
+      this.mapOrderByItems();
+      keys=Object.keys(this.items);
+    }
+    return keys.map(sku=>this.items[sku]).sort((a,b)=>b.quantity-a.quantity);
+  }
+
+
+  isDeposit(order){
+    // undefined test is for Bretzel 
+    return order.shipping.deposit||(order.shipping.deposit==undefined);
+  }
 
   isOrderCapturable(order:Order){
     // admin test should be outside 
@@ -85,6 +124,53 @@ export class OrderCustomersPage {
       this.cache[order.oid]=(order.getProgress());
     }
     return this.cache[order.oid]>=99.9;
+  }
+
+  mapOrderByItems(){
+    this.items={};
+    let orders=this.orders||[];
+    
+    //
+    // group orders by items
+    orders.forEach(order=>{
+      order.items.forEach(item=>{
+        //
+        // initial Grouped Item 
+        if(!this.items[item.sku]){
+          this.items[item.sku]={};
+          this.items[item.sku].sku=item.sku;
+          this.items[item.sku].title=item.title;
+          this.items[item.sku].quantity=0;
+          this.items[item.sku].amount=0;
+          this.items[item.sku].progress=0;
+          this.items[item.sku].done=false;
+          this.items[item.sku].vendor=item.vendor;
+          this.items[item.sku].customers=[];
+        }
+        this.items[item.sku].amount+=item.finalprice;
+        this.items[item.sku].quantity+=item.quantity;
+        //
+        // 
+        this.items[item.sku].customers.push({
+          oid:order.oid,
+          email:order.email,
+          customer:order.customer,
+          payment:{
+            status:order.payment.status
+          },
+          rank:order.rank,
+          item:item
+        } as OrderByItem);
+      })
+    });
+    //
+    // for each items, count progress of validated 
+    Object.keys(this.items).forEach(sku=>{
+      this.items[sku].progress=this.items[sku].customers.reduce((count, customer:OrderByItem)=>{
+        return customer.item.fulfillment.status=='fulfilled'?(count+1):count;
+      },0);
+    });
+
   }
 
   onDone(msg){
@@ -138,7 +224,16 @@ export class OrderCustomersPage {
     );
   }
 
-  openOrder(order){
+  openByItem(item:any){
+    this.navCtrl.push('ItemOrderPage',{
+      item:item,
+      shipping:this.shipping,
+      user:this.user
+    });
+
+  }
+
+  openByOrder(order){
     this.navCtrl.push('OrderItemsPage',{
       orders:[order],
       shipping:this.shipping,
@@ -148,6 +243,7 @@ export class OrderCustomersPage {
 
   onInitOrders([orders,shipping]:[Order[],Date]){
     console.log('---- init odrers',orders.length)
+    this.items={};
     this.orders = orders.sort(this.sortOrdersByRank);
 
     // 

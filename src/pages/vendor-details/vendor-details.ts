@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController, ModalController } from 'ionic-angular';
 
-import { config, 
-         User, 
-         Shop,
-         ShopService,
-         Category} from 'kng2-core';
+import {
+  config,
+  User,
+  Shop,
+  ShopService,
+  Category
+} from 'kng2-core';
 
 import moment from 'moment';
 
@@ -13,46 +15,48 @@ import moment from 'moment';
 @Component({
   selector: 'kio2-vendor-details',
   templateUrl: 'vendor-details.html',
+
 })
 export class VendorDetailsPage {
 
-  user:User;
-  defaultShop:Shop=new Shop();
-  shop:Shop;
-  categories:Category[];
-  title:string;
-  weekdays={};
+  user: User;
+  defaultShop: Shop = new Shop();
+  shop: Shop;
+  categories: Category[];
+  title: string;
+  weekdays = {};
   tvaId;
   catalog;
 
   constructor(
     private modalCtrl: ModalController,
-    private navCtrl: NavController, 
+    private navCtrl: NavController,
     private navParams: NavParams,
-    private $shop:ShopService,
-    private toast:ToastController    
+    private $shop: ShopService,
+    private toast: ToastController
   ) {
+
 
     // using form validator ?
     // let iBAN_Validator=(control: FormControl)=>{ 
     //   return this.isValidIBANNumber(control.value);
     // }    
     //this.ibanCtrl=new FormControl('', [Validators.required, iBAN_Validator])
-    this.shop = this.navParams.get('shop')||this.defaultShop;
-    this.user = this.navParams.get('user')||new User();    
-    this.categories = this.navParams.get('categories')||[];
-    this.$shop.get(this.shop.urlpath).subscribe(shop=>{
-      Object.assign(this.shop,shop);
+    this.shop = this.navParams.get('shop') || this.defaultShop;
+    this.user = this.navParams.get('user') || new User();
+    this.categories = this.navParams.get('categories') || [];
+    this.$shop.get(this.shop.urlpath).subscribe(shop => {
+      Object.assign(this.shop, shop);
     })
-    this.initShop();    
+    this.initShop();
   }
 
 
-  formatToGMT(date:Date){
+  formatToGMT(date: Date) {
     return moment(date).format()
   }
 
-  ibanCtrl(){
+  ibanCtrl() {
     return this.isValidIBANNumber(this.shop.account.IBAN);
   }
   /*
@@ -61,16 +65,16 @@ export class VendorDetailsPage {
    * Returns any other number (checksum) when the IBAN is invalid (check digits do not match)
    */
   isValidIBANNumber(input) {
-    let mod97=(str:string)=>{
-      let checksum:any = str.slice(0, 2), 
-          fragment:any;
+    let mod97 = (str: string) => {
+      let checksum: any = str.slice(0, 2),
+        fragment: any;
       for (let offset = 2; offset < str.length; offset += 7) {
         fragment = String(checksum) + str.substring(offset, offset + 7);
         checksum = parseInt(fragment, 10) % 97;
       }
       return checksum;
-    }  
-  
+    }
+
     let CODE_LENGTHS = {
       AD: 24, AE: 23, AT: 20, AZ: 28, BA: 20, BE: 16, BG: 22, BH: 22, BR: 29,
       CH: 21, CR: 21, CY: 28, CZ: 24, DE: 22, DK: 18, DO: 28, EE: 20, ES: 24,
@@ -88,7 +92,7 @@ export class VendorDetailsPage {
       return false;
     }
     // rearrange country code and check digits, and convert chars to ints
-    let replaceFunc=(letter:string):any=>{
+    let replaceFunc = (letter: string): any => {
       return letter.charCodeAt(0) - 55;
     }
     digits = (code[3] + code[1] + code[2]).replace(/[A-Z]/g, replaceFunc);
@@ -96,92 +100,101 @@ export class VendorDetailsPage {
     return mod97(digits);
   }
 
-  initShop(){
+  initShop() {
     //
     // Catalog
-    if(this.shop.catalog){
-      this.catalog=(this.shop.catalog._id)||this.shop.catalog;
+    if (this.shop.catalog) {
+      this.catalog = (this.shop.catalog._id) || this.shop.catalog;
     }
-    
+
     //
     // TVA
-    if(!this.shop.account.tva){
-      this.shop.account.tva={}
+    if (!this.shop.account.tva) {
+      this.shop.account.tva = {}
     }
-    this.tvaId=this.shop.account.tva.number||'';
+    this.tvaId = this.shop.account.tva.number || '';
     //
     // model for weekdays
-    (this.shop.available.weekdays||[]).map(day=>this.weekdays[day]=true);
-    
-  }
-
-  onDateFrom(){
-
-  }
-  onDateTo(){
+    (this.shop.available.weekdays || []).map(day => this.weekdays[day] = true);
 
   }
 
+  onDateFrom() {
 
-  doSave(){
+  }
+  onDateTo() {
+
+  }
+
+
+  doSave() {
 
     //
     // sync catalog
-    if(this.catalog!=this.shop.catalog){
-      this.shop.catalog=this.categories.find(c=>c._id==this.catalog);
+    if (this.catalog != this.shop.catalog) {
+      this.shop.catalog = this.categories.find(c => c._id == this.catalog);
     }
-    
+
     //
     // sync TVA
-    if(!this.shop.account.tva){
-      this.shop.account.tva={}
+    if (!this.shop.account.tva) {
+      this.shop.account.tva = {}
     }
-    this.shop.account.tva.number=this.tvaId;
+    this.shop.account.tva.number = this.tvaId;
+    
 
     //
     // sync weekdays
-    this.shop.available.weekdays=Object.keys(this.weekdays).filter(day=>this.weekdays[day]).map(day=>(parseInt(day)));
+    this.shop.available.weekdays = Object.keys(this.weekdays).filter(day => this.weekdays[day]).map(day => (parseInt(day)));
     this.$shop.save(this.shop).subscribe(
-      (shop:Shop)=>{
+      (shop: Shop) => {
         this.toast.create({
           message: "Enregistré",
           duration: 3000
         }).present();
 
-    
+
       },
-      error=>{
+      error => {
         this.toast.create({
           message: error.error,
           duration: 3000,
-          position:'top',
-          cssClass:'toast-error'
+          position: 'top',
+          cssClass: 'toast-error'
         }).present();
-      }     
+      }
     )
   }
 
-  doExit(){
+  doExit() {
     this.navCtrl.pop();
   }
 
-  getCatalog(){
-    return this.categories.filter(cat=>cat.active&&cat.type=='Catalog');
+  getCatalog() {
+    return this.categories.filter(cat => cat.active && cat.type == 'Catalog');
   }
 
-  uploadImageOwner(){
-    this.modalCtrl.create("UploadImagePage",{
-      user:this.user,
-      config:config,
-      shopowner:this.shop,
+  uploadImageOwner() {
+    this.modalCtrl.create("UploadImagePage", {
+      user: this.user,
+      config: config,
+      shopowner: this.shop,
     }).present();
   }
 
-  uploadImageFG(){
-    this.modalCtrl.create("UploadImagePage",{
-      user:this.user,
-      config:config,
-      shopfg:this.shop,
+  uploadImageFG() {
+    this.modalCtrl.create("UploadImagePage", {
+      user: this.user,
+      config: config,
+      shopfg: this.shop,
     }).present();
   }
+  uploadImageLogo() {
+    this.modalCtrl.create("UploadImagePage", {
+      user: this.user,
+      config: config,
+      shoplogo: this.shop,
+    }).present();
+  }
+
 }

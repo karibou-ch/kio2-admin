@@ -55,6 +55,7 @@
       <ion-label>Ou vous trouver sur Internet</ion-label>
       <ion-input type="url" placeholder="https:// ..." [(ngModel)]="shop.url"></ion-input>              
     </ion-item>    
+    <!-- PHOTO.FG -->
     <ion-item color="none">
       <ion-thumbnail item-left class="image">
         <img [hidden]="!shop?.photo.fg" [src]="'https:'+shop.photo.fg+'/-/resize/128x/'"/>
@@ -64,6 +65,7 @@
     <ion-item>
       <button ion-button outline color="primary" block (click)="uploadImageFG()">Photo d'équipe (large taille)</button>
     </ion-item>
+    <!-- PHOTO.OWNER -->
     <ion-item color="none">
       <ion-thumbnail item-left class="image">
         <img [hidden]="!shop?.photo.owner" [src]="'https:'+shop.photo.owner+'/-/resize/128x/'"/>
@@ -73,8 +75,42 @@
     <ion-item>
       <button ion-button outline color="primary" block (click)="uploadImageOwner()">Avatar (petite taille)</button>
     </ion-item>
+    <!-- PHOTO.LOGO -->
+    <ion-item color="none">
+      <ion-thumbnail item-left class="image">
+        <img [hidden]="!shop?.photo.logo" [src]="'https:'+shop.photo.logo+'/-/resize/128x/'"/>
+        <img [hidden]="shop?.photo.logo" src="/assets/img/add.png"/>
+      </ion-thumbnail>
+    </ion-item>
+    <ion-item>
+      <button ion-button outline color="primary" block (click)="uploadImageLogo()">Logo (petite taille)</button>
+    </ion-item>
+  
   </ion-list>  
   
+  <!-- ADRESSE -->
+  <ion-list >
+    <ion-item>
+      <ion-label color="primary" stacked>Nom et prénom du contact</ion-label> 
+      <ion-input  type="text"  placeholder="Nom et prénom" [(ngModel)]="shop.address.name" required></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label color="primary" stacked>Rue et numéro </ion-label> 
+      <ion-input  type="text"  placeholder="rue, numéro" [(ngModel)]="shop.address.streetAdress" required></ion-input>
+      <ion-input  type="text"  placeholder="Étage" [(ngModel)]="shop.address.floor" required></ion-input>
+    </ion-item>
+    <ion-item >
+      <ion-label color="primary" stacked>Téléphone de contact</ion-label> 
+      <ion-input  type="text"  placeholder="rue, numéro" [(ngModel)]="shop.address.phone" required></ion-input>
+    </ion-item>        
+    <ion-item >
+      <ion-label color="primary" stacked>Code postal et Région</ion-label> 
+      <ion-input  type="text"  placeholder="Code postal" [(ngModel)]="shop.address.postalCode" required></ion-input>
+      <ion-input  type="text"  placeholder="Région" [(ngModel)]="shop.address.region" required></ion-input>
+    </ion-item>        
+  </ion-list>
+
   <!-- FAQ -->
   <ion-list >
     <ion-item >
@@ -83,8 +119,8 @@
       </ion-label>
       <button ion-button outline item-end (click)="shop.faq.push({})">Ajouter</button>
     </ion-item>
-    <div *ngFor="let faq of shop.faq;let idx=index">
-      <ion-item>
+    <div *ngFor="let faq of shop.faq;let idx=index" class="faq-separator">
+      <ion-item class="faq-question">
         <ion-label stacked class="bold">Question </ion-label> 
         <ion-textarea  rows="2"  placeholder="Question fréquente... " [(ngModel)]="faq.q" required></ion-textarea>
       </ion-item>

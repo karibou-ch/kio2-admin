@@ -50,7 +50,7 @@
             <img [src]="getAvatar(product)">
           </ion-avatar>      
           <h2>{{product.title}}</h2>      
-          <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}}</h3>
+          <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}} &nbsp;<span class="gray">// {{product.details.origin}}</span></h3>
           <p>
             {{getStateLabel(product)}} <span>// {{product.belong.name}}</span>
             <span [hidden]="!product.attributes.boost" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #boost</span>

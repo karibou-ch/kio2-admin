@@ -3,6 +3,10 @@
 
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
+<ng-container *ngIf="!(loading$ | async); else loadingTpl">
+</ng-container>
+<ng-template #loadingTpl>...</ng-template> 
+
 -->
 <ion-header [hidden]="!header">
 
@@ -15,10 +19,9 @@
 
 <ion-content >
 
-  <h1 class="info" [hidden]="orders.length">Pas de commandes  pour la boutique {{vendor}} </h1>
-
+  <h1 class="info" [hidden]="orders.length&&!item.customers">Pas de commandes  pour la boutique {{vendor}} </h1>
   <ion-list *ngFor="let order of orders">
-    <ion-list-header>
+    <ion-list-header *ngIf="order.shipping">
       <ion-icon item-start class="rank">{{order.rank}}</ion-icon>
       <h2>
         {{order.customer.displayName}}
@@ -58,7 +61,7 @@
   
           <div class="price {{item.fulfillment.status}}" >
             <span class="suffix">fr</span>
-            <input type="number" class="input-price" 
+            <input type="number" step="0.1" min="0"  class="input-price" 
                    [(ngModel)]="item.finalprice"   
                    (keypress)="doKeypress($event.keyCode,order,item)"
                    (focus)="doSelectAllPrice($event)"/>
@@ -89,6 +92,5 @@
     </ion-item-sliding>
   </ion-list>
 
-
-
 </ion-content>
+

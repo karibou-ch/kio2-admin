@@ -19,6 +19,7 @@ export class OrderItemsPage {
   public shipping:Date;
   public isReady:boolean;
   public user:User;
+  public item:any;
 
   //
   // input props
@@ -38,15 +39,24 @@ export class OrderItemsPage {
 
     //
     // OrderItems[] for this vendor
+    this.item = this.navParams.get('item')||{};
     this.orders = this.navParams.get('orders')||[];
     this.vendor = this.navParams.get('vendor')||'';
     this.shipping = this.navParams.get('shipping');
     this.user = this.navParams.get('user');
     
+    //
+    // check content 
+    if(this.orders.length && !this.item.sku){
+      return;
+    }
+    //
+    // create orders by Item
+    console.log('---',this.item);
   }
 
   ngOnInit() {
-    this.isReady= (this.orders.length>0)|| (this.vendor!='') || (this.shipping!=null);
+    this.isReady= (this.orders.length>0)|| (this.vendor!='') || (!!this.shipping) || (!!this.item.customer);
     //console.log('-----',this.orders,(this.orders.length>0),(this.vendor!='') , (this.shipping!=null))
   }
 
@@ -182,7 +192,5 @@ export class OrderItemsPage {
   isPaid(order:Order){
     return (['paid','partially_refunded','manually_refunded'].indexOf(order.payment.status)>-1);
   } 
-
-
-
 }
+

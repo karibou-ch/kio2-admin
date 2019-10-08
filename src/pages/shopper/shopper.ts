@@ -57,6 +57,12 @@ export class ShopperPage {
     this.$tracker.stop();    
   }
 
+
+  isDeposit(order){
+    // undefined test is for Bretzel 
+    return order.shipping.deposit||(order.shipping.deposit==undefined);
+  }
+
   onDone(msg){
     this.toast.create({
       message: msg,

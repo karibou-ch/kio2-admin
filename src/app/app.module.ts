@@ -70,7 +70,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
 var SERVER:boolean|string=false;
 //SERVER="http://localhost:4000";
 //SERVER='http://api.karibou.evaletolab.ch';
-//SERVER='https://api.karibou.ch';
+SERVER='https://api.karibou.ch';
 //SERVER='http://api.boulangerie-bretzel.ch';
 
 // export function bootstrap($loader: LoaderService) {

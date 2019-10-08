@@ -67,6 +67,14 @@ export class VendorPage {
     });
   }
 
+  
+  onCreateVendor(){
+    this.navCtrl.push('VendorCreatePage',{
+      user:this.user,
+      categories:this.categories
+    });
+  }
+
   onDone(msg){
     this.toast.create({
       message: msg,

@@ -98,7 +98,7 @@ export class LogisticHeaderComponent {
       LogisticHeaderComponent.filtersOrder = LogisticHeaderComponent.filtersOrder||this.OPEN;
       //
       // FIXME issue with stream ordering (test right fter a login)
-      this.user=this.user.id?this.user:loader[1];      
+      this.user=(this.user&&this.user.id)?this.user:loader[1];      
       this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
       //
       // initial picker date

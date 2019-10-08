@@ -74,7 +74,7 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
       // console.log('DEBUG ',uploadcare);
       // console.log('DEBUG ',uploadcareTabEffects);
 
-      uploadcare.registerTab('preview', uploadcareTabEffects);   
+      // uploadcare.registerTab('preview', uploadcareTabEffects);   
       uploadcare.start({ 
         integration: `Angular/${VERSION.full}; Ngx-Uploadcare-Widget/${APP_VERSION}`,
         effects: ['crop', 'sharp', 'grayscale','enhance'],
@@ -340,10 +340,12 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
       uploadcare=window['uploadcare'];
 
       const $ = uploadcare.jQuery;
-      $(this.widget.inputElement.nextSibling).remove();
-      $(this.widget.inputElement).clone().appendTo($(this.element.nativeElement));
-      $(this.widget.inputElement).remove();
-      //this.renderer.destroyNode(this.inputElement);
+      if(this.widget.inputElement){
+        $(this.widget.inputElement.nextSibling).remove();
+        $(this.widget.inputElement).clone().appendTo($(this.element.nativeElement));
+        $(this.widget.inputElement).remove();
+      }
+      this.renderer.destroyNode(this.inputElement);
       this.renderer.removeChild(this.element.nativeElement, this.element.nativeElement.children[0]);
       delete this.widget;;  
     })

@@ -48,12 +48,12 @@ export class ProductDetailPage {
   ) {
     this.product = this.navParams.get('product')||this.defaultProduct;
     this.user = this.navParams.get('user')||new User();    
-    this.config = this.navParams.get('config');    
     this.shops=this.user.shops||[];
     this.create=this.navParams.get('create');    
+
     
-    this.TVAs=this.config.shared.TVA;
     this.title=this.product.title;
+    this.TVAs=[];
 
     //
     //FIXME hack category should be normalized in server side
@@ -64,6 +64,9 @@ export class ProductDetailPage {
 
 
     this.$loader.ready().subscribe((loader) => {
+      // config
+      this.config=loader[0];
+
       //
       // only interrested by active category
       this.categories=(loader[2]||[]).filter(c=>c.type==='Category'&&c.active);
@@ -79,6 +82,9 @@ export class ProductDetailPage {
          (typeof this.product.vendor !='string')){
         this.product.vendor=this.shops[0]['_id'];
       }
+
+      this.TVAs=this.config.shared.TVA;
+
 
       this.currentCategory=this.categories.find(cat=>(cat._id+'')==this.product.categories);
 

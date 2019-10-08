@@ -1,4 +1,5 @@
-kio2-order-items {
+kio2-order-items,
+kio2-item-orders {
   .toolbar-title{
   }
    h1.info{
@@ -6,6 +7,30 @@ kio2-order-items {
     padding: 50px;
     text-align: center;     
    }
+   h2{
+     color: #333;
+   }
+
+   ion-icon.rank{
+    margin-left: -5px!important;
+    font-family: sans-serif;
+    background: color($colors,primary);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    padding-top: 6px;
+    color: white; 
+    font-size: 1.6rem;
+    font-weight: 900; 
+    text-align: center;
+
+    &.big{
+      width: 45px;
+      height: 45px;
+      padding-top: 15px;      
+    }
+  }
+
   
   ion-content{
     background: color($colors,light)!important;    
@@ -24,18 +49,6 @@ kio2-order-items {
     margin-bottom: 1px!important;
     -border-top: 1px solid #006963!important;
 
-    ion-icon.rank{
-      margin-left: -5px!important;
-      font-family: sans-serif;
-      background: color($colors,primary);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      padding-top: 6px;
-      color: white; 
-      font-size: 1.6rem;
-      font-weight: 900;      
-    }
 
     h2{
       text-transform: capitalize;
@@ -62,7 +75,23 @@ kio2-order-items {
     display: flex;
     width: 100%;
     position: relative;
+
+    .rank{
+      margin-left:5px!important;
+      text-align: center;
+    }
+
     .title{
+      &.padding{
+        left: 42px;
+      }
+      a{
+        text-decoration: none!important;                
+      }
+      a.info{
+        margin-left: 5px;
+        transform: translateY(-4px);        
+      }
       padding: 3px 0;
       font-size: 1.6rem;
       position: absolute;
@@ -76,6 +105,9 @@ kio2-order-items {
       }
     }
     .quantity{
+      &.padding{
+        left: 42px;
+      }
       font-size: 1.4rem;
       position: absolute;
       top:34px;

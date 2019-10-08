@@ -22,6 +22,7 @@ export class UploadImagePage {
   product:Product;
   shopfg:Shop;
   shopowner:Shop;
+  shoplogo:Shop;
   image:string;
   pubUpcare:string;
 
@@ -37,6 +38,7 @@ export class UploadImagePage {
     this.product=navParams.get('product');
     this.shopfg=navParams.get('shopfg');
     this.shopowner=navParams.get('shopowner');
+    this.shoplogo=navParams.get('shoplogo');
     if(this.product){
       this.image=this.product.photo.url;
     }
@@ -45,6 +47,9 @@ export class UploadImagePage {
     }
     if(this.shopowner){
       this.image=this.shopowner.photo.owner;
+    }
+    if(this.shoplogo){
+      this.image=this.shoplogo.photo.logo;
     }
 
     if(this.config){
@@ -69,8 +74,9 @@ export class UploadImagePage {
   }
 
   onUpload($uc){
-    // console.log('---- upload',$uc);
-    this.image="//ucarecdn.com/"+$uc.uuid+"/";
+    console.log('---- upload',$uc);
+    //this.image="//ucarecdn.com/"+$uc.uuid+"/";
+    this.image=$uc.cdnUrl.replace('https:','');
     if(this.product){
       this.product.photo.url=this.image;
     }
@@ -79,6 +85,9 @@ export class UploadImagePage {
     }
     if(this.shopowner){
       this.shopowner.photo.owner=this.image;
+    }
+    if(this.shoplogo){
+      this.shoplogo.photo.logo=this.image;
     }
 
   }  
@@ -90,11 +99,11 @@ export class UploadImagePage {
     }).present();
   }
 
-  ucValidator(info){
-    console.log('DEBUG',info)
-      if (info.size !== null && info.size > 150 * 1024) {
-      // console.log('---- validator',info,150*1024)
-      throw new Error("fileMaximumSize");
+  ucValidator(info,more){
+    console.log('DEBUG uc --',info)
+    console.log('DEBUG uc --',more)
+    if (info.size !== null && info.size > 170 * 1024) {
+      // throw new Error("fileMaximumSize");
     }  
   }
 

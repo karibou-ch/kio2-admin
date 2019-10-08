@@ -8,6 +8,9 @@
 
 <ion-content>
   <div class="metabar">
+    <button ion-button icon-only (click)="onCreateVendor()">
+      <ion-icon name="add"></ion-icon>
+    </button>        
     <ion-searchbar
       [(ngModel)]="cache.search"
       [debounce]="500"

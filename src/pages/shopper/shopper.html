@@ -49,7 +49,7 @@
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <span class="rank" [class.orphan]="!order.shipping.priority">{{order.rank}}</span>
         </ion-avatar>
-        <h3 text-capitalize>{{ order.shipping.name }}</h3>
+        <h3 text-capitalize>{{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>
         <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
         <p>{{ order.shipping.note }}</p>
         <div class="shopper-info" >

@@ -8,7 +8,7 @@ import { VendorDetailsPage } from './vendor-details'
     VendorDetailsPage
   ],
   imports: [
-    IonicPageModule.forChild(VendorDetailsPage),
+    IonicPageModule.forChild(VendorDetailsPage)
   ],
   exports: [
     VendorDetailsPage

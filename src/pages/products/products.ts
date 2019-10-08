@@ -106,7 +106,7 @@ export class ProductsPage {
       this.config=loader[0];
       //
       // FIXME issue with stream ordering (test right fter a login)
-      this.user=this.user.id?this.user:loader[1];      
+      this.user=(this.user&&this.user.id)?this.user:loader[1];      
       this.loadProducts();
     });
 
@@ -114,11 +114,18 @@ export class ProductsPage {
     // update product list
     this.events.subscribe('refresh-products',(product)=>{
       if(product){
-        let idx=this.cache.products.findIndex(prod=>prod.sku==product.sku);
+        let idx=this.products.findIndex(prod=>prod.sku==product.sku);
+        let idxcached=this.cache.products.findIndex(prod=>prod.sku==product.sku);
+        if(idxcached){
+          Object.assign(this.cache.products[idxcached],product);
+        }
         if(idx){
-          this.cache.products[idx]=product;
+          Object.assign(this.products[idx],product);
+        }
+        if(idx||idxcached){
           return;
         }
+
       }
       this.loadProducts();
     });
