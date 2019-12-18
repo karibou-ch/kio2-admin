@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
 })
 export class LogisticHeaderComponent {
 
-  @Input() format:string="d MMM y";
+  @Input() format:string="EEEE d MMM yy";
   @Input() title:string="";
   @Input() month:number;
   @Input() year:number;

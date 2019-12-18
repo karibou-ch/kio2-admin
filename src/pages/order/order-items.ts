@@ -45,6 +45,12 @@ export class OrderItemsPage {
     this.shipping = this.navParams.get('shipping');
     this.user = this.navParams.get('user');
     
+    console.log('--DEBUG',this.orders);
+    console.log('--DEBUG',this.shipping);
+    if(this.orders.length == 1) {
+      this.shipping = this.orders[0].shipping.when;
+    }
+    
     //
     // check content 
     if(this.orders.length && !this.item.sku){
