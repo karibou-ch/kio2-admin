@@ -108,11 +108,15 @@ export class OrderItemsPage {
   doValidate(order, item){
     this.$order.updateItem(order,item,EnumFulfillments.fulfilled)
       .subscribe(ok=>{
-        this.doToast("Validation enregistrée");
+        const len = 18;
+        const title = item.title.substring(0,len)+(item.title.length>len?'...':'');
+        this.doToast(title+" dans sac "+order.rank);
+        Object.assign(order,ok);
         //
         // when admin, we should remove other vendor items
-        Object.assign(order,ok);
-        order.items=order.items.filter(i=>i.vendor===item.vendor)
+        // if(!this.user.isAdmin()){
+        //   order.items=order.items.filter(i=>i.vendor===item.vendor)
+        // }
       },error=>this.doToast(error.error,error));
   }
   
@@ -120,10 +124,10 @@ export class OrderItemsPage {
     this.$order.updateItem(order,item,EnumFulfillments.failure)
       .subscribe(ok=>{
         this.doToast("Annulation enregistrée");
+        Object.assign(order,ok);
         //
         // when admin, we should remove other vendor items
-        Object.assign(order,ok);
-        order.items=order.items.filter(i=>i.vendor===item.vendor)
+        // order.items=order.items.filter(i=>i.vendor===item.vendor)
       },error=>this.doToast(error.error,error));
   }
 
@@ -145,7 +149,8 @@ export class OrderItemsPage {
     }
     let params:any={
       message: msg,
-      duration: 3000
+      cssClass: 'toast-item',
+      duration: 4000
     }
     if(error){
       params.position='top';

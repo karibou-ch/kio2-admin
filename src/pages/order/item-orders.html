@@ -13,8 +13,7 @@
   <h1 class="info" [hidden]="item.customers">Pas de commandes  pour la boutique {{vendor}} </h1>
 
   <ion-list *ngIf="item.customers">
-    <ion-list-header >
-
+    <ion-list-header>
       <h2 (click)="doOpenProduct(item)">
         {{item.sku}} - {{item.title}}
         &nbsp;<span class="red">{{item.variant?.title}}</span>
