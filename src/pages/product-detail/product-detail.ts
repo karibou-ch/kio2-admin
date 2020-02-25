@@ -1,5 +1,6 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController, ModalController, LoadingController, Events } from 'ionic-angular';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { Config,
          LoaderService, 
@@ -21,7 +22,8 @@ import { Config,
   selector: 'kio2-product-detail',
   templateUrl: 'product-detail.html',
 })
-export class ProductDetailPage {
+export class ProductDetailPage implements OnInit{
+  form: FormGroup;
   defaultProduct:Product=new Product();
   detailled:boolean=false;
   create:boolean=false;
@@ -33,10 +35,14 @@ export class ProductDetailPage {
   TVAs:number[];
   title:string;
   user:User;
-  
+  ngFormStandalone = {
+    standalone: true
+  };
+
   @ViewChild('desc') desc: ElementRef;
 
   constructor(
+    public fb: FormBuilder,
     public events: Events,
     public loadingCtrl: LoadingController,
     public modalCtrl: ModalController,
@@ -92,6 +98,10 @@ export class ProductDetailPage {
     
   }
 
+  ngOnInit() {
+   
+  }
+
   categoryChange(){
     this.currentCategory=this.categories.find(cat=>(cat._id+'')==this.product.categories);
   }
@@ -137,6 +147,8 @@ export class ProductDetailPage {
   }
 
   doSave(product:Product){
+    console.log('----DEBUG-------');
+      
     let loading=this.loadingCtrl.create({
       content: 'Please wait...'
     });
@@ -145,9 +157,9 @@ export class ProductDetailPage {
     if(!shopowner||!shopowner.urlpath){
       //
       // TODO DEBUG only
-      console.log('---- vendor',this.shops);
+//      console.log('---- vendor',this.shops);
       console.log('---- p.vendor',product.vendor);
-      console.log('---- shopowner',shopowner);
+//      console.log('---- shopowner',shopowner);
   
       return this.toast.create({
         message: "La boutique n'a pas été sélectionnée",
