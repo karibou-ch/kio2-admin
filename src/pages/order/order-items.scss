@@ -1,3 +1,10 @@
+.toast-item{
+  .toast-message{
+    font-size: 2.5rem!important;
+    color: gold!important; 
+  }
+ }
+
 kio2-order-items,
 kio2-item-orders {
   .toolbar-title{
@@ -11,6 +18,8 @@ kio2-item-orders {
      color: #333;
    }
 
+   
+   
    ion-icon.rank{
     margin-left: -5px!important;
     font-family: sans-serif;

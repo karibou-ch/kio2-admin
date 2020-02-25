@@ -74,7 +74,6 @@ export class UploadImagePage {
   }
 
   onUpload($uc){
-    console.log('---- upload',$uc);
     //this.image="//ucarecdn.com/"+$uc.uuid+"/";
     this.image=$uc.cdnUrl.replace('https:','');
     if(this.product){
