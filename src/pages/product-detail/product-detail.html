@@ -7,7 +7,6 @@
 
 <ion-content >
 
-  <form novalidate (ngSubmit)="doSave(product)" >
 
     <ion-list *ngIf="product" >
       <ion-item>
@@ -31,38 +30,35 @@
         <ion-toggle color="positive" (ionChange)="doSave(product)" item-end [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.attributes.boost"></ion-toggle>
       </ion-item>
      
-      <ion-item>
-          <button ion-button outline block large color="primary" [disabled]="!isReady()" (click)="doSave(product)">Enregistrer</button>
-      </ion-item>
       
       <ion-item class="input-toggle">
         <ion-label stacked color="primary">
           Titre
         </ion-label>
-        <ion-input type="text" placeholder="titre" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.title"></ion-input>
+        <ion-input type="text" (ionBlur)="doSave(product)" placeholder="titre" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.title"></ion-input>
       </ion-item>
       <ion-item color="none">
         <ion-thumbnail item-left class="image">
           <img [hidden]="!product?.photo.url" [src]="'https:'+product?.photo.url+'/-/resize/128x/'"/>
           <img [hidden]="product?.photo.url" src="/assets/img/add.png"/>
         </ion-thumbnail>
-        <ion-textarea placeholder="description" autocorrect="true" #desc rows="8"  [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.description"></ion-textarea>
+        <ion-textarea (ionBlur)="doSave(product)" placeholder="description" autocorrect="true" #desc rows="8"  [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.description"></ion-textarea>
       </ion-item>
       <ion-item>
         <button ion-button outline color="primary" block (click)="uploadImage(product)">Photo</button>
       </ion-item>
       <ion-item>
         <ion-label color="primary" stacked>Ingrédients / Origines </ion-label> 
-        <ion-textarea  rows="4"  placeholder="ex, olive(Grèce), pâte(Italie)... " [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.origin" required></ion-textarea>
+        <ion-textarea  (ionBlur)="doSave(product)" rows="4"  placeholder="ex, olive(Grèce), pâte(Italie)... " [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.origin" required></ion-textarea>
       </ion-item>
       <ion-item>
         <ion-label color="primary" stacked>Péremption</ion-label>
-        <ion-input type="text" placeholder="ex. Se conserve 3 jours"  [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.shelflife.comment"></ion-input>    
+        <ion-input (ionBlur)="doSave(product)" type="text" placeholder="ex. Se conserve 3 jours"  [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.shelflife.comment"></ion-input>    
         <ion-toggle color="positive" (ionChange)="doSave(product)" item-end [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.shelflife.display"></ion-toggle>        
       </ion-item>
       <ion-item>
         <ion-label color="primary" stacked>Quantité</ion-label>
-        <ion-input type="text"  placeholder="ex. Convient pour 1-2 personnes" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.quantity.comment"></ion-input>    
+        <ion-input (ionBlur)="doSave(product)" type="text"  placeholder="ex. Convient pour 1-2 personnes" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.quantity.comment"></ion-input>    
         <ion-toggle color="positive" (ionChange)="doSave(product)" item-end [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.quantity.display"></ion-toggle>        
       </ion-item>
       
@@ -70,7 +66,7 @@
         <ion-label color="primary" stacked>
           En stock
         </ion-label>
-        <ion-input type="text" min="0" placeholder="0-1000" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.stock"></ion-input>
+        <ion-input (ionBlur)="doSave(product)" type="text" min="0" placeholder="0-1000" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.stock"></ion-input>
         <button ion-button outline large item-end (click)="product.pricing.stock=0">0</button>
         <button ion-button outline large item-end (click)="product.pricing.stock=40">40 </button>
         <button ion-button outline large item-end (click)="product.pricing.stock=100">100</button>
@@ -87,11 +83,11 @@
         <ion-label color="primary" stacked>
           Prix (TVA inc.)
         </ion-label>
-        <ion-input type="number" min="0" placeholder="0.00" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.price"></ion-input>
+        <ion-input (ionBlur)="doSave(product)" type="number" min="0" placeholder="0.00" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.price"></ion-input>
       </ion-item>
       <ion-item class="">
         <ion-label color="primary" stacked>Portion <b>(le signe ~ pour un poids variable, ex:~180gr)</b></ion-label>
-        <ion-input type="text"  placeholder="100gr/~180gr/1botte/0.75L/0.75litre/1pce" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.part"></ion-input>    
+        <ion-input (ionBlur)="doSave(product)" type="text"  placeholder="100gr/~180gr/1botte/0.75L/0.75litre/1pce" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.part"></ion-input>    
         <!-- <div class="info" *ngIf="product.pricing.part">
           Avec {{product.pricing.part}} le client recevra
           <span [hidden]="product.hasFixedPortion()"> {{portionStr(product.pricing.part)}}</span>
@@ -107,7 +103,7 @@
         <ion-label color="danger" stacked>
           Prix pendant promotion (activer la promotion à droite)
         </ion-label>
-        <ion-input type="number" min="0" placeholder="0.00" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.discount"></ion-input>
+        <ion-input (ionBlur)="doSave(product)" type="number" min="0" placeholder="0.00" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.pricing.discount"></ion-input>
         <ion-toggle color="positive" item-end [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.attributes.discount"></ion-toggle>
       </ion-item>
     </ion-list>
@@ -120,43 +116,43 @@
         
         <ion-item>
           <ion-label>Certifié GRTA </ion-label>
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.grta"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.grta"></ion-checkbox>
         </ion-item>
         <ion-item>
           <ion-label>Certifié Bio </ion-label>
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.bio"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.bio"></ion-checkbox>
         </ion-item>
         <ion-item>
           <ion-label> Biodynamie </ion-label>
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.biodynamics"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.biodynamics"></ion-checkbox>
         </ion-item>
         <ion-item>
           <ion-label> Bioconversion </ion-label>
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.bioconvertion"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.bioconvertion"></ion-checkbox>
         </ion-item>
         <ion-item>
           <ion-label>Production Locale </ion-label>
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.local"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.local"></ion-checkbox>
         </ion-item>
         <ion-item>
           <ion-label>Fabrication artisanale</ion-label>      
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.homemade"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.homemade"></ion-checkbox>
         </ion-item>
         <ion-item>
             <ion-label>Sans chimie de synthèse </ion-label>
-            <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.natural"></ion-checkbox>
+            <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.natural"></ion-checkbox>
           </ion-item>
         <ion-item>
           <ion-label>Sans gluten </ion-label>
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.gluten"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.gluten"></ion-checkbox>
         </ion-item>
         <ion-item>
           <ion-label>Sans lactose </ion-label>
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.lactose"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.lactose"></ion-checkbox>
         </ion-item>
         <ion-item>
           <ion-label>Végétarien </ion-label>    
-          <ion-checkbox [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.vegetarian"></ion-checkbox>
+          <ion-checkbox (ionChange)="doSave(product)" [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.details.vegetarian"></ion-checkbox>
         </ion-item>
       </ion-list>
       
@@ -164,11 +160,13 @@
       <ion-item [hidden]="!product.pricing.tva">Valeur actuelle {{product.pricing.tva|percent:'1.1-1'}}</ion-item>
       <ion-item *ngFor="let tva of TVAs">
         <ion-label color="primary">TVA {{tva|percent:'1.1-1'}}</ion-label>
-        <ion-radio [value]="tva"></ion-radio>
+        <ion-radio (ionBlur)="doSave(product)" [value]="tva"></ion-radio>
       </ion-item>        
     </ion-list>
 
     <!-- NAV -->  
+    <form novalidate (ngSubmit)="doSave(product)" >
+
     <ion-list [hidden]="!detailled">
       <ion-list-header color="primary">
         Navigation
@@ -194,7 +192,7 @@
         <ion-label>
           Categorie (secondaire)
         </ion-label>
-        <ion-select [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.belong.name">
+        <ion-select  [ngModelOptions]="ngFormStandalone" [(ngModel)]="product.belong.name">
           <ion-option *ngFor="let child of getChild()" [value]="child.name" >{{child.name}}</ion-option>        
         </ion-select>
       </ion-item>
@@ -208,6 +206,7 @@
         </ion-select>
       </ion-item>
     </ion-list>
+  </form> 
     <ion-list>
       <ion-item>
           <button [hidden]="detailled" ion-button block outline large color="primary" (click)="detailled=true">
@@ -221,6 +220,6 @@
       </ion-item>      
     </ion-list>
   
-  </form> 
+  
 
 </ion-content>
