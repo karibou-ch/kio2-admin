@@ -30,7 +30,8 @@ export class ShopperPage {
   private planning=[];
   private currentPlanning;
   private reorder:boolean=false;
-
+  searchFilter: string;
+ 
   constructor(
     public events: Events,
     private $loader: LoaderService,
@@ -94,6 +95,16 @@ export class ShopperPage {
       return false;
     }
     return order.customer.phoneNumbers[0].number;
+  }
+
+  getOrders(){
+    if(!this.searchFilter){
+      return this.orders;
+    }
+    return this.orders.filter(order => {
+      const filter = order.oid+' '+order.email+' '+order.rank+' '+order.customer.displayName
+      return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase())>-1;
+    });
   }
 
   isOrderSelected(order){
@@ -214,6 +225,14 @@ export class ShopperPage {
 
   openTracker4One(order:Order){
     this.modalCtrl.create('tracker', { results: order }).present();
+  }
+
+
+  onSearchInput($event){
+  }
+
+  onSearchCancel($event){
+    this.searchFilter=null;
   }
 
 

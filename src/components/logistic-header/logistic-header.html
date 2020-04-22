@@ -36,6 +36,15 @@
           ion-button (click)="openCollect()" clear="true" >
           <ion-icon name="list"></ion-icon>
   </button>      
+
+  <!-- <button color="light" 
+          [hidden]="hideCollect"
+          [disabled]="!isReady" 
+          icon-only
+          ion-button (click)="openOrdered()" clear="true" >
+          <ion-icon name="cube"></ion-icon>
+  </button>       -->
+
   </ion-buttons>
 
   <!-- title  -->
@@ -55,10 +64,9 @@
 
 </ion-navbar>
 
-
 <!-- MAP BUTTON -->
 <button ion-fab  class="fab hidden-print"
-        [disabled]="monthOrders.get(currentShippingDate?.getTime()) === undefined"
+        [disabled]="monthOrders.get(getCurrentTime()) === undefined"
         (click)="openMap()">          
     <ion-icon [name]="fabIcon||'pin'" id="pin-icon"></ion-icon>
 </button>

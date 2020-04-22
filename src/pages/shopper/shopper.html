@@ -34,7 +34,7 @@
     <ion-item-group [reorder]="reorder" (ionItemReorder)="reorderItems($event)">
 
     <!-- DISPLAY ORDERS -->
-    <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersByPosition)  ">
+    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition)  ">
 
       <ion-item (click)="toggleOrder(order)" 
                 [class.selected]="isOrderSelected(order)"
@@ -64,10 +64,12 @@
         <ion-select [(ngModel)]="order.shipping.priority" 
                       (ngModelChange)="setShippingPriority(order,$event)"
                       interface="action-sheet">
+          <ion-option value="0">reset</ion-option>
           <ion-option value="1">1 tournée</ion-option>
           <ion-option value="2">2 tournée</ion-option>
           <ion-option value="3">3 tournée</ion-option>
           <ion-option value="4">4 tournée</ion-option>
+          <ion-option value="5">5 tournée</ion-option>
         </ion-select>        
       </ion-item-options>
 
@@ -83,6 +85,7 @@
             <ion-option value="3">3 sac</ion-option>
             <ion-option value="4">4 sac</ion-option>
             <ion-option value="5">5 sac</ion-option>
+            <ion-option value="6">6 sac</ion-option>
           </ion-select>
 
         </div>
@@ -97,5 +100,13 @@
 
     </ion-item-group>
   </ion-list>
+
+  <!-- SEARCH -->
+  <ion-searchbar
+    [(ngModel)]="searchFilter"
+    [debounce]="500"
+    (ionInput)="onSearchInput($event)"
+    (ionClear)="onSearchCancel($event)">
+  </ion-searchbar>  
 
 </ion-content>

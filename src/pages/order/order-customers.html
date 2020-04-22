@@ -24,6 +24,15 @@
   </ion-refresher>
 
   <ng-container *ngTemplateOutlet="displayByItems ? ordersItems: ordersByRank"></ng-container>
+  
+  <!-- SEARCH -->
+  <ion-searchbar
+    [(ngModel)]="searchFilter"
+    [debounce]="500"
+    (ionInput)="onSearchInput($event)"
+    (ionClear)="onSearchCancel($event)">
+  </ion-searchbar>  
+
 </ion-content>
 
 
@@ -87,7 +96,7 @@
         </button>
       </ion-note>
     </ion-item>
-    <ion-item-sliding *ngFor="let order of orders.sort(sortOrdersByPosition);let i=index;">
+    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition);let i=index;">
       <ion-item [class.selected]="isOrderSelected(order)" [class.in-progress]="!isFulfilled(order)">
         <ion-note item-end (click)="openByOrder(order)">
           <span class="price">{{order.getSubTotal()|number:'1.0-0'}} fr</span>

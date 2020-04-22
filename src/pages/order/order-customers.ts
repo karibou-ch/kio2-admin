@@ -35,7 +35,8 @@ export class OrderCustomersPage {
   isReady:boolean;
   orderAvg:number;
   orderTotal:number;
-  orderBaseAmount:number=0;
+  orderBaseAmount: number=0;
+  searchFilter: string;
   items:{
     [sku: number]: (OrderByItem[]|any);
   };
@@ -56,7 +57,7 @@ export class OrderCustomersPage {
         Object.assign(this.user,loader[1]);
         if(this.user.isAdmin()){
           // change the average
-          this.orderBaseAmount=12;
+          this.orderBaseAmount=0;
         }
     })
   }
@@ -71,7 +72,11 @@ export class OrderCustomersPage {
   
   emailVendors(){
     // inform all shops: 'shops'||false
-    this.$order.informShopToOrders('shops',this.shipping).subscribe(
+    // FIXME sent ISO date get wrong on server 
+    const UTC = new Date(this.shipping);
+    UTC.setHours(8);
+
+    this.$order.informShopToOrders('shops',UTC).subscribe(
       (result)=>{
         this.onDone("Mail envoyé à "+Object.keys(result).length+" destinataire(s)")
       },err=>this.onDone(err.error)
@@ -97,6 +102,26 @@ export class OrderCustomersPage {
     return keys.map(sku=>this.items[sku]).sort((a,b)=>b.quantity-a.quantity);
   }
 
+  sortedItem(order:Order) {
+    return order.items.sort((a,b) => {
+        const catCmp = a.category.localeCompare(b.category);
+        if(catCmp !== 0) {
+          return catCmp;
+        }
+        return a.vendor.localeCompare(b.vendor);
+    });
+  }
+
+
+  getOrders(){
+    if(!this.searchFilter){
+      return this.orders;
+    }
+    return this.orders.filter(order => {
+      const filter = order.oid+' '+order.email+' '+order.rank+' '+order.customer.displayName
+      return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase())>-1;
+    });
+  }
 
   isDeposit(order){
     // undefined test is for Bretzel 
@@ -242,13 +267,14 @@ export class OrderCustomersPage {
   }
 
   onInitOrders([orders,shipping]:[Order[],Date]){
-    console.log('---- init odrers',orders.length)
+    // console.log('---- init odrers',orders.length, shipping);
     this.items={};
     this.orders = orders.sort(this.sortOrdersByRank);
 
     // 
+    // use shipping day from 
     // force current shipping day 
-    this.shipping=Order.currentShippingDay();
+    this.shipping=shipping || Order.currentShippingDay();
     this.isReady=true;
     // AVG
     this.orderTotal=this.orders.reduce((sum,order,i)=>{
@@ -257,6 +283,14 @@ export class OrderCustomersPage {
     this.orderAvg=this.orderTotal/this.orders.length;
     
   }
+
+  onSearchInput($event){
+  }
+
+  onSearchCancel($event){
+    this.searchFilter=null;
+  }
+  
 
   sortOrdersByRank(o1,o2){
     return o1.rank-o2.rank;

@@ -36,6 +36,19 @@ export class Kio2Aadmin {
       this.splashScreen.hide();
       console.log('INIT APP isCore,isMobileweb',this.platform.is('core'),this.platform.is('mobileweb'))
 
+      //
+      // force relaod app each 20h
+      const bootTime = Date.now();
+      const oneDay = 3600 * 20 * 1000;
+      setInterval(()=>{
+        try{
+          const now = Date.now();
+          if(bootTime+oneDay<now){
+            window.location.reload(true);
+          }          
+        }catch(e){}        
+      }, 10000);
+
     });
   }
 

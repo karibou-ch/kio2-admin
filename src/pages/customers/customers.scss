@@ -7,6 +7,9 @@ page-customers {
       
     ion-label{
       padding-top:7px;
+      h3{
+        margin-top: 10px;
+      }
     }
 
     span.light{
@@ -14,53 +17,46 @@ page-customers {
       font-size: small;
       padding-right: 3px;      
     }
-    span.stats{
-      position: absolute;
-      right: 10px;
-      top:15px;
-      font-size: small;
-      -color: black;
-    }
-    span.label{
-      -background: rgba(0, 105, 99, 0.34);
-      -background: #555;
-      -color: white;
-      -font-size: 85%;  
-      padding: 2px 4px;
-      border-radius: 0px; 
-      position: absolute;
-      right: 5px;
-      margin-top: -7px;   
-      &.counter{
-        border-right: 1px solid #eee;
+    div.stats {
+      display: flex;
+      margin-right: 0;
+      margin-left: auto;
+      font-size: 1.4rem;
+      @media screen and (max-width:499px) {
+        margin-top: 10px;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        span.label{
+          margin-right: 0;
+          margin-left: auto;          
+        }
       }
+
+      @media screen and (min-width:500px) {
+        width: 100px;
+
+        span.info{
+          position: absolute;
+          right: 10px;
+          top:15px;
+          margin-left: -5px;
+          font-size: small;
+          -color: black;  
+        }
+        span.label{
+          position: absolute;
+          right: 0px;
+          margin-top: -17px;   
+          &.counter{
+            border-right: 1px solid #eee;
+          }
+        }
+  
+      }
+
+  
     }
 
-    span.price{
-      position: absolute;
-      font-size: 1.6rem;
-      top: 10px;
-      color: white;
-      font-weight: 900;
-      padding: 0;
-      width: 18px;
-      height: 18px;
-      line-height: 15px;
-      text-align: center;
-      width: 55px;
-      padding-top: 1px;
-      border-radius: 3px;
-      background: color($colors,primary);
-      right: 10px;
-      
-    } 
-
-    span.progress{
-      color: green;
-      position: absolute;
-      bottom: 10px;
-      right: 10px;        
-    }
 
    
     ion-avatar {

@@ -18,6 +18,9 @@ kio2-item-orders {
      color: #333;
    }
 
+   .header{
+     background-color: #dbe6e5;
+   }
    
    
    ion-icon.rank{
@@ -91,10 +94,13 @@ kio2-item-orders {
     }
 
     .title{
+      &.failure{
+        text-decoration: line-through!important;
+      }
       &.padding{
         left: 42px;
       }
-      a{
+      a:not(.failure){
         text-decoration: none!important;                
       }
       a.info{
@@ -114,6 +120,10 @@ kio2-item-orders {
       }
     }
     .quantity{
+      &.failure{
+        text-decoration: line-through!important;
+      }
+
       &.padding{
         left: 42px;
       }
@@ -133,6 +143,11 @@ kio2-item-orders {
       &.fulfilled{
         color:color($colors,info)!important;
       }
+
+      &.failure{
+        color: red;
+      }
+
       position: absolute;
       top:34px;
       right: 80px;

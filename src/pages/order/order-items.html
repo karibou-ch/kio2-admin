@@ -22,38 +22,54 @@
 
   <h1 class="info" [hidden]="orders.length&&!item.customers">Pas de commandes  pour la boutique {{vendor}} </h1>
   <ion-list *ngFor="let order of orders">
+    <!-- CUSTOMER HEADER -->
     <ion-list-header *ngIf="order.shipping">
       <ion-icon item-start class="rank">{{order.rank}}</ion-icon>
       <h2>
         {{order.customer.displayName}}
       </h2>
       <p> 
-        {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>
-        <!--<div class="">
-          {{order.shipping.streetAdress}},{{order.shipping.floor}}
-          Note: {{order.shipping.note}}
-        </div>-->
-  
+        {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>  
       </p>
 
       <ion-note item-end >
-        {{order.getSubTotal()|currency:'CHF'}}
+        {{order.getSubTotal()|currency:'CHF'}} <br/>
+        <span [class.red]="deltaPrice>0.15">{{deltaPrice|percent}}</span>
       </ion-note>
       <a [hidden]="!getPhoneNumber(order)"
          item-end color="info" round ion-button outline href="tel:{{getPhoneNumber(order)}}"><ion-icon name="call"> </ion-icon> </a>
       <a item-end color="info" round ion-button outline href="mailto:{{order.email}}"> <ion-icon name="mail"> </ion-icon></a>
     </ion-list-header>
 
-    <ion-item-sliding *ngFor="let item of order.items">    
+    <!-- GLOBAL SAVE ACTION-->
+    <ion-item class="header">
+      <div item-content >
+        <div class="title">Valider tous les articles au tarif de base!</div>
+        <div class="quantity" >
+          Note: la correction par article est possible ensuite!
+        </div>
+
+        <div class="actions">
+          <button class="" ion-button expandable outline item-end color="danger"
+                  [hidden]="isPaid(order)"
+                  (click)="doValidateAll(order)">
+            <ion-icon name="checkmark" ></ion-icon>             
+          </button>
+          
+        </div>
+      </div>
+    </ion-item>
+
+    <ion-item-sliding *ngFor="let item of sortedItem(order)">    
       <ion-item >
         <div item-content >
-          <div class="title" (click)="doOpenProduct(item)">
+          <div class="title {{item.fulfillment.status}}" (click)="doOpenProduct(item)" >
               {{item.title}} 
             <div [hidden]="!item.variant" class="dark-green link">
               // {{item.variant?.title}}
             </div>
           </div>
-          <div class="quantity" [class.red.bold]="item.quantity>1">
+          <div class="quantity {{item.fulfillment.status}}" [class.red.bold]="item.quantity>1">
             {{item.quantity}}x <span class="part">{{item.part}}</span> 
             <span class="issue" [hidden]="!item.fulfillment.request">problème:{{item.fulfillment.request}} </span>
             <span class="issue" [hidden]="!item.fulfillment.refunded"><span [hidden]="item.finalprice==0">partiellement</span> remboursé </span>

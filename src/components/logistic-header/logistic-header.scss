@@ -1,4 +1,9 @@
 logistic-header {
+  
+  .toolbar-title {
+    text-transform: capitalize;
+  }
+
   button.fab{
     position: fixed;
     bottom: 30px;

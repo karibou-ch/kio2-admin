@@ -1,7 +1,7 @@
 <ion-header>
 
   <ion-navbar color="primary">
-    <ion-title>Les Clients</ion-title>
+    <ion-title>Vos Clients</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -11,18 +11,11 @@
   <ion-list>
     <ion-item-sliding *ngFor="let customer of customers;let i=index;">
       <ion-item>
-        <ion-note item-end >
-          <span class="stats">          
-            ERR: {{customer.errors}} - REMB: {{customer.refunds}}
-          </span>
-          <span class="label">{{customer.amount|currency:'CHF'}} </span>
-
-        </ion-note>
         <ion-avatar item-start>
           <span class="rank">{{customer.orders}}</span>
         </ion-avatar>
         <h2 >
-            {{customer._id}} 
+            <a href="mailto:{{customer.email}}">{{customer.email}}</a>
         </h2>
         <h3>
           <span class="">
@@ -31,6 +24,13 @@
             {{customer.last3Month}}<span class="light">/3mois</span> 
             {{customer.last6Month}}<span class="light">/6mois</span></span>
         </h3>
+        <div class="stats">
+          <span class="info">          
+            ERR: {{customer.errors}} - REMB: {{customer.refunds}}
+          </span>
+          <span class="label">{{customer.amount|currency:'CHF'}} </span>
+        </div>
+
       </ion-item>
     </ion-item-sliding>
   </ion-list>

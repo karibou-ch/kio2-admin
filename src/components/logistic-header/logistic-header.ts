@@ -17,7 +17,9 @@ import { Subscription } from 'rxjs';
 })
 export class LogisticHeaderComponent {
 
-  @Input() format:string="EEEE d MMM yy";
+  static defaultDate: Date;
+
+  @Input() format:string="EEEE d MMM";
   @Input() title:string="";
   @Input() month:number;
   @Input() year:number;
@@ -59,7 +61,6 @@ export class LogisticHeaderComponent {
 
     //private userSrv:UserService
   ) {
-    // most init values depends on config and the loader
   }
 
   displayMsg(msg:string){
@@ -95,11 +96,15 @@ export class LogisticHeaderComponent {
 
     this.$loader.ready().subscribe((loader) => {
       let pickerDate;
+      this.currentShippingDate = LogisticHeaderComponent.defaultDate || this.currentShippingDate;
+  
       LogisticHeaderComponent.filtersOrder = LogisticHeaderComponent.filtersOrder||this.OPEN;
       //
       // FIXME issue with stream ordering (test right fter a login)
       this.user=(this.user&&this.user.id)?this.user:loader[1];      
-      this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
+      LogisticHeaderComponent.defaultDate = this.currentShippingDate = this.currentShippingDate||Order.currentShippingDay();
+
+
       //
       // initial picker date
       pickerDate=new Date(this.currentShippingDate);
@@ -155,6 +160,7 @@ export class LogisticHeaderComponent {
     this.currentShippingDate.setDate(2);
     this.pickerShippingDate = this.currentShippingDate.toISOString();
 
+    LogisticHeaderComponent.defaultDate = this.currentShippingDate;
     this.findAllOrdersForShipping();
   }
 
@@ -191,10 +197,16 @@ export class LogisticHeaderComponent {
         this.monthOrders.get(order.shipping.when.getTime()).push(order);
       });
 
+      // FIXME, when currentDay is empty (orders == 0) then keys().next().value is wrong
+      let closestValue = 9000000000000;
+      this.monthOrders.forEach((orders,time) => {
+        closestValue = Math.min(closestValue,time);
+      })
+
       //
       //set currentshipping with first key
       let shipping=(this.monthOrders.get(this.currentShippingDate.getTime()))?
-            this.currentShippingDate:this.monthOrders.keys().next().value;
+            this.currentShippingDate:(new Date(closestValue));
       this.initOrders(shipping);
     },error=>{
       //Cette fonctionalité est réservée à la logistique
@@ -202,8 +214,12 @@ export class LogisticHeaderComponent {
     })
   }
 
+  getCurrentTime(){
+    return this.currentShippingDate.getTime();
+  }
 
   initOrders(shipping?){
+    LogisticHeaderComponent.defaultDate = shipping || LogisticHeaderComponent.defaultDate;
     let current=Order.currentShippingDay();
     if(!shipping){
       return this.doInitOrders.emit([[],this.currentShippingDate,this.availableDates,this.pickerShippingDate]);
@@ -217,6 +233,14 @@ export class LogisticHeaderComponent {
     
   }
   
+
+  openOrdered(){
+    const orders:Order[] = (this.monthOrders.get(this.currentShippingDate.getTime()));
+    this.navCtrl.push('OverviewPage',{
+      orders: orders
+    });
+  }
+
 
   openCollect(){
     this.navCtrl.push('CollectPage',{

@@ -27,6 +27,10 @@ export class AdminSettingsPage {
     this.parent=this.navParams.get('component');
     this.toggle=this.navParams.get('toggle');
     this.user=this.navParams.get('user')||this.user;
+    if(this.availableDates.length){
+      this.availableDates=this.availableDates.sort((a:Date,b:Date)=>a.getTime()-b.getTime());
+    }
+
   }
 
   ngOnInit(){
@@ -36,7 +40,7 @@ export class AdminSettingsPage {
     // });
     this.version=' (v'+Pro.getApp().version+')';
     this.sub=this.parent.doInitOrders.subscribe(([orders,when,dates])=>{
-      this.availableDates=dates;
+      this.availableDates=(dates||[]).sort((a,b)=>a-b);
     })
   }
 
@@ -52,6 +56,10 @@ export class AdminSettingsPage {
   displayOrders(shipping){
     this.parent.initOrders(shipping);
     this.navCtrl.pop();
+  }
+
+  goHome(){
+    window.location.href='/';
   }
 
   toggleShippingFilter(){

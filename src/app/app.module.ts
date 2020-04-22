@@ -90,7 +90,6 @@ SERVER='https://api.karibou.ch';
         "categories",
         "shops"
       ]
-      
     }),
     IonicModule.forRoot(Kio2Aadmin,{
       preloadModules: false
