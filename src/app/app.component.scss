@@ -1,0 +1,107 @@
+// http://ionicframework.com/docs/v2/theming/
+
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+
+
+[class^="kico-"],
+[class*=" kico-"] {
+  display: inline-block;
+  width: 60px;
+  height: 54px;
+  margin-right: 10px;
+  text-indent: -9999em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.kico-k {
+  background-image: url('../assets/img/k.svg');
+}
+
+.align-right{
+  float: right;
+}
+
+.dark-green{
+  color:#092f2b!important;
+}
+
+
+.gray{
+  color:#888!important;
+}
+
+.red{
+  color:red!important;
+}
+.bold{
+  font-weight: 900!important;
+}
+
+.link{
+  border-bottom: 1px dotted color($colors,light)
+}
+
+.toast-error{
+  .toast-top{
+    background-color: rgba(255, 220, 220, 0.85);
+
+  }
+  .toast-message{
+    color: #880000;    
+  }
+}
+
+textarea,
+input.text,
+input[type="text"],
+input[type="button"],
+input[type="submit"],
+.input-checkbox {
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+body{
+  user-select: text;  
+}
+
+@media print {
+    ion-header{ 
+      display: none !important; 
+    }  
+
+    body, 
+    .app-root, 
+    .split-pane, 
+    .ion-page, 
+    ion-app, 
+    ion-nav { 
+      contain: none; 
+    }
+    body, 
+    ion-nav{ 
+      overflow: initial; 
+    }
+    body{ 
+      position: static; 
+    }
+  
+    [ion-content-print]{ 
+      overflow-y: visible !important; 
+      position: relative; 
+    }    
+  }
