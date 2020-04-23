@@ -52,7 +52,7 @@
     "ionic-plugin-deeplinks": "^1.0.17",
     "ionic-plugin-keyboard": "^2.2.1",
     "ionicons": "^4.1.2",
-    "kng2-core": "^1.59.1",
+    "kng2-core": "^1.56.0",
     "moment": "^2.22.0",
     "rxjs": "~5.5.8",
     "showdown": "^1.8.6",
