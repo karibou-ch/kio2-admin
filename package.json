@@ -75,7 +75,7 @@
     "cordova-plugin-splashscreen"
   ],
   "cordovaPlatforms": [],
-  "description": "kio2-admin: An karibou.ch project",
+  "description": "kio2-admin: A karibou.ch project",
   "cordova": {
     "plugins": {
       "cordova-plugin-console": {},
