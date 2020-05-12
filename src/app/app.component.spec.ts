@@ -5,9 +5,9 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
-import { Kio2Aadmin } from './app.component';
+import { AppComponent } from './app.component';
 
-describe('Kio2Aadmin', () => {
+describe('AppComponent', () => {
 
   let statusBarSpy, splashScreenSpy, platformReadySpy, platformSpy;
 
@@ -18,7 +18,7 @@ describe('Kio2Aadmin', () => {
     platformSpy = jasmine.createSpyObj('Platform', { ready: platformReadySpy });
 
     TestBed.configureTestingModule({
-      declarations: [Kio2Aadmin],
+      declarations: [AppComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: StatusBar, useValue: statusBarSpy },
@@ -29,13 +29,13 @@ describe('Kio2Aadmin', () => {
   }));
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(Kio2Aadmin);
+    const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   });
 
   it('should initialize the app', async () => {
-    TestBed.createComponent(Kio2Aadmin);
+    TestBed.createComponent(AppComponent);
     expect(platformSpy.ready).toHaveBeenCalled();
     await platformReadySpy;
     expect(statusBarSpy.styleDefault).toHaveBeenCalled();

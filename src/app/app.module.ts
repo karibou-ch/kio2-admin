@@ -1,29 +1,28 @@
-import { Pro } from '@ionic/pro';
-import { LOCALE_ID, NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
+import { NgModule, LOCALE_ID, Injectable, ErrorHandler, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonApp, IonicModule} from '@ionic/angular';
-import { Kio2Aadmin } from './app.component';
+import { RouteReuseStrategy } from '@angular/router';
 
-import { Kng2CoreModule} from 'kng2-core';
+import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+
+import { Kio2Admin } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+import { Kng2CoreModule } from 'kng2-core';
+import { environment } from 'src/environments/environment';
 import { HttpClientModule } from '@angular/common/http';
-
-import { NativeStorage } from '@ionic-native/native-storage/ngx';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-
-import { Geolocation  } from '@ionic-native/geolocation/ngx';
-import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
-import { Dialogs } from '@ionic-native/dialogs/ngx';
-import { Network } from '@ionic-native/network/ngx';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 //
-// environnement
-import { environment } from '../environments/environment';
-import { AppRoutingModule } from './app-routing.module';
-import { version } from '../../package.json';
+// local data
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+registerLocaleData(localeFr);
 
 
-@Injectable()
+//
+// preparing Sentry feedback
+@Injectable({ providedIn: 'root' })
 export class Kio2AdminErrorHandler implements ErrorHandler {
   errorHandler: ErrorHandler;
 
@@ -37,7 +36,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
   }
 
   handleError(err: any): void {
-    console.log('---- Kio2AdminErrorHandler', version, err);
+    console.log('---- Kio2AdminErrorHandler', 'version', err);
     // Pro.monitoring.handleNewError(err);
     // Remove this if you want to disable Ionic's auto exception handling
     // in development mode.
@@ -47,42 +46,27 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
 
 
 @NgModule({
-  declarations: [
-    Kio2Aadmin
-  ],
+  declarations: [Kio2Admin],
+  entryComponents: [],
   imports: [
     BrowserModule,
     HttpClientModule,
+    IonicModule.forRoot(),
     Kng2CoreModule.forRoot({
       API_SERVER: environment.API_SERVER,
       loader: [
         'categories',
-        'shops'
       ]
     }),
-    IonicModule.forRoot(),
     AppRoutingModule
   ],
-  bootstrap: [IonApp],
-  entryComponents: [
-    Kio2Aadmin
-  ],
   providers: [
-    // preload
-    // { provide: APP_INITIALIZER, useFactory: bootstrap, deps: [LoaderService], multi: true },
-
-    // set locale to french (for dates, etc. )
-    { provide: LOCALE_ID, useValue: 'fr-FR' },
-    { provide: ErrorHandler, useClass: ErrorHandler},
-    { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },
-    Dialogs,
-    Geolocation,
-    LaunchNavigator,
-    NativeStorage,
-    Network,
     StatusBar,
-    SplashScreen
-  ]
+    SplashScreen,
+    Geolocation,
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
+    // { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }  ],
+  bootstrap: [Kio2Admin]
 })
-export class AppModule {
-}
+export class AppModule {}
