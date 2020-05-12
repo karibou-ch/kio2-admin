@@ -4,7 +4,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 30%;
   transform: translateY(-50%);
 }
 
@@ -16,12 +16,30 @@
 #container p {
   font-size: 16px;
   line-height: 22px;
-
   color: #8c8c8c;
-
   margin: 0;
+  margin-bottom: 20px;
 }
 
 #container a {
   text-decoration: none;
+}
+
+ion-row {
+  height: 100%;
+  flex-wrap: wrap;
+  ion-col {
+    flex: 0 0 33%!important;
+    max-width: 33%!important;
+    text-align: center!important;
+    padding: 10px 5px!important;
+    >div{
+      padding: 3px;          
+      font-size: 90%;
+    }
+    ion-icon {
+      font-size: 50px!important;
+    }
+  
+  }        
 }

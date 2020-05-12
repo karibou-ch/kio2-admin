@@ -1,20 +1,59 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      Karibou.ch
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+  <!-- <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">Karibou.ch</ion-title>
     </ion-toolbar>
-  </ion-header>
+  </ion-header> -->
 
   <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <strong>Que souhaitez-vous faire</strong>
+    <p>Start with K. <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+
+    <ion-row>
+      <ion-col [hidden]="!(user.hasRole('logistic')||user.isAdmin())" (click)="openShopper()">
+        <ion-icon name="bicycle-outline" color="grey-icon"></ion-icon>
+        <div>Logistique</div>
+      </ion-col>
+
+      <ion-col [hidden]="!(user.isAdmin())" (click)="openOrders()">
+        <ion-icon name="cart-outline" color="grey-icon"></ion-icon>
+        <div>Commandes</div>
+      </ion-col>
+
+      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openCustomers()">
+        <ion-icon  name="people-circle-outline" color="grey-icon"></ion-icon>
+        <div>Clients</div>
+      </ion-col>
+
+      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openReports()">
+        <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
+        <div>Rapports</div>
+      </ion-col>
+      
+      <ion-col [hidden]="!(user.isAdmin())" (click)="openProducts()">
+        <ion-icon name="cube-outline" color="grey-icon"></ion-icon>
+        <div>Produits</div>
+      </ion-col>
+    
+      <ion-col [hidden]="!(user.isAdmin())" (click)="openVendors()">
+        <ion-icon name="home-outline" color="grey-icon"></ion-icon>
+        <div>Boutiques</div>
+      </ion-col>
+
+      <ion-col (click)="openProfile()">
+        <ion-icon name="settings-outline" color="grey-icon"></ion-icon>
+        <div>Profil</div>
+      </ion-col>
+    </ion-row>
+
   </div>
+
 </ion-content>

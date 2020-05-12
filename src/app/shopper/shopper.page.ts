@@ -41,6 +41,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.user = this.$engine.currentUser;
 
+    this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrdersForShipping();
     // this.$tracker.start();

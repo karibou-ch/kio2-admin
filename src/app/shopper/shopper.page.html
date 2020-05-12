@@ -1,8 +1,8 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>{{ (pickerShippingDate| date:format) || 'Shopper'}}  </ion-title>
+    <ion-title>{{ (pickerShippingDate| date:format) }}  </ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="home"></ion-back-button>
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button (click)="picker.open()">
