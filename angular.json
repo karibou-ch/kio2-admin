@@ -19,6 +19,7 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
+            "preserveSymlinks": true,
             "assets": [
               {
                 "glob": "**/*",
@@ -74,7 +75,6 @@
                 }
               ]
             },
-
             "ci": {
               "progress": false
             }
@@ -89,6 +89,11 @@
             "production": {
               "browserTarget": "app:build:production"
             },
+            "devel": {
+              "optimization": false,
+              "browserTarget": "app:build:devel"
+            },
+
             "ci": {
               "progress": false
             }
@@ -165,6 +170,9 @@
           "configurations": {
             "production": {
               "browserTarget": "app:build:production"
+            },
+            "devel": {
+              "browserTarget": "app:build:devel"
             }
           }
         },
@@ -178,6 +186,10 @@
             "production": {
               "cordovaBuildTarget": "app:ionic-cordova-build:production",
               "devServerTarget": "app:serve:production"
+            },
+            "devel": {
+              "cordovaBuildTarget": "app:ionic-cordova-build:devel",
+              "devServerTarget": "app:serve:devel"
             }
           }
         }
