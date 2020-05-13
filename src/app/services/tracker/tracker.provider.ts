@@ -1,8 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
-import { Events } from '../events/events';
 import { filter } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs';
 
 /*
   Generated class for the TrackerProvider provider.
@@ -16,34 +15,36 @@ export class TrackerProvider {
   public geoLocation$;
   public currentPosition;
 
+  public update$: ReplaySubject<Coordinates>;
   options = {
     enableHighAccuracy: true,
     frequency: 12000
   };
 
   constructor(
-    public events: Events,
-    public geolocation: Geolocation,
-    public http: HttpClient,
-    public zone: NgZone
+    public $geolocation: Geolocation,
+    public $zone: NgZone
   ) {
+    this.update$ = new ReplaySubject(1);
   }
 
   fetch() {
-    this.geolocation.getCurrentPosition(this.options).then(position => {
-      this.zone.run(() => this.events.publish('location', position.coords));
+    this.$geolocation.getCurrentPosition(this.options).then(position => {
+      this.$zone.run(() => this.update$.next(position.coords));
+    }).catch(err=>{
+      console.log('--- ',err)
     });
   }
 
   start() {
-    this.watch = this.geolocation.watchPosition(this.options).pipe(
+    this.watch = this.$geolocation.watchPosition(this.options).pipe(
       filter((p: any) => p.code === undefined)
     ).subscribe((position: Geoposition) => {
-      this.zone.run(() => this.events.publish('location', position.coords));
+      this.$zone.run(() => this.update$.next(position.coords));
     });
 
-    this.geolocation.getCurrentPosition(this.options).then(position => {
-      this.zone.run(() => this.events.publish('location', position.coords));
+    this.$geolocation.getCurrentPosition(this.options).then(position => {
+      this.$zone.run(() => this.update$.next(position.coords));
     });
   }
 
