@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { User, Order, OrderService } from 'kng2-core';
+import { User, Order, OrderService, Config } from 'kng2-core';
 import { ReplaySubject } from 'rxjs';
-import { INT_TYPE } from '@angular/compiler/src/output/output_ast';
 
 //
 // orders and context used by subject$
@@ -23,6 +22,8 @@ export class EngineService {
   private monthOrders: Map<number, Order[]> = new Map();
   private orderStatus: any;
   private shippingDate: Date;
+  private config: Config;
+  private user: User;
 
   //
   // calendar of loaded Orders
@@ -43,7 +44,6 @@ export class EngineService {
   selectedOrders$: ReplaySubject<OrdersCtx>;
   status$: ReplaySubject<OrderStatus>;
 
-  user: User;
 
   constructor(public $order: OrderService) {
 
@@ -54,13 +54,18 @@ export class EngineService {
     this.currentShippingDate = today.dayToDates([2, 3, 4, 5, 6])[0];
     this.selectedOrders$ = new ReplaySubject<OrdersCtx>(1);
     this.status$ = new ReplaySubject(1);
-
-
   }
 
   get availableDates() {
     return this.shippingWeek;
   }
+  set currentConfig(config: Config) {
+    this.config = config;
+  }
+  get currentConfig() {
+    return this.config;
+  }
+
 
   set currentUser(user: User) {
     this.user = user;
