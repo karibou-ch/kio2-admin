@@ -120,8 +120,7 @@
         </ion-item-option>
       </ion-item-options>
 
-      <ion-item  (click)="toggleOrder(order)" 
-                [class.selected]="isOrderSelected(order)">
+      <ion-item  (click)="toggleOrder(order)" >
         <ion-note slot="end">
           {{order.shipping.postalCode}}
           <span class="price" [hidden]="!order.shipping.bags">{{ order.shipping.bags }} sac</span>
@@ -129,7 +128,7 @@
         </ion-note>        
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
-          <span class="rank" [class.orphan]="!order.shipping.priority">{{order.rank}}</span>
+          <span class="rank" [class.orphan]="!order.shipping.priority" [class.selected]="isOrderSelected(order)">{{order.rank}}</span>
         </ion-avatar>
         <ion-label class="ion-text-wrap">
           <h3 text-capitalize>{{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>
@@ -146,4 +145,12 @@
 
     </ion-reorder-group>
   </ion-list>
+
+  <!-- MAP BUTTON -->
+  <ion-fab class="fab" [hidden]="!orders.length">
+    <ion-fab-button (click)="openTracker()">
+      <ion-icon name="map-outline" id="pin-icon"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>  
+
 </ion-content>

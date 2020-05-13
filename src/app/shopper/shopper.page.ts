@@ -45,12 +45,9 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrdersForShipping();
-    // this.$tracker.start();
-    //
   }
 
   ngOnDestroy() {
-    //this.$tracker.stop();
   }
 
 
@@ -278,9 +275,11 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   }
 
-  openTracker4One(order: Order) {
+  openTracker() {
+    const selected = Object.keys(this.selectedOrder);
+    const orders = this.orders.filter(order => (selected.indexOf(order.oid + '') > -1));
     const params = {
-      order: (order)
+      orders: (orders)
     };
     this.modalCtrl.create({
       component: TrackerPage,

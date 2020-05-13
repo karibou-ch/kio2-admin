@@ -1,3 +1,10 @@
+.fab{
+  position: fixed;
+  bottom: 30px;
+  right: 40px;    
+  z-index: 1;
+}
+
 
 h1.info{
   color: gray;
@@ -45,10 +52,6 @@ ion-item {
       padding-left: 8px;
       padding-right: 8px;      
     }
-  }
-  &.selected{
-    background-color: var(--ion-color-kio-light);
-    background-color: rgba(0, 105, 99, 0.14);
   }
 
   
@@ -118,6 +121,10 @@ ion-item {
     position: relative;
 
     span.rank{
+      &.selected{
+        background-color: var(--ion-color-danger);
+      }
+    
       position: absolute;
       top: 00%;
       left: 0;
