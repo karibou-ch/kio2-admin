@@ -1,17 +1,45 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Settings</ion-title>
+    <ion-title>{{user.displayName}}</ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>      
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Nom</ion-label>
+      <p text-capitalize>{{ user.name.familyName }}</p>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Prenom</ion-label>
+      <p text-capitalize>{{ user.name.givenName }}</p>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Email</ion-label>
+      <p>{{ user.email.address }}</p>
+    </ion-item>
+    <ion-item *ngFor="let phone of user.phoneNumbers">
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Telephone</ion-label>
+      <p>{{ phone.number }}</p>
+    </ion-item>
+      
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Rôle</ion-label>
+      <ul>
 
+        <li [hidden]="!user.hasRole('logistic')" color="secondary">Logistic</li>      
+        <li [hidden]="!user.isAdmin()" color="secondary">Admin</li>
+        <li [hidden]="!user.shops.length" color="secondary">Vendor</li>
+        <li color="secondary">Utilisateur</li>    
+      </ul>
+    </ion-item>
+    <ion-item>
+      <ion-button size="large" expand="block" shape="round" fill="outline" color="danger" (click)="logout()">
+        <ion-icon slot="start" name="person-circle-outline"></ion-icon> Logout
+      </ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

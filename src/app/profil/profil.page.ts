@@ -3,6 +3,7 @@ import { Config, User, ConfigKeyStoreEnum, config, LoaderService, UserService } 
 import { App } from '@ionic/pro';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { EngineService } from '../services/engine.service';
 
 @Component({
   selector: 'app-profil',
@@ -21,11 +22,13 @@ export class ProfilPage implements OnInit {
   KIO2_SERVER: string = ConfigKeyStoreEnum[ConfigKeyStoreEnum.KIO2_SERVER];
 
   constructor(
-    private $loader: LoaderService,
+    private $engine: EngineService,
     private $router: Router,
     private toast: ToastController,
     private $user: UserService
   ) {
+    this.user = this.$engine.currentUser;
+    this.config = this.$engine.currentConfig;
   }
 
   isPC(postal: string) {
@@ -39,16 +42,6 @@ export class ProfilPage implements OnInit {
   }
 
   ngOnInit() {
-    this.$loader.ready().subscribe((loader) => {
-      this.config = loader[0];
-      Object.assign(this.user, loader[1]);
-      this.isReady = true;
-      //
-      // config.shared.shipping.periphery
-      this.postalCodes = this.config.shared.user.location.list || [];
-    });
-
-    this.$user.subscribe(user => Object.assign(this.user, user));
   }
 
   logout() {
