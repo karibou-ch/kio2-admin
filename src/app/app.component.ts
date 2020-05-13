@@ -25,6 +25,10 @@ export class Kio2Admin {
   ) {
     this.initializeApp();
     this.$loader.update().subscribe((ctx) => {
+      if (ctx.config) {
+        this.$engine.currentConfig = ctx.config;
+      }
+
       if (ctx.user) {
         this.onInit(ctx.user);
       }
