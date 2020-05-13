@@ -32,11 +32,6 @@ const routes: Routes = [
     path: 'shopper',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./shopper/shopper.module').then( m => m.ShopperPageModule)
-  },
-  {
-    path: 'tracker',
-    resolve: {loader : LoaderResolve },
-    loadChildren: () => import('./tracker/tracker.module').then( m => m.TrackerPageModule)
   }
 ];
 
