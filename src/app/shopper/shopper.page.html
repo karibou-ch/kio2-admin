@@ -66,6 +66,7 @@
     </div>
     <!-- SEARCH -->
     <ion-searchbar
+      mode="ios"
       [(ngModel)]="searchFilter"
       [debounce]="500"
       (ionInput)="onSearchInput($event)"

@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>products</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content >
+  <div class="metabar" [hidden]="loadError">
+  </div>
+  <ion-item>
+    <ion-label>Rechercher</ion-label>
+    <ion-searchbar
+      mode="ios"
+      [(ngModel)]="cache.search"
+      [debounce]="500"
+      (ionInput)="onSearchInput($event)"
+      (ionClear)="onSearchCancel($event)">
+    </ion-searchbar>  
+    <ion-button slot="end" icon-only (click)="doCreateProduct()">
+      <ion-icon name="add"></ion-icon>
+    </ion-button>    
+  </ion-item>  
+  <ion-item>
+    <ion-badge slot="end" color="primary">> {{products?.length}}</ion-badge>
+
+    <ion-chip (click)="cache.active=!cache.active;sliceProducts()">
+      <ion-icon name="close-circle" [hidden]="!cache.active"></ion-icon>
+      <ion-label color="primary">Actif</ion-label>
+    </ion-chip>
+    <ion-chip (click)="cache.discount=!cache.discount;sliceProducts()">
+      <ion-icon name="close-circle" [hidden]="!cache.discount"></ion-icon>
+      <ion-label color="primary">Discount</ion-label>
+    </ion-chip>        
+
+    <ion-chip (click)="cache.boost=!cache.boost;sliceProducts()">
+      <ion-icon name="close-circle" [hidden]="!cache.boost"></ion-icon>
+      <ion-label color="primary">Boost</ion-label>
+    </ion-chip>        
+  </ion-item>
+
+  <div *ngIf="loadError" class="error">
+    <b>Ouups!</b> <br/>
+    Il y a eu une erreur, veuillez recharger l'application
+  </div>
+  <div *ngIf="cache.boost" class="boost">
+      <ion-icon name="alert" ></ion-icon> Les {{products?.length}} produits en promotions !      
+  </div>
+  
+      
+  <ion-list>    
+    <ion-item-sliding *ngFor="let product of filteredProducts()">    
+        <ion-item (click)="openDetails(product)" [class.inactive]="!cache.active">
+          <ion-avatar slot="start">
+            <img [src]="getAvatar(product)">
+          </ion-avatar>      
+          <ion-label>
+            <h2 [class.red]="product.attributes.discount">{{product.title}}</h2>      
+            <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}} &nbsp;<span class="gray">// {{product.details.origin}}</span></h3>
+            <p>
+              {{getStateLabel(product)}} <span>// {{product.belong.name}}</span>
+              <span [hidden]="!product.attributes.boost" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #boost</span>
+              <span [hidden]="!product.attributes.home" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #select</span>              
+            </p>  
+          </ion-label>
+          <span slot="end" [class.red]="product.pricing.stock<6">
+              {{product.pricing.stock}}
+          </span>          
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-button [color]="product.attributes.available?'danger':'secondary'" (click)="toggleActive(product)">
+            <ion-icon name="basket"></ion-icon>
+            <span [hidden]="!product.attributes.available">Désactiver</span>
+            <span [hidden]="product.attributes.available">Activer</span>
+          </ion-button>        
+          <!-- <ion-select [(ngModel)]="product.pricing.stock" 
+          (ngModelChange)="updateStock(product,$event)"
+          interface="action-sheet">
+            <ion-option value="0">O en stock</ion-option>
+            <ion-option value="10">10 en stock</ion-option>
+            <ion-option value="50">50 en stock</ion-option>
+          </ion-select>         -->
+
+        </ion-item-options>
+      </ion-item-sliding>    
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [position]="'bottom'">
+      <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Chargement des produits ...">
+    </ion-infinite-scroll-content>    
+  </ion-infinite-scroll>  
+
+</ion-content>

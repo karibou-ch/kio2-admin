@@ -55,6 +55,12 @@ export class Kio2Admin {
     }
 
     //
+    // navigation is running
+    if(this.$router.url === '/') {
+      return;
+    }
+
+    //
     // if admin||logistic => shopper
     if (user.isAdmin() || user.hasRole('logistic')) {
       this.$router.navigateByUrl('/shopper');
