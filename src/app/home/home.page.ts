@@ -17,7 +17,6 @@ export class HomePage {
     private $router: Router
   ) {
     this.user = this.$engine.currentUser;
-
   }
 
 
