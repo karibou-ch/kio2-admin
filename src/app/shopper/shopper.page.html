@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>{{ (pickerShippingDate| date:format) }}  </ion-title>
+    <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }}  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
@@ -9,8 +9,6 @@
         <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
       </ion-button>      
     </ion-buttons>
-
-
   </ion-toolbar>
   <ion-datetime #picker 
     displayFormat="MM/YYYY" 
@@ -34,6 +32,9 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher> -->
 
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
   <!--  LOGISTIC HEADER -->
   <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes {{openShippings?'livrées':'en préparation'}} pour ce mois-ci</h1>
 

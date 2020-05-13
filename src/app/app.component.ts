@@ -25,7 +25,6 @@ export class Kio2Admin {
   ) {
     this.initializeApp();
     this.$loader.update().subscribe((ctx) => {
-      console.log('---- loader', ctx);
       if (ctx.user) {
         this.onInit(ctx.user);
       }

@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { User, Order, LoaderService, OrderService, UserService } from 'kng2-core';
-import { ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController, PopoverController } from '@ionic/angular';
 import { TrackerProvider } from '../services/tracker/tracker.provider';
-import { EngineService, OrdersCtx } from '../services/engine.service';
+import { EngineService, OrdersCtx, OrderStatus } from '../services/engine.service';
 import { TrackerPage } from '../tracker/tracker.page';
+import { CalendarPage } from '../calendar/calendar.page';
 
 @Component({
   selector: 'kio2-shopper',
@@ -27,11 +28,10 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   constructor(
     private $engine: EngineService,
-    private $loader: LoaderService,
     private $order: OrderService,
+    private $popup: PopoverController,
     private modalCtrl: ModalController,
     public $tracker: TrackerProvider,
-    private $user: UserService,
     private toast: ToastController
   ) {
     this.isReady = false;
@@ -42,6 +42,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.user = this.$engine.currentUser;
 
     this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
+    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrdersForShipping();
     // this.$tracker.start();
@@ -65,16 +66,22 @@ export class ShopperPage implements OnInit, OnDestroy {
     date.setHours(0, 0, 0, 0);
     date.setDate(2);
 
+
     this.pickerShippingDate = date.toISOString();
-    this.$engine.shippingDate = date;
+    this.$engine.currentShippingDate = date;
     this.$engine.findAllOrdersForShipping();
   }
 
+
+  onEngineStatus(status: OrderStatus) {
+    this.isReady = !status.running;
+  }
 
   onInitOrders(ctx: OrdersCtx) {
     //
     // set default order value based on postalCode
     this.shipping = ctx.when;
+    this.pickerShippingDate = ctx.when.toISOString();
     this.orders = ctx.orders.sort(this.sortOrdersByPosition);
     this.isReady = true;
     this.trackPlanning(this.orders);
@@ -93,6 +100,32 @@ export class ShopperPage implements OnInit, OnDestroy {
       duration: 3000
     }).then(alert => alert.present());
 
+  }
+
+  async openCalendar($event) {
+    const pop = await this.$popup.create({
+      component: CalendarPage,
+      translucent: true,
+      event: $event,
+      componentProps: {
+        orders: this.orders
+      }
+    });
+
+    //
+    // when a shipping date is selected
+    pop.onDidDismiss().then(result => {
+      if (result.data) {
+        const when = result.data[0];
+        const orders = this.$engine.getOrdersByDay(when);
+        this.onInitOrders({
+          orders: (orders),
+          when: (when)
+        } as OrdersCtx);
+      }
+    });
+
+    return await pop.present();
   }
 
   isPlanified() {
@@ -174,8 +207,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     // })
   }
 
-
-
   //
   // manual reorder of items
   reorderItems(index) {
@@ -193,6 +224,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
     index.detail.complete();
   }
+
   toggleOrder(order) {
     this.selectedOrder[order.oid] = !this.selectedOrder[order.oid];
     this.debug();

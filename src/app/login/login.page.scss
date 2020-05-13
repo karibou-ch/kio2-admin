@@ -1,10 +1,8 @@
-
-  .sitename{
-    color: #bbb;
-    font-size: 12px;    
-    padding: 5px;
-  }
+  :host {
   
+  }
+
+  #background-content,
   .landing-k {
     position: relative;
     display: inline-block;
@@ -13,6 +11,14 @@
     background-size: auto 350px;
     background-image: url('/assets/img/k.svg');
   }
+
+  .sitename{
+    color: #bbb;
+    font-size: 12px;    
+    padding: 5px;
+  }
+  
+
   form{
     margin-top:40vh; 
     padding: 30px;
@@ -21,13 +27,14 @@
     .btn {
       height: 50px;
       line-height: 50px;
-      margin: 10px 0;
+      margin: 10px auto;
       padding: 0 30px;
       border-radius: 25px;
       background: var(--ion-color-kio-primary);
       color: #fff;
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 500;
+      max-width: 70%;
     }
     .keep{
       position: fixed;

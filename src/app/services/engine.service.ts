@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 import { User, Order, OrderService } from 'kng2-core';
 import { ReplaySubject } from 'rxjs';
+import { INT_TYPE } from '@angular/compiler/src/output/output_ast';
 
 //
 // orders and context used by subject$
 export interface OrdersCtx {
   orders: Order[];
   when: Date;
+}
+
+export interface OrderStatus {
+  running: boolean;
 }
 
 @Injectable({
@@ -16,6 +21,12 @@ export class EngineService {
 
   // Local storage of orders
   private monthOrders: Map<number, Order[]> = new Map();
+  private orderStatus: any;
+  private shippingDate: Date;
+
+  //
+  // calendar of loaded Orders
+  shippingWeek: Date[];
 
 
   //
@@ -28,14 +39,9 @@ export class EngineService {
 
   defaultFormat = 'EEEE d MMM';
 
-  orderStatus: any;
-  shippingDate: Date;
-
-  //
-  // calendar of loaded Orders
-  shippingWeek: Date[];
 
   selectedOrders$: ReplaySubject<OrdersCtx>;
+  status$: ReplaySubject<OrderStatus>;
 
   user: User;
 
@@ -43,9 +49,13 @@ export class EngineService {
 
     //
     // order params
+    const today = new Date();
     this.orderStatus = this.OPEN;
-    this.currentShippingDate = (new Date()).dayToDates([2, 3, 4, 5, 6])[0];
+    this.currentShippingDate = today.dayToDates([2, 3, 4, 5, 6])[0];
     this.selectedOrders$ = new ReplaySubject<OrdersCtx>(1);
+    this.status$ = new ReplaySubject(1);
+
+
   }
 
   get availableDates() {
@@ -67,11 +77,18 @@ export class EngineService {
     return this.shippingDate;
   }
 
+  get currentOrderAreOpen() {
+    return (!!this.orderStatus.payment);
+  }
 
+  getOrdersByDay(shipping: Date) {
+    return (this.monthOrders.get(shipping.getTime())) || [];
+  }
   //
   // load orders for Shipping and for Vendors
   findAllOrdersForShipping() {
 
+    this.status$.next({running:true});
     //
     // order settings
     const params = Object.assign({}, this.orderStatus);
@@ -101,22 +118,23 @@ export class EngineService {
         this.monthOrders.get(orderTime).push(order);
       });
 
-      // FIXME, when currentDay is empty (orders == 0) then keys().next().value is wrong
-      let closestValue = 9000000000000;
-      this.monthOrders.forEach((orders, time) => {
-        closestValue = Math.min(closestValue, time);
-      });
+      //
+      // get the must recent value
+      const times = Array.from(this.monthOrders.keys()).sort((a, b) => a - b);
 
       //
       // update currentshipping that containes orders
       const currentTime = this.currentShippingDate.getTime();
-      this.currentShippingDate = (this.monthOrders.has(currentTime)) ?
-        this.currentShippingDate : (new Date(closestValue));
+      this.currentShippingDate = (!orders.length || this.monthOrders.has(currentTime)) ?
+        this.currentShippingDate : (new Date(times[0]));
 
       //
       // sort shipping dates
       this.shippingWeek = this.shippingWeek.sort((a: Date, b: Date) => a.getTime() - b.getTime());
 
+      //
+      // publish status
+      this.status$.next({running: false});
 
       //
       // publish content
@@ -126,6 +144,8 @@ export class EngineService {
         when: this.currentShippingDate
       } as OrdersCtx);
     }, error => {
+      // publish status
+      this.status$.next({running: false});
       // Cette fonctionalité est réservée à la logistique
       this.selectedOrders$.error(error);
     });

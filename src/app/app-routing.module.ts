@@ -19,7 +19,7 @@ const routes: Routes = [
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
   },
   {
-    path: 'profil',
+    path: 'profile',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./profil/profil.module').then( m => m.ProfilPageModule)
   },
@@ -37,7 +37,7 @@ const routes: Routes = [
     path: 'tracker',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./tracker/tracker.module').then( m => m.TrackerPageModule)
-  },
+  }
 ];
 
 @NgModule({

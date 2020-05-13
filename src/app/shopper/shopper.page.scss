@@ -10,6 +10,10 @@ h2 {
     font-weight: bold;
 }
 
+ion-title{
+  text-transform: capitalize;
+}
+
 ion-badge {
     font-size: 0.7rem;
 }
@@ -156,3 +160,26 @@ ion-item-options{
   }    
 }
 
+.loader {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  padding: 46%;
+  z-index: 1;
+  background: rgba(12, 12, 12, 0.24);
+  color: white;
+}
+
+@keyframes rotating {
+  from{
+      -webkit-transform: rotate(0deg);
+  }
+  to{
+      -webkit-transform: rotate(360deg);
+  }
+}
+
+.rotating {
+  -webkit-animation: rotating 2s linear infinite;
+  animation: rotating 2s linear infinite;
+}

@@ -1,0 +1,22 @@
+
+<ion-content>
+  <ion-toolbar>
+    <ion-segment value="all" (ionChange)="onStatusChanged($event)" [value]="segmentValue">
+      <ion-segment-button value="current">Préparations</ion-segment-button>
+      <ion-segment-button value="past">Fermées</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+  <div class="calendar">
+    <div *ngFor="let shipping of availableDates;let i = index" 
+      class="day"
+      [class.selected]="shipping.getTime()===currentShipping.getTime()"  
+      (click)="onSelectDay(shipping)">    
+      <div class="wd">{{ shipping | date:'EEEE' }}</div>
+      <div class="dd">{{ shipping | date:'d' }}</div>
+      <div class="month">{{ shipping | date:'MMMM' }}</div>
+    </div>    
+  </div>
+  
+
+</ion-content>
