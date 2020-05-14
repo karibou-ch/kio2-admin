@@ -15,7 +15,7 @@
 
   <div id="container">
     <strong>Que souhaitez-vous faire</strong>
-    <p>Start with K. <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <p>Opérationel <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
 
     <ion-row>
       <ion-col [hidden]="!(user.hasRole('logistic')||user.isAdmin())" (click)="openShopper()">
@@ -28,24 +28,32 @@
         <div>Commandes</div>
       </ion-col>
 
-      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openCustomers()">
-        <ion-icon  name="people-circle-outline" color="grey-icon"></ion-icon>
-        <div>Clients</div>
-      </ion-col>
-
-      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openReports()">
-        <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
-        <div>Rapports</div>
-      </ion-col>
-      
       <ion-col [hidden]="!(user.isAdmin())" (click)="openProducts()">
         <ion-icon name="cube-outline" color="grey-icon"></ion-icon>
         <div>Produits</div>
       </ion-col>
+
+    </ion-row>
+
+    <div class="middle">
+      Que souhaitez-vous faire
+      <p>Administration</p>
+    </div>
     
+    <ion-row>
+      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openReports()">
+        <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
+        <div>Rapports</div>
+      </ion-col>
+          
       <ion-col [hidden]="!(user.isAdmin())" (click)="openVendors()">
         <ion-icon name="home-outline" color="grey-icon"></ion-icon>
         <div>Boutiques</div>
+      </ion-col>
+
+      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openCustomers()">
+        <ion-icon  name="people-circle-outline" color="grey-icon"></ion-icon>
+        <div>Clients</div>
       </ion-col>
 
       <ion-col (click)="openProfile()">

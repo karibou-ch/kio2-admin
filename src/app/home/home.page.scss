@@ -4,7 +4,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 30%;
+  top: 40%;
   transform: translateY(-50%);
 }
 
@@ -23,6 +23,10 @@
 
 #container a {
   text-decoration: none;
+}
+
+#container .middle {
+  margin-top: 40px;  
 }
 
 ion-row {
