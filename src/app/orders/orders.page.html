@@ -1,0 +1,141 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{user.displayName}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content >
+  <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes</h1>
+  
+  <ion-refresher 
+    (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngTemplateOutlet="displayByItems ? ordersItems: ordersByRank"></ng-container>
+  
+  <!-- SEARCH -->
+  <ion-searchbar
+    [(ngModel)]="searchFilter"
+    [debounce]="500"
+    (ionInput)="onSearchInput($event)"
+    (ionClear)="onSearchCancel($event)">
+  </ion-searchbar>  
+
+</ion-content>
+
+
+<!-- GROUP BY ITEMS LISTING -->
+<ng-template #ordersItems>
+    <ion-item class="in-progress" [hidden]="(orders?.length < 1)">
+      <ion-avatar slot="start">
+        <span class="rank">
+          <ion-icon name="stats"></ion-icon>
+        </span>
+      </ion-avatar>
+      <h3>
+        {{orders.length}} cmds / <b>{{orderTotal|number:'1.0-0'}} fr</b>
+        <span [hidden]="orders.length<2">, AVG <b>{{orderAvg|number:'1.0-0'}} fr</b></span>
+      </h3>
+      <ion-note slot="end">
+        <button ion-button small color="primary" outline (click)="emailVendors()">
+          <ion-icon name="send"></ion-icon>&nbsp;email
+        </button> 
+      </ion-note>
+    </ion-item>
+    <!-- ITEMS -->
+    <ion-item-sliding *ngFor="let item of getOrderByItems();let i=index;">
+      <ion-item (click)="openByItem(item)">
+        <h3 text-capitalize >
+            {{item.quantity}}x {{ item.sku }} - {{ item.title }}
+        </h3>
+        <h2>
+          {{item.progress}} - {{item.customers.length}} clients
+          <!-- INFORM CUSTOMER OF ISSUE -->
+          <!-- <button ion-button small color="primary" outline (click)="emailCustomers()">
+            <ion-icon name="send"></ion-icon>
+          </button>   -->
+        </h2>
+        <ion-note slot="end" >
+          <span class="price">{{item.amount|number:'1.0-0'}} fr</span>
+          <span class="progress">{{(item.progress/item.customers.length)|percent}}</span>
+        </ion-note>      
+      </ion-item>
+    </ion-item-sliding>
+
+</ng-template>
+
+<!-- NATURAL ORDERS LISTING -->
+<ng-template #ordersByRank>
+  <!-- DISPLAY ORDERS -->
+  <ion-list>
+    <ion-item class="in-progress" [hidden]="(orders?.length < 1)">
+      <ion-avatar slot="start">
+        <span class="rank">
+          <ion-icon name="stats"></ion-icon>
+        </span>
+      </ion-avatar>
+      <h3>
+        {{orders.length}} cmds / <b>{{orderTotal|number:'1.0-0'}} fr</b>
+        <span [hidden]="orders.length<2">, AVG <b>{{orderAvg|number:'1.0-0'}} fr</b></span>
+      </h3>
+      <ion-note slot="end">
+        <button ion-button small color="primary" outline (click)="emailVendors()">
+          <ion-icon name="send"></ion-icon>&nbsp;email
+        </button>
+      </ion-note>
+    </ion-item>
+    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition);let i=index;">
+      <ion-item [class.selected]="isOrderSelected(order)" [class.in-progress]="!isFulfilled(order)">
+        <ion-note slot="end" (click)="openByOrder(order)">
+          <span class="price">{{order.getSubTotal()|number:'1.0-0'}} fr</span>
+          <span class="progress">{{order.getProgress()|number:'1.0-0'}} %</span>
+        </ion-note>
+        <ion-avatar slot="start" (click)="openByOrder(order)">
+          <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
+          <span class="rank">{{order.rank}}</span>
+        </ion-avatar>
+        <h3 text-capitalize (click)="openByOrder(order)">
+          {{ order.oid }} - {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
+        </h3>
+        <h2>
+          <span class="label counter">{{i+1}}</span>
+          <span class="label">{{order.payment.status}}</span>
+          {{order.getFulfilledProgress()}}/{{order.items.length}}
+        </h2>
+        <button ion-button expandable color="danger" class="hidden-sm capture" (click)="orderCapture(order)"
+          [hidden]="!user.isAdmin()||!isOrderCapturable(order)">
+          facturer
+        </button>
+  
+      </ion-item>
+      <ion-item-options side="left" [hidden]="!user.isAdmin()">
+        <button ion-button expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
+          facturer
+        </button>
+        <button ion-button expandable color="danger" (click)="orderCancel(order)" [hidden]="isOrderCapturable(order)">
+          cancel
+        </button>
+      </ion-item-options>
+  
+      <ion-item-options side="right" class="shipping" [hidden]="!user.isAdmin()">
+        <ion-label color="primary">Livraison</ion-label>
+        <ion-select [(ngModel)]="order.payment.fees.shipping" color="primary" (ionChange)="orderShippingFees(order)">
+          <ion-select-option value="0">0.0 fr</ion-select-option>
+          <ion-select-option value="4">4.0 fr</ion-select-option>
+          <ion-select-option value="5.5">5.5 fr</ion-select-option>
+          <ion-select-option value="7.5">7.5 fr</ion-select-option>
+          <ion-select-option value="10">10.0 fr</ion-select-option>
+          <ion-select-option value="11.90">11.9 fr</ion-select-option>
+          <ion-select-option value="14.90">14.9 fr</ion-select-option>
+          <ion-select-option value="16.90">16.9 fr</ion-select-option>
+          <ion-select-option value="19.90">19.9 fr</ion-select-option>
+        </ion-select>
+      </ion-item-options>
+  
+    </ion-item-sliding>
+  </ion-list>
+</ng-template> 
