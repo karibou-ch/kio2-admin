@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gérer votre image</ion-title>
+    <ion-buttons slot="start">
+      <ion-button icon-only (click)="onClose()" >
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding>
+
+  <img [src]="'https:'+image" />
+
+  <!-- <button ion-button block large color="primary" (click)="doUpload()">Upload Image</button> -->
+
+  <ngx-uploadcare-widget 
+        preview-step="true" 
+        crop="true" 
+        image-shrink="1024x1024"
+        images-only="true" 
+        [value]="image" 
+        [public-key]="pubUpcare" 
+        [validator]="ucValidator"
+        (on-dialog-open)="onDialogOpen($event)"
+        (on-upload-complete)="onUpload($event)">
+  </ngx-uploadcare-widget>
+
+</ion-content>

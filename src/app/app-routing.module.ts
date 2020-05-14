@@ -37,6 +37,11 @@ const routes: Routes = [
     path: 'products',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./products/products.module').then( m => m.ProductsPageModule)
+  },
+  {
+    path: 'product',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./product-details/product-details.module').then( m => m.ProductDetailsPageModule)
   }
 ];
 

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Product, Config, User, ProductService } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
-import { ToastController } from '@ionic/angular';
+import { ToastController, ModalController } from '@ionic/angular';
+import { ProductDetailsPage } from '../product-details/product-details.page';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-products',
@@ -29,7 +31,7 @@ export class ProductsPage implements OnInit {
 
 
   constructor(
-
+    private $router: Router,
     private $engine: EngineService,
     private $product: ProductService,
     private toast: ToastController,
@@ -48,13 +50,12 @@ export class ProductsPage implements OnInit {
     this.config = this.$engine.currentConfig;
   }
 
+  ngAfterViewInit() {
+    // console.log('---', window.history)
+  }
+
   doCreateProduct() {
-    // this.navCtrl.push('ProductDetailPage', {
-    //   product: new Product(),
-    //   config: this.config,
-    //   user: this.user,
-    //   create: true
-    // });
+    this.$router.navigateByUrl('/product/create');
   }
 
   doInfinite(infiniteScroll) {
@@ -84,37 +85,13 @@ export class ProductsPage implements OnInit {
     return product.attributes.available ? 'Disponible' : 'Indisponible';
   }
 
-  ngOnDestroy() {
-    // this.events.unsubscribe('refresh-products');
-  }
-
   ngOnInit() {
-  
-    this.loadProducts();
-
-    //
-    // update product list after modification
-    // this.events.subscribe('refresh-products', (product) => {
-    //   if (product) {
-    //     const idx = this.products.findIndex(prod => prod.sku == product.sku);
-    //     const idxcached = this.cache.products.findIndex(prod => prod.sku == product.sku);
-    //     if (idxcached) {
-    //       Object.assign(this.cache.products[idxcached], product);
-    //     }
-    //     if (idx) {
-    //       Object.assign(this.products[idx], product);
-    //     }
-    //     if (idx || idxcached) {
-    //       return;
-    //     }
-
-    //   }
-    //   this.loadProducts();
-    // });
-
+    this.loadProducts();    
   }
 
   loadProducts() {
+    this.isReady = false;
+
     const params:any = {};
     //
     // get select products
@@ -135,6 +112,7 @@ export class ProductsPage implements OnInit {
       (products: Product[]) => {
         //
         // FIXME remove filter, server should clean orphan products!
+        this.isReady = true;
         this.cache.products = products.filter(p => p.vendor).sort(this.sortByVendorAndStock);
         this.products = this.sliceProducts();
       }
@@ -148,14 +126,15 @@ export class ProductsPage implements OnInit {
     }).then(alert => alert.present());
   }
 
-
   openDetails(product: Product) {
-    // this.navCtrl.push('ProductDetailPage', {
-    //   product,
-    //   config: this.config,
-    //   user: this.user
-    // });
-
+    const params = {
+      product: (product)
+    };
+    this.$router.navigate(['/product', product.sku]);
+    // this.$modal.create({
+    //   component: ProductDetailsPage,
+    //   componentProps: params
+    // }).then(alert => alert.present());
   }
 
   onSearchInput($event) {
@@ -168,6 +147,17 @@ export class ProductsPage implements OnInit {
     this.products = this.sliceProducts();
   }
 
+  onUpdateStock(product: Product, count: number) {
+    product.pricing.stock = count;
+    this.$product.save(product).subscribe(
+      () => {
+        this.onDone('Enregistré');
+      },
+      (error) => {
+        this.onDone(error.error);
+      }
+    );
+  }
 
   resume(product: Product) {
     // product.pricing.price

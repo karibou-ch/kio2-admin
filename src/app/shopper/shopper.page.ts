@@ -30,7 +30,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     private $engine: EngineService,
     private $order: OrderService,
     private $popup: PopoverController,
-    private modalCtrl: ModalController,
+    private $modal: ModalController,
     public $tracker: TrackerProvider,
     private toast: ToastController
   ) {
@@ -265,7 +265,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     const params = {
       orders : selected
     };
-    this.modalCtrl.create({
+    this.$modal.create({
       component: TrackerPage,
       componentProps: params
     }).then(alert => alert.present());
@@ -281,7 +281,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     const params = {
       orders: (orders)
     };
-    this.modalCtrl.create({
+    this.$modal.create({
       component: TrackerPage,
       componentProps: params
     }).then(alert => alert.present());

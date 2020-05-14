@@ -17,6 +17,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 // local data
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
+import { UcWidgetComponent } from './components/uc-widget/uc-widget';
 registerLocaleData(localeFr);
 
 
@@ -56,6 +57,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
       API_SERVER: environment.API_SERVER,
       loader: [
         'categories',
+        'shops'
       ]
     }),
     AppRoutingModule

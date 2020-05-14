@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User, Order, OrderService, Config } from 'kng2-core';
+import { User, Order, OrderService, Product, Config } from 'kng2-core';
 import { ReplaySubject } from 'rxjs';
 
 //
@@ -24,6 +24,8 @@ export class EngineService {
   private shippingDate: Date;
   private config: Config;
   private user: User;
+
+  private cached: any;
 
   //
   // calendar of loaded Orders
@@ -54,6 +56,7 @@ export class EngineService {
     this.currentShippingDate = today.dayToDates([2, 3, 4, 5, 6])[0];
     this.selectedOrders$ = new ReplaySubject<OrdersCtx>(1);
     this.status$ = new ReplaySubject(1);
+    this.cached = {};
   }
 
   get availableDates() {
@@ -72,6 +75,14 @@ export class EngineService {
   }
   get currentUser() {
     return this.user;
+  }
+
+  setCurrentProduct(product: Product) {
+    this.cached[product.sku] = product;
+  }
+
+  getCurrentProduct(sku) {
+    return this.cached[sku];
   }
 
   set currentShippingDate(date: Date) {

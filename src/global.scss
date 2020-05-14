@@ -43,3 +43,18 @@ text-capitalize {
 .red{
   color: red;
 }
+
+
+ion-toggle {
+  --background-checked: var(--ion-color-primary);
+  --handle-background-checked: var(--ion-color-primary);
+}
+
+
+.toggle-checked .toggle-inner{
+  background-color: var(--ion-color-primary);
+}
+
+[expand = block] {
+  width: 100%;
+}

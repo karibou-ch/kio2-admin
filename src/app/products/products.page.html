@@ -7,9 +7,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content >
-  <div class="metabar" [hidden]="loadError">
+<ion-content>
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
+
   <ion-item>
     <ion-label>Rechercher</ion-label>
     <ion-searchbar
@@ -24,7 +26,7 @@
     </ion-button>    
   </ion-item>  
   <ion-item>
-    <ion-badge slot="end" color="primary">> {{products?.length}}</ion-badge>
+    <ion-badge slot="end" mode="ios" color="primary">> {{products?.length}}</ion-badge>
 
     <ion-chip (click)="cache.active=!cache.active;sliceProducts()">
       <ion-icon name="close-circle" [hidden]="!cache.active"></ion-icon>
@@ -45,10 +47,6 @@
     <b>Ouups!</b> <br/>
     Il y a eu une erreur, veuillez recharger l'application
   </div>
-  <div *ngIf="cache.boost" class="boost">
-      <ion-icon name="alert" ></ion-icon> Les {{products?.length}} produits en promotions !      
-  </div>
-  
       
   <ion-list>    
     <ion-item-sliding *ngFor="let product of filteredProducts()">    
@@ -70,19 +68,24 @@
           </span>          
         </ion-item>
         <ion-item-options side="end">
-          <ion-button [color]="product.attributes.available?'danger':'secondary'" (click)="toggleActive(product)">
-            <ion-icon name="basket"></ion-icon>
-            <span [hidden]="!product.attributes.available">Désactiver</span>
-            <span [hidden]="product.attributes.available">Activer</span>
-          </ion-button>        
-          <!-- <ion-select [(ngModel)]="product.pricing.stock" 
-          (ngModelChange)="updateStock(product,$event)"
-          interface="action-sheet">
-            <ion-option value="0">O en stock</ion-option>
-            <ion-option value="10">10 en stock</ion-option>
-            <ion-option value="50">50 en stock</ion-option>
-          </ion-select>         -->
-
+          <ion-item-option>
+            <ion-button [color]="product.attributes.available?'danger':'secondary'" (click)="toggleActive(product)">
+              <ion-icon name="basket"></ion-icon>
+              <span [hidden]="!product.attributes.available">Désactiver</span>
+              <span [hidden]="product.attributes.available">Activer</span>
+            </ion-button>          
+          </ion-item-option>
+          <ion-item-option>
+            <ion-select [(ngModel)]="product.pricing.stock" placeholder="Stock" 
+            (ngModelChange)="onUpdateStock(product,$event)"
+            interface="action-sheet">
+              <ion-select-option value="0">O en stock</ion-select-option>
+              <ion-select-option value="10">10 en stock</ion-select-option>
+              <ion-select-option value="50">50 en stock</ion-select-option>
+              <ion-select-option value="10">100 en stock</ion-select-option>
+              <ion-select-option value="100">1000 en stock</ion-select-option>
+            </ion-select>          
+          </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>    
   </ion-list>
