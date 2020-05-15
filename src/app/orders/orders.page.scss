@@ -2,6 +2,10 @@ button.fab{
   display: none;
 }
 
+h3,
+h4 {
+  font-size: 0.9rem;
+}
   
 h1.info{
   color: gray;
@@ -54,18 +58,6 @@ ion-item {
     ion-label{
       margin: 0;
     }
-    button{
-      height: 1.7rem;
-      border: none;
-      width: 17px;
-      margin-right: 0;
-      &.selected{
-        background:var(--ion-color-kio-info);
-        color:var(--ion-color-kio-dark);
-      }
-      background:#fff;
-      color: var(--ion-color-kio-primary);
-    }
   }    
   &.selected{
     background-color: var(--ion-color-kio-light);
@@ -91,6 +83,7 @@ ion-item {
   h2{
     color: green;
     font-size:0.8rem!important;
+    font-weight: 200;
   }
   p{
     font-size:0.7rem!important;
@@ -155,3 +148,42 @@ ion-item {
   }
 
 }  
+
+
+
+ion-item-options{
+  background: var(--ion-background-primary);      
+  
+  ion-item-option{
+    &.phone{
+    }
+    a{
+      color: white;
+    }
+
+  }    
+}
+
+.loader {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  padding: 46%;
+  z-index: 1;
+  background: rgba(12, 12, 12, 0.24);
+  color: white;
+}
+
+@keyframes rotating {
+  from{
+      -webkit-transform: rotate(0deg);
+  }
+  to{
+      -webkit-transform: rotate(360deg);
+  }
+}
+
+.rotating {
+  -webkit-animation: rotating 2s linear infinite;
+  animation: rotating 2s linear infinite;
+}

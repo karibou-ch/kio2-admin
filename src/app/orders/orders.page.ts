@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { EngineService } from '../services/engine.service';
+import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
-import { ToastController } from '@ionic/angular';
+import { ToastController, PopoverController, ModalController } from '@ionic/angular';
+import { CalendarPage } from '../calendar/calendar.page';
+import { OrdersItemsPage } from './orders-items.page';
 
 export class OrderByItem {
   oid: number;
@@ -30,27 +32,38 @@ export class OrdersCustomerPage {
   orderAvg: number;
   orderTotal: number;
   orderBaseAmount= 0;
-  searchFilter: string;
   items: {
     [sku: number]: (OrderByItem[]|any);
   };
 
+  pickerShippingDate: string;
+  searchFilter: string;
+
+
   constructor(
     private $engine: EngineService,
-    public toast: ToastController,
+    private $modal: ModalController,
+    public $toast: ToastController,
     public $loader: LoaderService,
+    private $popup: PopoverController,
     public $order: OrderService
   ) {
     this.orders = [];
     this.cache = {};
     this.items = {};
-    this.$loader.ready().subscribe((loader) => {
-        Object.assign(this.user, loader[1]);
-        if (this.user.isAdmin()) {
-          // change the average
-          this.orderBaseAmount = 0;
-        }
-    });
+  }
+
+  ngOnInit() {
+    this.user = this.$engine.currentUser;
+    if (this.user.isAdmin()) {
+      // change the average
+      this.orderBaseAmount = 0;
+    }
+
+    this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
+    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
+    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
+    this.$engine.findAllOrdersForShipping();
   }
 
 
@@ -190,7 +203,7 @@ export class OrdersCustomerPage {
   }
 
   onDone(msg) {
-    this.toast.create({
+    this.$toast.create({
       message: msg,
       duration: 3000
     }).then(alert => alert.present());
@@ -241,6 +254,33 @@ export class OrdersCustomerPage {
     );
   }
 
+  async openCalendar($event) {
+    const pop = await this.$popup.create({
+      component: CalendarPage,
+      translucent: true,
+      event: $event,
+      componentProps: {
+        orders: this.orders
+      }
+    });
+
+    //
+    // when a shipping date is selected
+    pop.onDidDismiss().then(result => {
+      if (result.data) {
+        const when = result.data[0];
+        const orders = this.$engine.getOrdersByDay(when);
+        this.onInitOrders({
+          orders: (orders),
+          when: (when)
+        } as OrdersCtx);
+      }
+    });
+
+    return await pop.present();
+
+  }
+
   openByItem(item: any) {
     // this.navCtrl.push('ItemOrderPage', {
     //   item,
@@ -251,23 +291,44 @@ export class OrdersCustomerPage {
   }
 
   openByOrder(order) {
-    // this.navCtrl.push('OrderItemsPage', {
-    //   orders: [order],
-    //   shipping: this.shipping,
-    //   user: this.user
-    // });
+    const params = {
+      orders: [order],
+      shipping: this.shipping
+    }
+    this.$modal.create({
+      component: OrdersItemsPage,
+      componentProps: params
+    }).then(alert => alert.present());
   }
 
-  onInitOrders([orders, shipping]: [Order[], Date]) {
+  //
+  // on selected date
+  onDatePicker() {
+    const date = new Date(this.pickerShippingDate);
+    date.setHours(0, 0, 0, 0);
+    date.setDate(2);
+
+
+    this.pickerShippingDate = date.toISOString();
+    this.$engine.currentShippingDate = date;
+    this.$engine.findAllOrdersForShipping();
+  }
+
+  onEngineStatus(status: OrderStatus) {
+    this.isReady = !status.running;
+  }
+
+  onInitOrders(ctx: OrdersCtx) {
     // console.log('---- init odrers',orders.length, shipping);
     this.items = {};
-    this.orders = orders.sort(this.sortOrdersByRank);
+    this.orders = ctx.orders.sort(this.sortOrdersByRank);
 
     //
     // use shipping day from
     // force current shipping day
-    this.shipping = shipping || Order.currentShippingDay();
-    this.isReady = true;
+    this.shipping = ctx.when;
+    this.pickerShippingDate = ctx.when.toISOString();
+
     // AVG
     this.orderTotal = this.orders.reduce((sum, order, i) => {
       return order.getSubTotal() + sum + this.orderBaseAmount;
@@ -298,6 +359,11 @@ export class OrdersCustomerPage {
     return delta;
   }
 
+  updateBag(order, count) {
+    this.$order.updateBagsCount(order, count).subscribe(ok => {
+          this.onDone('Nombre sac enregistré')
+    }, (error) => this.onDone(error.error));
+  }
 
   validateAll(order) {
 

@@ -29,16 +29,16 @@
     <ion-badge slot="end" mode="ios" color="primary">> {{products?.length}}</ion-badge>
 
     <ion-chip (click)="cache.active=!cache.active;sliceProducts()">
-      <ion-icon name="close-circle" [hidden]="!cache.active"></ion-icon>
+      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
       <ion-label color="primary">Actif</ion-label>
     </ion-chip>
     <ion-chip (click)="cache.discount=!cache.discount;sliceProducts()">
-      <ion-icon name="close-circle" [hidden]="!cache.discount"></ion-icon>
+      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.discount"></ion-icon>
       <ion-label color="primary">Discount</ion-label>
     </ion-chip>        
 
     <ion-chip (click)="cache.boost=!cache.boost;sliceProducts()">
-      <ion-icon name="close-circle" [hidden]="!cache.boost"></ion-icon>
+      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.boost"></ion-icon>
       <ion-label color="primary">Boost</ion-label>
     </ion-chip>        
   </ion-item>

@@ -95,14 +95,14 @@
           <ion-select-option value="5">5 tournée</ion-select-option>
         </ion-select>        
       </ion-item-option>
-    </ion-item-options>
+      </ion-item-options>
 
       <ion-item-options side="end">
         <ion-item-option>
           <ion-select  placeholder="Nb sacs" 
-                       [(ngModel)]="order.shipping.bags"                       
-                       (ngModelChange)="updateBag(order,$event)"
-                       interface="action-sheet">
+                        [(ngModel)]="order.shipping.bags"                       
+                        (ngModelChange)="updateBag(order,$event)"
+                        interface="action-sheet">
             <ion-select-option value="1">1 sac</ion-select-option>
             <ion-select-option value="2">2 sac</ion-select-option>
             <ion-select-option value="3">3 sac</ion-select-option>
@@ -115,12 +115,11 @@
           <ion-label >
             <a ion-button color="danger" [hidden]="!getPhoneNumber(order)" 
             href='tel:{{getPhoneNumber(order)}}'>
-             <ion-icon name="call"></ion-icon>             
-           </a> 
+              <ion-icon name="call"></ion-icon>             
+            </a> 
           </ion-label>
         </ion-item-option>
       </ion-item-options>
-
       <ion-item  (click)="toggleOrder(order)" >
         <ion-note slot="end">
           {{order.shipping.postalCode}}
@@ -141,7 +140,6 @@
         </ion-label>
         <ion-reorder slot="end"></ion-reorder>
       </ion-item>
-
     </ion-item-sliding>
 
     </ion-reorder-group>

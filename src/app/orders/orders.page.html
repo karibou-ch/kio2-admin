@@ -1,13 +1,34 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>{{user.displayName}}</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }}  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="picker.open()">
+        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+      </ion-button>      
+    </ion-buttons>
   </ion-toolbar>
+  <ion-datetime #picker 
+    displayFormat="MM/YYYY" 
+    pickerFormat="MMMM YYYY" 
+    [(ngModel)]="pickerShippingDate" 
+    (ngModelChange)="onDatePicker()" 
+    cancelText="Annuler" 
+    doneText="Fait" 
+    dayValues="1"
+    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
+    max="2024"
+    style="display: none;">
+  </ion-datetime>        
 </ion-header>
 
 <ion-content >
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
   <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes</h1>
   
   <ion-refresher 
@@ -15,15 +36,18 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ng-container *ngTemplateOutlet="displayByItems ? ordersItems: ordersByRank"></ng-container>
-  
   <!-- SEARCH -->
   <ion-searchbar
+    mode="ios"
     [(ngModel)]="searchFilter"
     [debounce]="500"
+    [hidden]="!(orders?.length)"
     (ionInput)="onSearchInput($event)"
     (ionClear)="onSearchCancel($event)">
   </ion-searchbar>  
+
+  <ng-container *ngTemplateOutlet="displayByItems ? ordersItems: ordersByRank"></ng-container>
+  
 
 </ion-content>
 
@@ -33,7 +57,7 @@
     <ion-item class="in-progress" [hidden]="(orders?.length < 1)">
       <ion-avatar slot="start">
         <span class="rank">
-          <ion-icon name="stats"></ion-icon>
+          <ion-icon name="stats-chart-outline"></ion-icon>
         </span>
       </ion-avatar>
       <h3>
@@ -41,30 +65,30 @@
         <span [hidden]="orders.length<2">, AVG <b>{{orderAvg|number:'1.0-0'}} fr</b></span>
       </h3>
       <ion-note slot="end">
-        <button ion-button small color="primary" outline (click)="emailVendors()">
+        <ion-button  size="small" color="medium" fill="outline" (click)="emailVendors()">
           <ion-icon name="send"></ion-icon>&nbsp;email
-        </button> 
+        </ion-button> 
       </ion-note>
     </ion-item>
     <!-- ITEMS -->
-    <ion-item-sliding *ngFor="let item of getOrderByItems();let i=index;">
-      <ion-item (click)="openByItem(item)">
+    <ion-item (click)="openByItem(item)" *ngFor="let item of getOrderByItems();let i=index;">
+      <ion-label class="ion-text-wrap">
         <h3 text-capitalize >
             {{item.quantity}}x {{ item.sku }} - {{ item.title }}
         </h3>
         <h2>
           {{item.progress}} - {{item.customers.length}} clients
           <!-- INFORM CUSTOMER OF ISSUE -->
-          <!-- <button ion-button small color="primary" outline (click)="emailCustomers()">
+          <!-- <ion-button ion-button small color="primary" outline (click)="emailCustomers()">
             <ion-icon name="send"></ion-icon>
-          </button>   -->
+          </ion-button>   -->
         </h2>
-        <ion-note slot="end" >
-          <span class="price">{{item.amount|number:'1.0-0'}} fr</span>
-          <span class="progress">{{(item.progress/item.customers.length)|percent}}</span>
-        </ion-note>      
-      </ion-item>
-    </ion-item-sliding>
+      </ion-label>
+      <ion-note slot="end" >
+        <span class="price">{{item.amount|number:'1.0-0'}} fr</span>
+        <span class="progress">{{(item.progress/item.customers.length)|percent}}</span>
+      </ion-note>      
+    </ion-item>
 
 </ng-template>
 
@@ -75,7 +99,7 @@
     <ion-item class="in-progress" [hidden]="(orders?.length < 1)">
       <ion-avatar slot="start">
         <span class="rank">
-          <ion-icon name="stats"></ion-icon>
+          <ion-icon name="stats-chart-outline"></ion-icon>
         </span>
       </ion-avatar>
       <h3>
@@ -83,12 +107,55 @@
         <span [hidden]="orders.length<2">, AVG <b>{{orderAvg|number:'1.0-0'}} fr</b></span>
       </h3>
       <ion-note slot="end">
-        <button ion-button small color="primary" outline (click)="emailVendors()">
+        <ion-button size="small" color="medium" fill="outline" (click)="emailVendors()">
           <ion-icon name="send"></ion-icon>&nbsp;email
-        </button>
+        </ion-button>
       </ion-note>
     </ion-item>
     <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition);let i=index;">
+      <ion-item-options side="start" [hidden]="!user.isAdmin()">
+        <ion-item-option>
+          <ion-button expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
+            facturer
+          </ion-button>
+          <ion-button expandable color="danger" (click)="orderCancel(order)" [hidden]="isOrderCapturable(order)">
+            cancel
+          </ion-button>
+        </ion-item-option>
+      </ion-item-options>  
+      <ion-item-options side="end" class="shipping" [hidden]="!user.isAdmin()">
+        <ion-item-option color="secondary">
+          <ion-select [(ngModel)]="order.payment.fees.shipping" 
+                      color="primary" 
+                      placeholder="Livraison" 
+                      interface="action-sheet"
+                      (ionChange)="orderShippingFees(order)">
+            <ion-select-option value="0">0.0 fr</ion-select-option>
+            <ion-select-option value="4">4.0 fr</ion-select-option>
+            <ion-select-option value="5.5">5.5 fr</ion-select-option>
+            <ion-select-option value="7.5">7.5 fr</ion-select-option>
+            <ion-select-option value="10">10.0 fr</ion-select-option>
+            <ion-select-option value="11.90">11.9 fr</ion-select-option>
+            <ion-select-option value="14.90">14.9 fr</ion-select-option>
+            <ion-select-option value="16.90">16.9 fr</ion-select-option>
+            <ion-select-option value="19.90">19.9 fr</ion-select-option>
+          </ion-select>
+        </ion-item-option>
+        <ion-item-option>
+          <ion-select  placeholder="Nb sacs" 
+                        [(ngModel)]="order.shipping.bags"                       
+                        (ngModelChange)="updateBag(order,$event)"
+                        interface="action-sheet">
+            <ion-select-option value="1">1 sac</ion-select-option>
+            <ion-select-option value="2">2 sac</ion-select-option>
+            <ion-select-option value="3">3 sac</ion-select-option>
+            <ion-select-option value="4">4 sac</ion-select-option>
+            <ion-select-option value="5">5 sac</ion-select-option>
+            <ion-select-option value="6">6 sac</ion-select-option>
+          </ion-select>
+        </ion-item-option>
+
+      </ion-item-options>
       <ion-item [class.selected]="isOrderSelected(order)" [class.in-progress]="!isFulfilled(order)">
         <ion-note slot="end" (click)="openByOrder(order)">
           <span class="price">{{order.getSubTotal()|number:'1.0-0'}} fr</span>
@@ -98,44 +165,22 @@
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <span class="rank">{{order.rank}}</span>
         </ion-avatar>
-        <h3 text-capitalize (click)="openByOrder(order)">
-          {{ order.oid }} - {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
-        </h3>
-        <h2>
-          <span class="label counter">{{i+1}}</span>
-          <span class="label">{{order.payment.status}}</span>
-          {{order.getFulfilledProgress()}}/{{order.items.length}}
-        </h2>
-        <button ion-button expandable color="danger" class="hidden-sm capture" (click)="orderCapture(order)"
+        <ion-label class="ion-text-wrap">
+          <h3 text-capitalize (click)="openByOrder(order)">
+            {{ order.oid }} - {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
+          </h3>
+          <h2>
+            <span class="label counter">{{i+1}}</span>
+            <span class="label">{{order.payment.status}}</span>
+            {{order.getFulfilledProgress()}}/{{order.items.length}}
+          </h2>
+        </ion-label>
+        <ion-button expandable color="danger" class="hidden-sm capture" (click)="orderCapture(order)"
           [hidden]="!user.isAdmin()||!isOrderCapturable(order)">
           facturer
-        </button>
+        </ion-button>
   
-      </ion-item>
-      <ion-item-options side="left" [hidden]="!user.isAdmin()">
-        <button ion-button expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
-          facturer
-        </button>
-        <button ion-button expandable color="danger" (click)="orderCancel(order)" [hidden]="isOrderCapturable(order)">
-          cancel
-        </button>
-      </ion-item-options>
-  
-      <ion-item-options side="right" class="shipping" [hidden]="!user.isAdmin()">
-        <ion-label color="primary">Livraison</ion-label>
-        <ion-select [(ngModel)]="order.payment.fees.shipping" color="primary" (ionChange)="orderShippingFees(order)">
-          <ion-select-option value="0">0.0 fr</ion-select-option>
-          <ion-select-option value="4">4.0 fr</ion-select-option>
-          <ion-select-option value="5.5">5.5 fr</ion-select-option>
-          <ion-select-option value="7.5">7.5 fr</ion-select-option>
-          <ion-select-option value="10">10.0 fr</ion-select-option>
-          <ion-select-option value="11.90">11.9 fr</ion-select-option>
-          <ion-select-option value="14.90">14.9 fr</ion-select-option>
-          <ion-select-option value="16.90">16.9 fr</ion-select-option>
-          <ion-select-option value="19.90">19.9 fr</ion-select-option>
-        </ion-select>
-      </ion-item-options>
-  
+      </ion-item>  
     </ion-item-sliding>
   </ion-list>
 </ng-template> 

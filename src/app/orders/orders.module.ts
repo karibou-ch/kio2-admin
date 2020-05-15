@@ -6,15 +6,21 @@ import { IonicModule } from '@ionic/angular';
 
 import { OrdersCustomerPageRoutingModule } from './orders-routing.module';
 
+import { CalendarPageModule } from '../calendar/calendar.module';
+import { CalendarPage } from '../calendar/calendar.page';
+
 import { OrdersCustomerPage } from './orders.page';
+import { OrdersItemsPage } from './orders-items.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    CalendarPageModule,
     OrdersCustomerPageRoutingModule
   ],
-  declarations: [OrdersCustomerPage]
+  entryComponents:[CalendarPage, OrdersItemsPage],
+  declarations: [OrdersCustomerPage, OrdersItemsPage]
 })
 export class OrdersPageModule {}
