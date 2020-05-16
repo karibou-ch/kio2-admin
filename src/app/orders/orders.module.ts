@@ -11,6 +11,7 @@ import { CalendarPage } from '../calendar/calendar.page';
 
 import { OrdersCustomerPage } from './orders.page';
 import { OrdersItemsPage } from './orders-items.page';
+import { OrdersCollectPage } from './orders-collect.page';
 
 @NgModule({
   imports: [
@@ -21,6 +22,6 @@ import { OrdersItemsPage } from './orders-items.page';
     OrdersCustomerPageRoutingModule
   ],
   entryComponents:[CalendarPage, OrdersItemsPage],
-  declarations: [OrdersCustomerPage, OrdersItemsPage]
+  declarations: [OrdersCustomerPage, OrdersItemsPage, OrdersCollectPage]
 })
 export class OrdersPageModule {}

@@ -9,9 +9,14 @@
 
 -->
 <ion-header [hidden]="!header">
-  <ion-button  (click)="doClose()">
-    <ion-icon name="chevron-back-outline"></ion-icon>
-  </ion-button>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button  (click)="doClose()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ (shipping | date:format) }}</ion-title>
+  </ion-toolbar>
 </ion-header>
 
 
@@ -27,17 +32,17 @@
           {{order.customer.displayName}}
         </h2>
         <p> 
-          {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>  
+          {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>            
         </p>  
       </ion-label>
       <ion-note slot="end" >
         {{order.getSubTotal()|currency:'CHF'}} <br/>
         <span [class.red]="deltaPrice>0.15">{{deltaPrice|percent}}</span>
       </ion-note>
-      <div slot="end">
+      <div class="note" slot="end">
         <a [hidden]="!getPhoneNumber(order)"
-         color="info" round ion-button outline href="tel:{{getPhoneNumber(order)}}"><ion-icon name="call"> </ion-icon> </a>
-     <a  color="info" round ion-button outline href="mailto:{{order.email}}"> <ion-icon name="mail"> </ion-icon></a>
+         color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
+     <a  color="info" href="mailto:{{order.email}}"> <ion-icon name="mail"> </ion-icon></a>
 
       </div>
     </ion-item>
@@ -65,11 +70,12 @@
     <ion-item-sliding *ngFor="let item of sortedItem(order)">    
       <ion-item-options side="end" [hidden]="!isPaid(order)">
         <ion-item-option>
-            <button class="avoid button-refund" color="danger" ion-button slot="end" 
+            <ion-button class="avoid button-refund" 
+                    color="danger"  slot="end" 
                     [disabled]="item.finalprice==0"                    
                     (click)="doRefund(order,item)">
-              <ion-icon name="card" ></ion-icon>&nbsp;refund
-            </button>
+              <ion-icon name="card-outline" ></ion-icon>&nbsp;refund
+            </ion-button>
         </ion-item-option>
       </ion-item-options>  
       <ion-item >

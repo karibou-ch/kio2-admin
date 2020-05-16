@@ -13,6 +13,7 @@ export class OrdersItemsPage {
   public isReady: boolean;
   public user: User;
   public deltaPrice: number;
+  public format: string;
 
   @Input() vendor: string;
   @Input() shipping: Date;
@@ -42,10 +43,13 @@ export class OrdersItemsPage {
     this.orders = [];
     this.vendor = '';
 
+    this.format = this.$engine.defaultFormat;
 
   }
 
   ngOnInit() {
+    console.log('---',this.vendor);
+
     if (this.orders.length == 1) {
       this.shipping = this.orders[0].shipping.when;
       this.computeDeltaPrice(this.orders[0]);
@@ -87,6 +91,14 @@ export class OrdersItemsPage {
     this.deltaPrice = parseFloat((finalAmount / originAmount - 1).toFixed(2));
   }
 
+  doDisplayphone(order) {
+    const phone = this.getPhoneNumber(order);
+    this.$alert.create({
+      header: 'Numéro de téléphone',
+      message: 'Appeler <a href="tel:' + phone + '">' + phone + '</a>',
+    }).then(alert => alert.present());
+  }
+
   doRefund(order: Order, item: OrderItem) {
     this.$alert.create({
       header: 'Rembousement partiel',
@@ -122,7 +134,9 @@ export class OrdersItemsPage {
   }
 
   doValidateAll(order) {
-    const items = this.sortedItem(order);
+    const items = order.items.
+                  filter(item => item.fulfillment.status !== 'failure');
+
     this.$order.updateItem(order, items, EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
@@ -154,6 +168,13 @@ export class OrdersItemsPage {
         if (!this.user.isAdmin()) {
           order.items = order.items.filter(i => i.vendor === item.vendor);
         }
+        
+        // FIXME this items filter should be on server for NON admin user
+        // For Admin we should ALWAYS constraint to the vendor
+        if (this.vendor) {
+          order.items = order.items.filter(i => i.vendor === this.vendor);
+        }
+
         this.computeDeltaPrice(order);
       }, error => this.doToast(error.error, error));
   }

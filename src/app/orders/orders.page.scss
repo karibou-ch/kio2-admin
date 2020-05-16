@@ -5,6 +5,9 @@ button.fab{
 h3,
 h4 {
   font-size: 0.9rem;
+  &.bold {
+    font-weight: 600;
+  }
 }
   
 h1.info{
@@ -127,11 +130,22 @@ ion-item {
     right: 10px;        
   }
 
+  .ranks{
+    margin-right: 3px;
+  }
   
   ion-avatar {
     position: relative;
 
     span.rank{
+      &.collect{
+        background: var(--ion-color-kio-light);
+        color:black;
+      }
+      &.collected{
+        background: var(--ion-color-kio-primary);
+        color:white;
+      }
       position: absolute;
       top: 00%;
       left: 0;

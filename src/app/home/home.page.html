@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>
       Karibou.ch
     </ion-title>
@@ -21,6 +21,11 @@
       <ion-col [hidden]="!(user.hasRole('logistic')||user.isAdmin())" (click)="openShopper()">
         <ion-icon name="bicycle-outline" color="grey-icon"></ion-icon>
         <div>Logistique</div>
+      </ion-col>
+
+      <ion-col [hidden]="!(user.hasRole('logistic')||user.isAdmin())" (click)="openCollect()">
+        <ion-icon name="bicycle-outline" color="grey-icon"></ion-icon>
+        <div>Collecte</div>
       </ion-col>
 
       <ion-col [hidden]="!(user.isAdmin())" (click)="openOrders()">

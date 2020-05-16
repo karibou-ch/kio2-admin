@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User, Order, OrderService, Product, Config } from 'kng2-core';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, from } from 'rxjs';
 
 //
 // orders and context used by subject$
@@ -107,13 +107,18 @@ export class EngineService {
     this.status$.next({running:true});
     //
     // order settings
+
     const params = Object.assign({}, this.orderStatus);
     params.month = (new Date(this.currentShippingDate).getMonth()) + 1;
     params.year = new Date(this.currentShippingDate).getFullYear();
-    params.padding = true;
+    if (this.orderStatus.payment) {
+      params.padding = true;
+    }
+
 
 
     this.monthOrders = new Map();
+    this.monthOrders.clear();
     this.shippingWeek = [];
 
     //
@@ -151,6 +156,7 @@ export class EngineService {
       //
       // publish status
       this.status$.next({running: false});
+
 
       //
       // publish content

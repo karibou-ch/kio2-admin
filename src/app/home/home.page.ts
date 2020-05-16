@@ -25,7 +25,6 @@ export class HomePage {
     this.$router.navigateByUrl('/shopper');
   }
 
-
   openCustomers() {
     this.$router.navigateByUrl('/customers');
   }
@@ -49,6 +48,11 @@ export class HomePage {
     // this.navCtrl.push('OrderCustomersPage');
     this.$router.navigateByUrl('/orders');
   }
+
+  openCollect() {
+    this.$router.navigateByUrl('/orders/collect');
+  }
+
 
   openVendors() {
     // this.navCtrl.pop();
