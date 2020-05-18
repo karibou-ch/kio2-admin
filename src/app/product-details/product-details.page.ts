@@ -174,7 +174,9 @@ export class ProductDetailsPage implements OnInit {
     return 'une portion entre ' + this.roundN(w - w * 0.07) + unit + ' et ' + this.roundN(w + w * 0.07) + '' + unit;
   }
 
-
+  doBack(){
+    window.history.back();
+  }
 
   doSave(product: Product, silent?: boolean) {
     const shopowner = this.shops.find(shop => shop._id === product.vendor);

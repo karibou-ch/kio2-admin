@@ -4,8 +4,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 40%;
-  transform: translateY(-50%);
+  top: 100px;
+  -transform: translateY(-50%);
 }
 
 #container strong {
@@ -33,8 +33,16 @@ ion-row {
   height: 100%;
   flex-wrap: wrap;
   ion-col {
-    flex: 0 0 33%!important;
-    max-width: 33%!important;
+    cursor: pointer;
+    &:hover {
+      color: #999;
+      font-weight: 700;      
+    }
+    flex: 0 0 24%!important;
+    max-width: 49%!important;
+    @media (max-width: 426px) {
+      flex: 0 0 49%!important;
+    }
     text-align: center!important;
     padding: 10px 5px!important;
     >div{

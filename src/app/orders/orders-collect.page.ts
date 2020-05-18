@@ -25,6 +25,7 @@ export class OrdersCollectPage  implements OnInit{
   pickerShippingDate: string;
   format: string;
   searchFilter: string;
+  collected: boolean;
 
   constructor(
     private $engine: EngineService,
@@ -105,7 +106,7 @@ export class OrdersCollectPage  implements OnInit{
 
   getVendors(){
     return this.vendors.list.filter(vendor => {
-      if(!this.searchFilter) {
+      if (!this.searchFilter) {
         return true;
       }
       return vendor.indexOf(this.searchFilter) > -1;

@@ -53,7 +53,10 @@ export class LoginPage implements OnInit {
       });
     });
 
+    console.log('--- user ngInit');
+    this.isReady = true;
     this.$loader.ready().subscribe((loader) => {
+      console.log('--- ngInit.loader',loader);
       const isHub = loader[0].shared.hub && loader[0].shared.hub.siteName;
       this.siteName = (isHub) ? (loader[0].shared.hub.siteName.fr ): 'K';
       Object.assign(this.user, loader[1]);

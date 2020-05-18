@@ -35,17 +35,24 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- SEARCH -->
-  <ion-searchbar
-    mode="ios"
-    [(ngModel)]="searchFilter"
-    [debounce]="500"
-    [hidden]="!(vendors.list.length)"
-    (ionInput)="onSearchInput($event)"
-    (ionClear)="onSearchCancel($event)">
-  </ion-searchbar>  
-
   <ion-list>
+    <!-- SEARCH & FILTERS-->
+    <ion-item>
+      <ion-searchbar
+        mode="ios"
+        [(ngModel)]="searchFilter"
+        [debounce]="500"
+        [hidden]="!(vendors.list.length)"
+        (ionInput)="onSearchInput($event)"
+        (ionClear)="onSearchCancel($event)">
+      </ion-searchbar>  
+      <ion-chip (click)="collected=!collected;" slot="end">
+        <!-- radio-button-off-outline || checkmark-circle-outline -->
+        <ion-icon name="checkmark-circle-outline" [hidden]="!collected"></ion-icon>
+        <ion-label color="primary">Collecté</ion-label>
+      </ion-chip>    
+    </ion-item>
+  
     <ion-item-sliding *ngFor="let vendor of getVendors()  ">    
       <ion-item-options side="end">
         <ion-item-option>
@@ -58,7 +65,7 @@
       <ion-item >
         <ion-avatar slot="start" (click)="updateCollect(vendor)">
           <span class="check rank collect" [class.collected]="isCollected(vendor)">
-            <ion-icon name="apps-outline" ></ion-icon>
+            <ion-icon name="checkmark-done-outline" ></ion-icon>
           </span>
         </ion-avatar>
         <div (click)="openVendorItems(vendor)" >

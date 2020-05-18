@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { LoaderResolve } from 'kng2-core';
+import { LoaderResolve, UserResolve } from 'kng2-core';
 
 const routes: Routes = [
   {
@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    resolve: {loader : LoaderResolve },
+    resolve: {user : UserResolve },
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   },
   {
@@ -47,6 +47,10 @@ const routes: Routes = [
     path: 'orders',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./orders/orders.module').then( m => m.OrdersPageModule)
+  },
+  {
+    path: 'customers',
+    loadChildren: () => import('./customers/customers.module').then( m => m.CustomersPageModule)
   }
 ];
 

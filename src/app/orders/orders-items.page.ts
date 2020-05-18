@@ -3,6 +3,7 @@ import { ToastController, AlertController, ModalController } from '@ionic/angula
 
 import { Order, EnumFulfillments, OrderService, Product, OrderItem, ProductService, User } from 'kng2-core';
 import { EngineService } from 'src/app/services/engine.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'kio2-orders-items',
@@ -30,6 +31,7 @@ export class OrdersItemsPage {
     public $order: OrderService,
     public $modal: ModalController,
     public $product: ProductService,
+    public $router: Router,
     public $toast: ToastController
   ) {
 
@@ -48,7 +50,7 @@ export class OrdersItemsPage {
   }
 
   ngOnInit() {
-    console.log('---',this.vendor);
+    console.log('---', this.vendor);
 
     if (this.orders.length == 1) {
       this.shipping = this.orders[0].shipping.when;
@@ -125,7 +127,7 @@ export class OrdersItemsPage {
                 item.fulfillment = tosave.fulfillment;
                 this.doToast('Montant: ' + data.amount + ' remboursé');
               }, error => this.doToast(error.error, error)
-            )
+            );
           }
         }
       ]
@@ -140,7 +142,7 @@ export class OrdersItemsPage {
     this.$order.updateItem(order, items, EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
-        this.doToast('Articles du sac '+ order.rank);
+        this.doToast('Articles du sac ' + order.rank);
         Object.assign(order, ok);
 
 
@@ -160,7 +162,7 @@ export class OrdersItemsPage {
       .subscribe(ok => {
         const len = 18;
         const title = item.title.substring(0, len) + (item.title.length > len ? '...' : '');
-        this.doToast(title +' dans sac '+ order.rank);
+        this.doToast(title + ' dans sac ' + order.rank);
         Object.assign(order, ok);
         //
         // when not admin, we should remove other vendor items
@@ -168,7 +170,7 @@ export class OrdersItemsPage {
         if (!this.user.isAdmin()) {
           order.items = order.items.filter(i => i.vendor === item.vendor);
         }
-        
+
         // FIXME this items filter should be on server for NON admin user
         // For Admin we should ALWAYS constraint to the vendor
         if (this.vendor) {
@@ -200,15 +202,7 @@ export class OrdersItemsPage {
 
 
   doOpenProduct(item: OrderItem) {
-    // FIXME open product from here
-    // this.$product.get(item.sku).subscribe(
-    //   (product: Product) => {
-    //     this.navCtrl.push('ProductDetailPage', {
-    //       product,
-    //       user: this.user
-    //     });
-    //   }
-    // );
+    this.$router.navigate(['/product', item.sku]);
   }
 
   doToast(msg, error?) {

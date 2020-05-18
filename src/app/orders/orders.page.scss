@@ -139,20 +139,21 @@ ion-item {
 
     span.rank{
       &.collect{
-        background: var(--ion-color-kio-light);
-        color:black;
+        background: #eee;
+        color:#aaa;
+        font-size: x-large;
       }
       &.collected{
         background: var(--ion-color-kio-primary);
         color:white;
       }
       position: absolute;
-      top: 00%;
+      top: 0%;
       left: 0;
       color: white;
       font-weight: 900;
       background: var(--ion-color-kio-primary);
-      padding: 0;
+      padding: 2px 0;
       width: 40px;
       height: 40px;
       border-radius: 50%;

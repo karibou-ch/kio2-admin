@@ -57,6 +57,7 @@ export class EngineService {
     this.selectedOrders$ = new ReplaySubject<OrdersCtx>(1);
     this.status$ = new ReplaySubject(1);
     this.cached = {};
+    this.user = new User();
   }
 
   get availableDates() {

@@ -2,7 +2,9 @@
   <ion-toolbar color="primary">
     <ion-title>{{title}} - {{product?.sku}}</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="products"  text=""></ion-back-button>
+      <ion-button  (click)="doBack()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
