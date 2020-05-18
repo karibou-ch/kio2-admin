@@ -83,7 +83,7 @@ export class CustomersPage implements OnInit {
       return result;
      }).slice(0, this.cache.start + this.cache.step).sort((a,b) => {
       if (this.cache.refund) {
-        return (b.refund / b.orders) - (a.refund / a.orders);
+        return (b.refunds / b.orders) - (a.refunds / a.orders);
       }
       if (this.cache.errors) {
         return (b.errors / b.orders) - (a.errors / a.orders);
