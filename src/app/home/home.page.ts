@@ -30,22 +30,14 @@ export class HomePage {
   }
 
   openProducts() {
-    // this.navCtrl.pop();
-    // this.navCtrl.push('ProductsPage', {
-    //   user: this.user
-    // });
     this.$router.navigateByUrl('/products');
   }
 
   openProfile() {
-    // this.navCtrl.pop();
-    // this.navCtrl.push('ProfilPage');
     this.$router.navigateByUrl('/profile');
   }
 
   openOrders() {
-    // this.navCtrl.pop();
-    // this.navCtrl.push('OrderCustomersPage');
     this.$router.navigateByUrl('/orders');
   }
 

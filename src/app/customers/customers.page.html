@@ -1,9 +1,56 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>customers</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Clients</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <ion-list>
+    <ion-item>  
+      <ion-chip (click)="cache.errors=!cache.errors;sliceCustomers()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.errors"></ion-icon>
+        <ion-label color="primary">Erreur</ion-label>
+      </ion-chip>
+      <ion-chip (click)="cache.refund=!cache.refund;sliceCustomers()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.refund"></ion-icon>
+        <ion-label color="primary">Remboursement</ion-label>
+      </ion-chip>        
+    </ion-item>
+    
+    <ion-item-sliding *ngFor="let customer of customers;let i=index;">
+      <ion-item>
+        <ion-avatar slot="start">
+          <span class="rank">{{customer.orders}}</span>
+        </ion-avatar>
+          <ion-label class="ion-text-wrap">
+            <h2 >
+              <a href="mailto:{{customer.email}}">{{customer.email}}</a>
+            </h2>
+            <h3>            
+              <span class="light">Achat:</span> 
+              {{customer.last1Month}}<span class="light">/30 jours</span>, 
+              {{customer.last3Month}}<span class="light">/3mois</span> 
+              {{customer.last6Month}}<span class="light">/6mois</span>
+            </h3>
+            <div class="stats">
+              <span class="info">          
+                ERR: {{customer.errors}} ({{getErrorRatio(customer)|percent}}) - REMB: {{customer.refunds}}
+              </span>
+              <span class="label">{{customer.amount|currency:'CHF'}} </span>
+            </div>    
+        </ion-label>
+      </ion-item>
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [position]="'bottom'">
+      <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Chargement des clients ...">
+    </ion-infinite-scroll-content>    
+  </ion-infinite-scroll>  
 
 </ion-content>

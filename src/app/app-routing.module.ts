@@ -50,6 +50,7 @@ const routes: Routes = [
   },
   {
     path: 'customers',
+    resolve: {loader : LoaderResolve },
     loadChildren: () => import('./customers/customers.module').then( m => m.CustomersPageModule)
   }
 ];
