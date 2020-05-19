@@ -45,9 +45,9 @@
     </div>
     
     <ion-row>
-      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openReports()">
+      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openReport()">
         <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
-        <div>Rapports</div>
+        <div>Rapport</div>
       </ion-col>
           
       <ion-col [hidden]="!(user.isAdmin())" (click)="openVendors()">

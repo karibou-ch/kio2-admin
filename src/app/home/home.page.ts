@@ -54,7 +54,7 @@ export class HomePage {
     this.$router.navigateByUrl('/vendors');
   }
 
-  openReports() {
+  openReport() {
     // const month = this.currentShippingDate.getMonth() + 1;
     // const year = this.currentShippingDate.getFullYear();
 
@@ -64,7 +64,7 @@ export class HomePage {
     //   month,
     //   year
     // });
-    this.$router.navigateByUrl('/reports');
+    this.$router.navigateByUrl('/report');
 
   }
 

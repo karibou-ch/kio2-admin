@@ -34,9 +34,9 @@ ion-row {
   flex-wrap: wrap;
   ion-col {
     cursor: pointer;
+    font-weight: 400;      
     &:hover {
-      color: #999;
-      font-weight: 700;      
+      color: var(--ion-color-kio-info);
     }
     flex: 0 0 24%!important;
     max-width: 49%!important;
