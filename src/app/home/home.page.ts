@@ -47,25 +47,11 @@ export class HomePage {
 
 
   openVendors() {
-    // this.navCtrl.pop();
-    // this.navCtrl.push('VendorPage', {
-    //   user: this.user
-    // });
     this.$router.navigateByUrl('/vendors');
   }
 
   openReport() {
-    // const month = this.currentShippingDate.getMonth() + 1;
-    // const year = this.currentShippingDate.getFullYear();
-
-    // this.navCtrl.pop();
-    // this.navCtrl.push('ReportPage', {
-    //   user: this.user,
-    //   month,
-    //   year
-    // });
     this.$router.navigateByUrl('/report');
-
   }
 
 }
