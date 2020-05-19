@@ -3,7 +3,7 @@ import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.servic
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
 import { ToastController, PopoverController, ModalController } from '@ionic/angular';
 import { CalendarPage } from '../calendar/calendar.page';
-import { OrdersItemsPage } from './orders-items.page';
+import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 
 export class OrderByItem {
   oid: number;
@@ -13,6 +13,7 @@ export class OrderByItem {
   payment: {
     status: string;
   };
+  index: string;
   item: OrderItem;
 }
 
@@ -24,6 +25,7 @@ export class OrderByItem {
 export class OrdersCustomerPage {
 
 
+  format: string;
   user: User = new User();
   shipping: Date;
   orders: Order[];
@@ -31,7 +33,8 @@ export class OrdersCustomerPage {
   isReady: boolean;
   orderAvg: number;
   orderTotal: number;
-  orderBaseAmount= 0;
+  orderBaseAmount = 0;
+  displayByItems: boolean;
   items: {
     [sku: number]: (OrderByItem[]|any);
   };
@@ -54,6 +57,7 @@ export class OrdersCustomerPage {
   }
 
   ngOnInit() {
+    this.format = this.$engine.defaultFormat;
     this.user = this.$engine.currentUser;
     if (this.user.isAdmin()) {
       // change the average
@@ -98,12 +102,10 @@ export class OrdersCustomerPage {
   // - status (not)
   //
   getOrderByItems() {
-    let keys = Object.keys(this.items || {});
-    if (!keys.length) {
-      this.mapOrderByItems();
-      keys = Object.keys(this.items);
-    }
-    return keys.map(sku => this.items[sku]).sort((a, b) => b.quantity - a.quantity);
+    const keys = Object.keys(this.items);
+    return keys.map(sku => this.items[sku])
+          .filter(item => !this.cache.searchFilter || item.title.toLocaleLowerCase().indexOf(this.cache.searchFilter) > -1)
+          .sort((a, b) => b.quantity - a.quantity);
   }
 
   sortedItem(order: Order) {
@@ -288,6 +290,15 @@ export class OrdersCustomerPage {
     //   user: this.user
     // });
 
+    const params = {
+      item: (item),
+      shipping: this.shipping
+    }
+    this.$modal.create({
+      component: OrdersByItemsPage,
+      componentProps: params
+    }).then(alert => alert.present());
+
   }
 
   openByOrder(order) {
@@ -323,6 +334,8 @@ export class OrdersCustomerPage {
     this.items = {};
     this.orders = ctx.orders.sort(this.sortOrdersByRank);
 
+    this.mapOrderByItems();
+
     //
     // use shipping day from
     // force current shipping day
@@ -338,6 +351,7 @@ export class OrdersCustomerPage {
   }
 
   onSearchInput($event) {
+    this.cache.searchFilter = ($event.target.value || '').toLocaleLowerCase();
   }
 
   onSearchCancel($event) {
@@ -361,7 +375,7 @@ export class OrdersCustomerPage {
 
   updateBag(order, count) {
     this.$order.updateBagsCount(order, count).subscribe(ok => {
-          this.onDone('Nombre sac enregistré')
+          this.onDone('Nombre sac enregistré');
     }, (error) => this.onDone(error.error));
   }
 

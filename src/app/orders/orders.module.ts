@@ -10,7 +10,7 @@ import { CalendarPageModule } from '../calendar/calendar.module';
 import { CalendarPage } from '../calendar/calendar.page';
 
 import { OrdersCustomerPage } from './orders.page';
-import { OrdersItemsPage } from './orders-items.page';
+import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 import { OrdersCollectPage } from './orders-collect.page';
 
 @NgModule({
@@ -21,7 +21,7 @@ import { OrdersCollectPage } from './orders-collect.page';
     CalendarPageModule,
     OrdersCustomerPageRoutingModule
   ],
-  entryComponents:[CalendarPage, OrdersItemsPage],
-  declarations: [OrdersCustomerPage, OrdersItemsPage, OrdersCollectPage]
+  entryComponents:[CalendarPage, OrdersItemsPage, OrdersByItemsPage],
+  declarations: [OrdersCustomerPage, OrdersItemsPage, OrdersByItemsPage, OrdersCollectPage]
 })
 export class OrdersPageModule {}

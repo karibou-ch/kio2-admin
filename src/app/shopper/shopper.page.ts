@@ -14,14 +14,14 @@ import { CalendarPage } from '../calendar/calendar.page';
 export class ShopperPage implements OnInit, OnDestroy {
 
   selectedOrder = {};
-  private user: User = new User();
-  private isReady: boolean;
-  private orders: Order[] = [];
-  private shipping: Date;
-  private planning = [];
-  private currentPlanning;
-  private reorder = false;
+  user: User = new User();
+  isReady: boolean;
+  orders: Order[] = [];
+  shipping: Date;
+  planning = [];
+  reorder = false;
 
+  currentPlanning;
   format: string;
   pickerShippingDate: string;
   searchFilter: string;
@@ -165,7 +165,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     return this.selectedOrder[order.oid];
   }
 
-  setShippingPriority(order: Order) {
+  setShippingPriority(order: Order, pos: number) {
     const position = order.shipping.position;
     const priority = order.shipping.priority;
     this.$order.updateShippingShopper(order, priority, position)

@@ -10,6 +10,12 @@
       </ion-button>      
     </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar [hidden]="isReady&&!orders?.length" color="primary">
+    <div class="metabar " >
+      <ion-label>Afficher les commandes par produits</ion-label>
+      <ion-toggle mode="md" (ionChange)="displayByItems=!displayByItems"></ion-toggle>      
+    </div>
+  </ion-toolbar>
   <ion-datetime #picker 
     displayFormat="MM/YYYY" 
     pickerFormat="MMMM YYYY" 

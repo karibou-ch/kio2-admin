@@ -24,11 +24,6 @@ const routes: Routes = [
     loadChildren: () => import('./profil/profil.module').then( m => m.ProfilPageModule)
   },
   {
-    path: 'admin-settings',
-    resolve: {loader : LoaderResolve },
-    loadChildren: () => import('./admin-settings/admin-settings.module').then( m => m.AdminSettingsPageModule)
-  },
-  {
     path: 'shopper',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./shopper/shopper.module').then( m => m.ShopperPageModule)

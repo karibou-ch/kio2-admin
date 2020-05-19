@@ -279,3 +279,11 @@ export class OrdersItemsPage {
 
 }
 
+
+@Component({
+  selector: 'kio2-orders-by-items',
+  templateUrl: 'orders-by-items.html',
+  styleUrls: ['./orders-items.scss']
+})
+export class OrdersByItemsPage extends OrdersItemsPage {
+}
