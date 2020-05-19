@@ -80,6 +80,7 @@ export class VendorsPage implements OnInit {
     //   user: this.user,
     //   categories: this.categories
     // });
+    this.$router.navigate(['/vendor', 'create']);
   }
 
   onDone(msg) {
@@ -95,11 +96,11 @@ export class VendorsPage implements OnInit {
     //   user:this.user,
     //   categories:this.categories
     // });
+    this.$router.navigate(['/vendor', shop.urlpath]);
   }
 
   onSearchInput($event) {
     const search = this.cache.search.toLocaleLowerCase();
-    console.log('--- search',this.cache.search, $event.target.value);
     if (search.length < 3) {
       return this.shops = this.cache.shops;
     }

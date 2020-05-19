@@ -33,11 +33,14 @@ export class ProductDetailsPage implements OnInit {
     private $engine: EngineService,
     private $loading: LoadingController,
     private $modal: ModalController,
-    private toast: ToastController,
+    private $toast: ToastController,
     private $loader: LoaderService,
     private $product: ProductService,
     private $route: ActivatedRoute
   ) {
+
+    const loader = this.$route.snapshot.data.loader;
+    this.categories = loader[2];
 
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
@@ -45,7 +48,10 @@ export class ProductDetailsPage implements OnInit {
     this.sku = this.$route.snapshot.params.sku;
 
 
-    this.create = (this.sku === 'create');
+    if (this.sku === 'create') {
+      this.create = true;
+      this.product = new Product();
+    }
 
 
     this.title = '';
@@ -184,17 +190,19 @@ export class ProductDetailsPage implements OnInit {
 
     if(error === 1) {
       silent || this.$loading.dismiss();
-      return this.toast.create({
+      return this.$toast.create({
         message: 'La boutique n\'a pas été sélectionnée',
-        duration: 3000
+        duration: 3000,
+        color: 'dark'
       }).then(alert => alert.present());
     }
 
     if(error === 2) {
       silent || this.$loading.dismiss();
-      return this.toast.create({
+      return this.$toast.create({
         message: 'La sous catégorie  n\'est pas compatible',
-        duration: 3000
+        duration: 3000,
+        color: 'dark'
       }).then(alert => alert.present());
     }
 
@@ -222,21 +230,22 @@ export class ProductDetailsPage implements OnInit {
 
         if (!silent) {
           this.$loading.dismiss();
-          this.toast.create({
+          this.$toast.create({
             message: 'Enregistré',
-            duration: 3000
+            duration: 3000,
+            color: 'dark'
           }).then(alert => alert.present());
         }
       },
-      error => {
+      status => {
         if (!silent) {
           this.$loading.dismiss();
         }
-        this.toast.create({
-          message: error.error,
+        this.$toast.create({
+          message: status.error,
           duration: 5000,
           position: 'top',
-          cssClass: 'toast-error'
+          color: 'danger'
         }).then(alert => alert.present());
       }
     );

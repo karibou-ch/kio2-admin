@@ -62,6 +62,11 @@ const routes: Routes = [
     path: 'vendors',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./vendors/vendors.module').then( m => m.VendorsPageModule)
+  },
+  {
+    path: 'vendor',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./vendor-details/vendor-details.module').then( m => m.VendorDetailsPageModule)
   }
 ];
 

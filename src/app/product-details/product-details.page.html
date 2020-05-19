@@ -19,25 +19,25 @@
         <ion-label color="primary">
           Produit actif à la vente
         </ion-label>
-        <ion-toggle mode="md" color="positive" ngDefaultControl [(ngModel)]="product.attributes.available"></ion-toggle>
+        <ion-toggle  color="positive" ngDefaultControl [(ngModel)]="product.attributes.available"></ion-toggle>
       </ion-item>
 
       <ion-item>
         <ion-label>En promotion</ion-label>
-        <ion-toggle mode="md" color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
+        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
       </ion-item>
 
       <ion-item [hidden]="!user.isAdmin()">
         <ion-label>Sélection</ion-label>
-        <ion-toggle mode="md" color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.home"></ion-toggle>
+        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.home"></ion-toggle>
       </ion-item>
       <ion-item [hidden]="!user.isAdmin()">
         <ion-label>Boost</ion-label>
-        <ion-toggle mode="md" color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
+        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
       </ion-item>
         
       <ion-item>
-          <ion-button outline expand="block" large color="primary" [disabled]="!isReady()" (click)="doSave(product)">Enregistrer</ion-button>
+          <ion-button fill="outline" expand="block" size="large" color="primary" [disabled]="!isReady()" (click)="doSave(product)">Enregistrer</ion-button>
       </ion-item>
       
       <ion-item class="input-toggle">
@@ -46,17 +46,16 @@
         </ion-label>
         <ion-input type="text" placeholder="titre" ngDefaultControl [(ngModel)]="product.title"></ion-input>
       </ion-item>
-      <ion-item color="none">
-        <ion-thumbnail item-left class="image">
-          <img [hidden]="!product?.photo.url" [src]="'https:'+product?.photo.url+'/-/resize/128x/'"/>
-          <img [hidden]="product?.photo.url" src="/assets/img/add.png"/>
+      <ion-item color="none" *ngIf="product.photo.url">
+        <ion-thumbnail slot="start" class="image" >
+          <img  [src]="'https:'+product.photo.url+'/-/resize/128x/'"/>
         </ion-thumbnail>
         <div class="photo">
-          <img [hidden]="!product?.photo.url" [src]="product?.photo.url+'/-/resize/400x/'"/>
+          <img  [src]="product.photo.url+'/-/resize/400x/'"/>
         </div>
       </ion-item>
       <ion-item>
-        <ion-button outline color="primary" expand="block" (click)="uploadImage(product)">Ajouter ou modifier la photo</ion-button>
+        <ion-button fill="outline" color="primary" expand="block" (click)="uploadImage(product)">Modifier la photo du produit</ion-button>
       </ion-item>
 
       <ion-item color="none">
@@ -69,12 +68,12 @@
       <ion-item>
         <ion-label color="primary" position="stacked">Péremption</ion-label>
         <ion-input type="text" placeholder="ex. Se conserve 3 jours"  ngDefaultControl [(ngModel)]="product.shelflife.comment"></ion-input>    
-        <ion-toggle mode="md" color="positive" slot="end" ngDefaultControl [(ngModel)]="product.shelflife.display"></ion-toggle>        
+        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.shelflife.display"></ion-toggle>        
       </ion-item>
       <ion-item>
         <ion-label color="primary" position="stacked">Quantité</ion-label>
         <ion-input type="text"  placeholder="ex. Convient pour 1-2 personnes" ngDefaultControl [(ngModel)]="product.quantity.comment"></ion-input>    
-        <ion-toggle mode="md" color="positive" slot="end" ngDefaultControl [(ngModel)]="product.quantity.display"></ion-toggle>        
+        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.quantity.display"></ion-toggle>        
       </ion-item>
       
       <ion-item class="stock">
@@ -82,9 +81,9 @@
           En stock
         </ion-label>
         <ion-input type="text" min="0" placeholder="0-1000" ngDefaultControl [(ngModel)]="product.pricing.stock"></ion-input>
-        <ion-button outline large slot="end" (click)="product.pricing.stock=0">0</ion-button>
-        <ion-button outline large slot="end" (click)="product.pricing.stock=40">40 </ion-button>
-        <ion-button outline large slot="end" (click)="product.pricing.stock=100">100</ion-button>
+        <ion-button fill="outline" size="large" slot="end" (click)="product.pricing.stock=0">0</ion-button>
+        <ion-button fill="outline" size="large" slot="end" (click)="product.pricing.stock=40">40 </ion-button>
+        <ion-button fill="outline" size="large" slot="end" (click)="product.pricing.stock=100">100</ion-button>
         
       </ion-item>
     </ion-list>
@@ -114,12 +113,12 @@
 
       </ion-item>
 
-      <ion-item class="promotion large">
+      <ion-item class="promotion" size="large">
         <ion-label color="danger" position="stacked">
           Prix pendant promotion (activer la promotion à droite)
         </ion-label>
         <ion-input type="number" min="0" placeholder="0.00" ngDefaultControl [(ngModel)]="product.pricing.discount"></ion-input>
-        <ion-toggle mode="md" color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
+        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
       </ion-item>
     </ion-list>
 
@@ -219,14 +218,14 @@
     </ion-list>
     <ion-list>
       <ion-item>
-          <ion-button [hidden]="detailled" expand="block" outline large color="primary" (click)="detailled=true">
+          <ion-button [hidden]="detailled" expand="block" fill="outline" size="large" color="primary" (click)="detailled=true">
             Editer tous les paramètres 
           </ion-button>
             
-          <ion-button [hidden]="!detailled" expand="block" outline large color="primary" (click)="doSave(product)">
+          <ion-button [hidden]="!detailled" expand="block" fill="outline" size="large" color="primary" (click)="doSave(product)">
             Enregistrer
           </ion-button>            
-          <!-- <ion-button expand="block" large color="primary" (click)="doSave()">Enregistrer</ion-button> -->
+          <!-- <ion-button expand="block" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button> -->
       </ion-item>      
     </ion-list>
   <!--

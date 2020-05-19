@@ -1,0 +1,52 @@
+.inactive{
+  opacity: .5;
+}
+
+.invalid-iban:not(.ng-untouched){
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+.faq-separator{
+  border-top: 4px solid #006a64;
+  .faq-question{
+    font-weight: 600;      
+  }
+  ion-label{
+    font-weight: 200;      
+  }    
+}
+
+ion-list-header{
+  font-size: 18px;
+}
+
+.floor{
+  max-width: 55px;  
+}
+
+.img-button {
+  width: 49%; 
+}
+
+.photo{
+  &.large{
+    width: 100vw;
+  }
+  padding: 10px;
+  margin-right: 0;
+  display: flex;
+  width: 80%; 
+  img{
+    max-width: 90%;
+    border-radius: 8px;
+    margin-right: 0;
+    margin-left: auto;    
+  }
+}
+
+.image{
+  cursor: pointer;
+  img{
+    border-radius: 8px;
+  }
+}

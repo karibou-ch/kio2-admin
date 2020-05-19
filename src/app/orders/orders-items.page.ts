@@ -217,7 +217,7 @@ export class OrdersItemsPage {
     };
     if (error) {
       params.position = 'top';
-      params.cssClass = 'toast-error';
+      params.color = 'danger';
     }
     this.$toast.create(params).then(alert => alert.present());
   }
