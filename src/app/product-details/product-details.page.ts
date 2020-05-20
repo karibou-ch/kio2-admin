@@ -5,7 +5,7 @@ import { EngineService } from '../services/engine.service';
 import { UploadImagePage } from '../upload-image/upload-image.page';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, fromEvent, of } from 'rxjs';
-import { debounceTime, filter, map } from 'rxjs/operators';
+import { debounceTime, filter, map, skip } from 'rxjs/operators';
 
 @Component({
   selector: 'app-product-details',
@@ -61,6 +61,7 @@ export class ProductDetailsPage implements OnInit {
   ngAfterViewInit() {
     fromEvent(this.$elem.nativeElement, 'focusout').pipe(
       debounceTime(2000),
+      skip(1),
       map($event => this.shops.find(shop => shop._id === this.product.vendor)),
       filter(shop => {
         return !this.isProductReadyTosave(this.product, shop);
