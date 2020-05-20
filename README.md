@@ -45,7 +45,7 @@ Kio2-admin is a:
 
 # Publih for www
 **targets**,
-* betaadmin.karibou.ch
+* admin.beta.karibou.ch
 * admin.karibou.ch
 * testadmin.karibou.ch
 * admin.boulangerie-bretzel.ch
