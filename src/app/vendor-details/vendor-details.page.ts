@@ -61,6 +61,14 @@ export class VendorDetailsPage {
     window.history.back();
   }
 
+  doCreateFAQ(shop) {
+    shop.faq.push({
+      q: '',
+      a: '',
+      updated: (new Date())
+    });
+  }
+
   //
   // https://stackoverflow.com/a/41905475
   formatToGMT(date: Date) {

@@ -77,11 +77,9 @@ export class OrdersCollectPage  implements OnInit{
     return (order.items.filter(i => i.fulfillment.status !== EnumFulfillments[EnumFulfillments.fulfilled]).length) > 0;
   }
 
-  getShopPhone(shop: Shop) {
-    if (!shop || !shop.owner.phoneNumbers || !shop.owner.phoneNumbers.length) {
-      return 'NONE';
-    }
-    return shop.owner.phoneNumbers[0].number;
+  getShopPhone(vendor: string) {
+    const shop = this.vendors[vendor];
+    console.log('----', shop);
   }
 
 

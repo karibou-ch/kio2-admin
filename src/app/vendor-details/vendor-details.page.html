@@ -120,7 +120,7 @@
       <ion-label color="primary" >
         FAQ
       </ion-label>
-      <ion-button fill="outline" slot="end" (click)="shop.faq.push({ q:'',a:'',updated:Date.now()})">Ajouter</ion-button>
+      <ion-button fill="outline" slot="end" (click)="doCreateFAQ(shop)">Ajouter</ion-button>
     </ion-item>
     <div *ngFor="let faq of shop.faq;let idx=index" class="faq-separator">
       <ion-item class="faq-question">

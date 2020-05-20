@@ -29,7 +29,7 @@
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
 
-  <h1 class="info" [hidden]="!isReady||(vendors.list.length > 0)">Pas de commandes {{openShippings?'livrées':'en préparation'}} pour ce mois-ci</h1>
+  <h1 class="info" [hidden]="!isReady||(vendors.list.length > 0)">Pas de commandes pour la date sélectionnée</h1>
 
   <ion-refresher (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -56,7 +56,7 @@
     <ion-item-sliding *ngFor="let vendor of getVendors()  ">    
       <ion-item-options side="end">
         <ion-item-option>
-        <ion-button color="danger" href='tel:{{getShopPhone(shop)}}'>
+        <ion-button color="danger" href='tel:{{getShopPhone(vendor)}}'>
           <ion-icon name="call-outline"></ion-icon>
           Appeler
         </ion-button>        
