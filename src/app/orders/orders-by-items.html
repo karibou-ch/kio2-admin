@@ -16,41 +16,42 @@
   <h1 class="info" [hidden]="item.customers">Pas de commandes  pour la boutique {{vendor}} </h1>
 
   <ion-list *ngIf="item.customers">
-    <ion-list-header>
-      <h2 (click)="doOpenProduct(item)">
-        {{item.sku}} - {{item.title}}
-        &nbsp;<span class="red">{{item.variant?.title}}</span>
-      </h2>
-      <div> 
-        <div>{{item.vendor}} - {{item.amount|currency:'CHF'}}</div>
-      </div>
-
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h2 (click)="doOpenProduct(item)">
+          {{item.sku}} - {{item.title}}
+          &nbsp;<span class="red">{{item.variant?.title}}</span>
+        </h2>
+        <div> 
+          <div>{{item.vendor}} - {{item.amount|currency:'CHF'}}</div>
+        </div>
+      </ion-label>
       <ion-note slot="end" >          
-          <ion-icon slot="start" class="rank big">{{item.progress}}/{{item.customers.length}}</ion-icon>
-          <div>progression</div>
+        <div  class="rank big">{{item.progress}}/{{item.customers.length}}</div>
       </ion-note>
-    </ion-list-header>
+    </ion-item>
+    <!-- CUSTOMER -->
+    <ion-item class="customer-contact">
+      <ion-select 
+        color="primary" 
+        placeholder="Communication avec les clients" 
+        interface="action-sheet"
+        (ionChange)="doCustomerContact(item, $event)">
+        <ion-select-option value="Produit manquant">Produit manquant</ion-select-option>
+        <ion-select-option value="Nouveauté">Nouveauté</ion-select-option>
+        <ion-select-option value="Produit remplacé">Produit remplacé</ion-select-option>
+      </ion-select>
+    </ion-item>
 
-    <ion-item-sliding *ngFor="let customer of item.customers">    
-      <ion-item-options side="end" [hidden]="!isPaid(customer)">
-        <ion-item-option>
-           <ion-button class="avoid button-refund" color="danger" slot="end" 
-                   [disabled]="customer.item.finalprice==0"                    
-                   (click)="doRefund(customer,customer.item)">
-             <ion-icon name="card" ></ion-icon>&nbsp;refund
-           </ion-button>
-       </ion-item-option>            
-     </ion-item-options>
-
+    <ion-item-sliding *ngFor="let customer of item.customers">
       <ion-item >        
-        <ion-label>
+        <ion-label class="ion-text-wrap">
           <ion-icon slot="start" class="rank">{{customer.rank}}</ion-icon>
 
-          <div class="title padding" >
+          <div class="title " >
               <a href="mailto:{{customer.email}}">{{(customer.customer.name.givenName)[0]}}. {{customer.customer.name.familyName}} </a>
-              <a [hidden]="!getPhoneNumber(customer)" class="info" slot="end" color="info" round ion-button fill="outline" href="tel:{{getPhoneNumber(customer)}}"><ion-icon name="call"> </ion-icon> </a>  
           </div>
-          <div class="quantity padding" [class.red.bold]="customer.item.quantity>1">
+          <div class="quantity " [class.red.bold]="customer.item.quantity>1">
             {{customer.item.quantity}}x <span class="part">{{customer.item.part}}</span> 
             <span class="issue" [hidden]="!customer.item.fulfillment.request">problème:{{customer.item.fulfillment.request}} </span>
             <span class="issue" [hidden]="!customer.item.fulfillment.refunded"><span [hidden]="customer.item.finalprice==0">partiellement</span> remboursé </span>
@@ -65,16 +66,23 @@
                    (focus)="doSelectAllPrice($event)"/>
           </div>
           <div class="actions">
-            <ion-button class="validate"  fill="outline" slot="end" 
+            <button class="item-button phone"  fill="outline" slot="end" 
+                    [hidden]="!getPhoneNumber(customer)"
+                    (click)="doDisplayphone(customer)">
+              <ion-icon name="call" ></ion-icon>
+            </button>
+
+            <!-- VALIDATE//UNVALIDATE -->
+            <button class="item-button validate"  fill="outline" slot="end" 
                     [class.button-validate]="isItemValid(customer.item)" [hidden]="isPaid(customer)"
                     (click)="doValidate(customer, customer.item)">
-              <ion-icon name="checkmark" ></ion-icon>
-            </ion-button>
-            <ion-button class="avoid"  fill="outline" slot="end" 
+              <ion-icon name="checkmark-outline" ></ion-icon>
+            </button>
+            <button class="item-button avoid"  fill="outline" slot="end" 
                     [class.button-cancel]="isItemCancel(customer.item)" [hidden]="isPaid(customer)"
-                    (click)="doCancel(customer,item)">
-              <ion-icon name="close" ></ion-icon>
-            </ion-button>            
+                    (click)="doCancel(customer,customer.item)">
+              <ion-icon name="close-outline" ></ion-icon>
+          </button>            
             
           </div>
         </ion-label>

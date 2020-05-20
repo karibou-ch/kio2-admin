@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ToastController, AlertController, ModalController } from '@ionic/angular';
 
 import { Order, EnumFulfillments, OrderService, Product, OrderItem, ProductService, User } from 'kng2-core';
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   templateUrl: 'orders-items.html',
   styleUrls: ['./orders-items.scss'],
 })
-export class OrdersItemsPage {
+export class OrdersItemsPage implements OnInit {
   public isReady: boolean;
   public user: User;
   public deltaPrice: number;
@@ -50,7 +50,6 @@ export class OrdersItemsPage {
   }
 
   ngOnInit() {
-    console.log('---', this.vendor);
 
     if (this.orders.length == 1) {
       this.shipping = this.orders[0].shipping.when;
@@ -71,15 +70,16 @@ export class OrdersItemsPage {
     }
     //
     // create orders by Item
-    console.log('---', this.item);
     this.isReady = (this.orders.length > 0) || (this.vendor != '') || (!!this.shipping) || (!!this.item.customer);
   }
 
-  ngOnDestroy() {
-    // this.events.publish('refresh');
-  }
-
   computeDeltaPrice(order: Order) {
+    //
+    // case of Orders By Item
+    if (!order.getSubTotal) {
+      return;
+    }
+
     let originAmount = 0;
     const finalAmount: number = order.getSubTotal();
     this.deltaPrice = 0;
@@ -93,10 +93,29 @@ export class OrdersItemsPage {
     this.deltaPrice = parseFloat((finalAmount / originAmount - 1).toFixed(2));
   }
 
+  doCustomerContact(item, $event) {
+    const value = $event.detail.value;
+    const emails = item.customers.map(customer => {
+      return customer.email;
+    });
+    const href = 'mailto:' + this.user.email.address +
+                 '?bcc=' + emails.join(',') +
+                 '&subject=' + value;
+    const text = emails.join(',');
+
+    this.$alert.create({
+      header: value,
+      subHeader: item.title,
+      message: `Contacter vos clients par email: <a href="${href}">${text}</a>`
+    }).then(alert => alert.present());
+
+  }
+
   doDisplayphone(order) {
     const phone = this.getPhoneNumber(order);
     this.$alert.create({
       header: 'Numéro de téléphone',
+      subHeader: order.customer.displayName,
       message: 'Appeler <a href="tel:' + phone + '">' + phone + '</a>',
     }).then(alert => alert.present());
   }
@@ -153,7 +172,6 @@ export class OrdersItemsPage {
         }
 
         this.computeDeltaPrice(order);
-        console.log('---- vendor', this.vendor);
       }, error => this.doToast(error.error, error));
   }
 
