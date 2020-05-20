@@ -18,22 +18,22 @@
     <p>Opérationel</p>
 
     <ion-row>
-      <ion-col [hidden]="!(user.hasRole('logistic')||user.isAdmin())" (click)="openShopper()">
+      <ion-col [hidden]="!isAdminOrLogistic" (click)="openShopper()">
         <ion-icon name="bicycle-outline" color="grey-icon"></ion-icon>
         <div>Logistique</div>
       </ion-col>
 
-      <ion-col [hidden]="!(user.hasRole('logistic')||user.isAdmin())" (click)="openCollect()">
+      <ion-col [hidden]="!isAdminOrLogistic" (click)="openCollect()">
         <ion-icon name="contract-outline" color="grey-icon"></ion-icon>
         <div>Collecte</div>
       </ion-col>
 
-      <ion-col [hidden]="!(user.isAdmin())" (click)="openOrders()">
+      <ion-col [hidden]="!isAdminOrVendor" (click)="openOrders()">
         <ion-icon name="cart-outline" color="grey-icon"></ion-icon>
         <div>Commandes</div>
       </ion-col>
 
-      <ion-col [hidden]="!(user.isAdmin())" (click)="openProducts()">
+      <ion-col [hidden]="!isAdminOrVendor" (click)="openProducts()">
         <ion-icon name="cube-outline" color="grey-icon"></ion-icon>
         <div>Produits</div>
       </ion-col>
@@ -45,17 +45,17 @@
     </div>
     
     <ion-row>
-      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openReport()">
+      <ion-col [hidden]="!isAdminOrVendor" (click)="openReport()">
         <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
         <div>Rapport</div>
       </ion-col>
           
-      <ion-col [hidden]="!(user.isAdmin())" (click)="openVendors()">
+      <ion-col [hidden]="!isAdminOrVendor" (click)="openVendors()">
         <ion-icon name="home-outline" color="grey-icon"></ion-icon>
         <div>Boutiques</div>
       </ion-col>
 
-      <ion-col [hidden]="!(user.shops||[]).length&&!user.isAdmin()" (click)="openCustomers()">
+      <ion-col [hidden]="!isAdminOrVendor" (click)="openCustomers()">
         <ion-icon  name="people-circle-outline" color="grey-icon"></ion-icon>
         <div>Clients</div>
       </ion-col>
@@ -64,7 +64,20 @@
         <ion-icon name="settings-outline" color="grey-icon"></ion-icon>
         <div>Profil</div>
       </ion-col>
+
+      <ion-button [hidden]="user.shops.length>1"  
+                  class="create" 
+                  fill="outline" 
+                  expand="block" 
+                  size="large" 
+                  color="primary" 
+                  (click)="openShopCreate()">
+                  Créer votre boutique
+      </ion-button>
+
     </ion-row>
+
+
 
   </div>
 

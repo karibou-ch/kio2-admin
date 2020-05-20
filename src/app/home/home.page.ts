@@ -12,11 +12,17 @@ export class HomePage {
 
   user: User;
 
+  isAdminOrLogistic: boolean;
+  isAdminOrVendor: boolean;
+
   constructor(
     private $engine: EngineService,
     private $router: Router
   ) {
     this.user = this.$engine.currentUser;
+
+    this.isAdminOrVendor = (!!this.user.shops.length) || this.user.isAdmin();
+    this.isAdminOrLogistic = this.user.hasRole('logistic') || this.user.isAdmin();
   }
 
 
@@ -52,6 +58,10 @@ export class HomePage {
 
   openReport() {
     this.$router.navigateByUrl('/report');
+  }
+
+  openShopCreate() {
+    this.$router.navigateByUrl('/vendor/create');
   }
 
 }

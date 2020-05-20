@@ -37,7 +37,7 @@
       <ion-label color="primary">Discount</ion-label>
     </ion-chip>        
 
-    <ion-chip (click)="cache.boost=!cache.boost;sliceProducts()">
+    <ion-chip (click)="cache.boost=!cache.boost;sliceProducts()" [hidden]="!user.isAdmin()">
       <ion-icon name="checkmark-circle-outline" [hidden]="!cache.boost"></ion-icon>
       <ion-label color="primary">Boost</ion-label>
     </ion-chip>        

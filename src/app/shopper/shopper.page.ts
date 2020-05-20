@@ -81,6 +81,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.pickerShippingDate = ctx.when.toISOString();
     this.orders = ctx.orders.sort(this.sortOrdersByPosition);
     this.isReady = true;
+    this.currentPlanning = null;
     this.trackPlanning(this.orders);
   }
 
