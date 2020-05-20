@@ -78,8 +78,8 @@ export class OrdersCollectPage  implements OnInit{
   }
 
   getShopPhone(vendor: string) {
-    const shop = this.vendors[vendor];
-    console.log('----', shop);
+    const shop: Shop = this.vendors[vendor];
+    return shop.address.phone;
   }
 
 
