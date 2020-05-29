@@ -33,6 +33,22 @@
       font-size: 22px;
   }
 }
+ion-list-header {
+  font-size: 17px;
+  padding-top: 10px;
+  padding-bottom: 10px;  
+}
+
+.info{
+  font-size: medium;
+  color: gray;  
+}
+
+:host(textarea) {
+  background: #eee;
+  border-radius: 5px;
+  margin-bottom: 1px;  
+}
 
 
 .toggle-checked .toggle-inner{

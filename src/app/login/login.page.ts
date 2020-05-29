@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Platform, ToastController, LoadingController } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
 
 
-import { LoaderService, User, UserService, ConfigKeyStoreEnum } from 'kng2-core';
-
+import { LoaderService, User, UserService, ConfigKeyStoreEnum, Config } from 'kng2-core';
 import { version } from '../../../package.json';
 
 @Component({
@@ -15,11 +15,12 @@ export class LoginPage implements OnInit {
 
   VERSION: string;
   siteName: string;
-  user: User = new User();
+  user: User;
   model: any = {};
   status;
   keep: boolean;
   isReady: boolean;
+  config: Config;
   loader: any;
 
   KIO2_LOGIN_REMEMBER: string = ConfigKeyStoreEnum[ConfigKeyStoreEnum.KIO2_LOGIN_REMEMBER];
@@ -29,11 +30,15 @@ export class LoginPage implements OnInit {
     private $loader: LoaderService,
     public loadingCtrl: LoadingController,
     public platform: Platform,
+    private $route: ActivatedRoute,
     private $user: UserService
   ) {
     this.VERSION = version;
     this.siteName = '';
     this.isReady = false;
+    const loader = this.$route.snapshot.data.loader;
+    this.config = loader[0];
+    this.user = loader[1];
   }
 
   ngOnInit() {
@@ -53,19 +58,17 @@ export class LoginPage implements OnInit {
       });
     });
 
-    console.log('--- user ngInit');
-    this.isReady = true;
-    this.$loader.ready().subscribe((loader) => {
-      console.log('--- ngInit.loader',loader);
-      const isHub = loader[0].shared.hub && loader[0].shared.hub.siteName;
-      this.siteName = (isHub) ? (loader[0].shared.hub.siteName.fr ): 'K';
-      Object.assign(this.user, loader[1]);
-      this.isReady = true;
-      //
-      // use localstorage
-      // https://stackoverflow.com/questions/37318472/ionic-2-app-remember-user-on-the-device
-    });
+    console.log('----', this.config);
 
+    this.isReady = true;
+    const isHub = this.config.shared.hub && this.config.shared.hub.siteName;
+    this.siteName = (isHub) ? (this.config.shared.hub.siteName.fr ) : 'K';
+    Object.assign(this.user, this.user);
+    this.isReady = true;
+
+    //
+    // use localstorage
+    // https://stackoverflow.com/questions/37318472/ionic-2-app-remember-user-on-the-device
   }
 
 
@@ -103,7 +106,7 @@ export class LoginPage implements OnInit {
       }
       this.showError('Erreur d\'authentification :-((');
     }, error => {
-      this.showError(error.error);
+      this.showError('Erreur d\'authentification :-((');
     });
   }
 

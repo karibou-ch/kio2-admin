@@ -67,8 +67,9 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     SplashScreen,
     Geolocation,
     { provide: LOCALE_ID, useValue: 'fr-FR' },
-    // { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }  ],
+    { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },
+    // { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+  ],
   bootstrap: [Kio2Admin]
 })
 export class AppModule {}

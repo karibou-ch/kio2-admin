@@ -36,7 +36,7 @@
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
   <!--  LOGISTIC HEADER -->
-  <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Rien à afficher </h1>
+  <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Rien à afficher <br/>pour {{currentHub?.name}}</h1>
 
   <ion-list >
 
@@ -58,21 +58,30 @@
         <ion-label class="ion-text-wrap">
           Tournée {{currentPlanning}} ({{getOrders().length}})
         </ion-label>
-        <ion-select placeholder="test@tru.com">
-          <ion-select-option value="1">machine1@truc.com</ion-select-option>          
-          <ion-select-option value="1">chose@truc.com</ion-select-option>          
+        <ion-select placeholder="en développement"         
+                    interface="action-sheet">
+          <ion-select-option value="1">{{currentShopper}}</ion-select-option>          
         </ion-select>
       </ion-item>
     </div>
     <!-- SEARCH -->
     <ion-searchbar
       mode="ios"
+      [hidden]="!orders.length"
       [(ngModel)]="searchFilter"
       [debounce]="500"
       (ionInput)="onSearchInput($event)"
       (ionClear)="onSearchCancel($event)">
     </ion-searchbar>  
   
+    <!-- HUBS -->
+    <ion-item class="hub" lines="none" [hidden]="!hubs.length || !orders.length">
+      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
+        <ion-label color="primary">{{hub.name}} ({{hub.orders}})</ion-label>
+      </ion-chip>
+    </ion-item>
+
 
     <!-- REORDERING -->
     <ion-reorder-group [disabled]="!reorder" (ionItemReorder)="reorderItems($event)">
@@ -133,7 +142,7 @@
         <ion-label class="ion-text-wrap">
           <h3 text-capitalize>{{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>
           <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
-          <p>{{ order.shipping.note }}</p>
+          <p class="note">{{ order.shipping.note }}</p>
           <div class="shopper-info" >
             {{getShopperInfo(order)}}
           </div>

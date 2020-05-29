@@ -205,15 +205,19 @@ export class TrackerPage implements OnInit, OnDestroy {
                   ${order.shipping.note}
                     `
       });
+      marker.infowindow = infowindow;
       marker.addListener('click', () => {
         infowindow.open(this.map, marker);
-      });
-      google.maps.event.addListener(this.map, 'click', (event) => {
-        infowindow.close();
       });
 
       this.markerBounds.extend(pos); // extend markerBounds with each marker (for the zoom)
     });
+
+    // google.maps.event.addListener(this.map, "click", function(event) {
+    //   this.markers.forEach(marker => {
+    //     marker.infowindow.close();
+    //   });
+    // });
     this.markerBounds.extend(new google.maps.LatLng(this.lat, this.lng));  // add user marker
     setTimeout(() => this.map.fitBounds(this.markerBounds), 500);
   }

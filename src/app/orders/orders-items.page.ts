@@ -214,6 +214,13 @@ export class OrdersItemsPage implements OnInit {
         if (!this.user.isAdmin()) {
           order.items = order.items.filter(i => i.vendor === item.vendor);
         }
+
+        // FIXME this items filter should be on server for NON admin user
+        // For Admin we should ALWAYS constraint to the vendor
+        if (this.vendor) {
+          order.items = order.items.filter(i => i.vendor === this.vendor);
+        }
+
         this.computeDeltaPrice(order);
       }, error => this.doToast(error.error, error));
   }

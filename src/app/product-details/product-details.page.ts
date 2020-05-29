@@ -59,6 +59,7 @@ export class ProductDetailsPage implements OnInit {
   }
 
   ngAfterViewInit() {
+    // console.log('--- ngAfterViewInit')
     fromEvent(this.$elem.nativeElement, 'focusout').pipe(
       debounceTime(2000),
       skip(1),
@@ -76,10 +77,10 @@ export class ProductDetailsPage implements OnInit {
 
     const product$ = (this.create) ? of(this.product) : this.$product.get(this.sku);
 
-    combineLatest(
+    combineLatest([
       this.$loader.ready(),
       product$,
-    ).subscribe(([loader, product]: any) => {
+    ]).subscribe(([loader, product]: any) => {
       //
       // only interrested by active category
       this.categories = (loader[2] || []).filter(c => c.type === 'Category' && c.active);
@@ -110,6 +111,13 @@ export class ProductDetailsPage implements OnInit {
       this.currentCategory = this.categories.find(cat => (cat._id + '') == this.product.categories);
     });
 
+  }
+
+  doCreateVariant(product: Product) {
+    product.variants.push({
+      title: '',
+      short: ''
+    });
   }
 
   categoryChange() {
@@ -172,16 +180,17 @@ export class ProductDetailsPage implements OnInit {
   }
 
   portionStr(part, def?) {
-    if (!def) {def=''; }
-    if (!part) { return ""; }
+    const delta = 0.15;
+    if (!def) {def = ''; }
+    if (!part) { return ''; }
     let m = part.match(/~([0-9.]+) ?(.+)/);
-    if (!m && def) {m=def.match(/~([0-9.]+) ?(.+)/); }
+    if (!m && def) {m = def.match(/~([0-9.]+) ?(.+)/); }
     if (!m || m.length < 2) {return ''; }
-    let w = parseFloat(m[1]), unit = (m[2]).toLowerCase();
-    return 'une portion entre ' + this.roundN(w - w * 0.07) + unit + ' et ' + this.roundN(w + w * 0.07) + '' + unit;
+    const w = parseFloat(m[1]), unit = (m[2]).toLowerCase();
+    return 'une portion entre ' + this.roundN(w - w * delta) + unit + ' et ' + this.roundN(w + w * delta) + '' + unit;
   }
 
-  doBack(){
+  doBack() {
     window.history.back();
   }
 
@@ -189,7 +198,7 @@ export class ProductDetailsPage implements OnInit {
     const shopowner = this.shops.find(shop => shop._id === product.vendor);
     const error = this.isProductReadyTosave(product, shopowner);
 
-    if(error === 1) {
+    if (error === 1) {
       silent || this.$loading.dismiss();
       return this.$toast.create({
         message: 'La boutique n\'a pas été sélectionnée',
@@ -198,7 +207,7 @@ export class ProductDetailsPage implements OnInit {
       }).then(alert => alert.present());
     }
 
-    if(error === 2) {
+    if (error === 2) {
       silent || this.$loading.dismiss();
       return this.$toast.create({
         message: 'La sous catégorie  n\'est pas compatible',
@@ -222,8 +231,8 @@ export class ProductDetailsPage implements OnInit {
       (product) => {
         this.create = false;
         this.product.sku = product.sku;
-        this.product.categories = product.categories._id|| product.categories;
-        this.product.vendor = product.vendor._id|| product.vendor;
+        this.product.categories = product.categories._id || product.categories;
+        this.product.vendor = product.vendor._id || product.vendor;
 
         //
         // cached

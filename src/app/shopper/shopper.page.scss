@@ -17,6 +17,10 @@ h2 {
     font-weight: bold;
 }
 
+ion-select {
+  max-width: 70%;
+}
+
 ion-title{
   text-transform: capitalize;
 }
@@ -62,6 +66,9 @@ ion-item {
   }
 
   p{
+    &.note{
+      min-height: 14px;
+    }
     font-size:0.7rem!important;
     white-space:initial;
   }

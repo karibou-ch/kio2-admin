@@ -29,15 +29,15 @@
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
 
-  <h1 class="info" [hidden]="!isReady||(vendors.list.length > 0)">Pas de commandes pour la date sélectionnée</h1>
+  <h1 class="info" [hidden]="!isReady||(vendors.list.length > 0)">Pas de commandes <br/>pour {{currentHub?.name}}</h1>
 
   <ion-refresher (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
   <ion-list>
-    <!-- SEARCH & FILTERS-->
-    <ion-item>
+    <!-- SEARCH & HUB FILTERS-->
+    <ion-item  lines="none">
       <ion-searchbar
         mode="ios"
         [(ngModel)]="searchFilter"
@@ -46,14 +46,21 @@
         (ionInput)="onSearchInput($event)"
         (ionClear)="onSearchCancel($event)">
       </ion-searchbar>  
-      <ion-chip (click)="collected=!collected;" slot="end">
+      <ion-chip (click)="toCollect=!toCollect;" slot="end">
         <!-- radio-button-off-outline || checkmark-circle-outline -->
-        <ion-icon name="checkmark-circle-outline" [hidden]="!collected"></ion-icon>
-        <ion-label color="primary">Collecté</ion-label>
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!toCollect"></ion-icon>
+        <ion-label color="primary">A Collecter</ion-label>
       </ion-chip>    
     </ion-item>
+    <ion-item class="hub" lines="none" [hidden]="!hubs.length || !orders.length">
+      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
+        <ion-label color="primary">{{hub.name}} ({{hub.orders}})</ion-label>
+      </ion-chip>
+    </ion-item>
   
-    <ion-item-sliding *ngFor="let vendor of getVendors()  ">    
+    <ion-item-sliding *ngFor="let vendor of getVendors()"
+                      [class.shadow]="toCollect && isCollected(vendor)">    
       <ion-item-options side="end">
         <ion-item-option>
         <ion-button color="danger" href='tel:{{getShopPhone(vendor)}}'>

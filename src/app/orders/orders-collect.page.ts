@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ToastController, ModalController, PopoverController } from '@ionic/angular';
-import { EnumFulfillments, Order, OrderItem, OrderService, User, Shop } from 'kng2-core';
+import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop } from 'kng2-core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { OrdersItemsPage } from './orders-items.page';
 import { CalendarPage } from '../calendar/calendar.page';
@@ -13,6 +13,9 @@ import { CalendarPage } from '../calendar/calendar.page';
 })
 export class OrdersCollectPage  implements OnInit{
 
+  config: Config;
+  hubs: any[];
+  currentHub: any;
   orders: Order[];
   shipping: Date;
   toggleDisplay= false;
@@ -25,7 +28,7 @@ export class OrdersCollectPage  implements OnInit{
   pickerShippingDate: string;
   format: string;
   searchFilter: string;
-  collected: boolean;
+  toCollect: boolean;
 
   constructor(
     private $engine: EngineService,
@@ -36,10 +39,84 @@ export class OrdersCollectPage  implements OnInit{
   ) {
     this.vendors.list = [];
     this.shipping = this.$engine.currentShippingDate;
+
+    this.user = this.$engine.currentUser;
+    this.config = this.$engine.currentConfig;
+    this.hubs = (this.config.shared.hubs || []).slice();
+    this.orders = [];
+
+    //
+    // Manage HUB selections
+    // back compatibility with K.v2
+    if (this.hubs.length) {
+      this.hubs[0].selected = true;
+      this.hubs[0].orders = 0;
+      //
+      // if you are associed to one HUB
+      this.currentHub = this.hubs[0];
+      if (this.user.hubs && this.user.hubs.length === 1) {
+        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
+      }
+    }
+
+    //
+    // keep orders sync
+    this.$order.order$.subscribe(order => {
+      const idx = this.orders.findIndex(o => o.oid === order.oid);
+      if( idx > -1) {
+        this.orders[idx] = order;
+        this.orderToVendor(order);
+      }
+    });
+
+  }
+
+  private orderToVendor(order) {
+    //
+    // select visible HUB
+    if (this.currentHub && this.currentHub.id !== order.hub) {
+      return;
+    }
+    order.items.forEach((item: OrderItem) => {
+      //
+      // init item for this vendor
+      if (!this.vendors[item.vendor]) {
+        const collected = order.vendors.some(v => v.slug === item.vendor && v.collected);
+        this.vendors[item.vendor] = {};
+        this.vendors[item.vendor].shipping = order.shipping;
+        this.vendors[item.vendor].items = [];
+        this.vendors[item.vendor].ranks = [];
+        this.vendors[item.vendor].collected = collected;
+        this.vendors.list.push(item.vendor);
+
+      }
+      // add item to this vendor
+      const idx = this.vendors[item.vendor].items.findIndex(i => i.sku === item.sku);
+      if ( idx === -1 ) {
+        this.vendors[item.vendor].items.push(item);
+        this.vendors[item.vendor].ranks.push((order.rank|0));
+      } else {
+        this.vendors[item.vendor].items[idx] = item;
+      }
+      //
+      // filter unique ranks
+      const ranks = this.vendors[item.vendor].ranks;
+      this.vendors[item.vendor].ranks = ranks.filter((rank,index) => ranks.indexOf(rank) === index).sort();
+
+
+    });
+  }
+
+  private orderItemsByVendorAndHub(vendor) {
+    this.currentHub = this.hubs.find(hub => hub.selected) || {};
+    return this.orders.filter(order =>  !this.currentHub || order.hub === this.currentHub.id).map(order => {
+      const o = new Order(order);
+      o.items = order.items.filter((item) => item.vendor === vendor);
+      return o;
+    }).filter(o => o.items.length);
   }
 
   ngOnInit() {
-    this.user = this.$engine.currentUser;
     this.format = this.$engine.defaultFormat;
     this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
@@ -55,20 +132,14 @@ export class OrdersCollectPage  implements OnInit{
     }, 2000);
   }
 
-  doToast(msg) {
+  doToast(msg, error?) {
     this.$toast.create({
       message: msg,
-      duration: 3000
+      duration: 3000,
+      color: (error ? 'danger' : 'dark')
     }).then(alert => alert.present());
   }
 
-  filterOrderItemsByVendor(vendor) {
-    return this.orders.map(order => {
-      const o = new Order(order);
-      o.items = order.items.filter((order) => order.vendor === vendor);
-      return o;
-    }).filter(o => o.items.length);
-  }
 
   filterByDisplay(order) {
     if (!this.toggleDisplay) {
@@ -79,7 +150,7 @@ export class OrdersCollectPage  implements OnInit{
 
   getShopPhone(vendor: string) {
     const shop: Shop = this.vendors[vendor];
-    return shop.address.phone;
+    return '';//shop.address.phone;
   }
 
 
@@ -102,12 +173,14 @@ export class OrdersCollectPage  implements OnInit{
     , 0).toFixed(2);
   }
 
-  getVendors(){
+  getVendors() {
+    if (!this.searchFilter) {
+      return this.vendors.list.sort();
+    }
+
+    const search = this.searchFilter.toLocaleLowerCase();
     return this.vendors.list.filter(vendor => {
-      if (!this.searchFilter) {
-        return true;
-      }
-      return vendor.indexOf(this.searchFilter) > -1;
+      return vendor.indexOf(search) > -1;
     }).sort();
   }
 
@@ -117,13 +190,7 @@ export class OrdersCollectPage  implements OnInit{
   //
   // check if current vendor is already collected
   isCollected(vendor: string): boolean {
-    const vendors = {};
-    this.orders.forEach(order => {
-          order.vendors.forEach(vendor => {
-            vendors[vendor.slug] = vendor.collected;
-          });
-    });
-    return vendors[vendor];
+    return this.vendors[vendor].collected;
   }
 
 
@@ -134,27 +201,14 @@ export class OrdersCollectPage  implements OnInit{
     this.shipping = ctx.when;
     this.isReady = true;
     this.vendors = {list: []};
+    //
+    // init orders count
+    this.hubs.forEach(hub => hub.orders = 0);
     this.orders.forEach(order => {
-      order.items.forEach((item: OrderItem) => {
-        //
-        // init item for this vendor
-        if (!this.vendors[item.vendor]) {
-          this.vendors[item.vendor] = {};
-          this.vendors[item.vendor].shipping = order.shipping;
-          this.vendors[item.vendor].items = [];
-          this.vendors[item.vendor].ranks = [];
-          this.vendors.list.push(item.vendor);
-        }
-        // add item to this vendor
-        this.vendors[item.vendor].items.push(item);
-        this.vendors[item.vendor].ranks.push((order.rank|0));
-        //
-        // filter unique ranks
-        const ranks = this.vendors[item.vendor].ranks;
-        this.vendors[item.vendor].ranks = ranks.filter((rank,index) => ranks.indexOf(rank) === index).sort();
-
-
-      });
+      if (this.hubs.length) {
+        this.hubs.find(hub =>  order.hub === hub.id).orders ++;
+      }
+      this.orderToVendor(order);
     });
   }
 
@@ -170,9 +224,6 @@ export class OrdersCollectPage  implements OnInit{
   }
 
 
-  onSelectedOrders(orders: Order[]) {
-    this.toggleDisplay = !this.toggleDisplay;
-  }
 
   async openCalendar($event) {
     const pop = await this.$popup.create({
@@ -216,24 +267,36 @@ export class OrdersCollectPage  implements OnInit{
 
   openVendorItems(vendor: string) {
     const params = {
-      orders: this.filterOrderItemsByVendor(vendor),
+      orders: this.orderItemsByVendorAndHub(vendor),
       shipping: this.shipping,
       vendor: (vendor)
-    }
+    };
+
     this.$modal.create({
       component: OrdersItemsPage,
       componentProps: params
     }).then(alert => alert.present());
   }
 
+  setCurrentHub(hub) {
+    this.hubs.forEach( h => h.selected = false);
+    this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
+    this.currentHub.selected = true;
+    this.vendors = {
+      list: []
+    };
+    this.orders.forEach(order => {
+      this.orderToVendor(order);
+    });
+  }
 
   setCollected(slug) {
     this.orders.forEach(order => {
           order.vendors.forEach(vendor => {
-            if (vendor.slug === slug) {vendor.collected=true; }
+            if (vendor.slug === slug) {vendor.collected = true; }
           });
     });
-
+    this.vendors[slug].collected = true;
   }
 
 
@@ -253,11 +316,16 @@ export class OrdersCollectPage  implements OnInit{
 
   updateCollect(vendor) {
     const when = this.vendors[vendor].shipping.when;
+    this.currentHub = this.hubs.find(hub => hub.selected) || {};
     when.setHours(22, 0, 0, 0);
-    this.$order.updateCollect(vendor, true, when)
-      .subscribe(ok => {
-        this.doToast('Collecte enregistrée');
-        this.setCollected(vendor);
+    this.$order.updateCollect( vendor, true, when, this.currentHub.slug)
+      .subscribe(orders => {
+        if(orders.length) {
+          this.doToast('Collecte enregistrée');
+          this.setCollected(vendor);
+        } else {
+          this.doToast('Collecte n\'a pas eu être enregistrée', true);
+        }
       }, error => this.doToast(error.error));
   }
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { User, Order, LoaderService, OrderService, UserService } from 'kng2-core';
+import { Config, User, Order, LoaderService, OrderService, UserService } from 'kng2-core';
 import { ModalController, ToastController, PopoverController } from '@ionic/angular';
 import { TrackerProvider } from '../services/tracker/tracker.provider';
 import { EngineService, OrdersCtx, OrderStatus } from '../services/engine.service';
@@ -14,13 +14,17 @@ import { CalendarPage } from '../calendar/calendar.page';
 export class ShopperPage implements OnInit, OnDestroy {
 
   selectedOrder = {};
-  user: User = new User();
+  user: User;
+  config: Config;
   isReady: boolean;
   orders: Order[] = [];
   shipping: Date;
   planning = [];
   reorder = false;
 
+  hubs: any[];
+  currentHub: any;
+  currentShopper: string;
   currentPlanning;
   format: string;
   pickerShippingDate: string;
@@ -40,6 +44,23 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.user = this.$engine.currentUser;
+    this.currentShopper = this.user.email.address;
+    this.config = this.$engine.currentConfig;
+
+    //
+    // Manage HUB selections
+    // back compatibility with K.v2
+    this.hubs = (this.config.shared.hubs || []).slice();
+    if (this.hubs.length) {
+      this.hubs.forEach(hub => hub.orders = 0);
+      this.hubs[0].selected = true;
+      //
+      // if you are associed to one HUB
+      this.currentHub = this.hubs[0];
+      if (this.user.hubs && this.user.hubs.length === 1) {
+        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
+      }
+    }
 
     this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
@@ -80,6 +101,15 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.shipping = ctx.when;
     this.pickerShippingDate = ctx.when.toISOString();
     this.orders = ctx.orders.sort(this.sortOrdersByPosition);
+
+    //
+    // IFF HUBs are available
+    if (this.hubs.length) {
+      this.orders.forEach(order => {
+        this.hubs.find(hub =>  order.hub === hub.id).orders ++;
+      });
+    }
+
     this.isReady = true;
     this.currentPlanning = null;
     this.trackPlanning(this.orders);
@@ -147,6 +177,10 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   getOrders() {
+    const filterByHub = (order) => {
+      return !this.currentHub || order.hub === this.currentHub.id;
+    };
+
     const filterByPlan = (order) => {
       if (this.currentPlanning == undefined) {
         return true;
@@ -154,9 +188,13 @@ export class ShopperPage implements OnInit, OnDestroy {
       return this.currentPlanning == order.shipping.priority;
     };
     if (!this.searchFilter) {
-      return this.orders.filter(filterByPlan.bind(this));
+      return this.orders.filter(filterByHub.bind(this))
+                        .filter(filterByPlan.bind(this));
     }
-    return this.orders.filter(filterByPlan.bind(this)).filter(order => {
+    return this.orders
+                  .filter(filterByHub.bind(this))
+                  .filter(filterByPlan.bind(this))
+                  .filter(order => {
       const filter = order.email + ' ' + order.rank + ' ' + order.customer.displayName;
       return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
     });
@@ -169,7 +207,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   setShippingPriority(order: Order, pos: number) {
     const position = order.shipping.position;
     const priority = order.shipping.priority;
-    this.$order.updateShippingShopper(order, priority, position)
+    this.$order.updateShippingPriority(order, priority, position)
         .subscribe(ok => {
           this.onDone('Livraison planifiée');
           this.trackPlanning(this.orders);
@@ -182,12 +220,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     }, (error) => this.onError(error.error));
   }
 
-  // $scope.updateShippingPrice=function(order,amount){
-  //   order.updateShippingPrice(amount).$promise.then(function(o){
-  //     api.info($scope,"Commande modifée",2000);
-  //     order.wrap(o);
-  //   });
-  // };
   getShopperInfo(order: Order) {
     if (!order || !order.shipping.shopper) {
       return '';
@@ -216,7 +248,7 @@ export class ShopperPage implements OnInit, OnDestroy {
       this.orders[index.detail.to].shipping.position - 1 : this.orders[index.detail.to].shipping.position + 1;
     this.orders = this.orders.sort(this.sortOrdersByPosition);
 
-    this.$order.updateShippingShopper(order, priority, order.shipping.position)
+    this.$order.updateShippingPriority(order, priority, order.shipping.position)
       .subscribe(ok => {
       }, error => this.onError(error.error));
 
@@ -225,7 +257,6 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   toggleOrder(order) {
     this.selectedOrder[order.oid] = !this.selectedOrder[order.oid];
-    this.debug();
   }
 
 
@@ -242,6 +273,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
 
   trackPlanning(orders: Order[]) {
+
     this.planning = orders.reduce((planning, order, i) => {
       if (order.shipping.priority &&
          planning.indexOf(order.shipping.priority) == -1) {
@@ -252,33 +284,15 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   }
 
-  onSelectedOrders([orders, shipping]: [Order[], Date]) {
-    // count available selection
-    const oids = Object.keys(this.selectedOrder).reduce((count, oid) => {
-      return this.selectedOrder[oid] ? count + 1 : count;
-    }, 0);
-    const selectedOrders = (order) => {
-      return this.selectedOrder[order.oid] || (!oids);
-    };
-    //
-    // filter orders to display,
-    const selected = orders.filter(selectedOrders).filter(this.filterByPlan.bind(this));
-    const params = {
-      orders : selected
-    };
-    this.$modal.create({
-      component: TrackerPage,
-      componentProps: params
-    }).then(alert => alert.present());
-  }
-
   onEditCustomer(customer) {
 
   }
 
   openTracker() {
-    const selected = Object.keys(this.selectedOrder);
-    const orders = this.orders.filter(order => (selected.indexOf(order.oid + '') > -1));
+    const selected = Object.keys(this.selectedOrder).filter(oid=>this.selectedOrder[oid]);
+    const countSelected = selected.length;
+    const orders = this.orders.filter(order => !countSelected || (selected.indexOf(order.oid + '') > -1))
+                              .filter(this.filterByPlan.bind(this));
     const params = {
       orders: (orders)
     };
@@ -296,6 +310,11 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.searchFilter = null;
   }
 
+  setCurrentHub(hub) {
+    this.hubs.forEach( h => h.selected = false);
+    this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
+    this.currentHub.selected = true;
+  }
 
 
   sortOrdersByCP(o1, o2) {

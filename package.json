@@ -1,6 +1,6 @@
 {
-  "name": "kio2-admin-migration",
-  "version": "2.99.3",
+  "name": "kio2-admin",
+  "version": "2.99.7",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {

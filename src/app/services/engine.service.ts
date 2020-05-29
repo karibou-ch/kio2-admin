@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { User, Order, OrderService, Product, Config } from 'kng2-core';
 import { ReplaySubject, from } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 //
 // orders and context used by subject$
@@ -47,7 +48,10 @@ export class EngineService {
   status$: ReplaySubject<OrderStatus>;
 
 
-  constructor(public $order: OrderService) {
+  constructor(
+    private $order: OrderService,
+    private $route: ActivatedRoute,
+    ) {
 
     //
     // order params
@@ -105,6 +109,9 @@ export class EngineService {
   // load orders for Shipping and for Vendors
   findAllOrdersForShipping() {
 
+    //
+    // check for preferred day
+    const queryWhen = (this.$route.snapshot.queryParamMap.get('when'));
     this.status$.next({running:true});
     //
     // order settings
@@ -158,10 +165,12 @@ export class EngineService {
       // publish status
       this.status$.next({running: false});
 
+      const preferredWhen = (queryWhen && this.monthOrders.has(parseInt(queryWhen))) ? 
+            parseInt(queryWhen) : this.currentShippingDate.getTime();
 
       //
       // publish content
-      const result = (this.monthOrders.get(this.currentShippingDate.getTime())) || [];
+      const result = (this.monthOrders.get(preferredWhen)) || [];
       this.selectedOrders$.next({
         orders: result,
         when: this.currentShippingDate

@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { EngineService } from '../services/engine.service';
-import { User } from 'kng2-core';
+import { User, Config } from 'kng2-core';
+
+import { version } from '../../../package.json';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +12,10 @@ import { User } from 'kng2-core';
 })
 export class HomePage {
 
+  VERSION = version;
+  siteName: string;
   user: User;
+  config: Config;
 
   isAdminOrLogistic: boolean;
   isAdminOrVendor: boolean;
@@ -20,6 +25,10 @@ export class HomePage {
     private $router: Router
   ) {
     this.user = this.$engine.currentUser;
+    this.config = this.$engine.currentConfig;
+
+    this.siteName = (this.config.shared.hub && this.config.shared.hub.slug) ? (this.config.shared.hub.siteName.fr ) : 'K';
+
 
     this.isAdminOrVendor = (!!this.user.shops.length) || this.user.isAdmin();
     this.isAdminOrLogistic = this.user.hasRole('logistic') || this.user.isAdmin();

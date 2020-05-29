@@ -4,6 +4,7 @@ import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason }
 import { ToastController, PopoverController, ModalController } from '@ionic/angular';
 import { CalendarPage } from '../calendar/calendar.page';
 import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
+import { Router, ActivatedRoute } from '@angular/router';
 
 export class OrderByItem {
   oid: number;
@@ -49,6 +50,7 @@ export class OrdersCustomerPage {
     public $toast: ToastController,
     public $loader: LoaderService,
     private $popup: PopoverController,
+    private $router: Router,
     public $order: OrderService
   ) {
     this.orders = [];
@@ -68,6 +70,12 @@ export class OrdersCustomerPage {
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrdersForShipping();
+    this.$order.order$.subscribe(order => {
+      const idx = this.orders.findIndex(o => o.oid === order.oid);
+      if( idx > -1) {
+        this.orders[idx] = order;
+      }
+    });
   }
 
 
@@ -119,6 +127,8 @@ export class OrdersCustomerPage {
   }
 
 
+  //
+  // get orders by HUB
   getOrders() {
     if (!this.searchFilter) {
       return this.orders;
@@ -272,6 +282,8 @@ export class OrdersCustomerPage {
       if (result.data) {
         const when = result.data[0];
         const orders = this.$engine.getOrdersByDay(when);
+        this.$router.navigate(['/orders'], { queryParams: { when: (when.getTime()) }});
+
         this.onInitOrders({
           orders: (orders),
           when: (when)
@@ -330,7 +342,6 @@ export class OrdersCustomerPage {
   }
 
   onInitOrders(ctx: OrdersCtx) {
-    // console.log('---- init odrers',orders.length, shipping);
     this.items = {};
     this.orders = ctx.orders.sort(this.sortOrdersByRank);
 
