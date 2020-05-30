@@ -105,6 +105,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     //
     // IFF HUBs are available
     if (this.hubs.length) {
+      this.hubs.forEach(hub => hub.orders = 0);
       this.orders.forEach(order => {
         this.hubs.find(hub =>  order.hub === hub.id).orders ++;
       });
@@ -204,16 +205,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     return this.selectedOrder[order.oid];
   }
 
-  setShippingPriority(order: Order, pos: number) {
-    const position = order.shipping.position;
-    const priority = order.shipping.priority;
-    this.$order.updateShippingPriority(order, priority, position)
-        .subscribe(ok => {
-          this.onDone('Livraison planifiée');
-          this.trackPlanning(this.orders);
-        }, error => this.onError(error.error));
-  }
-
   updateBag(order, count) {
     this.$order.updateBagsCount(order, count).subscribe(ok => {
           this.onDone('Nombre sac enregistré')
@@ -310,12 +301,31 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.searchFilter = null;
   }
 
+  setShippingShopper(shopper: string) {
+    const hub = this.currentHub && this.currentHub.slug;
+    const when = this.shipping;
+    this.$order.updateShippingShopper(hub,this.currentPlanning, when)
+        .subscribe(ok => {
+          this.onDone('Livraison planifiée');
+        }, error => this.onError(error.error));
+  }
+
+
+  setShippingPriority(order: Order, pos: number) {
+    const position = order.shipping.position;
+    const priority = order.shipping.priority;
+    this.$order.updateShippingPriority(order, priority, position)
+        .subscribe(ok => {
+          this.onDone('Livraison planifiée');
+          this.trackPlanning(this.orders);
+        }, error => this.onError(error.error));
+  }
+
   setCurrentHub(hub) {
     this.hubs.forEach( h => h.selected = false);
     this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
     this.currentHub.selected = true;
   }
-
 
   sortOrdersByCP(o1, o2) {
     // TODO checking type of postalCode is always a number

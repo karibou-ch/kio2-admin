@@ -50,7 +50,7 @@ export class OrdersCollectPage  implements OnInit{
     // back compatibility with K.v2
     if (this.hubs.length) {
       this.hubs[0].selected = true;
-      this.hubs[0].orders = 0;
+      this.hubs.forEach(hub => hub.orders = 0);
       //
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];

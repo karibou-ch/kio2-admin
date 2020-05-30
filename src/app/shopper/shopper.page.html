@@ -59,6 +59,7 @@
           Tournée {{currentPlanning}} ({{getOrders().length}})
         </ion-label>
         <ion-select placeholder="en développement"         
+                    (ngModelChange)="setShippingShopper($event)"
                     interface="action-sheet">
           <ion-select-option value="1">{{currentShopper}}</ion-select-option>          
         </ion-select>
