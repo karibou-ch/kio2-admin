@@ -62,7 +62,8 @@ const routes: Routes = [
     path: 'vendor',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./vendor-details/vendor-details.module').then( m => m.VendorDetailsPageModule)
-  }
+  },
+  { path: '**', redirectTo: '/home', pathMatch: 'full' }
 ];
 
 @NgModule({
