@@ -4,7 +4,7 @@ import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop } 
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { OrdersItemsPage } from './orders-items.page';
 import { CalendarPage } from '../calendar/calendar.page';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
@@ -19,7 +19,7 @@ export class OrdersCollectPage  implements OnInit{
   currentHub: any;
   orders: Order[];
   shipping: Date;
-  toggleDisplay= false;
+  toggleDisplay = false;
   vendors = {
     list: []
   };
@@ -37,6 +37,7 @@ export class OrdersCollectPage  implements OnInit{
     private $order: OrderService,
     private $popup: PopoverController,
     private $route: ActivatedRoute,
+    private $router: Router,
     private $toast: ToastController
   ) {
     this.vendors.list = [];
@@ -69,7 +70,12 @@ export class OrdersCollectPage  implements OnInit{
       const idx = this.orders.findIndex(o => o.oid === order.oid);
       if( idx > -1) {
         this.orders[idx] = order;
-        this.orderToVendor(order);
+        const time = Date.now();
+        //
+        // for each update, we have to recreate the index
+        this.vendors = {list: []};
+        this.orders.forEach(this.orderToVendor.bind(this));
+        console.log('index created in', ( Date.now() - time) , 'ms');
       }
     });
   }
@@ -122,19 +128,12 @@ export class OrdersCollectPage  implements OnInit{
 
       }
       // add item to this vendor
-      const idx = this.vendors[item.vendor].items.findIndex(i => i.sku === item.sku);
-      if ( idx === -1 ) {
-        this.vendors[item.vendor].items.push(item);
-        this.vendors[item.vendor].ranks.push((order.rank|0));
-      } else {
-        this.vendors[item.vendor].items[idx] = item;
-      }
+      this.vendors[item.vendor].items.push(item);
       //
       // filter unique ranks
-      const ranks = this.vendors[item.vendor].ranks;
-      this.vendors[item.vendor].ranks = ranks.filter((rank,index) => ranks.indexOf(rank) === index).sort();
-
-
+      if (this.vendors[item.vendor].ranks.indexOf(+order.rank) === -1){
+        this.vendors[item.vendor].ranks.push((+order.rank));
+      }
     });
   }
 
@@ -191,8 +190,11 @@ export class OrdersCollectPage  implements OnInit{
 
 
   getAmount(vendor: string): number {
+    // this.vendors[vendor].items.forEach((item,i) => {
+    //   if(vendor==='boulangerie-leonhard-bretzel') console.log(i+1 ,'----',vendor,item.finalprice,item.fulfillment.status);
+    // });
     return this.vendors[vendor].items.reduce((amount, item) =>
-      (item.fulfillment.status !== EnumFulfillments[EnumFulfillments.failure]) ? (amount + item.finalprice) : amount
+      (item.fulfillment.status !== 'failure') ? (amount + item.finalprice) : amount
     , 0).toFixed(2);
   }
 
@@ -264,6 +266,8 @@ export class OrdersCollectPage  implements OnInit{
       if (result.data) {
         const when = result.data[0];
         const orders = this.$engine.getOrdersByDay(when);
+        this.$router.navigate([], { queryParams: { when: (when.getTime()) }});
+
         this.onInitOrders({
           orders: (orders),
           when: (when)
@@ -285,6 +289,9 @@ export class OrdersCollectPage  implements OnInit{
     this.pickerShippingDate = date.toISOString();
     this.$engine.currentShippingDate = date;
     this.$engine.findAllOrders();
+    //
+    // update route
+    this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
   }
 
 

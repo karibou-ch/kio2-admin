@@ -23,6 +23,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   reorder = false;
 
   hubs: any[];
+  hubsRank: any;
   currentHub: any;
   currentShopper: string;
   currentPlanning;
@@ -51,9 +52,14 @@ export class ShopperPage implements OnInit, OnDestroy {
     //
     // Manage HUB selections
     // back compatibility with K.v2
+    this.hubsRank = {undefined: { prefix: ''}};
     this.hubs = (this.config.shared.hubs || []).slice();
     if (this.hubs.length) {
-      this.hubs.forEach(hub => hub.orders = 0);
+      this.hubs.forEach(hub => {
+        hub.orders = 0;
+        this.hubsRank[hub.id] = hub;
+        this.hubsRank[hub.id].prefix = hub.name[0].toUpperCase();
+      });
       //
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];
@@ -61,6 +67,7 @@ export class ShopperPage implements OnInit, OnDestroy {
         this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
       }
       this.currentHub.selected = true;
+
     }
 
     //
@@ -76,6 +83,12 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
   }
+
+  getOrderRank(order: Order) {
+    const prefix = this.hubsRank[order.hub].prefix;
+    return prefix + order.rank;
+  }
+
 
   initDate() {
     const currentDate = this.$engine.currentShippingDate;

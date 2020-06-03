@@ -36,6 +36,7 @@ export class OrdersCustomerPage {
   orderTotal: number;
   orderBaseAmount = 0;
   displayByItems: boolean;
+  hubs: any;
   items: {
     [sku: number]: (OrderByItem[]|any);
   };
@@ -60,6 +61,14 @@ export class OrdersCustomerPage {
   }
 
   ngOnInit() {
+    //
+    // load Hubs
+    this.hubs = {undefined: { prefix: ''}};
+    (this.$engine.currentConfig.shared.hubs || []).forEach(hub => {
+      this.hubs[hub.id] = hub;
+      this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
+    });
+
     this.format = this.$engine.defaultFormat;
     this.user = this.$engine.currentUser;
     if (this.user.isAdmin()) {
@@ -141,6 +150,11 @@ export class OrdersCustomerPage {
       const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
       return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
     });
+  }
+
+  getOrderRank(order: Order) {
+    const prefix = this.hubs[order.hub].prefix;
+    return prefix + order.rank;
   }
 
   initDate() {
