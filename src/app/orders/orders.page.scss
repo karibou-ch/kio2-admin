@@ -70,13 +70,8 @@ ion-item {
     }
   }
 
-  button.capture{
-    position: absolute;
-    top: 5px;
-    right: 80px;
-    bottom: 5px;
-    box-shadow: none;
-    -height: 40px!important;      
+  ion-button.capture{
+    margin-right: 50px;
   }
   
   h2{
@@ -105,7 +100,7 @@ ion-item {
     font-size: 1.0rem;
     top: 10px;
     color: white;
-    font-weight: 900;
+    font-weight: 700;
     padding: 0;
     width: 18px;
     height: 18px;
@@ -147,9 +142,9 @@ ion-item {
       top: 0%;
       left: 0;
       color: white;
-      font-weight: 900;
+      font-weight: 700;
       background: var(--ion-color-kio-primary);
-      padding: 2px 0;
+      padding: 0px 0;
       width: 40px;
       height: 40px;
       border-radius: 50%;

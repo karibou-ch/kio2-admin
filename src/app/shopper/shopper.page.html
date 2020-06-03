@@ -92,8 +92,9 @@
       <ion-item-options side="start">
         <ion-item-option class="shopper"  color="secondary">
           <ion-icon name="bicycle"></ion-icon>
-        <ion-select   placeholder="Réserver"
+        <ion-select class="block"  placeholder="Tournée"
                       [(ngModel)]="order.shipping.priority" 
+                      [selectedText]="order.shipping.priority  + ' tournée'"
                       (ngModelChange)="setShippingPriority(order,$event)"
                       interface="action-sheet">
           <ion-select-option value="0">reset</ion-select-option>
@@ -107,25 +108,19 @@
       </ion-item-options>
 
       <ion-item-options side="end">
-        <ion-item-option>
-          <ion-select  placeholder="Nb sacs" 
-                        [(ngModel)]="order.shipping.bags"                       
-                        (ngModelChange)="updateBag(order,$event)"
-                        interface="action-sheet">
-            <ion-select-option value="1">1 sac</ion-select-option>
-            <ion-select-option value="2">2 sac</ion-select-option>
-            <ion-select-option value="3">3 sac</ion-select-option>
-            <ion-select-option value="4">4 sac</ion-select-option>
-            <ion-select-option value="5">5 sac</ion-select-option>
-            <ion-select-option value="6">6 sac</ion-select-option>
-          </ion-select>
-        </ion-item-option>
         <ion-item-option class="phone">
           <ion-label >
-            <a ion-button color="danger" [hidden]="!getPhoneNumber(order)" 
+            <ion-button mode="ios" color="primary" 
+            href='mailto:{{order.email}}'>
+              <ion-icon name="mail"></ion-icon>             
+            </ion-button> 
+          </ion-label>
+
+          <ion-label >
+            <ion-button mode="ios" color="danger" [hidden]="!getPhoneNumber(order)" 
             href='tel:{{getPhoneNumber(order)}}'>
               <ion-icon name="call"></ion-icon>             
-            </a> 
+            </ion-button> 
           </ion-label>
         </ion-item-option>
       </ion-item-options>
@@ -137,7 +132,9 @@
         </ion-note>        
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
-          <span class="rank" [class.orphan]="!order.shipping.priority" [class.selected]="isOrderSelected(order)">{{order.rank}}</span>
+          <span class="rank" [class.orphan]="!order.shipping.priority" [class.selected]="isOrderSelected(order)">
+            {{getOrderRank(order)}}
+          </span>
         </ion-avatar>
         <ion-label class="ion-text-wrap">
           <h3 text-capitalize>{{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>

@@ -29,10 +29,10 @@ span.rank{
   font-family: sans-serif;
   background: var(--ion-color-kio-primary);
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   color: white; 
-  font-size: 1.0rem;
+  font-size: 0.9rem;
   font-weight: 900; 
   text-align: center;
 
@@ -61,7 +61,7 @@ span.rank{
     margin-bottom: 1px!important;
     span.rank{
       background: var(--ion-color-primary);
-      padding: 9px;
+      padding: 11px 5px;
       margin: 0;
       border-radius: 50%;
       color: white;
@@ -143,7 +143,7 @@ span.rank{
       letter-spacing: -.5px;
       font-size: 16px;
       position: absolute;
-      width: 100%;
+      width: auto;
       top:4px;
       color: var(--ion-color-kio-primary);
       >div{

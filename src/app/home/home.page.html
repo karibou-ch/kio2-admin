@@ -68,15 +68,22 @@
 
 
     <hr>
-    <div class="">
+    <div [hidden]="!user.shops.length">
       <p>Votre boutique</p>
     </div>
+    <ion-button [hidden]="user.shops.length>0"  
+      class="create" 
+      size="small" 
+      color="primary" 
+      (click)="openShopCreate()">
+      Créer votre boutique
+    </ion-button>
 
     <ion-list >
       <ion-item *ngFor="let shop of user.shops" [href]="'/vendor/'+shop.urlpath">
         
         <ion-label>
-          <h2>{{shop.name}}</h2>
+          <h2>{{shop.name}} - {{shop.status}} - {{shop.available.active}}</h2>
           <p [hidden]="isShopOpen(shop )" class="red small">
             Fermeture le {{shop.available.from |date:'mediumDate':'GMT+1':'fr'}}, ouverture le {{shop.available.to |date:'mediumDate':'GMT+1':'fr'}}          
           </p>
@@ -85,17 +92,7 @@
           <ion-icon name="cloud-done" size="large"></ion-icon>
         </ion-note>
       </ion-item>
-    </ion-list>
-    <ion-button [hidden]="user.shops.length>0"  
-                class="create" 
-                expand="block" 
-                fill="outline" 
-                size="small" 
-                color="primary" 
-                (click)="openShopCreate()">
-                Créer votre boutique
-    </ion-button>
-  
+    </ion-list>  
   </div>
 
 

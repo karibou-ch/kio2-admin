@@ -16,7 +16,7 @@
   <ion-list *ngFor="let order of orders">
     <!-- CUSTOMER HEADER -->
     <ion-item class="customer" *ngIf="order.shipping">
-      <span  class="rank">{{order.rank}}</span>
+      <span  class="rank">{{getOrderRank(order)}}</span>
       <ion-label class="ion-text-wrap">
         <h2>
           {{order.customer.displayName}}
@@ -109,5 +109,6 @@
 
   </ion-list>
 
+  <br/>
 </ion-content>
 

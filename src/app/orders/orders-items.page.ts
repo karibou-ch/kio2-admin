@@ -15,6 +15,7 @@ export class OrdersItemsPage implements OnInit {
   public user: User;
   public deltaPrice: number;
   public format: string;
+  public hubs: any;
 
   @Input() vendor: string;
   @Input() shipping: Date;
@@ -50,6 +51,13 @@ export class OrdersItemsPage implements OnInit {
   }
 
   ngOnInit() {
+    //
+    // load Hubs
+    this.hubs = {undefined: { prefix: ''}};
+    (this.$engine.currentConfig.shared.hubs || []).forEach(hub => {
+      this.hubs[hub.id] = hub;
+      this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
+    });
 
     if (this.orders.length == 1) {
       this.shipping = this.orders[0].shipping.when;
@@ -268,6 +276,11 @@ export class OrdersItemsPage implements OnInit {
     if (kcode === 13) {
       this.doValidate(order, item);
     }
+  }
+
+  getOrderRank(order: Order) {
+    const prefix = this.hubs[order.hub].prefix;
+    return prefix + order.rank;
   }
 
   getPhoneNumber(order: Order) {

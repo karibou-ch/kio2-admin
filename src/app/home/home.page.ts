@@ -42,7 +42,7 @@ export class HomePage {
   }
 
   isShopOpen(shop: Shop) {
-    return (shop.status === true) && shop.available.active;
+    return (shop.status === true) && !shop.available.active;
   }
 
   openShopper() {
