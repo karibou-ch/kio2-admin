@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { EngineService } from '../services/engine.service';
-import { User, Config } from 'kng2-core';
+import { User, Config, Shop } from 'kng2-core';
 
 import { version } from '../../../package.json';
 
@@ -19,6 +19,7 @@ export class HomePage {
 
   isAdminOrLogistic: boolean;
   isAdminOrVendor: boolean;
+  isAdmin: boolean;
 
   constructor(
     private $engine: EngineService,
@@ -30,12 +31,18 @@ export class HomePage {
     this.siteName = (this.config.shared.hub && this.config.shared.hub.slug) ? (this.config.shared.hub.siteName.fr ) : 'K';
 
 
+    this.isAdmin = this.user.isAdmin();
     this.isAdminOrVendor = (!!this.user.shops.length) || this.user.isAdmin();
     this.isAdminOrLogistic = this.user.hasRole('logistic') || this.user.isAdmin();
   }
 
+
   doRefresh($event){
     window.location.reload();
+  }
+
+  isShopOpen(shop: Shop) {
+    return (shop.status === true) && shop.available.active;
   }
 
   openShopper() {

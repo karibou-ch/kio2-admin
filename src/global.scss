@@ -43,7 +43,9 @@ ion-popover {
 .red{
   color: red!important;
 }
-
+.small {
+  font-size: small!important;
+}
 
 ion-toggle {
   --background-checked: var(--ion-color-primary);
