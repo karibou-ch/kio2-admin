@@ -7,7 +7,12 @@ const routes: Routes = [
   {
     path: '',
     component: ShopperPage
+  },
+  {
+    path: ':month/:year',
+    component: ShopperPage
   }
+
 ];
 
 @NgModule({

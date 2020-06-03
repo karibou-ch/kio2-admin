@@ -50,6 +50,7 @@ export class OrdersCustomerPage {
     public $toast: ToastController,
     public $loader: LoaderService,
     private $popup: PopoverController,
+    private $route: ActivatedRoute,
     private $router: Router,
     public $order: OrderService
   ) {
@@ -66,10 +67,13 @@ export class OrdersCustomerPage {
       this.orderBaseAmount = 0;
     }
 
-    this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
+    //
+    // use correct date
+    this.initDate();
+
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
-    this.$engine.findAllOrdersForShipping();
+    this.$engine.findAllOrders();
     this.$order.order$.subscribe(order => {
       const idx = this.orders.findIndex(o => o.oid === order.oid);
       if( idx > -1) {
@@ -137,6 +141,23 @@ export class OrdersCustomerPage {
       const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
       return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
     });
+  }
+
+  initDate() {
+    const currentDate = this.$engine.currentShippingDate;
+    const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
+    const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
+    const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
+
+    currentDate.setFullYear(year);
+    currentDate.setMonth(month - 1);
+    //
+    // constraint Date engine with month/year
+    this.$engine.currentShippingDate = currentDate;
+
+    //
+    // use full Date for Display
+    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
   }
 
   isDeposit(order) {
@@ -282,7 +303,7 @@ export class OrdersCustomerPage {
       if (result.data) {
         const when = result.data[0];
         const orders = this.$engine.getOrdersByDay(when);
-        this.$router.navigate(['/orders'], { queryParams: { when: (when.getTime()) }});
+        this.$router.navigate([], { queryParams: { when: (when.getTime()) }});
 
         this.onInitOrders({
           orders: (orders),
@@ -329,12 +350,16 @@ export class OrdersCustomerPage {
   onDatePicker() {
     const date = new Date(this.pickerShippingDate);
     date.setHours(0, 0, 0, 0);
-    date.setDate(2);
+    date.setDate(1);
 
 
     this.pickerShippingDate = date.toISOString();
     this.$engine.currentShippingDate = date;
-    this.$engine.findAllOrdersForShipping();
+    this.$engine.findAllOrders();
+
+    //
+    // update route
+    this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
   }
 
   onEngineStatus(status: OrderStatus) {

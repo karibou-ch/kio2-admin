@@ -34,7 +34,9 @@ export class HomePage {
     this.isAdminOrLogistic = this.user.hasRole('logistic') || this.user.isAdmin();
   }
 
-
+  doRefresh($event){
+    window.location.reload();
+  }
 
   openShopper() {
     this.$router.navigateByUrl('/shopper');

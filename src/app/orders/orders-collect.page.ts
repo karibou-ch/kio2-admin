@@ -4,6 +4,7 @@ import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop } 
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { OrdersItemsPage } from './orders-items.page';
 import { CalendarPage } from '../calendar/calendar.page';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -35,6 +36,7 @@ export class OrdersCollectPage  implements OnInit{
     private $modal: ModalController,
     private $order: OrderService,
     private $popup: PopoverController,
+    private $route: ActivatedRoute,
     private $toast: ToastController
   ) {
     this.vendors.list = [];
@@ -49,13 +51,15 @@ export class OrdersCollectPage  implements OnInit{
     // Manage HUB selections
     // back compatibility with K.v2
     if (this.hubs.length) {
-      this.hubs[0].selected = true;
       this.hubs.forEach(hub => hub.orders = 0);
       //
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];
       if (this.user.hubs && this.user.hubs.length === 1) {
         this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
+        this.currentHub.selected = true;
+      } else {
+        this.hubs[0].selected = true;
       }
     }
 
@@ -68,8 +72,35 @@ export class OrdersCollectPage  implements OnInit{
         this.orderToVendor(order);
       }
     });
-
   }
+
+  ngOnInit() {
+    this.initDate();
+    this.format = this.$engine.defaultFormat;
+    this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
+    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
+    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
+    this.$engine.findAllOrders();
+  }
+
+
+  initDate() {
+    const currentDate = this.$engine.currentShippingDate;
+    const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
+    const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
+    const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
+
+    currentDate.setFullYear(year);
+    currentDate.setMonth(month - 1);
+    //
+    // constraint Date engine with month/year
+    this.$engine.currentShippingDate = currentDate;
+
+    //
+    // use full Date for Display
+    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
+  }
+
 
   private orderToVendor(order) {
     //
@@ -114,14 +145,6 @@ export class OrdersCollectPage  implements OnInit{
       o.items = order.items.filter((item) => item.vendor === vendor);
       return o;
     }).filter(o => o.items.length);
-  }
-
-  ngOnInit() {
-    this.format = this.$engine.defaultFormat;
-    this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
-    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
-    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
-    this.$engine.findAllOrdersForShipping();
   }
 
   doRefresh(refresher) {
@@ -261,7 +284,7 @@ export class OrdersCollectPage  implements OnInit{
 
     this.pickerShippingDate = date.toISOString();
     this.$engine.currentShippingDate = date;
-    this.$engine.findAllOrdersForShipping();
+    this.$engine.findAllOrders();
   }
 
 

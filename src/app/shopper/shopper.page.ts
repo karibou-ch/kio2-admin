@@ -5,6 +5,7 @@ import { TrackerProvider } from '../services/tracker/tracker.provider';
 import { EngineService, OrdersCtx, OrderStatus } from '../services/engine.service';
 import { TrackerPage } from '../tracker/tracker.page';
 import { CalendarPage } from '../calendar/calendar.page';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'kio2-shopper',
@@ -18,7 +19,6 @@ export class ShopperPage implements OnInit, OnDestroy {
   config: Config;
   isReady: boolean;
   orders: Order[] = [];
-  shipping: Date;
   planning = [];
   reorder = false;
 
@@ -32,11 +32,12 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   constructor(
     private $engine: EngineService,
+    private $modal: ModalController,
     private $order: OrderService,
     private $popup: PopoverController,
-    private $modal: ModalController,
-    public $tracker: TrackerProvider,
-    private toast: ToastController
+    private $route: ActivatedRoute,
+    private $router: Router,
+    private $toast: ToastController
   ) {
     this.isReady = false;
     this.format = this.$engine.defaultFormat;
@@ -53,22 +54,44 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.hubs = (this.config.shared.hubs || []).slice();
     if (this.hubs.length) {
       this.hubs.forEach(hub => hub.orders = 0);
-      this.hubs[0].selected = true;
       //
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];
       if (this.user.hubs && this.user.hubs.length === 1) {
         this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
       }
+      this.currentHub.selected = true;
     }
+
+    //
+    // use valid date
+    this.initDate();
+
 
     this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
-    this.$engine.findAllOrdersForShipping();
+    this.$engine.findAllOrders();
   }
 
   ngOnDestroy() {
+  }
+
+  initDate() {
+    const currentDate = this.$engine.currentShippingDate;
+    const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
+    const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
+    const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
+
+    currentDate.setFullYear(year);
+    currentDate.setMonth(month - 1);
+    //
+    // constraint Date engine with month/year
+    this.$engine.currentShippingDate = currentDate;
+
+    //
+    // use full Date for Display
+    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
   }
 
 
@@ -80,14 +103,20 @@ export class ShopperPage implements OnInit, OnDestroy {
   //
   // on selected date
   onDatePicker() {
+    const today = new Date();
     const date = new Date(this.pickerShippingDate);
     date.setHours(0, 0, 0, 0);
-    date.setDate(2);
+    date.setDate(1);
 
+    this.$engine.selectOrderArchives(date < today);
 
     this.pickerShippingDate = date.toISOString();
     this.$engine.currentShippingDate = date;
-    this.$engine.findAllOrdersForShipping();
+    this.$engine.findAllOrders();
+
+    //
+    // update route
+    this.$router.navigate([], {queryParams: { when: (date.getTime()) }});
   }
 
 
@@ -98,7 +127,6 @@ export class ShopperPage implements OnInit, OnDestroy {
   onInitOrders(ctx: OrdersCtx) {
     //
     // set default order value based on postalCode
-    this.shipping = ctx.when;
     this.pickerShippingDate = ctx.when.toISOString();
     this.orders = ctx.orders.sort(this.sortOrdersByPosition);
 
@@ -117,14 +145,14 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   onDone(msg) {
-    this.toast.create({
+    this.$toast.create({
       message: msg,
       duration: 3000
     }).then(alert => alert.present());
 
   }
   onError(msg) {
-    this.toast.create({
+    this.$toast.create({
       message: msg,
       duration: 3000
     }).then(alert => alert.present());
@@ -147,6 +175,8 @@ export class ShopperPage implements OnInit, OnDestroy {
       if (result.data) {
         const when = result.data[0];
         const orders = this.$engine.getOrdersByDay(when);
+        this.$router.navigate([], { queryParams: { when: (when.getTime()) }});
+
         this.onInitOrders({
           orders: (orders),
           when: (when)
@@ -166,8 +196,8 @@ export class ShopperPage implements OnInit, OnDestroy {
     // use Observer to complete refresher
     this.$engine.refresh();
     setTimeout(() => {
-      refresher.complete();
-    }, 1000);
+      refresher.target.complete();
+    }, 500);
   }
 
   getPhoneNumber(order: Order) {
@@ -264,7 +294,6 @@ export class ShopperPage implements OnInit, OnDestroy {
 
 
   trackPlanning(orders: Order[]) {
-
     this.planning = orders.reduce((planning, order, i) => {
       if (order.shipping.priority &&
          planning.indexOf(order.shipping.priority) == -1) {
@@ -280,7 +309,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   openTracker() {
-    const selected = Object.keys(this.selectedOrder).filter(oid=>this.selectedOrder[oid]);
+    const selected = Object.keys(this.selectedOrder).filter(oid => this.selectedOrder[oid]);
     const countSelected = selected.length;
     const orders = this.orders.filter(order => !countSelected || (selected.indexOf(order.oid + '') > -1))
                               .filter(this.filterByPlan.bind(this));
@@ -303,7 +332,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   setShippingShopper(shopper: string) {
     const hub = this.currentHub && this.currentHub.slug;
-    const when = this.shipping;
+    const when = new Date(this.pickerShippingDate);
     this.$order.updateShippingShopper(hub,this.currentPlanning, when)
         .subscribe(ok => {
           this.onDone('Livraison planifiée');

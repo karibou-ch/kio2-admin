@@ -18,9 +18,11 @@
 .calendar{
   display: flex;
   width: 100%;
+  min-height: 200px;
   padding: 5px;
   flex-wrap: wrap;
   justify-content: flex-start;
+  align-content: center;
   div.day {
     .month{
       font-size: 0.9rem;

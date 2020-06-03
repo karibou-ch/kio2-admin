@@ -10,6 +10,10 @@ const routes: Routes = [
     component: OrdersCustomerPage
   },
   {
+    path: ':month/:year',
+    component: OrdersCustomerPage
+  },
+  {
     path: 'collect',
     component: OrdersCollectPage
   }

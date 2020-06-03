@@ -26,11 +26,10 @@
 </ion-header>
 <ion-content>
 
-  <!-- <ion-refresher 
-    [enabled]="!reorder"
-    (ionRefresh)="doRefresh($event)">
+  <ion-refresher slot="fixed" [disabled]="false" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
-  </ion-refresher> -->
+  </ion-refresher>
+
 
   <div class="loader" [hidden]="isReady">
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
@@ -42,12 +41,12 @@
 
     <!-- FITER BASED ON PLANNING -->
     <ion-item [hidden]="!planning.length" class="header" color="primary">
-      <button ion-button 
+      <button 
               round color="light"  [class.selected]="currentPlanning===plan"
-              outline small (click)="togglePlanning(plan)"
+              outline  (click)="togglePlanning(plan)"
               *ngFor="let plan of planning  "><b>{{plan}}</b>
       </button>
-      <button ion-button slot="end" round color="light" outline small 
+      <button ion-button slot="end" round color="light" fill="outline"  
               [class.selected]="reorder"
               (click)="toggleReorder()"><b><ion-icon name="reorder-two-outline"></ion-icon></b>
       </button>

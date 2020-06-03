@@ -39,7 +39,7 @@ export class EngineService {
 
   //
   // get fulfilled Orders, means paid,authorized or refunded
-  LOCKED = { fulfillments: 'fulfilled,partial' };
+  ARCHIVE = { fulfillments: 'fulfilled,partial' };
 
   defaultFormat = 'EEEE d MMM';
 
@@ -98,7 +98,7 @@ export class EngineService {
     return this.shippingDate;
   }
 
-  get currentOrderAreOpen() {
+  get currentOrderStatus() {
     return (!!this.orderStatus.payment);
   }
 
@@ -107,12 +107,12 @@ export class EngineService {
   }
   //
   // load orders for Shipping and for Vendors
-  findAllOrdersForShipping() {
+  findAllOrders() {
 
     //
-    // check for preferred day
-    const queryWhen = (this.$route.snapshot.queryParamMap.get('when'));
-    this.status$.next({running:true});
+    // check for preferred day (in week)
+    const queryWhen: number = parseInt(this.$route.snapshot.queryParamMap.get('when'), 10);
+    this.status$.next({running: true});
     //
     // order settings
 
@@ -128,6 +128,7 @@ export class EngineService {
     this.monthOrders = new Map();
     this.monthOrders.clear();
     this.shippingWeek = [];
+
 
     //
     // use right orders source
@@ -151,11 +152,6 @@ export class EngineService {
       // get the must recent value
       const times = Array.from(this.monthOrders.keys()).sort((a, b) => a - b);
 
-      //
-      // update currentshipping that containes orders
-      const currentTime = this.currentShippingDate.getTime();
-      this.currentShippingDate = (!orders.length || this.monthOrders.has(currentTime)) ?
-        this.currentShippingDate : (new Date(times[0]));
 
       //
       // sort shipping dates
@@ -165,8 +161,27 @@ export class EngineService {
       // publish status
       this.status$.next({running: false});
 
-      const preferredWhen = (queryWhen && this.monthOrders.has(parseInt(queryWhen))) ? 
-            parseInt(queryWhen) : this.currentShippingDate.getTime();
+      //
+      // select current Times
+      const currentTime = this.currentShippingDate.getTime();
+      let preferredWhen;
+
+      if (queryWhen && this.monthOrders.get(queryWhen)) {
+        preferredWhen = queryWhen;
+      } else
+      if (this.monthOrders.get(currentTime)) {
+        preferredWhen = currentTime;
+      } else
+      if (times[0]) {
+        preferredWhen = times[0]
+      } else {
+        preferredWhen = currentTime;
+      }
+
+
+      //
+      // update currentshipping that containes orders
+      this.currentShippingDate = new Date(preferredWhen);
 
       //
       // publish content
@@ -184,12 +199,12 @@ export class EngineService {
   }
 
   refresh() {
-    return this.findAllOrdersForShipping();
+    return this.findAllOrders();
   }
 
-  toggleOrderStatus() {
-    this.orderStatus = (this.orderStatus.payment) ? this.LOCKED : this.OPEN;
-    this.findAllOrdersForShipping();
+  selectOrderArchives(archive: boolean) {
+    this.orderStatus = (archive) ? this.ARCHIVE : this.OPEN;
+    this.findAllOrders();
   }
 
 }
