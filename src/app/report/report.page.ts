@@ -43,6 +43,12 @@ export class ReportPage implements OnInit {
     this.currentDate.setFullYear(this.year);
     this.currentDate.setMonth(this.month - 1);
     this.pickerShippingDate = this.currentDate.toISOString();
+
+    //
+    // reload data 
+    // this.$route.params.subscribe(params => {
+    //   console.log('--',params);
+    // });
   }
 
   ngOnInit() {
@@ -64,12 +70,12 @@ export class ReportPage implements OnInit {
     date.setHours(0, 0, 0, 0);
     date.setDate(2);
 
-
     this.pickerShippingDate = date.toISOString();
     this.currentDate = date;
     this.month = (this.currentDate.getMonth() + 1);
     this.year = (this.currentDate.getFullYear());
     this.$router.navigate(['/report', this.month, this.year]);
+    this.onInitReport();
   }
 
 
