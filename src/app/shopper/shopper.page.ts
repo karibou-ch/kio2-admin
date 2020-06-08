@@ -1,11 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Config, User, Order, LoaderService, OrderService, UserService } from 'kng2-core';
-import { ModalController, ToastController, PopoverController } from '@ionic/angular';
-import { TrackerProvider } from '../services/tracker/tracker.provider';
+import { Config, User, Order, OrderService } from 'kng2-core';
+import { ModalController, ToastController, PopoverController, AlertController } from '@ionic/angular';
 import { EngineService, OrdersCtx, OrderStatus } from '../services/engine.service';
 import { TrackerPage } from '../tracker/tracker.page';
 import { CalendarPage } from '../calendar/calendar.page';
 import { Router, ActivatedRoute } from '@angular/router';
+
+export interface ShopperPlan {
+  shopper: string;
+  plan: number;
+  time: string;
+}
 
 @Component({
   selector: 'kio2-shopper',
@@ -31,7 +36,11 @@ export class ShopperPage implements OnInit, OnDestroy {
   pickerShippingDate: string;
   searchFilter: string;
 
+  shippingShopper: {[key: string]: ShopperPlan};
+  shippingShoppers: string[];
+
   constructor(
+    private $alert: AlertController,
     private $engine: EngineService,
     private $modal: ModalController,
     private $order: OrderService,
@@ -42,6 +51,8 @@ export class ShopperPage implements OnInit, OnDestroy {
   ) {
     this.isReady = false;
     this.format = this.$engine.defaultFormat;
+    this.shippingShoppers = [];
+    this.shippingShopper = {};
   }
 
   ngOnInit() {
@@ -82,6 +93,23 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+  }
+
+  doDisplayPhone(order) {
+    const phone = this.getPhoneNumber(order);
+    this.$alert.create({
+      header: 'Numéro de téléphone',
+      subHeader: order.customer.displayName,
+      message: 'Appeler <a href="tel:' + phone + '">' + phone + '</a>',
+    }).then(alert => alert.present());
+  }
+
+  doDisplayMail(order) {
+    this.$alert.create({
+      header: 'Mail de la commande',
+      subHeader: order.customer.displayName,
+      message: 'Contacter <a href="mailto:' + order.email + '">' + order.email + '</a>',
+    }).then(alert => alert.present());
   }
 
   getOrderRank(order: Order) {
@@ -160,14 +188,16 @@ export class ShopperPage implements OnInit, OnDestroy {
   onDone(msg) {
     this.$toast.create({
       message: msg,
-      duration: 3000
+      duration: 3000,
+      color: 'dark'
     }).then(alert => alert.present());
 
   }
   onError(msg) {
     this.$toast.create({
       message: msg,
-      duration: 3000
+      duration: 3000,
+      color: 'danger'
     }).then(alert => alert.present());
 
   }
@@ -222,7 +252,8 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   getOrders() {
     const filterByHub = (order) => {
-      return !this.currentHub || order.hub === this.currentHub.id;
+      return !this.currentHub ||
+      order.hub === this.currentHub.id;
     };
 
     const filterByPlan = (order) => {
@@ -231,6 +262,12 @@ export class ShopperPage implements OnInit, OnDestroy {
       }
       return this.currentPlanning == order.shipping.priority;
     };
+
+    const filterByText = (order) => {
+      const filter = order.email + ' ' + order.rank + ' ' + order.customer.displayName;
+      return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
+    };
+
     if (!this.searchFilter) {
       return this.orders.filter(filterByHub.bind(this))
                         .filter(filterByPlan.bind(this));
@@ -238,10 +275,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     return this.orders
                   .filter(filterByHub.bind(this))
                   .filter(filterByPlan.bind(this))
-                  .filter(order => {
-      const filter = order.email + ' ' + order.rank + ' ' + order.customer.displayName;
-      return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
-    });
+                  .filter(filterByText.bind(this));
   }
 
   isOrderSelected(order) {
@@ -307,13 +341,33 @@ export class ShopperPage implements OnInit, OnDestroy {
 
 
   trackPlanning(orders: Order[]) {
+    const shoppers = {};
     this.planning = orders.reduce((planning, order, i) => {
+      //
+      // create planning
       if (order.shipping.priority &&
          planning.indexOf(order.shipping.priority) == -1) {
         planning.push(order.shipping.priority);
+        shoppers[order.shipping.shopper] = true;
+      }
+
+      //
+      // list shopper
+      if (order.shipping.shopper && order.shipping.priority) {
+        this.shippingShopper[order.shipping.priority] = {
+          shopper: order.shipping.shopper,
+          plan: order.shipping.priority,
+          time: order.shipping.shopper_time
+        };
       }
       return planning.sort();
     }, []);
+
+    //
+    // update the available shoppers
+    // FIXME only avilable for managers ?
+    shoppers[this.user.email.address] = true;
+    this.shippingShoppers = Object.keys(shoppers);
 
   }
 
@@ -343,13 +397,30 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.searchFilter = null;
   }
 
-  setShippingShopper(shopper: string) {
+  setShippingShopper($event?) {
     const hub = this.currentHub && this.currentHub.slug;
     const when = new Date(this.pickerShippingDate);
-    this.$order.updateShippingShopper(hub,this.currentPlanning, when)
+    const plan = this.currentPlanning;
+    const shopper = $event.shopper || this.shippingShopper[plan].shopper;
+    let time: any = (this.shippingShopper[plan].time);
+
+    //
+    // return silently if setup is not complet
+    if (!time || !shopper) {
+      return;
+    }
+    if (!/^\d{1,2}:\d{1,2}$/.test(time)) {
+      time = new Date(time);
+      time = time.getHours() + ':' + ('0' + time.getMinutes()).slice(-2);
+    }
+
+    //var date1 = new Date(null, null, null, 14, 10);
+    this.$order.updateShippingShopper(hub, shopper, plan, when, time)
         .subscribe(ok => {
-          this.onDone('Livraison planifiée');
-        }, error => this.onError(error.error));
+          this.onDone('Livraisons planifiées');
+        }, status => {
+          this.onError(status.message||status.error)
+        });
   }
 
 
@@ -358,7 +429,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     const priority = order.shipping.priority;
     this.$order.updateShippingPriority(order, priority, position)
         .subscribe(ok => {
-          this.onDone('Livraison planifiée');
+          this.onDone('Tournée planifiée');
           this.trackPlanning(this.orders);
         }, error => this.onError(error.error));
   }

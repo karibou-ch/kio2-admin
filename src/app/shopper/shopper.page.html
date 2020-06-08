@@ -51,22 +51,37 @@
               (click)="toggleReorder()"><b><ion-icon name="reorder-two-outline"></ion-icon></b>
       </button>
     </ion-item>
-    <div *ngIf="currentPlanning">
+    <div *ngIf="currentPlanning" >
       <!-- WHO AND WHEN -->
-      <ion-item>
+      <ion-item class="planning">
         <ion-label class="ion-text-wrap">
           Tournée {{currentPlanning}} ({{getOrders().length}})
         </ion-label>
-        <ion-select placeholder="en développement"         
-                    (ngModelChange)="setShippingShopper($event)"
+        <ion-select placeholder="Plan ?"         
+                    (ngModelChange)="setShippingShopper({shopper:$event})"
+                    [(ngModel)]="shippingShopper[currentPlanning].shopper" 
                     interface="action-sheet">
-          <ion-select-option value="1">{{currentShopper}}</ion-select-option>          
-        </ion-select>
+                    <ion-select-option *ngFor="let shopper of shippingShoppers"  [value]="shopper">{{shopper}}</ion-select-option>
+                  </ion-select>
+
+      <ion-datetime 
+        placeholder="Time"
+        displayFormat="HH:mm" 
+        pickerFormat="HH mm" 
+        [(ngModel)]="shippingShopper[currentPlanning].time" 
+        (ngModelChange)="setShippingShopper({time:$event})" 
+        cancelText="Annuler" 
+        doneText="Fait" 
+        minuteValues="0,30">
+      </ion-datetime>        
+    
+
       </ion-item>
     </div>
     <!-- SEARCH -->
     <ion-searchbar
       mode="ios"
+      placeholder="Filtrer"
       [hidden]="!orders.length"
       [(ngModel)]="searchFilter"
       [debounce]="500"
@@ -110,15 +125,14 @@
       <ion-item-options side="end">
         <ion-item-option class="phone">
           <ion-label >
-            <ion-button mode="ios" color="primary" 
-            href='mailto:{{order.email}}'>
+            <ion-button mode="ios" color="primary" (click)="doDisplayMail(order)">
               <ion-icon name="mail"></ion-icon>             
             </ion-button> 
           </ion-label>
 
           <ion-label >
             <ion-button mode="ios" color="danger" [hidden]="!getPhoneNumber(order)" 
-            href='tel:{{getPhoneNumber(order)}}'>
+            (click)="doDisplayPhone(order)">
               <ion-icon name="call"></ion-icon>             
             </ion-button> 
           </ion-label>
@@ -128,7 +142,7 @@
         <ion-note slot="end">
           {{order.shipping.postalCode}}
           <span class="price" [hidden]="!order.shipping.bags">{{ order.shipping.bags }} sac</span>
-          <span class="price" [hidden]="order.shipping.bags">{{order.getSubTotal()|number:'1.0-0'}} fr</span>
+          <span class="price" [hidden]="order.shipping.bags">{{order.getSubTotal({ withoutCharge: true })|number:'1.0-0'}} fr</span>
         </ion-note>        
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->

@@ -17,8 +17,13 @@ h2 {
     font-weight: bold;
 }
 
+ion-datetime{
+  font-size: 15px;
+}
+
 ion-select {
   max-width: 70%;
+  font-size: 15px;
   &.block{
     max-width: 93%;
   }
@@ -38,6 +43,10 @@ ion-list{
 }
 
 ion-item {
+  &.planning{
+    --background: var(--ion-color-kio-primary);
+    --color:white;
+  }
   &.header{
     min-height: 1.9rem;
     background: var(--ion-color-kio-primary);
