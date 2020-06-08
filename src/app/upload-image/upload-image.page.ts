@@ -49,6 +49,11 @@ export class UploadImagePage implements OnInit{
     }
   }
 
+  getImage() {
+    if(!this.image) return '';
+    return 'https:' + this.image;
+  }
+
   isReady() {
     return (this.config && this.user);
   }
