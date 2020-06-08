@@ -45,6 +45,7 @@
   <!-- SEARCH -->
   <ion-searchbar
     mode="ios"
+    placeholder="Filtrer"
     [(ngModel)]="searchFilter"
     [debounce]="500"
     [hidden]="!(orders?.length)"
@@ -150,7 +151,7 @@
         <ion-item-option>
           <ion-select  placeholder="Nb sacs" 
                         [(ngModel)]="order.shipping.bags"                       
-                        [selectedText]="order.shipping.bags  + ' sacs'"
+                        [selectedText]="order.shipping.bags? (order.shipping.bags  + ' sacs'):'Nb sacs'"
                         (ngModelChange)="updateBag(order,$event)"
                         interface="action-sheet">
             <ion-select-option value="1">1 sac</ion-select-option>
@@ -165,7 +166,7 @@
       </ion-item-options>
       <ion-item [class.selected]="isOrderSelected(order)" [class.in-progress]="!isFulfilled(order)">
         <ion-note slot="end" (click)="openByOrder(order)">
-          <span class="price">{{order.getSubTotal()|number:'1.0-0'}} fr</span>
+          <span class="price">{{order.getSubTotal({ withoutCharge: true })|number:'1.0-0'}} fr</span>
           <span class="progress">{{order.getProgress()|number:'1.0-0'}} %</span>
         </ion-note>
         <ion-avatar slot="start" (click)="openByOrder(order)">
@@ -179,7 +180,7 @@
           <h2>
             <span class="label counter">{{i+1}}</span>
             <span class="label">{{order.payment.status}}</span>
-            {{order.getFulfilledProgress()}}/{{order.items.length}} ({{order.shipping.bags}} sacs)
+            {{order.getFulfilledProgress()}}/{{order.items.length}} - {{order.shipping.bags}}
           </h2>
         </ion-label>
         <ion-button mode="ios" expandable color="danger" class="hidden-sm capture" (click)="orderCapture(order)"

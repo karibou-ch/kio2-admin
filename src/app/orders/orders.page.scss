@@ -4,7 +4,7 @@ button.fab{
 
 h3,
 h4 {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   &.bold {
     font-weight: 600;
   }
@@ -97,16 +97,16 @@ ion-item {
   }
   span.price{
     position: absolute;
-    font-size: 1.0rem;
+    font-size: 0.9rem;
     top: 10px;
     color: white;
-    font-weight: 700;
+    font-weight: 200;
     padding: 0;
     width: 18px;
     height: 18px;
     line-height: 15px;
     text-align: center;
-    width: 55px;
+    width: 45px;
     padding-top: 1px;
     border-radius: 3px;
     background: var(--ion-color-kio-primary);
@@ -117,8 +117,9 @@ ion-item {
   span.progress{
     color: green;
     position: absolute;
-    bottom: 10px;
+    bottom: 5px;
     right: 10px;        
+    font-size: 0.9rem;
   }
 
   .ranks{

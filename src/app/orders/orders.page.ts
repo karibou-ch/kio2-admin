@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
-import { ToastController, PopoverController, ModalController } from '@ionic/angular';
+import { ToastController, PopoverController, ModalController, LoadingController } from '@ionic/angular';
 import { CalendarPage } from '../calendar/calendar.page';
 import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -50,6 +50,7 @@ export class OrdersCustomerPage {
     private $modal: ModalController,
     public $toast: ToastController,
     public $loader: LoaderService,
+    private $loading: LoadingController,
     private $popup: PopoverController,
     private $route: ActivatedRoute,
     private $router: Router,
@@ -104,9 +105,16 @@ export class OrdersCustomerPage {
     // FIXME sent ISO date get wrong on server
     const UTC = new Date(this.shipping);
     UTC.setHours(8);
+    const loading = this.$loading.create({
+      cssClass: '',
+      message: 'Please wait...',
+      duration: 2000
+    }).then(load => load.present());
+
 
     this.$order.informShopToOrders('shops', UTC).subscribe(
       (result) => {
+        this.$loading.dismiss();
         this.onDone('Mail envoyé à '+ Object.keys(result).length +' destinataire(s)');
       }, err => this.onDone(err.error)
     );
@@ -252,7 +260,8 @@ export class OrdersCustomerPage {
   onDone(msg) {
     this.$toast.create({
       message: msg,
-      duration: 3000
+      duration: 3000,
+      color: 'dark'
     }).then(alert => alert.present());
 
   }
@@ -394,7 +403,7 @@ export class OrdersCustomerPage {
 
     // AVG
     this.orderTotal = this.orders.reduce((sum, order, i) => {
-      return order.getSubTotal() + sum + this.orderBaseAmount;
+      return order.getSubTotal({ withoutCharge: true }) + sum + this.orderBaseAmount;
     }, 0);
     this.orderAvg = this.orderTotal / this.orders.length;
 
