@@ -226,6 +226,8 @@ export class OrdersCollectPage  implements OnInit{
     this.shipping = ctx.when;
     this.isReady = true;
     this.vendors = {list: []};
+    this.pickerShippingDate = ctx.when.toISOString();
+
     //
     // init orders count
     this.hubs.forEach(hub => hub.orders = 0);
@@ -253,7 +255,7 @@ export class OrdersCollectPage  implements OnInit{
   async openCalendar($event) {
     const pop = await this.$popup.create({
       component: CalendarPage,
-      translucent: true,
+      translucent: false,
       event: $event,
       componentProps: {
         orders: this.orders
@@ -283,7 +285,7 @@ export class OrdersCollectPage  implements OnInit{
   onDatePicker() {
     const date = new Date(this.pickerShippingDate);
     date.setHours(0, 0, 0, 0);
-    date.setDate(2);
+    date.setDate(1);
 
 
     this.pickerShippingDate = date.toISOString();
