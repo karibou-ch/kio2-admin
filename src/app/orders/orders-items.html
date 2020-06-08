@@ -46,6 +46,15 @@
         </div>
 
         <div class="actions">
+
+          <!-- REFUND HUB-->
+          <button class="avoid button-refund item-button" 
+            color="danger"  slot="end" 
+            [hidden]="!isPaid(order)"
+            (click)="doRefundHUB(order)">
+            HUB refund
+          </button>
+
           <button  class="item-button" fill="outline" slot="end" 
                   [hidden]="isPaid(order)"
                   (click)="doValidateAll(order)">

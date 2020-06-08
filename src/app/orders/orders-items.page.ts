@@ -128,6 +128,36 @@ export class OrdersItemsPage implements OnInit {
     }).then(alert => alert.present());
   }
 
+  doRefundHUB(order: Order) {
+    const max = order.getSubTotal();
+    this.$alert.create({
+      header: 'Rembousement à la charge du HUB',
+      subHeader: 'ATTENTION',
+      inputs: [{
+        name: 'amount',
+        placeholder: 'Max ' + max + ' fr',
+        type: 'number'
+      }],
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel',
+          handler: data => {
+          }
+        }, {
+          text: 'Rembouser',
+          handler: data => {
+            this.$order.hub_refund(order, data.amount).subscribe(
+              () => {
+                this.doToast('Montant: ' + data.amount + ' remboursé');
+              }, error => this.doToast(error.error, error)
+            );
+          }
+        }
+      ]
+    }).then(alert => alert.present());
+
+  }  
   doRefund(order: Order, item: OrderItem) {
     this.$alert.create({
       header: 'Rembousement partiel',
