@@ -26,7 +26,7 @@
         </p>  
       </ion-label>
       <ion-note slot="end" >
-        {{order.getSubTotal()|currency:'CHF'}} <br/>
+        {{order.getSubTotal({ withoutCharge:true })|currency:'CHF'}} <br/>
         <span [class.red]="deltaPrice>0.15">{{deltaPrice|percent}}</span>
       </ion-note>
       <div class="note" slot="end">

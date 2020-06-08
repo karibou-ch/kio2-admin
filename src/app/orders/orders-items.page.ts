@@ -89,7 +89,7 @@ export class OrdersItemsPage implements OnInit {
     }
 
     let originAmount = 0;
-    const finalAmount: number = order.getSubTotal();
+    const finalAmount: number = order.getSubTotal({ withoutCharge: true });
     this.deltaPrice = 0;
     order.items.forEach((item) => {
       //
@@ -245,7 +245,8 @@ export class OrdersItemsPage implements OnInit {
     // }
     const params: any = {
       message: msg,
-      cssClass: 'toast-item',
+      cssClass: 'toast-message',
+      color: 'dark',
       duration: 4000
     };
     if (error) {
