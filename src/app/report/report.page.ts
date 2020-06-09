@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Config, ReportOrders, ReportingService } from 'kng2-core';
+import { Config, ReportOrders, ReportingService, User } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
 import { ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,7 +20,7 @@ export class ReportPage implements OnInit {
   today: Date = new Date();
   headerImg = '/assets/img/k-sm.jpg';
   shops: string[] = [];
-  defaultShop: string;
+  defaultShop: any;
   defaultTitle: string;
   csv: { data: SafeUrl, filename: string};
 
@@ -28,6 +28,7 @@ export class ReportPage implements OnInit {
   pickerDate: string;
   currentDate: Date;
   pickerShippingDate: string;
+  user: User;
 
 
   constructor(
@@ -55,6 +56,8 @@ export class ReportPage implements OnInit {
   }
 
   ngOnInit() {
+    this.user = this.$engine.currentUser;
+
     this.onInitReport();
   }
 
@@ -66,6 +69,10 @@ export class ReportPage implements OnInit {
     }).then(alert => alert.present());
   }
 
+  getEmail() {
+    // backward compability
+    return this.config.shared['home'].mail || this.config.shared.mail.address
+  }
   //
   // on selected date
   onDatePicker() {
@@ -138,30 +145,17 @@ export class ReportPage implements OnInit {
     this.$router.navigate(['/report', this.month, this.year, slug]);
   }
 
-  shopName() {
-    if (!this.report) {
-      return '';
-    }
-    return this.report.shops[this.shops[0]].name;
-  }
-  shopGetFirst() {
-    if (!this.report) {
-      return {};
-    }
-    return this.report.shops[this.shops[0]];
-  }
-
 
   totalErrors() {
     return this.shops.reduce((sum, slug) => {
       return sum + this.report.shops[slug].errors;
-    }, 0)
+    }, 0);
   }
 
   totalRefunds() {
     return this.shops.reduce((sum, slug) => {
       return sum + this.report.shops[slug].refunds;
-    }, 0)
+    }, 0);
   }
 
 }

@@ -34,11 +34,11 @@
       <span class="gray"> | 34 route de chêne | 1208 | Genève</span> 
     </address>
 
-    <address>
-      <!-- <strong class="text-capitalize">{{user.display()}}</strong><br> -->
-      <!-- <span class="text-underline bold" >{{shopGetFirst().name}}</span><br> -->
-      <!-- <span >{{shopGetFirst().address.streetAdress}}</span><br>
-      <span >{{shopGetFirst().address.postalCode}} / {{shopGetFirst().address.region}}</span><br> -->
+    <address *ngIf="defaultShop">
+      <strong class="text-capitalize" >{{user.display()}}</strong><br> 
+      <h2 class="text-underline bold" >{{defaultShop.name}}</h2>
+      <!-- <span >defaultShop.address?.streetAdress}}</span><br>
+      <span >defaultShop.address?.postalCode}} / defaultShop.address?.region}}</span><br> -->
     </address>
 
     <h4 [hidden]="!report.from">Relevé d'activité du {{report.to|date:"d MMM y"}}</h4>
@@ -72,7 +72,7 @@
       <tbody *ngIf="shops.length>1" class="report-last">
         <tr><td><b>TOTAL</b> {{report.items}} articles / {{report.orders.length}} commandes</td><td>{{report.amount|currency:'CHF'}}</td></tr>
         <tr><td>Déduction liée à la participation aux frais des clients</td><td>{{report.discount|currency:'CHF'}}</td></tr>
-        <tr><td>Déduction lié au service config?.shared.siteName.fr </td><td>{{report.ca|currency:'CHF'}}</td></tr>
+        <tr><td>Déduction lié au service karibou.ch </td><td>{{report.ca|currency:'CHF'}}</td></tr>
         <tr><td class="bold">Solde en faveur des boutiques</td><td class="bold">{{report.amount-report.discount-report.ca|currency:'CHF'}}</td></tr>
       </tbody>
     </table>
@@ -100,7 +100,7 @@
     <h4>Avec nos meilleures salutations,</h4>
     <p>
       Karibou.ch<br/>
-      {{config?.shared.mail.address}}<br/>
+      {{getEmail()}}<br/>
     </p>
 
     <div class="page-break"></div>    
