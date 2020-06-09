@@ -30,9 +30,8 @@
   <div class=" report">
     <address class="small">
       <img [src]="headerImg"  />
-      <span class="text-underline bold" >config?.shared.siteName.fr</span> 
-      <!-- | <span class="text-capitalize">Olivier & Delphine Cluzel Evalet</span> | 
-      <span >34 route de chêne | 1208 | Genève</span>  -->
+      <span class="text-underline bold" >Karibou.ch</span> 
+      <span class="gray"> | 34 route de chêne | 1208 | Genève</span> 
     </address>
 
     <address>
@@ -80,6 +79,9 @@
     </div>
     <div *ngIf="defaultShop"><!-- BY PRODUCT -->
       <h4 class="ng-scope">Les ventes par produit</h4>
+      <p *ngIf="csv" class="hidden-print">
+        <a [href]="csv.data" [download]="csv.filename" class="small link">Télécharger {{csv.filename}}</a>
+      </p>
       <table class="mdl-data-table  " style="width:90vw">
         <thead>
           <tr>
@@ -97,9 +99,8 @@
     </div>
     <h4>Avec nos meilleures salutations,</h4>
     <p>
-      config?.shared.siteName.fr<br/>
+      Karibou.ch<br/>
       {{config?.shared.mail.address}}<br/>
-      config?.shared.phone<br/>
     </p>
 
     <div class="page-break"></div>    

@@ -3,6 +3,7 @@ import { Config, ReportOrders, ReportingService } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
 import { ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-report',
@@ -21,6 +22,7 @@ export class ReportPage implements OnInit {
   shops: string[] = [];
   defaultShop: string;
   defaultTitle: string;
+  csv: { data: SafeUrl, filename: string};
 
   format = 'MMM yyyy';
   pickerDate: string;
@@ -33,6 +35,7 @@ export class ReportPage implements OnInit {
     private $report: ReportingService,
     private $route: ActivatedRoute,
     private $router: Router,
+    private $sanitizer: DomSanitizer,
     private $toast: ToastController,
   ) {
     this.currentDate = this.$engine.currentShippingDate;
@@ -108,6 +111,24 @@ export class ReportPage implements OnInit {
           // sku,title,amount,count,vendor
           return b.amount - a.amount;
         });
+
+        //
+        // build csvData
+        // actual delimiter characters for CSV format
+        const colDelim = '","';
+        const rowDelim = '"\r\n"';
+        const csv = this.report.products.map( product => {
+          // escape double quotes
+          return [
+            '"' + product.title.replace(/"/g, "'") + '"', 
+            product.count,
+            product.amount.toFixed(2)
+          ].join(',');
+        }).join('\r\n');
+        this.csv = {
+          data: this.$sanitizer.bypassSecurityTrustUrl('data:application/csv;charset=utf-8,' + encodeURIComponent(csv)),
+          filename: this.defaultTitle + '.csv'
+        } ;
       }
     }, error => this.doToast(error.error)
    );
