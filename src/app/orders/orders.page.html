@@ -37,7 +37,7 @@
 
   <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes</h1>
   
-  <ion-refresher 
+  <ion-refresher slot="fixed" [disabled]="false"
     (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
