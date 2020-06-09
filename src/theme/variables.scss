@@ -292,38 +292,34 @@
   }
 }
 
-@media print {
-  .hidden-print{
-    display: none!important;
-  }
-  .report{
-    border: none!important;
-    padding:5px!important; 
-    font-size: xx-small!important;
-  }
-
-  // ion-content{
-  //   overflow-y: scroll!important;
-  //   .scroll-content{
-  //     position: relative;
-  //     height: auto;
-  //     width: 100%!important;
-  //     float: left;
-  //     overflow-x: visible!important;
-  //     overflow-y: visible!important;
-  //     width: 100%!important;    
-  //   }
-      
-  // }
+.text-capitalize {
+  text-transform: capitalize;
 }
 
-@import "md-table";
+.red{
+  color: red!important;
+}
+.small {
+  font-size: small!important;
+}
 
-// App iOS Variables
-// --------------------------------------------------
-// iOS only Sass variables can go here
+[expand = block] {
+  width: 100%;
+}
 
-ion-toolbar.ios {
-  height: 44px;
-  padding-top: 0;
+
+.gm-style .gm-style-iw{
+  font-size: 17px;
+}
+
+.gm-style .gm-style-iw-c{
+  min-width: initial;
+  width: 80vw;
+  line-height: 25px;
+}
+
+.uploadcare--widget,
+.uploadcare--widget__button{
+  width: 100%;
+  padding: 10px;
 }

@@ -1,0 +1,28 @@
+// Ionic Variables and Theming. For more info, please see:
+// http://ionicframework.com/docs/theming/
+
+ion-toolbar.ios {
+  height: 44px;
+  padding-top: 0;
+}
+
+ion-popover {
+  --min-with: 350px;
+  --min-height: 200px;
+}
+
+.popover-content{
+  min-width: 300px!important;
+}
+
+
+ion-toggle {
+  --background-checked: var(--ion-color-primary);
+  --handle-background-checked: var(--ion-color-primary);
+  --background: #eee;
+}
+
+
+.toggle-checked .toggle-inner{
+  background-color: var(--ion-color-primary);
+}

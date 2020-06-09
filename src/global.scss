@@ -26,55 +26,8 @@
 @import "~@ionic/angular/css/flex-utils.css";
 
 @import "./theme/variables.scss";
-
-ion-popover {
-  --min-with: 350px;
-  --min-height: 200px;
-}
-
-.popover-content{
-  min-width: 300px!important;
-}
-
-.text-capitalize {
-  text-transform: capitalize;
-}
-
-.red{
-  color: red!important;
-}
-.small {
-  font-size: small!important;
-}
-
-ion-toggle {
-  --background-checked: var(--ion-color-primary);
-  --handle-background-checked: var(--ion-color-primary);
-  --background: #eee;
-}
+@import "./theme/variables-ionic.scss";
+@import "./theme/md-table.scss";
+@import "./theme/print.scss";
 
 
-.toggle-checked .toggle-inner{
-  background-color: var(--ion-color-primary);
-}
-
-[expand = block] {
-  width: 100%;
-}
-
-
-.gm-style .gm-style-iw{
-  font-size: 17px;
-}
-
-.gm-style .gm-style-iw-c{
-  min-width: initial;
-  width: 80vw;
-  line-height: 25px;
-}
-
-.uploadcare--widget,
-.uploadcare--widget__button{
-  width: 100%;
-  padding: 10px;
-}
