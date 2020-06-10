@@ -98,6 +98,7 @@ export class OrdersCustomerPage {
     // setTimeout(() => {
     //   refresher.complete();
     // }, 1000);
+    window.location.reload();
   }
 
   emailVendors() {

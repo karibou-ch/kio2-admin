@@ -337,13 +337,15 @@ export class OrdersItemsPage implements OnInit {
     return (['paid', 'partially_refunded', 'manually_refunded'].indexOf(order.payment.status) > -1);
   }
 
+  //
+  // First sorted by vendors, then sorted by Cat
   sortedItem(order: Order) {
     return order.items.sort((a, b) => {
-        const catCmp = a.category.localeCompare(b.category);
-        if (catCmp !== 0) {
-          return catCmp;
+        const vendorCmp = a.vendor.localeCompare(b.vendor);
+        if (vendorCmp !== 0) {
+          return vendorCmp;
         }
-        return a.vendor.localeCompare(b.vendor);
+        return a.category.localeCompare(b.category);
     });
   }
 
