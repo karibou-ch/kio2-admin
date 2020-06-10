@@ -31,6 +31,10 @@ ion-select {
 
 ion-title{
   text-transform: capitalize;
+  ion-icon {
+    transform: translateY(4px);
+    color: gold;    
+  }
 }
 
 ion-badge {
