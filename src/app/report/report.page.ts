@@ -71,7 +71,11 @@ export class ReportPage implements OnInit {
 
   getEmail() {
     // backward compability
-    return this.config.shared['home'].mail || this.config.shared.mail.address
+    if(this.config.shared['home']){
+      return this.config.shared['home'].mail;
+    }
+
+    return this.config.shared.mail.address;
   }
   //
   // on selected date
@@ -92,7 +96,7 @@ export class ReportPage implements OnInit {
   onInitReport() {
    this.month = new Date(this.currentDate).getMonth() + 1;
    this.year = new Date(this.currentDate).getFullYear();
-   const month = ('0' + (this.month + 1)).slice(-2);
+   const month = ('0' + (this.month )).slice(-2);
 
    this.shops = [];
    this.report = null;

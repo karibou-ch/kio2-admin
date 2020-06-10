@@ -214,7 +214,8 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doValidate(order, item) {
-    this.$order.updateItem(order, [item], EnumFulfillments.fulfilled)
+    const copy = Object.assign({}, item);
+    this.$order.updateItem(order, [copy], EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
         const title = item.title.substring(0, len) + (item.title.length > len ? '...' : '');

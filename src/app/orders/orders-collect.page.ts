@@ -345,6 +345,10 @@ export class OrdersCollectPage  implements OnInit{
   };
 
 
+  toggleCollect($event) {
+    this.toCollect = !this.toCollect;
+  }
+
 
   updateCollect(vendor) {
     const when = this.vendors[vendor].shipping.when;

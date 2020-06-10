@@ -40,13 +40,14 @@
     <ion-item  lines="none">
       <ion-searchbar
         mode="ios"
+        showCancelButton="focus"
         [(ngModel)]="searchFilter"
         [debounce]="500"
         [hidden]="!(vendors.list.length)"
         (ionInput)="onSearchInput($event)"
         (ionClear)="onSearchCancel($event)">
       </ion-searchbar>  
-      <ion-chip (click)="toCollect=!toCollect;" slot="end" [hidden]="!orders.length">
+      <ion-chip (click)="toggleCollect($event)" slot="end" [hidden]="!orders.length" tabIndex="-1">
         <!-- radio-button-off-outline || checkmark-circle-outline -->
         <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!toCollect"></ion-icon>
         <ion-label color="primary">A Collecter</ion-label>
