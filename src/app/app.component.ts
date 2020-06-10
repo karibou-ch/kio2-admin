@@ -17,6 +17,7 @@ import { interval } from 'rxjs';
 })
 export class Kio2Admin {
   currentUser: User = new User();
+  NET_INFO: boolean;
 
   constructor(
     private $engine: EngineService,
@@ -44,33 +45,19 @@ export class Kio2Admin {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      let NET_INFO = false;
+      this.NET_INFO = false;
 
       //
       // SIMPLE NETWORK CHECKER INFO
       const neteork = interval(5000).subscribe(() => {
-        console.log('Network check',this.$network.type);
-        if(this.$network.type.toLocaleLowerCase() === 'none') {
-          if(NET_INFO) {
+        if(this.$network.type.toLocaleLowerCase() === 'none' ||
+          !window.navigator.onLine) {
+          if (this.NET_INFO) {
             return;
           }
-          this.$toast.create({
-            message: 'Problème avec le réseau ',
-            position: 'top',
-            buttons: [
-              {
-                text: 'OK',
-                role: 'cancel',
-                handler: () => {
-                }
-              }
-            ],
-            color: 'danger'
-          }).then(alert => alert.present());
-          NET_INFO = true;
-        } else if(NET_INFO){
-          this.$toast.dismiss();
-          NET_INFO = false;
+          this.NET_INFO = true;
+        } else if (this.NET_INFO){
+          this.NET_INFO = false;
         }
       });
     });
