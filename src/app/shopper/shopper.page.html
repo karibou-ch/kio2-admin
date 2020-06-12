@@ -58,6 +58,7 @@
           Tournée {{currentPlanning}} ({{getOrders().length}})
         </ion-label>
         <ion-select placeholder="Plan ?"         
+                    [hidden]="!currentHub"
                     (ngModelChange)="setShippingShopper({shopper:$event})"
                     [(ngModel)]="shippingShopper[currentPlanning].shopper" 
                     interface="action-sheet">
@@ -65,6 +66,7 @@
                   </ion-select>
 
       <ion-datetime 
+        [hidden]="!currentHub"
         placeholder="Time"
         displayFormat="HH:mm" 
         pickerFormat="HH mm" 
@@ -109,7 +111,6 @@
           <ion-icon name="bicycle"></ion-icon>
         <ion-select class="block"  placeholder="Tournée"
                       [(ngModel)]="order.shipping.priority" 
-                      [selectedText]="order.shipping.priority  + ' tournée'"
                       (ngModelChange)="setShippingPriority(order,$event)"
                       interface="action-sheet">
           <ion-select-option value="0">reset</ion-select-option>
