@@ -55,13 +55,17 @@ export class EngineService {
 
     //
     // order params
-    const today = new Date();
+    this.initDate();
     this.orderStatus = this.OPEN;
-    this.currentShippingDate = today.dayToDates([2, 3, 4, 5, 6])[0];
     this.selectedOrders$ = new ReplaySubject<OrdersCtx>(1);
     this.status$ = new ReplaySubject(1);
     this.cached = {};
     this.user = new User();
+  }
+
+  initDate() {
+    const today = new Date();
+    this.currentShippingDate = today.dayToDates([2, 3, 4, 5, 6])[0];
   }
 
   get availableDates() {
@@ -145,6 +149,7 @@ export class EngineService {
           this.monthOrders.set(orderTime, []);
           this.shippingWeek.push(order.shipping.when);
         }
+
         this.monthOrders.get(orderTime).push(order);
       });
 
@@ -182,6 +187,7 @@ export class EngineService {
       //
       // update currentshipping that containes orders
       this.currentShippingDate = new Date(preferredWhen);
+
 
       //
       // publish content
