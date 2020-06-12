@@ -129,8 +129,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     Kng2CoreModule.forRoot({
       API_SERVER: environment.API_SERVER,
       loader: [
-        'categories',
-        'shops'
+        'categories'
       ]
     }),
     AppRoutingModule
