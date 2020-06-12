@@ -284,7 +284,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   updateBag(order, count) {
     this.$order.updateBagsCount(order, count).subscribe(ok => {
-          this.onDone('Nombre sac enregistré')
+      this.onDone('Nombre sac enregistré');
     }, (error) => this.onError(error.error));
   }
 
