@@ -226,7 +226,7 @@
         <ion-label color="primary">
           Categorie (principale)
         </ion-label>
-        <ion-select ngDefaultControl [(ngModel)]="product.categories" (ionChange)="categoryChange()" interface="action-sheet">
+        <ion-select ngDefaultControl [(ngModel)]="product.categories" (ionChange)="categoryChange($event)" interface="action-sheet">
           <ion-select-option *ngFor="let cat of getCategories()"  [value]="cat._id">{{cat.name}}</ion-select-option>        
         </ion-select>
       </ion-item>

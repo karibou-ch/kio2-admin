@@ -60,16 +60,16 @@ export class ProductDetailsPage implements OnInit {
 
   ngAfterViewInit() {
     // console.log('--- ngAfterViewInit')
-    fromEvent(this.$elem.nativeElement, 'focusout').pipe(
-      debounceTime(2000),
-      skip(1),
-      map($event => this.shops.find(shop => shop._id === this.product.vendor)),
-      filter(shop => {
-        return !this.isProductReadyTosave(this.product, shop);
-      })
-   ).subscribe(shop => {
-    this.doSave(this.product, true);
-   });
+  //   fromEvent(this.$elem.nativeElement, 'focusout').pipe(
+  //     debounceTime(2000),
+  //     skip(1),
+  //     map($event => this.shops.find(shop => shop._id === this.product.vendor)),
+  //     filter(shop => {
+  //       return !this.isProductReadyTosave(this.product, shop);
+  //     })
+  //  ).subscribe(shop => {
+  //   this.doSave(this.product, true);
+  //  });
 
   }
 
@@ -87,7 +87,7 @@ export class ProductDetailsPage implements OnInit {
       //
       // admin can move a product to all shops
       if (this.user.isAdmin()) {
-        this.shops = loader[3].sort((s1, s2) => s1.urlpath.localeCompare(s2.urlpath));
+        this.shops = (loader[3] || []).sort((s1, s2) => s1.urlpath.localeCompare(s2.urlpath));
       }
 
       this.TVAs = this.config.shared.TVA;
@@ -120,8 +120,14 @@ export class ProductDetailsPage implements OnInit {
     });
   }
 
-  categoryChange() {
-    this.currentCategory = this.categories.find(cat => (cat._id + '') == this.product.categories);
+  categoryChange($event) {
+    // this.product.categories = $event.detail.value;
+    if(!$event.detail.value) {
+      return;
+    }
+    const id = $event.detail.value._id || $event.detail.value;
+    this.currentCategory = this.categories.find(cat => (cat._id + '') == id);
+    this.product.categories = this.currentCategory._id;
   }
 
 
@@ -150,9 +156,11 @@ export class ProductDetailsPage implements OnInit {
       return 1;
     }
 
-
     //
     // validate belong
+    if (!product.belong.name) {
+      return 2;
+    }
     if (product.belong.name && this.currentCategory) {
       const child = this.currentCategory.child.find(child => child.name === product.belong.name);
       if (!child) {
@@ -203,7 +211,8 @@ export class ProductDetailsPage implements OnInit {
       return this.$toast.create({
         message: 'La boutique n\'a pas été sélectionnée',
         duration: 3000,
-        color: 'dark'
+        color: 'danger',
+        position: 'top'
       }).then(alert => alert.present());
     }
 
@@ -212,7 +221,8 @@ export class ProductDetailsPage implements OnInit {
       return this.$toast.create({
         message: 'La sous catégorie  n\'est pas compatible',
         duration: 3000,
-        color: 'dark'
+        color: 'danger',
+        position: 'top'
       }).then(alert => alert.present());
     }
 
@@ -231,8 +241,8 @@ export class ProductDetailsPage implements OnInit {
       (product) => {
         this.create = false;
         this.product.sku = product.sku;
-        this.product.categories = product.categories._id || product.categories;
-        this.product.vendor = product.vendor._id || product.vendor;
+        // this.product.categories = product.categories._id || product.categories;
+        // this.product.vendor = product.vendor._id || product.vendor;
 
         //
         // cached
