@@ -1,8 +1,8 @@
-  :host {
   
+  ion-content{
+    --background: transparent;
   }
 
-  #background-content,
   .landing-k {
     position: relative;
     display: inline-block;
@@ -10,6 +10,11 @@
     background-position: center 10%;
     background-size: auto 350px;
     background-image: url('/assets/img/k.svg');
+    position: fixed;
+    width: 100vw;
+    height: 400px;
+    bottom: 0;
+    z-index: -1;    
   }
 
   .sitename{

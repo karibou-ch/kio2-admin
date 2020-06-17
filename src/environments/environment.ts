@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   // API_SERVER: 'http://api.karibou.evaletolab.ch'
-  API_SERVER: 'http://localhost:4000'
+  API_SERVER1: 'http://localhost:4000',
+  API_SERVER: 'https://karibou.ch/api'
 };
 
 /*

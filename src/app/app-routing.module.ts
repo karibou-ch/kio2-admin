@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    resolve: {loader : UserResolve },
+    resolve: {loader : LoaderResolve },
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   },
   {

@@ -143,7 +143,9 @@ export class OrdersCollectPage  implements OnInit{
       const o = new Order(order);
       o.items = order.items.filter((item) => item.vendor === vendor);
       return o;
-    }).filter(o => o.items.length);
+    }).filter(o => o.items.length).sort((a,b) => {
+      return a.rank - b.rank;
+    });
   }
 
   doRefresh(refresher) {
