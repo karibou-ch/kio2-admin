@@ -1,5 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
+
     <ion-title>
       Karibou.ch
     </ion-title>
@@ -11,7 +12,10 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="sitename">{{siteName}} <b>{{VERSION}}</b></div>
+  <div class="sitename">
+    <img class="logo-small" src="/assets/img/k-puce-light.png" />
+    <b>v{{VERSION}}</b>
+  </div>
 
 
   <div id="container">
@@ -23,7 +27,7 @@
     <strong>Que souhaitez-vous faire</strong>
     <p>Opérationel</p>
 
-    <ion-row>
+    <ion-row class="center">
       <ion-col [hidden]="!isAdminOrLogistic" (click)="openShopper()">
         <ion-icon name="bicycle-outline" color="grey-icon"></ion-icon>
         <div>Logistique</div>
@@ -50,7 +54,7 @@
       <p>Administration</p>
     </div>
     
-    <ion-row>
+    <ion-row class="center">
       <ion-col [hidden]="!isAdminOrVendor" (click)="openReport()">
         <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
         <div>Rapport</div>
@@ -89,7 +93,7 @@
       <ion-item *ngFor="let shop of user.shops" [href]="'/vendor/'+shop.urlpath">
         
         <ion-label>
-          <h2>{{shop.name}} - {{shop.status}} - {{shop.available.active}}</h2>
+          <h2>{{shop.name}}</h2>
           <p [hidden]="isShopOpen(shop )" class="red small">
             Fermeture le {{shop.available.from |date:'mediumDate':'GMT+1':'fr'}}, ouverture le {{shop.available.to |date:'mediumDate':'GMT+1':'fr'}}          
           </p>
