@@ -84,9 +84,17 @@ export class OrdersCustomerPage {
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrders();
+
+    //
+    // update orders state
+    const vendors = this.user.shops.map(shop => shop.urlpath);
+    const isAdmin = this.user.isAdmin();
     this.$order.order$.subscribe(order => {
       const idx = this.orders.findIndex(o => o.oid === order.oid);
-      if( idx > -1) {
+      if ( idx > -1) {
+        //
+        // FIXME this filter must be made in server side
+        order.items = order.items.filter(item => isAdmin || (vendors.indexOf(item.vendor) > -1));
         this.orders[idx] = order;
       }
     });
