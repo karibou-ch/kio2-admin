@@ -1,8 +1,8 @@
 {
   "name": "kio2-admin",
-  "version": "2.99.31",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "version": "3.00.04",
+  "author": "karibou.ch",
+  "homepage": "https://karibou.ch/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
