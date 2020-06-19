@@ -12,7 +12,7 @@
 
 <ion-content padding>
 
-  <img [src]="getImage()" />
+  <img *ngIf="getImage()" [src]="getImage()" />
 
   <!-- <button ion-button block large color="primary" (click)="doUpload()">Upload Image</button> -->
 

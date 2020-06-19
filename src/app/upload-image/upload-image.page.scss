@@ -1,3 +1,4 @@
+/** must be set on variable.scss */
 .uploadcare--widget,
 .uploadcare--widget__button{
   width: 100%;
@@ -5,7 +6,7 @@
 }
 
 .uploadcare--page{
-  overflow: visible;
+  overflow: visible!important;
 }
 
 
@@ -15,8 +16,10 @@ img {
   height: auto;
   margin-left: auto;
   margin-right: auto;
+  background-color: #eee;
+  max-height: calc( 100vh - 100px );
 
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-image: url('/assets/img/placeholder.png');  
+  -background-repeat: no-repeat;
+  -background-size: contain;
+  -background-image: url('/assets/img/placeholder.png');  
 }
