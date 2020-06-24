@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Config, User, ConfigKeyStoreEnum, config, LoaderService, UserService } from 'kng2-core';
+import { Config, User, ConfigKeyStoreEnum, config, LoaderService, UserService, Shop } from 'kng2-core';
 import { App } from '@ionic/pro';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -11,6 +11,15 @@ import { EngineService } from '../services/engine.service';
   styleUrls: ['./profil.page.scss'],
 })
 export class ProfilPage implements OnInit {
+
+
+  //
+  // Stripe connect
+  STRIPE_CONNECT = 'https://connect.stripe.com/express/oauth/authorize';
+
+  defaultShop: Shop;
+  stripeParameters: any;
+  stripeUrl: string;
 
 
   config: Config = config;
@@ -29,6 +38,39 @@ export class ProfilPage implements OnInit {
   ) {
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
+
+    //
+    // fix TVA
+    // if (!this.user.account.tva) {
+    //   this.user.account.tva = {};
+    // }
+
+    //
+    // display vendor informations
+    if (this.user.shops.length) {
+      this.defaultShop = this.user.shops[0];
+      this.stripeParameters = {};
+      const redirect = window.location.href;
+      this.stripeParameters.state = this.user.id;
+      this.stripeParameters.client_id = 'ca_AUrJdJtcFPx2GlG38h2i1XxUld9J2Ya8';//+config.shared.keys.pubStripe;
+      this.stripeParameters.redirect_uri = redirect + '/stripe';
+      this.stripeParameters['stripe_user[business_type]'] = 'company';
+      this.stripeParameters['stripe_user[phone_number]'] = this.defaultShop.address.phone;
+      this.stripeParameters['stripe_user[business_name]'] = this.defaultShop.name;
+      this.stripeParameters['stripe_user[first_name]'] = this.user.name.givenName;
+      this.stripeParameters['stripe_user[last_name]'] = this.user.name.familyName;
+      this.stripeParameters['stripe_user[email]'] = this.user.email.address;
+
+      // we can pass some additional fields to prefill:
+      this.stripeParameters['suggested_capabilities[]'] = 'transfers';
+      this.stripeParameters['stripe_user[street_address]'] = this.defaultShop.address.streetAdress;
+      this.stripeParameters['stripe_user[zip]'] = this.defaultShop.address.postalCode;
+      this.stripeParameters['stripe_user[state]'] = this.defaultShop.address.region;
+
+
+      this.stripeUrl = this.STRIPE_CONNECT + '?' + new URLSearchParams(this.stripeParameters).toString();
+    }
+
   }
 
   isPC(postal: string) {
@@ -45,9 +87,8 @@ export class ProfilPage implements OnInit {
   }
 
   logout() {
-    this.$user.logout().subscribe(() =>
-      this.$router.navigateByUrl('/')
-    );
+    this.$user.logout().subscribe();
+    this.$router.navigateByUrl('/login');
   }
 
   save() {

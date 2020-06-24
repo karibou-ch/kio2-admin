@@ -58,7 +58,6 @@ export class LoginPage implements OnInit {
       });
     });
 
-    console.log('----', this.config);
 
     this.isReady = true;
     const isHub = this.config.shared.hub && this.config.shared.hub.siteName;

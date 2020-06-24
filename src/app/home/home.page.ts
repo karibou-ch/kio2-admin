@@ -53,6 +53,10 @@ export class HomePage {
     this.$router.navigateByUrl('/customers');
   }
 
+  openInvoices() {
+    this.$router.navigateByUrl('/invoices');
+  }
+
   openProducts() {
     this.$router.navigateByUrl('/products');
   }

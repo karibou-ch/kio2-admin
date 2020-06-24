@@ -1,6 +1,6 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>{{shop.name}}</ion-title>
+  <ion-toolbar  [color]="isClosed() ? 'danger':'primary'">
+    <ion-title>{{shop.name || 'Nouvelle boutique'}}</ion-title>
     <ion-buttons slot="start">
       <ion-button  (click)="doBack()">
         <ion-icon name="chevron-back-outline"></ion-icon>
@@ -10,16 +10,27 @@
 </ion-header>
 
 
-<ion-content  [class.inactive]="!shop.status" *ngIf="shop.available">
+<ion-content  *ngIf="shop.available">
   <ion-list>
     <ion-item>
         <ion-button expand="block" fill="outline" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button>
       </ion-item>      
+      <ion-item [hidden]="!(user?.isAdmin())">
+        <ion-label color="primary" >
+          Boutique active pour la vente
+        </ion-label>
+        <ion-toggle color="positive" [(ngModel)]="shop.status" [disabled]="!user.isAdmin()"></ion-toggle>
+      </ion-item>
+      <ion-item >
+        <ion-label color="primary">Plus de détails avec le Mail des commandes</ion-label>
+        <ion-toggle color="positive" [(ngModel)]="shop.info.detailledOrder" ></ion-toggle>
+      </ion-item>        
+    
   </ion-list>
     
 
   <!-- VACANCE -->
-  <ion-list>
+  <ion-list [hidden]="shop.status !== true">
     <ion-list-header color="primary">
       Informez vos clients
     </ion-list-header>
@@ -41,20 +52,10 @@
 
   <!-- DESCRIPTION -->
   <ion-list >
-    <ion-item [hidden]="!(user?.isAdmin())">
-      <ion-label color="primary" >
-        Boutique active pour la vente
-      </ion-label>
-      <ion-toggle color="positive" [(ngModel)]="shop.status" [disabled]="!user.isAdmin()"></ion-toggle>
-    </ion-item>
     <ion-item>
       <ion-label color="primary" position="floating">Description </ion-label> 
       <ion-textarea  rows="10"  placeholder="votre histoire... " [(ngModel)]="shop.description" required></ion-textarea>
     </ion-item>
-    <ion-item >
-      <ion-label color="primary">Grouper la liste des produits commandés</ion-label>
-      <ion-toggle color="positive" [(ngModel)]="shop.info.detailledOrder" ></ion-toggle>
-    </ion-item>        
     <ion-item >
       <ion-label position="floating" color="primary">Ou vous trouver sur Internet</ion-label>
       <ion-input type="url" placeholder="https:// ..." [(ngModel)]="shop.url"></ion-input>              
@@ -167,7 +168,7 @@
 
     <ion-item [class.inactive]="!shop.discount.active">
         <ion-label color="primary" position="stacked">
-            Combien offrez-vous au client (CHF)
+            Vous offrez au client (CHF) (contribution à la livraison)
         </ion-label> 
         <ion-input type="number" placeholder="Votre participation en  X.XX CHF" [(ngModel)]="shop.discount.amount"></ion-input>              
     </ion-item>    

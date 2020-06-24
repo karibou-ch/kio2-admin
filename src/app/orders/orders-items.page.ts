@@ -119,6 +119,15 @@ export class OrdersItemsPage implements OnInit {
 
   }
 
+  doDisplayMail(order) {
+    const email = order.email;
+    this.$alert.create({
+      header: 'Adresse Mail',
+      subHeader: order.customer.displayName,
+      message: 'Mail <a href="mailto:' + email + '">' + email + '</a>',
+    }).then(alert => alert.present());
+  }
+
   doDisplayphone(order) {
     const phone = this.getPhoneNumber(order);
     this.$alert.create({
@@ -202,6 +211,13 @@ export class OrdersItemsPage implements OnInit {
         this.doToast('Articles du sac ' + order.rank);
         Object.assign(order, ok);
 
+        //
+        // when not admin, we should remove other vendor items
+        // FIXME this items filter should be on server for NON admin user
+        if (!this.user.isAdmin()) {
+          const vendor = items[0].vendor; /** items MUST BE for the same vendor */
+          order.items = order.items.filter(i => i.vendor === vendor);
+        }
 
         // FIXME this items filter should be on server for NON admin user
         // For Admin we should ALWAYS constraint to the vendor
@@ -223,13 +239,14 @@ export class OrdersItemsPage implements OnInit {
         Object.assign(order, ok);
         //
         // when not admin, we should remove other vendor items
-        // FIXME this items filter should be on server
+        // FIXME this items filter should be on server for NON admin user
         if (!this.user.isAdmin()) {
           order.items = order.items.filter(i => i.vendor === item.vendor);
         }
 
         // FIXME this items filter should be on server for NON admin user
         // For Admin we should ALWAYS constraint to the vendor
+        // vendor is set on collect page
         if (this.vendor) {
           order.items = order.items.filter(i => i.vendor === this.vendor);
         }
@@ -249,13 +266,13 @@ export class OrdersItemsPage implements OnInit {
         Object.assign(order, ok);
         //
         // when not admin, we should remove other vendor items
-        // FIXME this items filter should be on server
+        // FIXME this items filter should be on server for NON admin user
         if (!this.user.isAdmin()) {
           order.items = order.items.filter(i => i.vendor === item.vendor);
         }
 
-        // FIXME this items filter should be on server for NON admin user
         // For Admin we should ALWAYS constraint to the vendor
+        // vendor is set on collect page
         if (this.vendor) {
           order.items = order.items.filter(i => i.vendor === this.vendor);
         }

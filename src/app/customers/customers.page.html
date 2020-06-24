@@ -18,31 +18,54 @@
         <ion-icon name="checkmark-circle-outline" [hidden]="!cache.refund"></ion-icon>
         <ion-label color="primary">Remboursement</ion-label>
       </ion-chip>        
+      <ion-chip (click)="cache.premium=!cache.premium;sliceCustomers()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.premium"></ion-icon>
+        <ion-label color="primary">Premium</ion-label>
+      </ion-chip>        
+      <ion-note [hidden]="!customers.length" slot="end">
+        <ion-badge color="dark"> {{cache.customers.length}} </ion-badge>
+      </ion-note>
     </ion-item>
-    
     <ion-item-sliding *ngFor="let customer of customers;let i=index;">
       <ion-item>
         <ion-avatar slot="start">
           <span class="rank">{{customer.orders}}</span>
         </ion-avatar>
-          <ion-label class="ion-text-wrap">
-            <h2 >
-              <a href="mailto:{{customer.email}}">{{customer.email}}</a>
-            </h2>
-            <h3>            
-              <span class="light">Achat:</span> 
-              {{customer.last1Month}}<span class="light">/30 jours</span>, 
-              {{customer.last3Month}}<span class="light">/3mois</span> 
-              {{customer.last6Month}}<span class="light">/6mois</span>
-            </h3>
-            <div class="stats">
-              <span class="info">          
-                ERR: {{customer.errors}} ({{getErrorRatio(customer)|percent}}) - REMB: {{customer.refunds}}
-              </span>
-              <span class="label">{{customer.amount|currency:'CHF'}} </span>
-            </div>    
+        <ion-label>
+          <h2>{{customer.customer.displayName}} 
+            <span [hidden]="!user.isPremium(customer)">
+              <ion-icon color="danger" name="star"></ion-icon> 
+              <ion-icon color="danger" name="star" class="small"></ion-icon>
+            </span> </h2>
+          <h3>           
+            {{customer.last1Month}} <span class="">achats</span> <span class=""> / 30 derniers jours</span>
+          </h3>
+          <p>
+            Non reçus <b>{{customer.errors}}</b> ({{getErrorRatio(customer)|percent}}),
+             <b>{{customer.refunds}}</b> refund.
+          </p>
         </ion-label>
+        <div class="note">
+          <div class="label">{{customer.amount|currency:'CHF'}} </div> 
+          {{customer.customer.created|date:'MMM y'}} 
+        </div>
       </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option class="phone">
+          <ion-label >
+            <ion-button mode="ios" color="secondary" (click)="doDisplayMail(customer)">
+              <ion-icon name="mail"></ion-icon>             
+            </ion-button> 
+          </ion-label>
+
+          <ion-label >
+            <ion-button mode="ios" color="secondary" (click)="doDisplayPhone(customer)">
+              <ion-icon name="call"></ion-icon>             
+            </ion-button> 
+          </ion-label>
+        </ion-item-option>
+      </ion-item-options>
+
     </ion-item-sliding>
   </ion-list>
 

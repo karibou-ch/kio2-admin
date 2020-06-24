@@ -170,6 +170,9 @@ export class ShopperPage implements OnInit, OnDestroy {
     // set default order value based on postalCode
     this.pickerShippingDate = ctx.when.toISOString();
     this.orders = ctx.orders.sort(this.sortOrdersByPosition);
+    // this.orders.filter(o => o.shipping.priority === 1).forEach(order => {
+    //   console.log('---- priority,position',order.rank,order.shipping.priority, order.shipping.position);
+    // });
 
     //
     // IFF HUBs are available
@@ -442,13 +445,13 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   sortOrdersByCP(o1, o2) {
     // TODO checking type of postalCode is always a number
-    return (o1.shipping.postalCode | 0) - (o2.shipping.postalCode | 0);
+    return (+o1.shipping.postalCode) - (+o2.shipping.postalCode);
   }
 
   sortOrdersByPosition(o1, o2) {
     // TODO checking type of postalCode is always a number
     // console.log('sort',(o1.shipping.position*10+o1.rank),(o2.shipping.position*10+o2.rank))
-    const delta = ((o1.shipping.position | 0)) - ((o2.shipping.position | 0));
+    const delta = (+o1.shipping.position) - (+o2.shipping.position);
     if (delta === 0) {
       return o1.rank - o2.rank;
     }

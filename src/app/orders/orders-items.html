@@ -32,7 +32,7 @@
       <div class="note" slot="end">
         <a [hidden]="!getPhoneNumber(order)"
          color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
-     <a  color="info" href="mailto:{{order.email}}"> <ion-icon name="mail"> </ion-icon></a>
+     <a  color="info"  href="javascript:void()" (click)="doDisplayMail(order)"> <ion-icon name="mail"> </ion-icon></a>
 
       </div>
     </ion-item>

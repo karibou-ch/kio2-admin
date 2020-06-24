@@ -14,6 +14,16 @@
   font-size: 14px;
 }
 
+img.logo-small{
+  width: 22px;
+  margin: 0 4px;
+  transform: translateY(10px);
+}
+
+ion-row.center{
+  justify-content: center
+}
+
 #container {
   text-align: center;
 
@@ -21,30 +31,27 @@
   left: 0;
   right: 0;
   top: 100px;
-  -transform: translateY(-50%);
+
+  strong {
+    font-size: 20px;
+    line-height: 26px;
+  }  
+
+  p {
+    font-size: 16px;
+    line-height: 22px;
+    color: #8c8c8c;
+    margin: 0;
+    margin-bottom: 20px;
+  }  
+  a {
+    text-decoration: none;
+  }  
+  .middle {
+    margin-top: 40px;  
+  }  
 }
 
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  color: #8c8c8c;
-  margin: 0;
-  margin-bottom: 20px;
-}
-
-#container a {
-  text-decoration: none;
-}
-
-#container .middle {
-  margin-top: 40px;  
-}
 
 ion-list{
   margin-bottom: 50px;

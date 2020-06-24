@@ -84,6 +84,10 @@ export class VendorDetailsPage {
   ibanCtrl() {
     return this.isValidIBANNumber(this.shop.account.IBAN);
   }
+
+  isClosed() {
+    return this.shop.available.active || (this.shop.status !== true);
+  }
   /*
    * Returns 1 if the IBAN is valid
    * Returns FALSE if the IBAN's length is not as should be (for CY the IBAN Should be 28 chars long starting with CY )

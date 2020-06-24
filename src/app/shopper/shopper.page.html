@@ -99,7 +99,6 @@
       </ion-chip>
     </ion-item>
 
-
     <!-- REORDERING -->
     <ion-reorder-group [disabled]="!reorder" (ionItemReorder)="reorderItems($event)">
 
@@ -141,7 +140,7 @@
       </ion-item-options>
       <ion-item  (click)="toggleOrder(order)" >
         <ion-note slot="end">
-          {{order.shipping.postalCode}}
+          <b>{{order.shipping.postalCode}}</b>
           <span class="price" [hidden]="!order.shipping.bags">{{ order.shipping.bags }} sac</span>
           <span class="price" [hidden]="order.shipping.bags">{{order.getSubTotal({ withoutCharge: true })|number:'1.0-0'}} fr</span>
         </ion-note>        

@@ -50,13 +50,13 @@ export class Kio2Admin {
       //
       // SIMPLE NETWORK CHECKER INFO
       const neteork = interval(5000).subscribe(() => {
-        if(this.$network.type.toLocaleLowerCase() === 'none' ||
+        if((this.$network.type || '').toLocaleLowerCase() === 'none' ||
           !window.navigator.onLine) {
           if (this.NET_INFO) {
             return;
           }
           this.NET_INFO = true;
-        } else if (this.NET_INFO){
+        } else if (this.NET_INFO) {
           this.NET_INFO = false;
         }
       });

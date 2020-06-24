@@ -29,15 +29,37 @@
     <ion-item>
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Rôle</ion-label>
       <ul>
-
+        <li color="secondary">Utilisateur</li>    
         <li [hidden]="!user.hasRole('logistic')" color="secondary">Logistic</li>      
         <li [hidden]="!user.isAdmin()" color="secondary">Admin</li>
-        <li [hidden]="!user.shops.length" color="secondary">Vendor</li>
-        <li color="secondary">Utilisateur</li>    
+        <li [hidden]="!defaultShop" color="secondary">Vendor</li>
       </ul>
     </ion-item>
-    <ion-item>
-      <ion-button size="large" expand="block" shape="round" fill="outline" color="danger" (click)="logout()">
+    <!-- STRIPE -->
+    <ion-item *ngIf="defaultShop">
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Transfert d'argent</ion-label>
+
+      <ul>
+        <li>{{defaultShop.address.name}}</li>
+        <li>{{defaultShop.address.streetAdress}},{{defaultShop.address.postalCode}}, {{defaultShop.address.region}}</li>
+        <li>{{defaultShop.address.phone}}</li>
+        <li>{{defaultShop.account.IBAN}}</li>
+        <!-- <li>{{defaultShop.account.tva.number}}</li>         -->
+        <li [hidden]="!user.connect_state"><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon> Le transfert automatique est actif</li>
+      </ul>
+    </ion-item>
+    <ion-item *ngIf="defaultShop && !user.connect_state && false" class="space">
+      <ion-button size="medium"  expand="block" shape="round" fill="outline" color="primary" [href]="stripeUrl">
+        <ion-icon slot="start" name="card-outline"></ion-icon> Activer le transfert automatique à votre banque
+      </ion-button>
+    </ion-item>
+    <ion-item-divider>
+      <ion-label>
+        Fermer votre session
+      </ion-label>
+    </ion-item-divider>    
+    <ion-item class="space">
+      <ion-button size="medium"  expand="block" shape="round" fill="outline" color="danger" (click)="logout()">
         <ion-icon slot="start" name="person-circle-outline"></ion-icon> Logout
       </ion-button>
     </ion-item>

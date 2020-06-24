@@ -14,6 +14,11 @@ const routes: Routes = [
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   },
   {
+    path: 'stripe',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./stripe/stripe.module').then( m => m.StripePageModule)
+  },
+  {
     path: 'home',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
@@ -42,6 +47,11 @@ const routes: Routes = [
     path: 'orders',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./orders/orders.module').then( m => m.OrdersPageModule)
+  },
+  {
+    path: 'invoices',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./invoice/invoice.module').then( m => m.InvoicePageModule)
   },
   {
     path: 'customers',

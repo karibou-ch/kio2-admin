@@ -27,6 +27,14 @@
       </ion-button>    
     </ion-item>  
   
+    <!-- HUBS -->
+    <ion-item class="hub" lines="none" [hidden]="!hubs.length">
+      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
+        <ion-label color="primary">{{hub.name}}</ion-label>
+      </ion-chip>
+    </ion-item>
+
 
     <ion-item-sliding *ngFor="let shop of shops" [hidden]="shop.status!=cache.active">    
         <ion-item (click)="openDetails(shop)" [class.inactive]="shop.available.active">

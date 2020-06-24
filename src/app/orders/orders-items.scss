@@ -154,6 +154,10 @@ span.rank{
       width: auto;
       top:4px;
       color: var(--ion-color-kio-primary);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 95vw;
       >div{
         margin-left: 75px;
         margin-top: 2px;        

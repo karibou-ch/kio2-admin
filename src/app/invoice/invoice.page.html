@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Factures ouvertes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" [disabled]="false" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
+  <!--  LOGISTIC HEADER -->
+  <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Rien à afficher <br/>pour {{currentHub?.name}}</h1>
+
+  <ion-list>
+    <!-- DISPLAY ORDERS -->
+    <ion-item-sliding *ngFor="let order of orders">
+
+      <ion-item-options side="start" [hidden]="!user.isAdmin()">
+        <ion-item-option>
+          <ion-button mode="ios" expandable (click)="orderCapture(order)">
+            fermer
+          </ion-button>
+        </ion-item-option>
+      </ion-item-options>  
+
+      <ion-item-options side="start">
+      </ion-item-options>
+
+      <ion-item-options side="end">
+        <ion-item-option class="phone">
+          <ion-label >
+            <ion-button mode="ios" color="primary" (click)="doDisplayMail(order)">
+              <ion-icon name="mail"></ion-icon>             
+            </ion-button> 
+          </ion-label>
+
+          <ion-label >
+            <ion-button mode="ios" color="danger" [hidden]="!getPhoneNumber(order)" 
+            (click)="doDisplayPhone(order)">
+              <ion-icon name="call"></ion-icon>             
+            </ion-button> 
+          </ion-label>
+        </ion-item-option>
+      </ion-item-options>
+      <ion-item  >
+        <ion-note slot="end">
+          <b>{{order.shipping.postalCode}}</b>
+          <span class="price" >{{ order.shipping.bags }} sac - {{getSubTotal(order)|number:'1.0-0'}} fr</span>
+        </ion-note>        
+        <ion-avatar slot="start">
+          <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
+          <span class="rank" [class.orphan]="!order.shipping.priority">
+            {{getOrderRank(order)}}
+          </span>
+        </ion-avatar>
+        <ion-label class="ion-text-wrap">
+          <h3 text-capitalize>{{order.payment.status}} - {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>
+          <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
+          <p class="note">{{ order.shipping.note }}</p>
+        </ion-label>
+        <ion-reorder slot="end"></ion-reorder>
+      </ion-item>
+    </ion-item-sliding>
+
+  </ion-list>
+
+</ion-content>

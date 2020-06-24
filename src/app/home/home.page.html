@@ -48,6 +48,7 @@
         <div>Produits</div>
       </ion-col>
 
+
     </ion-row>
 
     <div class="middle">
@@ -59,7 +60,12 @@
         <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
         <div>Rapport</div>
       </ion-col>
-          
+
+      <ion-col [hidden]="!isAdmin" (click)="openInvoices()">
+        <ion-icon name="home-outline" color="grey-icon"></ion-icon>
+        <div>Factures</div>
+      </ion-col>
+      
       <ion-col [hidden]="!isAdmin" (click)="openVendors()">
         <ion-icon name="home-outline" color="grey-icon"></ion-icon>
         <div>Boutiques</div>

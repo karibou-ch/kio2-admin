@@ -130,7 +130,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
       API_SERVER: environment.API_SERVER,
       loader: [
         'categories',
-        'shops' /** shop is requiered by product-details:L90 */
+        /** 'shops'  shop is requiered by product-details:L90 */
       ]
     }),
     AppRoutingModule

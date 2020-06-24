@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Config, ReportCustomer, ReportingService } from 'kng2-core';
-import { ToastController } from '@ionic/angular';
+import { Config, ReportCustomer, ReportingService, User } from 'kng2-core';
+import { ToastController, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-customers',
@@ -11,8 +11,10 @@ export class CustomersPage implements OnInit {
 
   config: Config;
   customers: ReportCustomer[];
+  user: User;
 
   cache: {
+    premium: boolean;
     refund: boolean;
     errors: boolean;
     search: string;
@@ -22,15 +24,19 @@ export class CustomersPage implements OnInit {
   };
 
   constructor(
+    private $alert: AlertController,
     private $report: ReportingService,
     private $toast: ToastController
   ) {
+    this.user = new User();
+    this.customers = [];
     this.cache = {
       search: '',
       customers: [],
       step: 50,
       start: 0,
       refund: false,
+      premium: false,
       errors: false
     };
   }
@@ -44,6 +50,24 @@ export class CustomersPage implements OnInit {
      );
 
   }
+
+  doDisplayPhone(order) {
+    const phone = order.customer.phoneNumbers[0].number;
+    this.$alert.create({
+      header: 'Numéro de téléphone',
+      subHeader: order.customer.displayName,
+      message: 'Appeler <a href="tel:' + phone + '">' + phone + '</a>',
+    }).then(alert => alert.present());
+  }
+
+  doDisplayMail(order) {
+    this.$alert.create({
+      header: 'Mail de la commande',
+      subHeader: order.customer.displayName,
+      message: 'Contacter <a href="mailto:' + order.email + '">' + order.email + '</a>',
+    }).then(alert => alert.present());
+  }
+
 
   doInfinite(infiniteScroll) {
     // if(this.cache.search!==''){
@@ -79,6 +103,9 @@ export class CustomersPage implements OnInit {
       }
       if(this.cache.errors) {
         result = !!customer.errors;
+      }
+      if (this.cache.premium) {
+        result = this.user.isPremium(customer);
       }
       return result;
      }).slice(0, this.cache.start + this.cache.step).sort((a,b) => {

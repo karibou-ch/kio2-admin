@@ -21,6 +21,12 @@ ion-datetime{
   font-size: 15px;
 }
 
+ion-note{
+  margin-top: 10px;
+  margin-bottom: auto;
+  font-size: small;
+}
+
 ion-select {
   max-width: 70%;
   font-size: 15px;
@@ -102,12 +108,12 @@ ion-item {
   span.price, 
   span.priority{
     position: absolute;
-    font-size: 0.9rem;
-    top: 10px;
+    font-size: 0.8rem;
+    top: 40px;
     right: 15px;
     color: white;
-    font-weight: 900;
-    background: var(--ion-color-kio-info);
+    font-weight: 600;
+    background: var(--ion-color-kio-info);    
     padding: 0;
     width: 18px;
     height: 18px;

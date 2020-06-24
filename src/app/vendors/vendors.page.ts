@@ -16,6 +16,9 @@ export class VendorsPage implements OnInit {
   config: Config;
   user: User;
   shops: Shop[];
+  hubs: any[];
+  currentHub: any;
+
   cache: {
     discount: boolean;
     active: boolean;
@@ -44,6 +47,7 @@ export class VendorsPage implements OnInit {
       start: 0
     };
 
+    this.hubs = [];
   }
 
   ngOnInit() {
@@ -52,9 +56,26 @@ export class VendorsPage implements OnInit {
     const loader = this.$route.snapshot.data.loader;
 
     //
+    // select default HUB 
+    this.hubs = (this.config.shared.hubs || []).slice();
+    if (this.hubs.length) {
+      //
+      // if you are associed to one HUB
+      this.currentHub = this.hubs[0];
+      if (this.user.hubs && this.user.hubs.length === 1) {
+        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
+      }
+      this.currentHub.selected = true;
+    }
+
+
+    //
     // all available shops
     if (this.user.isAdmin()) {
       this.cache.shops = (loader[3] || []).sort(this.sortByVendor);
+      if (!this.cache.shops.length) {
+        this.getVendors();
+      }
     } else {
       this.cache.shops = this.user.shops || [];
     }
@@ -74,6 +95,19 @@ export class VendorsPage implements OnInit {
     );
   }
 
+  getVendors() {
+    const options: any = {
+
+    };
+    //
+    // set default HUB
+    if (this.currentHub) {
+      options.hub = this.currentHub.slug;
+    }
+    this.$shop.query(options).subscribe(shops => {
+      this.shops = this.cache.shops = shops.sort(this.sortByVendor);
+    });
+  }
 
   onCreateVendor() {
     // this.navCtrl.push('VendorCreatePage', {
@@ -115,6 +149,13 @@ export class VendorsPage implements OnInit {
     this.cache.search = '';
     this.cache.start = 0;
     this.shops = this.cache.shops;
+  }
+
+  setCurrentHub(hub) {
+    this.hubs.forEach( h => h.selected = false);
+    this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
+    this.currentHub.selected = true;
+    this.getVendors();
   }
 
   sortByVendor(p1: Shop, p2: Shop) {
