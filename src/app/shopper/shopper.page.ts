@@ -184,7 +184,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     }
 
     this.isReady = true;
-    this.currentPlanning = null;
+    this.currentPlanning = undefined;
     this.trackPlanning(this.orders);
   }
 
@@ -260,7 +260,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     };
 
     const filterByPlan = (order) => {
-      if (this.currentPlanning == undefined) {
+      if (!this.currentPlanning ) {
         return true;
       }
       return this.currentPlanning == order.shipping.priority;
@@ -311,19 +311,39 @@ export class ShopperPage implements OnInit, OnDestroy {
   //
   // manual reorder of items
   reorderItems(index) {
-    const order = this.orders[index.detail.from];
-
+    const orders = this.orders.filter(order => !this.currentPlanning || order.shipping.priority === this.currentPlanning);
+    // console.log('--- index f,t', index.detail.from, index.detail.to);
+    const order = orders[index.detail.from];
     const priority = order.shipping.priority;
-    const gt = order.shipping.position > this.orders[index.detail.to].shipping.position;
-    order.shipping.position = (gt) ?
-      this.orders[index.detail.to].shipping.position - 1 : this.orders[index.detail.to].shipping.position + 1;
+
+    //
+    // depending the direction, we should sum or substract the DELTA
+    const direction = (index.detail.from < index.detail.to) ? 1 : -1;
+    //
+    // get priority value from  previous order (order[index - 1])
+    const pFrom = (index.detail.to > 1) ?
+          orders[index.detail.to - 1].shipping.position : orders[index.detail.from].shipping.position;
+
+    const pTo = orders[index.detail.to].shipping.position;
+
+    //
+    // if position are equal, we should add one unit to compute a DELTA
+    const inc = (pTo === pFrom) ? 1 : 0;
+
+    //
+    // final position is an Epsylon added or substracted on the destination
+    const pFinal = pTo + (Math.abs(pTo - pFrom) + inc) / 2 * direction;
+
+    order.shipping.position = pFinal;
+
+
     this.orders = this.orders.sort(this.sortOrdersByPosition);
 
     this.$order.updateShippingPriority(order, priority, order.shipping.position)
       .subscribe(ok => {
+        index.detail.complete();
       }, error => this.onError(error.error));
-
-    index.detail.complete();
+    // index.detail.complete();
   }
 
   toggleOrder(order) {
