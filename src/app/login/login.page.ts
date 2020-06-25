@@ -21,14 +21,13 @@ export class LoginPage implements OnInit {
   keep: boolean;
   isReady: boolean;
   config: Config;
-  loader: any;
 
   KIO2_LOGIN_REMEMBER: string = ConfigKeyStoreEnum[ConfigKeyStoreEnum.KIO2_LOGIN_REMEMBER];
 
   constructor(
     private alertCtrl: ToastController,
     private $loader: LoaderService,
-    public loadingCtrl: LoadingController,
+    public $loading: LoadingController,
     public platform: Platform,
     private $route: ActivatedRoute,
     private $user: UserService
@@ -97,8 +96,8 @@ export class LoginPage implements OnInit {
 
 
       if (user.isAuthenticated()) {
-        this.loader.dismiss();
         try {
+          this.$loading.dismiss();
           window.location.href = '/';
         } catch (e) { }
         return;
@@ -143,18 +142,17 @@ export class LoginPage implements OnInit {
     });
   }
 
-  async showLoading() {
+  showLoading() {
     this.isReady = true;
-    this.loader = await this.loadingCtrl.create({
+    return this.$loading.create({
       spinner: 'crescent',
       message: 'Connexion en cours...',
-    });
-    this.loader.present();
+    }).then(loader => loader.present());
   }
 
   showError(msg) {
     this.isReady = true;
-    this.loader.dismiss();
+    this.$loading.dismiss();
     this.alertCtrl.create({
       message: msg,
       duration: 3000

@@ -175,8 +175,14 @@ export class OrdersCustomerPage {
   }
 
   initDate() {
-    const currentDate = this.$engine.currentShippingDate;
     const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
+    //
+    // if no date is specified, then make sure that 
+    if (isNaN(queryWhen.getTime())) {
+      this.$engine.initDate();
+    }
+
+    const currentDate = this.$engine.currentShippingDate;
     const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
     const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
 
