@@ -101,7 +101,7 @@
   <!-- ADRESSE -->
   <ion-list >
     <ion-list-header color="primary">
-      Votre adresse
+      Votre adresse <ion-icon  [hidden]="!shop.address.geo.lat" name="map-outline" class="gold align-right"></ion-icon>
     </ion-list-header>
 
     <ion-item>
@@ -111,16 +111,16 @@
     
     <ion-item>
       <ion-label color="primary" position="stacked">Rue et numéro </ion-label> 
-      <ion-input  type="text"  placeholder="rue, numéro" [(ngModel)]="shop.address.streetAdress" required></ion-input>
+      <ion-input  type="text"  placeholder="rue, numéro" (focusout)="ngOnChanges($event)" [(ngModel)]="shop.address.streetAdress" required></ion-input>
       <ion-input  type="text"  placeholder="Étage" class="floor" [(ngModel)]="shop.address.floor" required></ion-input>
     </ion-item>
     <ion-item >
       <ion-label color="primary" position="stacked">Téléphone de contact</ion-label> 
-      <ion-input  type="text"  placeholder="rue, numéro" [(ngModel)]="shop.address.phone" required></ion-input>
+      <ion-input  type="text"  placeholder="Téléphone pro." [(ngModel)]="shop.address.phone" required></ion-input>
     </ion-item>        
     <ion-item >
       <ion-label color="primary" position="stacked">Code postal et Région</ion-label> 
-      <ion-input  type="text"  placeholder="Code postal" [(ngModel)]="shop.address.postalCode" required></ion-input>
+      <ion-input  type="text"  placeholder="Code postal" (focusout)="ngOnChanges($event)" [(ngModel)]="shop.address.postalCode" required></ion-input>
       <ion-input  type="text"  placeholder="Région" [(ngModel)]="shop.address.region" required></ion-input>
     </ion-item>        
   </ion-list>

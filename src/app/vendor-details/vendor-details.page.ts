@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { User, Shop, Category, ShopService, Config } from 'kng2-core';
 import { ToastController, ModalController } from '@ionic/angular';
 import { UploadImagePage } from '../upload-image/upload-image.page';
 import { EngineService } from '../services/engine.service';
 import { ActivatedRoute } from '@angular/router';
+import { KngUtils } from '../services/kng-utils';
 
 @Component({
   selector: 'app-vendor-details',
   templateUrl: './vendor-details.page.html',
   styleUrls: ['./vendor-details.page.scss'],
 })
-export class VendorDetailsPage {
+export class VendorDetailsPage implements OnChanges {
 
   config: Config;
   user: User;
@@ -21,13 +22,16 @@ export class VendorDetailsPage {
   tvaId;
   catalog;
   isCreate: boolean;
+  regions: string[];
+  locations: any[];
 
   constructor(
     private $engine: EngineService,
     private $modal: ModalController,
     private $route: ActivatedRoute,
     private $shop: ShopService,
-    private $toast: ToastController
+    private $toast: ToastController,
+    private $util: KngUtils
   ) {
     //
     // loader[0] = User,
@@ -38,6 +42,30 @@ export class VendorDetailsPage {
     const urlpath = this.$route.snapshot.params.shop;
     this.config = this.$engine.currentConfig;
     this.shop = new Shop();
+
+    //
+    // validate geo localisation
+    this.locations = this.config.shared.user.location.list;
+    this.regions = this.config.shared.user.region.list;
+
+    this.$util.getGeoCode().subscribe(result => {
+
+
+      if (result.geo && result.geo.location) {
+        this.shop.address.geo = result.geo.location;
+      }
+
+      (result.components || []).forEach(comp => {
+        if (this.locations.indexOf(comp) > -1 && (this.shop.address.postalCode !== comp)) {
+          this.shop.address.postalCode = comp;
+        }
+        if (this.regions.indexOf(comp) > -1 && (this.shop.address.region !== comp)) {
+          this.shop.address.region = comp;
+        }
+      });
+
+    });
+
 
     this.user = this.$engine.currentUser;
     this.categories = loader[2];
@@ -56,7 +84,28 @@ export class VendorDetailsPage {
         position: 'top',
         color: 'danger'
       }).then(alert => alert.present());
-  });
+    });
+  }
+
+  ngOnChanges(input) {
+    const street: any = {
+      streetAdress: this.shop.address.streetAdress,
+      region: this.shop.address.region,
+      postalCode: this.shop.address.postalCode
+    };
+
+    if (!this.shop.address.streetAdress ||
+      this.shop.address.streetAdress === '') {
+      return;
+    }
+
+    //
+    // request new GEO
+    this.$util.updateGeoCode(
+      this.shop.address.streetAdress,
+      this.shop.address.postalCode,
+      this.shop.address.region);
+
   }
 
   doBack() {
@@ -178,11 +227,11 @@ export class VendorDetailsPage {
     }
     this.shop.account.tva.number = this.tvaId;
 
-
     //
     // sync weekdays
     this.shop.available.weekdays = Object.keys(this.weekdays).filter(day => this.weekdays[day]).map(day => (parseInt(day)));
-    this.$shop.save(this.shop).subscribe(
+    const action$ = (this.isCreate)? this.$shop.create(this.shop) : this.$shop.save(this.shop);
+    action$.subscribe(
       (shop: Shop) => {
         this.$toast.create({
           message: 'Enregistré',
