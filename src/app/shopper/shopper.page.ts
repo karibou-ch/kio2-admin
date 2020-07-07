@@ -341,9 +341,10 @@ export class ShopperPage implements OnInit, OnDestroy {
 
     this.$order.updateShippingPriority(order, priority, order.shipping.position)
       .subscribe(ok => {
-        index.detail.complete();
+        // UX is not nice
+        // index.detail.complete();
       }, error => this.onError(error.error));
-    // index.detail.complete();
+    index.detail.complete();
   }
 
   toggleOrder(order) {
