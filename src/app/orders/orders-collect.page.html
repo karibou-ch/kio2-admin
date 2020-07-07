@@ -64,7 +64,7 @@
                       [hidden]="toCollect && isCollected(vendor)">    
       <ion-item-options side="end">
         <ion-item-option>
-        <ion-button color="danger" href='tel:{{getShopPhone(vendor)}}'>
+        <ion-button color="danger" (click)="openPhone(vendor)">
           <ion-icon name="call-outline"></ion-icon>
           Appeler
         </ion-button>        

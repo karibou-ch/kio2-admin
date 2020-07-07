@@ -119,7 +119,12 @@ export class OrdersCollectPage  implements OnInit{
       // init item for this vendor
       if (!this.vendors[item.vendor]) {
         const collected = order.vendors.some(v => v.slug === item.vendor && v.collected);
+        const vendor = order.vendors.find(v  => v.slug === item.vendor);
+        const address = vendor.address.split('tel:');
         this.vendors[item.vendor] = {};
+        this.vendors[item.vendor].address = address[0];
+        this.vendors[item.vendor].geo = vendor.geo;
+        this.vendors[item.vendor].phone = (address.length > 1) ? address[1] : null;
         this.vendors[item.vendor].shipping = order.shipping;
         this.vendors[item.vendor].items = [];
         this.vendors[item.vendor].ranks = [];
@@ -173,8 +178,7 @@ export class OrdersCollectPage  implements OnInit{
   }
 
   getShopPhone(vendor: string) {
-    const shop: Shop = this.vendors[vendor];
-    return '';//shop.address.phone;
+    return this.vendors[vendor].phone;
   }
 
 
@@ -252,6 +256,10 @@ export class OrdersCollectPage  implements OnInit{
     this.searchFilter = null;
   }
 
+  openPhone(vendor) {
+    const link = 'tel:' + this.getShopPhone(vendor);
+    window.location.href = link;
+  }
 
 
   async openCalendar($event) {
