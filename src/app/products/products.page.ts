@@ -86,7 +86,7 @@ export class ProductsPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadProducts();    
+    this.loadProducts();
   }
 
   loadProducts() {
