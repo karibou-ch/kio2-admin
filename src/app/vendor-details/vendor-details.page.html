@@ -50,6 +50,16 @@
       
   </ion-list>
 
+  <ion-list *ngIf="isCreate">
+    <ion-item >
+      <ion-label position="floating" color="primary">
+        <ion-icon color="danger" name="information-circle-outline"></ion-icon> 
+        Le nom ne pourra pas être modifié par la suite.
+      </ion-label>
+      <ion-input type="url" placeholder="Nom de votre boutique" [(ngModel)]="shop.name"></ion-input>
+    </ion-item>    
+  </ion-list>
+
   <!-- DESCRIPTION -->
   <ion-list >
     <ion-item>

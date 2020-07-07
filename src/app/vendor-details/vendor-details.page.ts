@@ -20,6 +20,7 @@ export class VendorDetailsPage {
   weekdays = {};
   tvaId;
   catalog;
+  isCreate: boolean;
 
   constructor(
     private $engine: EngineService,
@@ -40,7 +41,8 @@ export class VendorDetailsPage {
 
     this.user = this.$engine.currentUser;
     this.categories = loader[2];
-    if (urlpath === 'create') {
+    this.isCreate = (urlpath === 'create');
+    if (this.isCreate) {
       this.initShop();
       return;
     }
