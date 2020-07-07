@@ -9,6 +9,10 @@
   color: white;
 }
 
+ion-chip.toggle {
+  min-width: 100px;
+}
+
 @keyframes rotating {
   from{
       -webkit-transform: rotate(0deg);

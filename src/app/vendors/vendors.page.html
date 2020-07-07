@@ -22,7 +22,12 @@
         (ionInput)="onSearchInput($event)"
         (ionClear)="onSearchCancel($event)">
       </ion-searchbar>  
-      <ion-button slot="end" icon-only (click)="onCreateVendor()">
+      <ion-chip (click)="cache.active=!cache.active" class="toggle">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
+        <ion-label color="primary">Actif</ion-label>
+      </ion-chip>
+  
+      <ion-button  icon-only (click)="onCreateVendor()">
         <ion-icon name="add"></ion-icon>
       </ion-button>    
     </ion-item>  
