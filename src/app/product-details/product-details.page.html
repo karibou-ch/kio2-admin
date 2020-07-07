@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar [color]="isDisabled() ? 'primary':'danger'">
     <ion-title>{{title}} - {{product?.sku}}</ion-title>
     <ion-buttons slot="start">
       <ion-button  (click)="doBack()">
