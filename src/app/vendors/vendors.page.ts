@@ -106,6 +106,12 @@ export class VendorsPage implements OnInit {
     }
     this.$shop.query(options).subscribe(shops => {
       this.shops = this.cache.shops = shops.sort(this.sortByVendor);
+    }, status => {
+      this.toast.create({
+        message: (status.message || status),
+        duration: 3000,
+        color: 'alert'
+      }).then(alert => alert.present());
     });
   }
 

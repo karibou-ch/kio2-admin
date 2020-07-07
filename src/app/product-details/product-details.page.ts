@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
-import { Product, Config, Category, Shop, User, LoaderService, ProductService } from 'kng2-core';
+import { Product, Config, Category, Shop, User, LoaderService, ProductService, ShopService } from 'kng2-core';
 import { LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
 import { UploadImagePage } from '../upload-image/upload-image.page';
@@ -36,6 +36,7 @@ export class ProductDetailsPage implements OnInit {
     private $toast: ToastController,
     private $loader: LoaderService,
     private $product: ProductService,
+    private $shops: ShopService,
     private $route: ActivatedRoute
   ) {
 
@@ -73,14 +74,19 @@ export class ProductDetailsPage implements OnInit {
 
   }
 
+
   ngOnInit() {
 
     const product$ = (this.create) ? of(this.product) : this.$product.get(this.sku);
+    if( !this.shops.length) {
+      this.getVendors();
+    }
 
     combineLatest([
       this.$loader.ready(),
       product$,
     ]).subscribe(([loader, product]: any) => {
+
       //
       // only interrested by active category
       this.categories = (loader[2] || []).filter(c => c.type === 'Category' && c.active);
@@ -128,6 +134,25 @@ export class ProductDetailsPage implements OnInit {
     const id = $event.detail.value._id || $event.detail.value;
     this.currentCategory = this.categories.find(cat => (cat._id + '') == id);
     this.product.categories = this.currentCategory._id;
+  }
+
+
+  isDisabled() {
+    return !this.product || !!this.product.attributes.available;
+  }
+
+  getVendors() {
+    const options: any = {
+    };
+    this.$shops.query(options).subscribe(shops => {
+      this.shops = shops.sort(this.sortByVendor);
+    }, status => {
+      this.$toast.create({
+        message: (status.message || status),
+        duration: 3000,
+        color: 'alert'
+      }).then(alert => alert.present());
+    });
   }
 
 
@@ -280,6 +305,16 @@ export class ProductDetailsPage implements OnInit {
     return this.categories;
   }
 
+  sortByVendor(p1: Shop, p2: Shop) {
+    if (p1.available.active) {
+      return -1;
+    }
+    if (p2.available.active) {
+      return 1;
+    }
+
+    return p1.urlpath.localeCompare(p2.urlpath);
+  }
 
   uploadImage(product: Product) {
     const params = {
@@ -294,6 +329,7 @@ export class ProductDetailsPage implements OnInit {
     }).then(alert => alert.present());
 
   }
+
 
 
 }
