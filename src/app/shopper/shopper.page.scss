@@ -71,16 +71,17 @@ ion-item {
       outline: 0;
       border: 1px solid white;
       &.selected{
-        background:var(--ion-color-kio-primary);
-        color:white;
+        background: white;
+        color: var(--ion-color-kio-primary);
       }
       border-radius: 5px;
       margin: 0 3px;
       margin-left: 6px;
-      background: white;
-      color: var(--ion-color-kio-primary);
-      padding-left: 8px;
-      padding-right: 8px;      
+      padding-left: 10px;
+      padding-right: 10px;      
+      background:var(--ion-color-kio-primary);
+      color:white;
+      font-size: 15px;
     }
   }
 
