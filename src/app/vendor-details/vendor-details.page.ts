@@ -230,9 +230,12 @@ export class VendorDetailsPage implements OnChanges {
     //
     // sync weekdays
     this.shop.available.weekdays = Object.keys(this.weekdays).filter(day => this.weekdays[day]).map(day => (parseInt(day)));
-    const action$ = (this.isCreate)? this.$shop.create(this.shop) : this.$shop.save(this.shop);
+    const action$ = (this.isCreate) ? this.$shop.create(this.shop) : this.$shop.save(this.shop);
     action$.subscribe(
       (shop: Shop) => {
+        //
+        // once the shop is created, it should switch on edit mode
+        this.isCreate = false;
         this.$toast.create({
           message: 'Enregistré',
           duration: 3000,
