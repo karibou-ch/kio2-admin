@@ -107,7 +107,7 @@ export class ProductDetailsPage implements OnInit {
 
       //
       // default vendor
-      if ((this.shops.length > 0 || this.shops.length < 3) &&
+      if ((this.shops.length > 0 && this.shops.length < 3) &&
          (typeof this.product.vendor !== 'string')) {
         this.product.vendor = this.shops[0]._id;
       }
