@@ -64,6 +64,9 @@ export class LoginPage implements OnInit {
     Object.assign(this.user, this.user);
     this.isReady = true;
 
+    if(this.user.isAuthenticated()) {
+      window.location.href = '/';
+    }
     //
     // use localstorage
     // https://stackoverflow.com/questions/37318472/ionic-2-app-remember-user-on-the-device
@@ -97,8 +100,8 @@ export class LoginPage implements OnInit {
 
       if (user.isAuthenticated()) {
         try {
-          this.$loading.dismiss();
           window.location.href = '/';
+          this.$loading.dismiss();
         } catch (e) { }
         return;
       }
