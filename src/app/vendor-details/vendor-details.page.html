@@ -185,37 +185,37 @@
   </ion-list>
 
   <!-- SHIPPING DAYS -->
-  <ion-list >    
+  <ion-list>    
     <ion-list-header color="primary">
       Livraison
     </ion-list-header>    
     <ion-item>
       <ion-label>Lundi </ion-label>
-      <ion-checkbox [(ngModel)]="weekdays[1]"></ion-checkbox>
+      <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[1]"></ion-checkbox>
     </ion-item>
     <ion-item>
       <ion-label>Mardi </ion-label>
-      <ion-checkbox [(ngModel)]="weekdays[2]"></ion-checkbox>
+      <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[2]"></ion-checkbox>
     </ion-item>
     <ion-item>
       <ion-label>Mercredi </ion-label>
-      <ion-checkbox [(ngModel)]="weekdays[3]"></ion-checkbox>
+      <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[3]"></ion-checkbox>
     </ion-item>
     <ion-item>
       <ion-label>Jeudi </ion-label>
-      <ion-checkbox [(ngModel)]="weekdays[4]"></ion-checkbox>
+      <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[4]"></ion-checkbox>
     </ion-item>
     <ion-item>
       <ion-label>Vendredi </ion-label>
-      <ion-checkbox [(ngModel)]="weekdays[5]"></ion-checkbox>
+      <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[5]"></ion-checkbox>
     </ion-item>
     <ion-item>
       <ion-label>Samedi </ion-label>
-      <ion-checkbox [(ngModel)]="weekdays[6]"></ion-checkbox>
+      <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[6]"></ion-checkbox>
     </ion-item>
     <ion-item>
       <ion-label>Dimanche</ion-label>
-      <ion-checkbox [(ngModel)]="weekdays[0]"></ion-checkbox>
+      <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[0]"></ion-checkbox>
     </ion-item>
   </ion-list>
 
@@ -263,7 +263,7 @@
   <!-- CATALOG -->
   <ion-item>
     <ion-label color="primary">
-      Catlogue
+      Catalogue
     </ion-label>
     <ion-select [(ngModel)]="catalog">
       <ion-select-option *ngFor="let cat of getCatalog()"  [value]="cat._id">{{cat.name}}</ion-select-option>        

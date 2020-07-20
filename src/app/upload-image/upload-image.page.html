@@ -18,7 +18,8 @@
 
   <ngx-uploadcare-widget 
         preview-step="true" 
-        crop="true" 
+        crop="1:1" 
+        effects="rotate,mirror,flip" 
         image-shrink="1024x1024"
         images-only="true" 
         [value]="image" 

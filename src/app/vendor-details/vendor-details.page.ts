@@ -113,6 +113,7 @@ export class VendorDetailsPage implements OnChanges {
   }
 
   doCreateFAQ(shop) {
+    shop.faq = shop.faq || [];
     shop.faq.push({
       q: '',
       a: '',
@@ -214,11 +215,24 @@ export class VendorDetailsPage implements OnChanges {
 
   doSave() {
 
+
     //
     // sync catalog
     if (this.catalog !== this.shop.catalog) {
-      this.shop.catalog = this.categories.find(c => c._id == this.catalog);
+      this.shop.catalog = this.categories.find(c => c._id === this.catalog);
     }
+
+    //
+    // checks
+    if(!this.shop.catalog || this.shop.catalog.type !== 'Catalog') {
+      return this.$toast.create({
+        message: 'Le catalogue n\'a pas encore été sélectionné',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      }).then(alert => alert.present());
+    }
+
 
     //
     // sync TVA
