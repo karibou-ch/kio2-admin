@@ -19,7 +19,6 @@ h2{
 
 .header{
   --background: #dbe6e5;
-  height: 90px;
   margin-top: -4px;
 }
   
@@ -52,6 +51,7 @@ span.rank{
     margin-top: -4px;
     --background: var(--ion-color-kio-light)!important;
   }
+
   ion-item.customer{
     left: 0px;
     margin: 0px!important;
@@ -120,12 +120,11 @@ span.rank{
     }
 
     padding: 1px;
-    min-height: 80px;
     display: flex;
     width: 100%;
     position: relative;
-    .item-native{
-      padding-left: 8px;
+    ion-label{
+      min-height: 55px;
     }
 
     .rank{

@@ -202,8 +202,8 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doValidateAll(order) {
-    const items = order.items.
-                  filter(item => item.fulfillment.status !== 'failure');
+    const items = JSON.parse(JSON.stringify(order.items.
+                  filter(item => item.fulfillment.status !== 'failure')));
 
     this.$order.updateItem(order, items, EnumFulfillments.fulfilled)
       .subscribe(ok => {
@@ -230,7 +230,7 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doValidate(order, item) {
-    const copy = Object.assign({}, item);
+    const copy = JSON.parse(JSON.stringify(item));
     this.$order.updateItem(order, [copy], EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
@@ -287,18 +287,20 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doToast(msg, error?) {
+
     // FIXME manage 401 error!
     // if (error && error.status == 401) {
     //   this.events.publish('unauthorized');
     // }
+    const out = error && error.message || msg;
     const params: any = {
-      message: msg,
+      message: out,
       cssClass: 'toast-message',
       color: 'dark',
-      duration: 4000
+      duration: 5000
     };
     if (error) {
-      params.position = 'top';
+      params.position = 'bottom';
       params.color = 'danger';
     }
     this.$toast.create(params).then(alert => alert.present());
