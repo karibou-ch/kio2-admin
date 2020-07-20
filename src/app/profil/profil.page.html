@@ -59,6 +59,13 @@
       </ion-label>
     </ion-item-divider>    
     <ion-item class="space">
+      <!-- <ion-label position="fixed" class="ion-text-wrap" color="primary">Gérer votre compte</ion-label> -->
+      <ion-button size="medium"  expand="block" shape="round" fill="outline" color="primary" href="https://karibou.ch/store/geneva/me/email">
+        <ion-icon slot="start" name="person-circle-outline"></ion-icon> Modifier vos informations de compte
+      </ion-button>
+    </ion-item>
+
+    <ion-item class="space">
       <ion-button size="medium"  expand="block" shape="round" fill="outline" color="danger" (click)="logout()">
         <ion-icon slot="start" name="person-circle-outline"></ion-icon> Logout
       </ion-button>
