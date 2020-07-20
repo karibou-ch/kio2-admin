@@ -12,13 +12,15 @@ import {
 
 import { Utils } from 'kng2-core';
 
-
-// import uploadcare from 'uploadcare-widget';
+import uploadcare from 'uploadcare-widget';
+import uploadcareTabEffects from 'uploadcare-widget-tab-effects';
 // import * as uploadcare from "uploadcare-widget";
 
-const CDNJS_UPLOADCARE = 'https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js';
+// const CDNJS_UPLOADCARE_EFFECTS = 'https://ucarecdn.com/libs/widget-tab-effects/1.x/uploadcare.tab-effects.js';
+// const CDNJS_UPLOADCARE = 'https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js';
 const APP_VERSION = '3.x';
 
+//https://github.com/uploadcare/ngx-uploadcare-widget/blob/master/projects/ngx-uploadcare-widget/src/lib/ucWidget/ucWidget.component.ts
 @Component({
   selector: 'ngx-uploadcare-widget',
   template: '',
@@ -66,18 +68,21 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
     //
     // use dynamic loader
     // https://github.com/ded/script.js/blob/master/src/script.js#L70
-    this.uploadcare = Utils.script(CDNJS_UPLOADCARE, 'uploadcare').toPromise();
+    // this.uploadcare = Promise.all([
+    //   Utils.script(CDNJS_UPLOADCARE, 'uploadcare').toPromise(),
+    //   Utils.script(CDNJS_UPLOADCARE_EFFECTS, 'tabseffects').toPromise()
+    // ]);
 
-    this.uploadcare.then((uploadcare: any) => {
+    // this.uploadcare.then(([uploadcare, effects]) => {
       // console.log('DEBUG ',uploadcare);
       // console.log('DEBUG ',uploadcareTabEffects);
 
-      // uploadcare.registerTab('preview', uploadcareTabEffects);
-      uploadcare.start({
-        integration: `Angular/${VERSION.full}; Ngx-Uploadcare-Widget/${APP_VERSION}`,
-        effects: ['crop', 'sharp', 'grayscale', 'enhance'],
-      });
+    uploadcare.registerTab('preview', uploadcareTabEffects);
+    uploadcare.start({
+      integration: `Angular/${VERSION.full}; Ngx-Uploadcare-Widget/${APP_VERSION}`,
+      effects: ['rotate', 'flip', 'mirror'],
     });
+    // });
   }
 
   @Input('public-key')
@@ -268,7 +273,9 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
     this.setInputAttr('data-multiple-min', this._multipleMin);
     this.setInputAttr('data-images-only', this._imagesOnly);
     this.setInputAttr('data-preview-step', this._previewStep);
-    this.setInputAttr('data-crop', this._crop);
+    this.setInputAttr('data-crop', '1:1');
+    this.setInputAttr('data-effects', 'crop,rotate,flip,mirror,crop');
+    this.setInputAttr('data-mirror', true);
     this.setInputAttr('data-image-shrink', this._imageShrink);
     this.setInputAttr('data-clearable', this._clearable);
     this.setInputAttr('data-tabs', this._tabs);
@@ -284,68 +291,66 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
-  private init(removeUploads = false) {
+  private async init(removeUploads = false) {
     this.inputElement = this.renderer.createElement('input');
     this.renderer.appendChild(this.element.nativeElement, this.inputElement);
     if (removeUploads) {
       this.clearUploads();
     }
     this.initInputElement();
-    return this.uploadcare.then((uploadcare: any) => {
-      uploadcare = (window as any).uploadcare;
-      const widget = uploadcare.Widget(this.inputElement);
+    //return this.uploadcare.then(([uploadcare, effects]) => {
+    //  uploadcare = (window as any).uploadcare;
+    const widget = uploadcare.Widget(this.inputElement);
 
-      widget.onDialogOpen((dialog) => {
-        this.onDialogOpen.emit(dialog);
-      });
-
-      widget.onUploadComplete((fileInfo) => {
-        this.onUploadComplete.emit(fileInfo);
-        this._value = fileInfo.uuid;
-      });
-      widget.onChange((selectionPromise) => {
-        if (!selectionPromise) {
-          return;
-        }
-        this.onChange.emit(selectionPromise);
-        if (typeof selectionPromise.promise === 'function') {
-          selectionPromise.promise()
-            .progress((progress) => {
-              this.onProgress.emit(progress);
-            });
-        } else {
-          selectionPromise
-            .progress((progress) => {
-              this.onProgress.emit(progress);
-            });
-        }
-      });
-
-      //
-      // bind validators
-      this._validators.forEach(validator => {
-        widget.validators.push(validator);
-      });
-
-
-      return widget;
-
+    widget.onDialogOpen((dialog) => {
+      this.onDialogOpen.emit(dialog);
     });
+
+    widget.onUploadComplete((fileInfo) => {
+      this.onUploadComplete.emit(fileInfo);
+      this._value = fileInfo.uuid;
+    });
+    widget.onChange((selectionPromise) => {
+      if (!selectionPromise) {
+        return;
+      }
+      this.onChange.emit(selectionPromise);
+      if (typeof selectionPromise.promise === 'function') {
+        selectionPromise.promise()
+          .progress((progress) => {
+            this.onProgress.emit(progress);
+          });
+      } else {
+        selectionPromise
+          .progress((progress) => {
+            this.onProgress.emit(progress);
+          });
+      }
+    });
+
+    //
+    // bind validators
+    this._validators.forEach(validator => {
+      widget.validators.push(validator);
+    });
+
+
+    return widget;
+
+//    });
   }
 
   private destroy() {
-    this.uploadcare.then(uploadcare => {
-      uploadcare = (window as any).uploadcare;
+    // this.uploadcare.then(([uploadcare, effects]) => {
+    //   uploadcare = (window as any).uploadcare;
 
-      const $ = uploadcare.jQuery;
-      if (this.widget.inputElement) {
-        $(this.widget.inputElement.nextSibling).remove();
-        $(this.widget.inputElement).clone().appendTo($(this.element.nativeElement));
-        $(this.widget.inputElement).remove();
-      }
-      this.renderer.destroyNode(this.inputElement);
-      this.renderer.removeChild(this.element.nativeElement, this.element.nativeElement.children[0]);
-      delete this.widget; ;
-    });
+    const $ = uploadcare.jQuery;
+
+    $(this.widget.inputElement.nextSibling).remove();
+    $(this.widget.inputElement).clone().appendTo($(this.element.nativeElement));
+    $(this.widget.inputElement).remove();
+    this.renderer.removeChild(this.element.nativeElement, this.element.nativeElement.children[0]);
+    delete this.widget;
+    // });
   }
 }
