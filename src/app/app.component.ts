@@ -50,6 +50,7 @@ export class Kio2Admin {
       //
       // SIMPLE NETWORK CHECKER INFO
       const neteork = interval(5000).subscribe(() => {
+        // console.log('---net',this.$network.type, window.navigator.onLine)
         if((this.$network.type || '').toLocaleLowerCase() === 'none' ||
           !window.navigator.onLine) {
           if (this.NET_INFO) {
