@@ -16,6 +16,10 @@
 
     <ion-list >
       <ion-item>
+        <ion-button fill="outline" expand="block" size="large" color="primary" [disabled]="!isReady()" (click)="doSave(product)">Enregistrer</ion-button>
+      </ion-item>
+
+      <ion-item>
         <ion-label color="primary">
           Produit actif à la vente
         </ion-label>
@@ -35,11 +39,11 @@
         <ion-label>Boost</ion-label>
         <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
       </ion-item>
-        
-      <ion-item>
-          <ion-button fill="outline" expand="block" size="large" color="primary" [disabled]="!isReady()" (click)="doSave(product)">Enregistrer</ion-button>
-      </ion-item>
-      
+
+      <ion-item class="header">
+        <h3>Informations</h3>
+      </ion-item>       
+
       <ion-item class="input-toggle">
         <ion-label position="stacked" color="primary">
           Titre
@@ -67,6 +71,10 @@
 
 
       <!-- PHOTOS -->
+      <ion-item class="header">
+        <h3>Photos</h3>
+      </ion-item>       
+
       <ion-item color="none" *ngIf="product.photo.url">
         <ion-thumbnail slot="start" class="image" >
           <img  [src]="'https:'+product.photo.url+'/-/resize/128x/'"/>
@@ -104,18 +112,18 @@
           En stock
         </ion-label>
         <ion-input type="text" min="0" placeholder="0-1000" ngDefaultControl [(ngModel)]="product.pricing.stock"></ion-input>
-        <ion-button fill="outline" size="large" slot="end" (click)="product.pricing.stock=0">0</ion-button>
-        <ion-button fill="outline" size="large" slot="end" (click)="product.pricing.stock=40">40 </ion-button>
-        <ion-button fill="outline" size="large" slot="end" (click)="product.pricing.stock=100">100</ion-button>
+        <button class="button-stock" slot="end" (click)="product.pricing.stock=0">0</button>
+        <button class="button-stock" slot="end" (click)="product.pricing.stock=40">40 </button>
+        <button class="button-stock" slot="end" (click)="product.pricing.stock=100">100</button>
         
       </ion-item>
     </ion-list>
 
     <!-- PRICE -->
     <ion-list [hidden]="!detailled">
-      <ion-list-header color="primary">
-        Prix
-      </ion-list-header>
+      <ion-item class="header">
+        <h3>Prix</h3>
+      </ion-item>       
       <ion-item class="large">
         <ion-label color="primary" position="stacked">
           Prix (TVA inc.)
@@ -125,15 +133,22 @@
       <ion-item class="">
         <ion-label color="danger" position="stacked">Portion <b>(le signe ~ pour un poids variable)</b></ion-label>
         <div class="info" *ngIf="product.pricing.part">
-          Avec {{product.pricing.part}} le client doit recevoir <br/>
-          <span [hidden]="product.hasFixedPortion()"> {{portionStr(product.pricing.part)}}</span>
+          <span [hidden]="product.hasFixedPortion()">
+            Avec {{product.pricing.part}} le client doit recevoir <br/>
+           {{portionStr(product.pricing.part)}}</span>
         </div>                        
         <div class="info" [hidden]="product.pricing.part">
-          Avec <b>~180gr</b> le client recevra {{portionStr('~180gr')}}
+          Avec <b>~200gr</b> le client recevra {{portionStr('~200gr')}}
         </div> 
 
 
-        <ion-input type="text"  placeholder="100gr/~180gr/1botte/0.75L/0.75litre/1pce" ngDefaultControl [(ngModel)]="product.pricing.part"></ion-input>    
+        <ion-input class="input-special" type="text"  placeholder="portions ?" ngDefaultControl [(ngModel)]="product.pricing.part"></ion-input>    
+      </ion-item>
+      <ion-item>
+        <button class="button-stock small" slot="end" (click)="product.pricing.part='0.75L'">0.75L</button>
+        <button class="button-stock small" slot="end" (click)="product.pricing.part='1pce'">1pce</button>
+        <button class="button-stock small" slot="end" (click)="product.pricing.part='200gr'">200gr</button>
+        <button class="button-stock small" slot="end" (click)="product.pricing.part='~200gr'">~200gr</button>
       </ion-item>
 
       <ion-item class="promotion" size="large">
@@ -143,6 +158,21 @@
         <ion-input type="number" min="0" placeholder="0.00" ngDefaultControl [(ngModel)]="product.pricing.discount"></ion-input>
         <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
       </ion-item>
+    </ion-list>
+
+    <!-- TVAs -->
+    <ion-list  [hidden]="!detailled">
+      <ion-radio-group ngDefaultControl [(ngModel)]="product.pricing.tva">
+        <ion-list-header [hidden]="!product.pricing.tva">
+          <ion-label>
+            Valeur actuelle {{product.pricing.tva|percent:'1.1-1'}}
+          </ion-label>
+        </ion-list-header>
+        <ion-item *ngFor="let tva of TVAs">
+          <ion-label color="primary">TVA {{tva|percent:'1.1-1'}}</ion-label>
+          <ion-radio [value]="tva"></ion-radio>
+        </ion-item>    
+      </ion-radio-group>    
     </ion-list>
 
     <!-- LABELS -->
@@ -193,20 +223,6 @@
         </ion-item>
       </ion-list>
       
-    <!-- TVAs -->
-    <ion-list  [hidden]="!detailled">
-      <ion-radio-group ngDefaultControl [(ngModel)]="product.pricing.tva">
-        <ion-list-header [hidden]="!product.pricing.tva">
-          <ion-label>
-            Valeur actuelle {{product.pricing.tva|percent:'1.1-1'}}
-          </ion-label>
-        </ion-list-header>
-        <ion-item *ngFor="let tva of TVAs">
-          <ion-label color="primary">TVA {{tva|percent:'1.1-1'}}</ion-label>
-          <ion-radio [value]="tva"></ion-radio>
-        </ion-item>    
-      </ion-radio-group>    
-    </ion-list>
 
     <!-- NAV -->  
     <ion-list [hidden]="!detailled">
@@ -243,7 +259,7 @@
     <ion-list>
       <ion-item>
           <ion-button [hidden]="detailled" expand="block" fill="outline" size="large" color="primary" (click)="detailled=true">
-            Editer tous les paramètres 
+            Editer plus de paramètres 
           </ion-button>
             
           <ion-button [hidden]="!detailled" expand="block" fill="outline" size="large" color="primary" (click)="doSave(product)">

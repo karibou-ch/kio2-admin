@@ -1,3 +1,15 @@
+ion-item {
+  margin: 10px 0;
+  &.header{
+    h3{
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ion-color-primary-contrast);      
+    }
+    --background:var(--ion-color-primary-shade);
+    --border-color:#000;
+  }
+}
 
 .image{
   cursor: pointer;
@@ -24,10 +36,18 @@
   ion-label{
     font-weight: 600;
   }
-  ion-button{
-    font-size: 20px;
+  button{
+    font-size: 16px;
     height: 40px;
-    width: 50px;    
+    width: 60px;    
+    background-color: #eee;
+    border: 1px solid var(--ion-color-primary);
+    &.small{
+      font-size: 13px;
+      height: 30px;
+      width: 50px;    
+      border: 1px solid #eee;  
+    }
   }
   ion-input{
       font-size: 22px;
@@ -39,9 +59,17 @@ ion-list-header {
   padding-bottom: 10px;  
 }
 
+.input-special{
+  min-height: 30px;  
+}
+
 .info{
-  font-size: medium;
+  font-size: 11px;
   color: gray;  
+  line-height: 13px;
+  padding: 5px 0;
+  background: #eee;
+  margin-top: 5px;    
 }
 
 :host(textarea) {

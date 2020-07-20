@@ -103,6 +103,7 @@ export class ProductDetailsPage implements OnInit {
       this.product.categories = product.categories._id || this.product.categories;
       this.product.vendor = product.vendor._id || this.product.vendor;
       this.product.belong = product.belong || {name: null, weight: 0};
+      this.product.details = product.details || {};
       this.title = product.title;
 
       //
@@ -120,6 +121,9 @@ export class ProductDetailsPage implements OnInit {
   }
 
   doCreateVariant(product: Product) {
+    if (!product.variants) {
+      product.variants = [];
+    }
     product.variants.push({
       title: '',
       short: ''
