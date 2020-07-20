@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 import { EngineService } from '../services/engine.service';
 import { User, Config, Shop } from 'kng2-core';
 
@@ -46,44 +46,44 @@ export class HomePage {
   }
 
   openShopper() {
-    this.$router.navigateByUrl('/shopper');
+    this.$router.navigate(['/shopper']);
   }
 
   openCustomers() {
-    this.$router.navigateByUrl('/customers');
+    this.$router.navigate(['/customers']);
   }
 
   openInvoices() {
-    this.$router.navigateByUrl('/invoices');
+    this.$router.navigate(['/invoices']);
   }
 
   openProducts() {
-    this.$router.navigateByUrl('/products');
+    this.$router.navigate(['/products']);
   }
 
   openProfile() {
-    this.$router.navigateByUrl('/profile');
+    this.$router.navigate(['/profile']);
   }
 
   openOrders() {
-    this.$router.navigateByUrl('/orders');
+    this.$router.navigate(['/orders']);
   }
 
   openCollect() {
-    this.$router.navigateByUrl('/orders/collect');
+    this.$router.navigate(['/orders/collect']);
   }
 
 
   openVendors() {
-    this.$router.navigateByUrl('/vendors');
+    this.$router.navigate(['/vendors']);
   }
 
   openReport() {
-    this.$router.navigateByUrl('/report');
+    this.$router.navigate(['/report']);
   }
 
   openShopCreate() {
-    this.$router.navigateByUrl('/vendor/create');
+    this.$router.navigate(['/vendor/create']);
   }
 
 }
