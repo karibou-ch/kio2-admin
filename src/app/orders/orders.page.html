@@ -183,10 +183,10 @@
             {{order.getFulfilledProgress()}}/{{order.items.length}} - {{order.shipping.bags}}
           </h2>
         </ion-label>
-        <ion-button mode="ios" expandable color="danger" class="hidden-sm capture" (click)="orderCapture(order)"
+        <button mode="ios" expandable color="danger" class="hidden-sm capture" (click)="orderCapture(order)"
           [hidden]="!user.isAdmin()||!isOrderCapturable(order)">
           facturer
-        </ion-button>
+        </button>
   
       </ion-item>  
     </ion-item-sliding>
