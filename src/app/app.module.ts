@@ -9,7 +9,7 @@ import { Kio2Admin } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { Kng2CoreModule } from 'kng2-core';
 import { environment } from 'src/environments/environment';
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HttpClientModule, HttpErrorResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 //
@@ -17,6 +17,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { Network } from '@ionic-native/network/ngx';
+import { TokenInterceptorProvider } from './services/token-interceptor/token-interceptor';
 registerLocaleData(localeFr);
 
 
@@ -142,6 +143,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     Network,
     { provide: LOCALE_ID, useValue: 'fr-FR' },
     { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorProvider, multi: true}
     // { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [Kio2Admin]

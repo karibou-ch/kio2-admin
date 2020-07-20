@@ -1,18 +1,20 @@
 import { HttpClient, HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { UserService } from 'kng2-core';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class TokenInterceptorProvider implements HttpInterceptor {
 
   constructor(
+    public $router: Router,
     public $user: UserService
   ) {
   }
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<any>, next: HttpHandler) {
 
     // JWT
     // - https://ryanchenkie.com/angular-authentication-using-the-http-client-and-http-interceptors
@@ -28,16 +30,17 @@ export class TokenInterceptorProvider implements HttpInterceptor {
     // delphine.cluzel@gmail.com
 
     return next.handle(request).pipe(
-      tap((event: HttpEvent<any>) => {
-      //
-      // on done
-      },(err: any) => {
-      //
-      // on error
-        if (err.status === 401) {
+      catchError(error => {
+        //
+        // on error
+        if (error.status === 401) {
           // console.log('TokenInterceptorProvider:ERROR',err.status)
-          this.$user.logout().subscribe();
+          this.$router.navigate(['/login']);
         }
+
+        return throwError(error);
+      }),
+      tap((event: HttpEvent<any>) => {
       })
     );
   }
