@@ -101,7 +101,7 @@ export class VendorsPage implements OnInit {
     };
     //
     // set default HUB
-    if (this.currentHub) {
+    if (this.currentHub && this.currentHub.slug) {
       options.hub = this.currentHub.slug;
     }
     this.$shop.query(options).subscribe(shops => {
@@ -158,6 +158,9 @@ export class VendorsPage implements OnInit {
   }
 
   setCurrentHub(hub) {
+    if(!hub ||!hub.id) {
+      this.currentHub = {};
+    }
     this.hubs.forEach( h => h.selected = false);
     this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
     this.currentHub.selected = true;

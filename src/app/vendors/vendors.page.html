@@ -18,7 +18,7 @@
       <ion-searchbar
         mode="ios"
         [(ngModel)]="cache.search"
-        [debounce]="100"
+        [debounce]="500"
         (ionInput)="onSearchInput($event)"
         (ionClear)="onSearchCancel($event)">
       </ion-searchbar>  
@@ -38,6 +38,11 @@
         <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
         <ion-label color="primary">{{hub.name}}</ion-label>
       </ion-chip>
+      <ion-chip class="hub" slot="start"  (click)="setCurrentHub({})" [hidden]="!user.isAdmin()">
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="currentHub?.slug"></ion-icon>
+        <ion-label color="primary">Sans HUB</ion-label>
+      </ion-chip>
+
     </ion-item>
 
 
