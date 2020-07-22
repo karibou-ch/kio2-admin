@@ -1,9 +1,9 @@
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { User, Shop, Category, ShopService, Config } from 'kng2-core';
-import { ToastController, ModalController } from '@ionic/angular';
+import { ToastController, ModalController, AlertController } from '@ionic/angular';
 import { UploadImagePage } from '../upload-image/upload-image.page';
 import { EngineService } from '../services/engine.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { KngUtils } from '../services/kng-utils';
 
 @Component({
@@ -26,9 +26,11 @@ export class VendorDetailsPage implements OnChanges {
   locations: any[];
 
   constructor(
+    private $alert: AlertController,
     private $engine: EngineService,
     private $modal: ModalController,
     private $route: ActivatedRoute,
+    private $router: Router,
     private $shop: ShopService,
     private $toast: ToastController,
     private $util: KngUtils
@@ -81,7 +83,7 @@ export class VendorDetailsPage implements OnChanges {
       this.$toast.create({
         message: status.error,
         duration: 3000,
-        position: 'top',
+        position: 'middle',
         color: 'danger'
       }).then(alert => alert.present());
     });
@@ -212,6 +214,35 @@ export class VendorDetailsPage implements OnChanges {
 
   }
 
+  doDelete() {
+    const confirm = window.prompt('LA SUPPRESSION EST DEFINITIVE! CONFIRMER AVEC VOTRE MOT-DE-PASSE');
+    if (!confirm) {
+      return;
+    }
+
+    this.$shop.remove(this.shop, confirm).subscribe(removeInfo => {
+      const shop = new Shop();
+      Object.assign(this.shop, shop);
+      this.$toast.create({
+        message: 'Suppression de produits:' + removeInfo.deletedCount,
+        duration: 3000,
+        position: 'middle',
+        color: 'danger'
+      }).then(alert => alert.present());
+      this.$router.navigate(['/vendors']);
+
+    }, status => {
+      this.$toast.create({
+        message: status.error,
+        duration: 3000,
+        position: 'middle',
+        color: 'danger'
+      }).then(alert => alert.present());
+    });
+
+
+
+  }
 
   doSave() {
 
@@ -229,7 +260,7 @@ export class VendorDetailsPage implements OnChanges {
         message: 'Le catalogue n\'a pas encore été sélectionné',
         duration: 3000,
         color: 'danger',
-        position: 'top'
+        position: 'middle'
       }).then(alert => alert.present());
     }
 
@@ -262,7 +293,7 @@ export class VendorDetailsPage implements OnChanges {
         this.$toast.create({
           message: status.error,
           duration: 3000,
-          position: 'top',
+          position: 'middle',
           color: 'danger'
         }).then(alert => alert.present());
       }
