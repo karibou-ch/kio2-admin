@@ -101,7 +101,7 @@
   <!-- ADRESSE -->
   <ion-list >
     <ion-list-header color="primary">
-      Votre adresse <ion-icon  [hidden]="!shop.address.geo.lat" name="map-outline" class="gold align-right"></ion-icon>
+      Votre adresse <ion-icon  [hidden]="!shop.address.geo || !shop.address.geo.lat" name="map-outline" class="gold align-right"></ion-icon>
     </ion-list-header>
 
     <ion-item>
@@ -272,9 +272,13 @@
 
 
   <ion-list>
+    <ion-item [hidden]="!user.isAdmin()">
+      <ion-button expand="block" fill="outline" size="large" color="danger" (click)="doDelete()">SUPPRIMER</ion-button>
+    </ion-item>      
+
     <ion-item>
-        <ion-button expand="block" fill="outline" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button>
-      </ion-item>      
+      <ion-button expand="block" fill="outline" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button>
+    </ion-item>      
   </ion-list>
     
 </ion-content>
