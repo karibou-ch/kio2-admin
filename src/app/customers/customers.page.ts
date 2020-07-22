@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Config, ReportCustomer, ReportingService, User } from 'kng2-core';
+import { Config, ReportCustomer, ReportingService, User, UserService } from 'kng2-core';
 import { ToastController, AlertController } from '@ionic/angular';
+import { EngineService } from '../services/engine.service';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-customers',
@@ -10,8 +13,9 @@ import { ToastController, AlertController } from '@ionic/angular';
 export class CustomersPage implements OnInit {
 
   config: Config;
-  customers: ReportCustomer[];
+  customers: ReportCustomer[] | User[];
   user: User;
+  search$: Subject<string>;
 
   cache: {
     premium: boolean;
@@ -20,15 +24,17 @@ export class CustomersPage implements OnInit {
     search: string;
     start: number;
     step: number;
-    customers: ReportCustomer[];
+    customers: any[];
   };
 
   constructor(
+    private $engine: EngineService,
     private $alert: AlertController,
     private $report: ReportingService,
-    private $toast: ToastController
+    private $toast: ToastController,
+    private $user: UserService
   ) {
-    this.user = new User();
+    this.user = this.$engine.currentUser;
     this.customers = [];
     this.cache = {
       search: '',
@@ -39,9 +45,43 @@ export class CustomersPage implements OnInit {
       premium: false,
       errors: false
     };
+
+    this.search$ = new Subject();
+    this.search$.pipe(debounceTime(500)).subscribe((text: string) => {
+      this.$user.query({search: text }).subscribe(customers => {
+        this.cache.customers = customers.map(user => {
+          const count = user.orders.last1Month +
+                        user.orders.last3Month +
+                        user.orders.last6Month +
+                        user.orders.after6Month;
+          return {
+            id: user.id,
+            last1Month: user.orders.last1Month,
+            last3Month: user.orders.last3Month,
+            last6Month: user.orders.last6Month,
+            after6Month: user.orders.after6Month,
+            avg: user.orders.avg,
+            orders: count,
+            errors: user.orders.errors,
+            refunds: user.orders.refunds,
+            customer: user
+          };
+        });
+        this.customers = this.sliceCustomers();
+      }, status => {
+        this.$toast.create({
+          message: status.error || status.message || status,
+          duration: 3000,
+          color: 'danger',
+          position: 'middle'
+        }).then(alert => alert.present());
+      });
+    });
+
   }
 
   ngOnInit() {
+
     this.$report.getCustomers().subscribe(
       (customers: ReportCustomer[]) => {
         this.cache.customers = customers;
@@ -80,6 +120,42 @@ export class CustomersPage implements OnInit {
     }, 100);
   }
 
+  doRemove(customer, idx) {
+    const confirm = window.prompt('SUPPRESSION DE ->' + customer.customer.email.address + '<- DEFINITIVE! \nCONFIRMER AVEC VOTRE MOT-DE-PASSE');
+    if (!confirm) {
+      return;
+    }
+
+
+    this.$user.remove(customer.customer.id, confirm).subscribe(ok => {
+      this.customers.splice(idx, 1);
+      this.$toast.create({
+        message: 'OK',
+        duration: 3000,
+        position: 'bottom'
+      }).then(alert => alert.present());
+    }, status => {
+      this.$toast.create({
+        message: status.error || status.message || status,
+        duration: 3000,
+        color: 'danger',
+        position: 'middle'
+      }).then(alert => alert.present());
+
+    });
+  }
+
+  doSearch($event: any) {
+    const text: string = $event.target.value || '';
+    if(text.length < 3) {
+      return;
+    }
+    this.search$.next(text);
+  }
+
+  doSearchCancel() {
+    this.ngOnInit();
+  }
 
   doToast(msg) {
     this.$toast.create({

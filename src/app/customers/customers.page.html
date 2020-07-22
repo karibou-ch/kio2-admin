@@ -9,6 +9,16 @@
 
 <ion-content>
   <ion-list>
+    <ion-item [hidden]="!user.isAdmin()">
+      <ion-label>Search</ion-label>
+      <ion-searchbar
+        mode="ios"
+        [debounce]="700"
+        (ionInput)="doSearch($event)"
+        (ionClear)="doSearchCancel()">
+      </ion-searchbar>  
+    </ion-item>  
+  
     <ion-item>  
       <ion-chip (click)="cache.errors=!cache.errors;sliceCustomers()">
         <ion-icon name="checkmark-circle-outline" [hidden]="!cache.errors"></ion-icon>
@@ -46,10 +56,20 @@
           </p>
         </ion-label>
         <div class="note">
-          <div class="label">{{customer.amount|currency:'CHF'}} </div> 
+          <div class="label">{{customer.avg|currency:'CHF'}} </div> 
           {{customer.customer.created|date:'MMM y'}} 
         </div>
       </ion-item>
+      <ion-item-options side="start" [hidden]="!user.isAdmin() || !customer.id">
+        <ion-item-option>
+          <ion-label >
+            <ion-button mode="ios" color="danger" (click)="doRemove(customer,i)">
+              <ion-icon name="trash-outline"></ion-icon> SUPPRIMER
+            </ion-button> 
+          </ion-label>
+        </ion-item-option>
+      </ion-item-options>
+
       <ion-item-options side="end">
         <ion-item-option class="phone">
           <ion-label >
@@ -64,8 +84,7 @@
             </ion-button> 
           </ion-label>
         </ion-item-option>
-      </ion-item-options>
-
+      </ion-item-options>      
     </ion-item-sliding>
   </ion-list>
 
