@@ -231,7 +231,7 @@ export class ProductDetailsPage implements OnInit {
     window.history.back();
   }
 
-  doSave(product: Product, silent?: boolean) {
+  async doSave(product: Product, silent?: boolean) {
     const shopowner = this.shops.find(shop => shop._id === product.vendor);
     const error = this.isProductReadyTosave(product, shopowner);
 
@@ -241,7 +241,7 @@ export class ProductDetailsPage implements OnInit {
         message: 'La boutique n\'a pas été sélectionnée',
         duration: 3000,
         color: 'danger',
-        position: 'top'
+        position: 'middle'
       }).then(alert => alert.present());
     }
 
@@ -251,14 +251,15 @@ export class ProductDetailsPage implements OnInit {
         message: 'La sous catégorie  n\'est pas compatible',
         duration: 3000,
         color: 'danger',
-        position: 'top'
+        position: 'middle'
       }).then(alert => alert.present());
     }
 
     if (!silent) {
-      this.$loading.create({
+      const alert = await this.$loading.create({
         message: 'Please wait...'
-      }).then(alert => alert.present());
+      });
+      alert.present();
     }
 
 
@@ -293,7 +294,7 @@ export class ProductDetailsPage implements OnInit {
         this.$toast.create({
           message: status.error,
           duration: 5000,
-          position: 'top',
+          position: 'middle',
           color: 'danger'
         }).then(alert => alert.present());
       }
