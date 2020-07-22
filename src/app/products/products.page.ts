@@ -108,6 +108,11 @@ export class ProductsPage implements OnInit {
       return;
     }
 
+    //
+    // force reload
+    params.rnd = Date.now();
+
+
     this.$product.select(params).subscribe(
       (products: Product[]) => {
         //
