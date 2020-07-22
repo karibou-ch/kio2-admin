@@ -77,9 +77,9 @@ export class LoginPage implements OnInit {
     return /\S+@\S+\.\S+/.test(this.model.email || '');
   }
 
-  login() {
+  async login() {
     this.isReady = false;  // to hide submit button after submitting
-    this.showLoading();
+    await this.showLoading();
     this.$user.login({
       email: this.model.email,
       password: this.model.password,
@@ -145,12 +145,13 @@ export class LoginPage implements OnInit {
     });
   }
 
-  showLoading() {
+  async showLoading() {
     this.isReady = true;
-    return this.$loading.create({
+    const loader = await this.$loading.create({
       spinner: 'crescent',
       message: 'Connexion en cours...',
-    }).then(loader => loader.present());
+    });
+    return loader.present();
   }
 
   showError(msg) {
