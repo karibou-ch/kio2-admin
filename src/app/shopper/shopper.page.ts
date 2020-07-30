@@ -343,7 +343,7 @@ export class ShopperPage implements OnInit, OnDestroy {
       .subscribe(ok => {
         // UX is not nice
         // index.detail.complete();
-      }, error => this.onError(error.error));
+      }, status => this.onError(status.error));
     index.detail.complete();
   }
 
@@ -438,12 +438,11 @@ export class ShopperPage implements OnInit, OnDestroy {
       time = time.getHours() + ':' + ('0' + time.getMinutes()).slice(-2);
     }
 
-    //var date1 = new Date(null, null, null, 14, 10);
     this.$order.updateShippingShopper(hub, shopper, plan, when, time)
         .subscribe(ok => {
           this.onDone('Livraisons planifiées');
         }, status => {
-          this.onError(status.message||status.error)
+          this.onError(status.error || status.message)
         });
   }
 
