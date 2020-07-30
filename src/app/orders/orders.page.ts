@@ -295,23 +295,17 @@ export class OrdersCustomerPage {
   }
 
   orderCancel(order: Order) {
-    // FIXME
-    // this.dialogs.confirm('SUPPRIMER LA COMMANDE').then(action => {
-    //   // 0:dismiss,1:OK,2:cancel
-    //   if (action != 1) {
-    //     return;
-    //   }
-    //   this.$order.cancelWithReason(order, EnumCancelReason.customer).subscribe(
-    //     (ok) => {
-    //       Object.assign(order, ok);
-    //       this.onDone('Commande annulée');
-    //     },
-    //     error => {
-    //       this.onDone(error.error);
-    //     }
-    //   );
-
-    // });
+    if (confirm('SUPPRIMER LA COMMANDE???')) {
+      this.$order.cancelWithReason(order, EnumCancelReason.customer).subscribe(
+        (ok) => {
+          Object.assign(order, ok);
+          this.onDone('Commande annulée');
+        },
+        error => {
+          this.onDone(error.error);
+        }
+      );
+    }
   }
 
   orderShippingFees(order) {
