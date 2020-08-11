@@ -158,12 +158,13 @@ export class VendorsPage implements OnInit {
   }
 
   setCurrentHub(hub) {
-    if(!hub ||!hub.id) {
-      this.currentHub = {};
-    }
     this.hubs.forEach( h => h.selected = false);
-    this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
-    this.currentHub.selected = true;
+    if (!hub || !hub.id) {
+      this.currentHub = {};
+    } else {
+      this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
+      this.currentHub.selected = true;
+    }
     this.getVendors();
   }
 

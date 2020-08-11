@@ -224,7 +224,7 @@ export class ProductDetailsPage implements OnInit {
     if (!m && def) {m = def.match(/~([0-9.]+) ?(.+)/); }
     if (!m || m.length < 2) {return ''; }
     const w = parseFloat(m[1]), unit = (m[2]).toLowerCase();
-    return 'une portion entre ' + this.roundN(w - w * delta) + unit + ' et ' + this.roundN(w + w * delta) + '' + unit;
+    return 'portion entre ' + this.roundN(w - w * delta) + unit + ' et ' + this.roundN(w + w * delta) + '' + unit;
   }
 
   doBack() {
@@ -272,7 +272,7 @@ export class ProductDetailsPage implements OnInit {
         this.create = false;
         this.product.sku = product.sku;
         // this.product.categories = product.categories._id || product.categories;
-        // this.product.vendor = product.vendor._id || product.vendor;
+        this.product.vendor = product.vendor._id || product.vendor;
 
         //
         // cached
