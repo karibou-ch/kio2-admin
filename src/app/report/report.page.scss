@@ -1,0 +1,123 @@
+.content{
+  overflow-y: auto!important;
+  @media print {
+    position: relative;
+    contain: unset;
+    height: auto!important;
+  }
+
+  ion-datetime {
+    display: none;
+  }
+
+  .scroll-content {
+    position: relative;
+    overflow:visible!important;
+  }
+    
+  .content{
+    width: 100%;
+  }
+  .fab{
+    display: none;
+  }
+  .report{
+    width: 100%;
+    height: fit-content!important;
+    overflow-y: auto;
+    margin-top:0px;
+    padding:20px 50px; 
+    @media print {
+      overflow-y: visible!important;
+      height: inherit;
+      margin-top:inherit;            
+    }
+    @media screen and (max-width:500px) {
+      padding:5px; 
+      
+    }
+    border: 1px solid #ddd;
+    background-color: white;
+    color: #333332;
+    font-family: Helvetica,sans-serif;
+    font-weight: 200;
+    ul{
+      list-style: none;
+      padding-left: 0;
+      li{
+        margin-bottom: 5px;
+      }
+    }
+    address{
+      margin-left: 0px!important;
+      vertical-align: middle;
+      margin-left: 60%;
+      margin-bottom: 50px;
+      text-decoration: none;
+      font-style:normal;
+      img{
+        width: 20px;
+      }
+    }
+    table.resume{
+      margin-top: 50px;
+      margin-bottom: 80px;
+      width: 90vw;
+      margin-left:-6px;          
+    }
+    .mdl-data-table td:first-child{
+      max-width: calc( 100vw - 115px );
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;      
+      @media screen and (max-width:500px){
+        padding-left:10px; 
+        padding-right:10px;         
+      }
+    }
+    .mdl-data-table td:last-child{
+      @media screen and (max-width:500px){
+        padding-left:10px; 
+        padding-right:10px;         
+      }
+    }
+    
+    .mdl-data-table td, 
+    .mdl-data-table th{
+      text-align: left;
+    }
+  
+
+    table.items{
+      font-size: 80%;
+    }
+    
+    table .report-last{
+      border-top: 2px solid black;
+    }
+    
+    table .report-separator{
+      border-top: 2px solid #aaa;
+    }
+    
+    h4{
+      margin-top: 50px;
+    }
+                
+  }
+    
+}
+
+
+
+
+
+
+
+@media print {
+  .report{
+    border: none!important;
+    padding:5px!important; 
+    font-size: xx-small!important;
+  }
+}

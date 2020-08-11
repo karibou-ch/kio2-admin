@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{user.displayName}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="sitename">
+    <img class="logo-small" src="/assets/img/k-puce-light.png" />
+    <b>v{{VERSION}}</b>
+  </div>
+
+
+  <div class="container" >
+    <div color="primary" class="info" [hidden]="isValid">
+      <b>Psst:</b> La transfert automatique ne peut pas être activé:<br/>
+      p1: '{{this.code}}' <b>;</b> p2: '{{this.state }}' <br/>
+      Contactez moi <a href="tel:0763797868">076 379 78 68</a>
+    </div>
+    <!--- show when connect is valid -->
+    <div class="success" [hidden]="!isOK">
+      <strong>Le transfert automatique est déjà activé</strong>
+      <p>Avec le transfert automatique vous recevez le montant de la vente quelque jours (max 7 jours) après le paiement</p>
+    </div>
+
+    <!--- show when params are valid -->
+    <div class="success" [hidden]="!isValid">
+      <strong>Finaliser l'activation du transfert automatique</strong>
+      <p>Avec le transfert automatique vous recevez le montant de la vente quelque jours (max 7 jours) après le paiement</p>
+  
+      <ion-button expand="block" color="primary" (click)="connect()">
+        <ion-icon slot="start" name="card-outline"></ion-icon> ENREGISTRER
+      </ion-button>
+  
+      <div>
+  
+      </div>
+        
+    </div>
+
+  </div>
+</ion-content>

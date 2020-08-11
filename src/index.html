@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <title>K. Vendor/Logistic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0">
+  <meta http-equiv="expires" content="0">
+  <meta http-equiv="pragma" content="no-cache">
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
 
   <link rel="icon" type="image/x-icon" href="assets/icon/favicon.ico">
-  <link rel="manifest" href="manifest.json">
   
   <meta name="mobile-web-app-capable" content="yes">
 
@@ -19,40 +22,19 @@
 
   <!-- iOS Safari -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#006a64">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Karibou.ch">
 
- 
-  <!-- cordova.js required for cordova apps -->
-  <script src="cordova.js"></script>
 
-  <!-- un-comment this code to enable service worker
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('service worker installed'))
-        .catch(err => console.error('Error', err));
-    }
-  </script>-->
+  <base href="/" />
 
-  <link href="build/main.css" rel="stylesheet">
-
-   <!--<script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>-->
-</head>
 <body>
+  <app-root></app-root>
+</body>
 
-  <!-- Ionic's root component and where the app will load -->
-  <ion-app></ion-app>
-
-  <!-- The polyfills js is generated during the build process -->
-  <script src="build/polyfills.js"></script>
-
-  <script src="build/vendor.js"></script>
-
-  <!-- The bundle js is generated during the build process -->
-  <script src="build/main.js"></script>
-
-  <!-- TODO for production, replace google maps CDN by actual package -->
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyCAGi2rm5I5OhtyKw63TCk9dzoi3xtv8v8"
+  <!-- TODO for production, replace google maps CDN by actual package AIzaSyA93ohXyArk6YIitqhGEs6H4Fov5i25oNs -->
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyA93ohXyArk6YIitqhGEs6H4Fov5i25oNs"
     ></script>
 
-</body>
 </html>

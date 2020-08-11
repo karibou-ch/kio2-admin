@@ -1,0 +1,98 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Clients</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item [hidden]="!user.isAdmin()">
+      <ion-label>Search</ion-label>
+      <ion-searchbar
+        mode="ios"
+        [debounce]="700"
+        (ionInput)="doSearch($event)"
+        (ionClear)="doSearchCancel()">
+      </ion-searchbar>  
+    </ion-item>  
+  
+    <ion-item>  
+      <ion-chip (click)="cache.errors=!cache.errors;sliceCustomers()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.errors"></ion-icon>
+        <ion-label color="primary">Erreur</ion-label>
+      </ion-chip>
+      <ion-chip (click)="cache.refund=!cache.refund;sliceCustomers()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.refund"></ion-icon>
+        <ion-label color="primary">Remboursement</ion-label>
+      </ion-chip>        
+      <ion-chip (click)="cache.premium=!cache.premium;sliceCustomers()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.premium"></ion-icon>
+        <ion-label color="primary">Premium</ion-label>
+      </ion-chip>        
+      <ion-note [hidden]="!customers.length" slot="end">
+        <ion-badge color="dark"> {{cache.customers.length}} </ion-badge>
+      </ion-note>
+    </ion-item>
+    <ion-item-sliding *ngFor="let customer of customers;let i=index;">
+      <ion-item>
+        <ion-avatar slot="start">
+          <span class="rank">{{customer.orders}}</span>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{customer.customer.displayName}} 
+            <span [hidden]="!user.isPremium(customer)">
+              <ion-icon color="danger" name="star"></ion-icon> 
+              <ion-icon color="danger" name="star" class="small"></ion-icon>
+            </span> </h2>
+          <h3>           
+            {{customer.last1Month}} <span class="">achats</span> <span class=""> / 30 derniers jours</span>
+          </h3>
+          <p>
+            Non reçus <b>{{customer.errors}}</b> ({{getErrorRatio(customer)|percent}}),
+             <b>{{customer.refunds}}</b> refund.
+          </p>
+        </ion-label>
+        <div class="note">
+          <div class="label">{{customer.avg|currency:'CHF'}} </div> 
+          {{customer.customer.created|date:'MMM y'}} 
+        </div>
+      </ion-item>
+      <ion-item-options side="start" [hidden]="!user.isAdmin() || !customer.id">
+        <ion-item-option>
+          <ion-label >
+            <ion-button mode="ios" color="danger" (click)="doRemove(customer,i)">
+              <ion-icon name="trash-outline"></ion-icon> SUPPRIMER
+            </ion-button> 
+          </ion-label>
+        </ion-item-option>
+      </ion-item-options>
+
+      <ion-item-options side="end">
+        <ion-item-option class="phone">
+          <ion-label >
+            <ion-button mode="ios" color="secondary" (click)="doDisplayMail(customer)">
+              <ion-icon name="mail"></ion-icon>             
+            </ion-button> 
+          </ion-label>
+
+          <ion-label >
+            <ion-button mode="ios" color="secondary" (click)="doDisplayPhone(customer)">
+              <ion-icon name="call"></ion-icon>             
+            </ion-button> 
+          </ion-label>
+        </ion-item-option>
+      </ion-item-options>      
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [position]="'bottom'">
+      <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Chargement des clients ...">
+    </ion-infinite-scroll-content>    
+  </ion-infinite-scroll>  
+
+</ion-content>

@@ -1,124 +1,151 @@
-import { Pro } from '@ionic/pro';
-import { LOCALE_ID, NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
+import { NgModule, LOCALE_ID, Injectable, ErrorHandler, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { Kio2Aadmin } from './app.component';
 
-import { Kng2CoreModule} from 'kng2-core';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
-import { NativeStorage } from '@ionic-native/native-storage';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-
-
-import { TrackerProvider } from '../providers/tracker/tracker.provider';
-import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
-import { Geolocation  } from '@ionic-native/geolocation';
-import { LaunchNavigator } from '@ionic-native/launch-navigator';
-import { Dialogs } from '@ionic-native/dialogs';
-import { Network } from '@ionic-native/network';
-
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/publishReplay';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/observable/throw';
-import 'rxjs/add/observable/of';
-import { TokenInterceptorProvider } from '../providers/token-interceptor/token-interceptor';
+import { Kio2Admin } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+import { Kng2CoreModule } from 'kng2-core';
+import { environment } from 'src/environments/environment';
+import { HttpClientModule, HttpErrorResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 //
-// make value sync with their sources
+// local data
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import { Network } from '@ionic-native/network/ngx';
+import { TokenInterceptorProvider } from './services/token-interceptor/token-interceptor';
+registerLocaleData(localeFr);
 
-var NPM_VERSION=require('../../package.json').version;
-var IONIC_APPID=require('../../ionic.config.json').prod_id;
 
-// if(process.env.NODE_ENV){
-
-// }
-
-Pro.init(IONIC_APPID, {
-  appVersion: NPM_VERSION
-});
-
-@Injectable()
+//
+// preparing Sentry feedback
+@Injectable({ providedIn: 'root' })
 export class Kio2AdminErrorHandler implements ErrorHandler {
-  ionicErrorHandler: IonicErrorHandler;
+  errorHandler: ErrorHandler;
 
   constructor(injector: Injector) {
     try {
-      this.ionicErrorHandler = injector.get(IonicErrorHandler);
-    } catch(e) {
+      // this.errorHandler = injector.get(ErrorHandler);
+    } catch (e) {
       // Unable to get the IonicErrorHandler provider, ensure
       // IonicErrorHandler has been added to the providers list below
     }
   }
 
-  handleError(err: any): void {    
-    console.log('---- Kio2AdminErrorHandler',NPM_VERSION,err)
-    // Pro.monitoring.handleNewError(err);
-    // Remove this if you want to disable Ionic's auto exception handling
-    // in development mode.
-    this.ionicErrorHandler && this.ionicErrorHandler.handleError(err);
+  extractError(error) {
+    // Try to unwrap zone.js error.
+    // https://github.com/angular/angular/blob/master/packages/core/src/util/errors.ts
+    if (error && error.ngOriginalError) {
+      error = error.ngOriginalError;
+    }
+
+    // We can handle messages and Error objects directly.
+    if (typeof error === 'string' || error instanceof Error) {
+      return error;
+    }
+
+    // If it's http module error, extract as much information from it as we can.
+    if (error instanceof HttpErrorResponse) {
+      // The `error` property of http exception can be either an `Error` object, which we can use directly...
+      if (error.error instanceof Error) {
+        return error.error;
+      }
+
+      // ... or an`ErrorEvent`, which can provide us with the message but no stack...
+      if (error.error instanceof ErrorEvent) {
+        return error.error.message;
+      }
+
+      // ...or the request body itself, which we can use as a message instead.
+      if (typeof error.error === 'string') {
+        return `Server returned code ${error.status} with body "${error.error}"`;
+      }
+
+      // If we don't have any detailed information, fallback to the request message itself.
+      return error.message;
+    }
+
+    // Skip if there's no error, and let user decide what to do with it.
+    return null;
+  }
+
+  handleError(error: any): void {
+    const extractedError = this.extractError(error) || "Handled unknown error";
+
+    //
+    // Page after new build deploy to load new chunks everything works fine,
+    // all we need to either show a popup message to user and ask him to reload
+    // page or we programmatically force app to reload if chunks failed error occurs.
+    // https://medium.com/@kamrankhatti/angular-lazy-routes-loading-chunk-failed-42b16c22a377
+    const chunkFailedMessage = /Loading chunk [\d]+ failed/;
+
+    //
+    // Reload App is enough
+    if (chunkFailedMessage.test(error.message)) {
+      return window.location.reload(true);
+    }
+
+    //
+    // IMPORTANT: Rethrow the error otherwise it gets swallowed
+    if (error.statusText === 'Unknown Error' ||
+        error.rejection && error.rejection.status === 0) {
+      window['API_ISSUE'] = true;
+      console.log('--- Network error');
+      return;
+    }
+
+    //
+    // LAZY LOADIN SENTRY
+    if (environment.production) {
+      import('./sentry/sentry.module').then(m => {
+        const Sentry = window['Sentry'];
+
+        Sentry.captureException(extractedError);
+        return m.SentryModule;
+      });
+    }
+
+    console.log('---- Kio2AdminErrorHandler', 'version', extractedError);
+    // // Pro.monitoring.handleNewError(err);
+    // // Remove this if you want to disable Ionic's auto exception handling
+    // // in development mode.
+    // this.errorHandler && this.errorHandler.handleError(error);
+
+    throw error;
   }
 }
 
-//
-// dynamic server settings
-
-var SERVER:boolean|string=false;
-//SERVER="http://localhost:4000";
-SERVER='http://api.karibou.evaletolab.ch';
-//SERVER='https://api.karibou.ch';
-//SERVER='http://api.boulangerie-bretzel.ch';
-
-// export function bootstrap($loader: LoaderService) {
-//   return () => $loader.ready();
-// }
 
 @NgModule({
-  declarations: [
-    Kio2Aadmin
-  ],
+  declarations: [Kio2Admin],
+  entryComponents: [],
   imports: [
     BrowserModule,
     HttpClientModule,
+    IonicModule.forRoot(),
     Kng2CoreModule.forRoot({
-      API_SERVER:SERVER,
-      loader:[
-        "categories",
-        "shops"
+      API_SERVER: environment.API_SERVER,
+      loader: [
+        'categories',
+        /** 'shops'  shop is requiered by product-details:L90 */
       ]
     }),
-    IonicModule.forRoot(Kio2Aadmin,{
-      preloadModules: false
-    })
-  ],
-  bootstrap: [IonicApp],
-  entryComponents: [
-    Kio2Aadmin
+    AppRoutingModule
   ],
   providers: [
-    // preload
-    // { provide: APP_INITIALIZER, useFactory: bootstrap, deps: [LoaderService], multi: true },
-
-    // set locale to french (for dates, etc. )
-    { provide: LOCALE_ID, useValue: "fr-FR" },  
-    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorProvider, multi: true },
-    // {provide: ErrorHandler, useClass: IonicErrorHandler},
-    { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },    
-    BackgroundGeolocation,
-    Dialogs,
-    Geolocation,
-    LaunchNavigator,
-    NativeStorage,
-    Network,
     StatusBar,
     SplashScreen,
-    TrackerProvider,
-    TokenInterceptorProvider
-  ]
+    Geolocation,
+    Network,
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
+    { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorProvider, multi: true}
+    // { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+  ],
+  bootstrap: [Kio2Admin]
 })
-export class AppModule {
-}
+export class AppModule {}

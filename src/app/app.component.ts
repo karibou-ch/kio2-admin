@@ -1,141 +1,92 @@
-import { Component, ViewChild } from '@angular/core';
-import { Platform, NavController } from 'ionic-angular';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-import { LoaderService, User, UserService } from 'kng2-core';
+import { Component } from '@angular/core';
 
-import localeFr from '@angular/common/locales/fr';
-//
-// the second parameter 'fr' is optional
-import { registerLocaleData } from '@angular/common';
-import { Network } from '@ionic-native/network';
-import { Dialogs } from '@ionic-native/dialogs';
-registerLocaleData(localeFr, 'fr');
+import { Platform,ToastController  } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { Network } from '@ionic-native/network/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { LoaderService, User } from 'kng2-core';
+import { Router } from '@angular/router';
+import { EngineService } from './services/engine.service';
+import { interval } from 'rxjs';
 
 
 @Component({
-  templateUrl: 'app.html'
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss']
 })
-export class Kio2Aadmin {
-  currentUser:User=new User();
-  rootPage: any ;
-  @ViewChild('adminNavigation') nav: NavController;
+export class Kio2Admin {
+  currentUser: User = new User();
+  NET_INFO: boolean;
 
   constructor(
-    private dialogs:Dialogs,
-    private $loader: LoaderService,
+    private $engine: EngineService,
     private $network: Network,
+    private $loader: LoaderService,
+    private $router: Router,
     private platform: Platform,
-    private statusBar: StatusBar,
     private splashScreen: SplashScreen,
-    private $user:UserService
+    private statusBar: StatusBar,
+    private $toast: ToastController
   ) {
+    this.initializeApp();
+    this.$loader.update().subscribe((ctx) => {
+      if (ctx.config) {
+        this.$engine.currentConfig = ctx.config;
+      }
+
+      if (ctx.user) {
+        this.onInit(ctx.user);
+      }
+    });
+  }
+
+  initializeApp() {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
-      this.statusBar.hide();
       this.splashScreen.hide();
-      console.log('INIT APP isCore,isMobileweb',this.platform.is('core'),this.platform.is('mobileweb'))
+      this.NET_INFO = false;
 
       //
-      // force relaod app each 20h
-      const bootTime = Date.now();
-      const oneDay = 3600 * 20 * 1000;
-      setInterval(()=>{
-        try{
-          const now = Date.now();
-          if(bootTime+oneDay<now){
-            window.location.reload(true);
-          }          
-        }catch(e){}        
-      }, 10000);
-
+      // SIMPLE NETWORK CHECKER INFO
+      const neteork = interval(5000).subscribe(() => {
+        // console.log('---net',this.$network.type, window.navigator.onLine)
+        if((this.$network.type || '').toLocaleLowerCase() === 'none' ||
+          !window.navigator.onLine) {
+          if (this.NET_INFO) {
+            return;
+          }
+          this.NET_INFO = true;
+        } else if (this.NET_INFO) {
+          this.NET_INFO = false;
+        }
+      });
     });
   }
 
 
-  //
-  // if default URL/# is set
-  // QUICK FIX for report 
-  defaultPage(){
-    try{
-      if(window&&window.location.hash){
-        let hash=window.location.hash;
-        return setTimeout(()=>{
-          window.location.hash=hash;
-        },400);
-      }  
-    }catch(e){
+  onInit(user: User) {
 
+    //
+    // update global state
+    this.$engine.currentUser = user;    
+
+    if (!user.isAuthenticated()) {
+      this.$router.navigateByUrl('/login');
+      return;
     }
-  }
 
-
-
-  onInit(user:User){
-
-    if(!user.isAuthenticated()){
-      this.rootPage='LoginPage';
+    //
+    // navigation is running
+    if(this.$router.url === '/') {
       return;
     }
 
     //
     // if admin||logistic => shopper
-    if(user.isAdmin()||user.hasRole('logistic')){
-      this.rootPage='ShopperPage';
-      this.defaultPage();
+    if (user.isAdmin() || user.hasRole('logistic')) {
+      this.$router.navigateByUrl('/shopper');
       return;
     }
-
-    this.rootPage='OrderCustomersPage';
-    this.defaultPage();
-
-  }
-
-  // ngAfterViewInit() {
-
-  //   // Convenience to route with a given nav
-  //   Deeplinks.routeWithNavController(this.navChild, {
-  //     '/about-us': AboutPage,
-  //     '/universal-links-test': AboutPage,
-  //     '/products/:productId': ProductPage
-  //   }).subscribe((match) => {
-  //     console.log('Successfully routed', match);
-  //   }, (nomatch) => {
-  //     console.warn('Unmatched Route', nomatch);
-  //   });
-  // }  
-
-  ngOnInit() {
-  
-    //
-    // checking network on start!
-    setTimeout(()=>{
-      if(this.$network.type=='none'){
-        return this.dialogs.alert("Il n'y a pas d'accès au réseau actuellement").then(()=>{
-          this.platform.exitApp();
-        })
-      }  
-    },1000);
-
-    //
-    //
-    this.$loader.update().subscribe((ctx)=>{
-      if(ctx.user){
-        this.onInit(ctx.user);
-      }
-    })
-
-    this.$loader.ready().subscribe((loader) => {
-      console.log('--- init',this.rootPage,this.currentUser)
-      Object.assign(this.currentUser,loader[1]);
-      this.onInit(this.currentUser);
-    },error=>{
-      console.log('--- ISSUE',error)
-      this.rootPage='OupsPage';
-      this.dialogs.alert("Un problème empêche l'accès au service..").then(()=>{
-        this.platform.exitApp();        
-      })
-    });
-
   }
 }

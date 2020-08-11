@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Boutiques</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <div class="loader" [hidden]="isReady">
+      <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+    </div>
+  
+    <ion-item>
+      <ion-label>Rechercher</ion-label>
+      <ion-searchbar
+        mode="ios"
+        [(ngModel)]="cache.search"
+        [debounce]="500"
+        (ionInput)="onSearchInput($event)"
+        (ionClear)="onSearchCancel($event)">
+      </ion-searchbar>  
+      <ion-chip (click)="cache.active=!cache.active" class="toggle">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
+        <ion-label color="primary">Actif</ion-label>
+      </ion-chip>
+  
+      <ion-button  icon-only (click)="onCreateVendor()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>    
+    </ion-item>  
+  
+    <!-- HUBS -->
+    <ion-item class="hub" lines="none" [hidden]="!hubs.length">
+      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
+        <ion-label color="primary">{{hub.name}}</ion-label>
+      </ion-chip>
+      <ion-chip class="hub" slot="start"  (click)="setCurrentHub({})" [hidden]="!user.isAdmin()">
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="currentHub?.slug"></ion-icon>
+        <ion-label color="primary">Sans HUB</ion-label>
+      </ion-chip>
+
+    </ion-item>
+
+
+    <ion-item-sliding *ngFor="let shop of shops" [hidden]="shop.status!=cache.active">    
+        <ion-item (click)="openDetails(shop)" [class.inactive]="shop.available.active">
+          <ion-avatar slot="start">
+            <img [src]="'https:'+shop.photo.owner+'/-/resize/128x/'">
+          </ion-avatar>      
+          <ion-label>
+            <h2>{{shop.name}}</h2>      
+            <h3 class="red" [hidden]="!shop.available.active">Boutique fermée jusqu'à {{shop.available.to|date:'mediumDate':'GMT+1':'fr'}}</h3>
+            <p></p>
+            <span slot="end" [class.red]="">
+              
+            </span>    
+          </ion-label>      
+        </ion-item>
+      </ion-item-sliding>    
+  </ion-list>
+</ion-content>

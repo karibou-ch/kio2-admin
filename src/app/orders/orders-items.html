@@ -1,0 +1,123 @@
+<ion-header [hidden]="!header">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button  (click)="doClose()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ (shipping | date:format) }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content >
+
+  <h1 class="info" [hidden]="orders.length&&!item.customers">Pas de commandes  pour la boutique {{vendor}} </h1>
+  <ion-list *ngFor="let order of orders">
+    <!-- CUSTOMER HEADER -->
+    <ion-item class="customer" *ngIf="order.shipping">
+      <span  class="rank">{{getOrderRank(order)}}</span>
+      <ion-label class="ion-text-wrap">
+        <h2>
+          {{order.customer.displayName}}
+        </h2>
+        <p> 
+          {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>            
+        </p>  
+      </ion-label>
+      <ion-note slot="end" >
+        {{order.getSubTotal({ withoutCharge:true })|currency:'CHF'}} <br/>
+        <span [class.red]="deltaPrice>0.15">{{deltaPrice|percent}}</span>
+      </ion-note>
+      <div class="note" slot="end">
+        <a [hidden]="!getPhoneNumber(order)"
+         color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
+     <a  color="info"  href="javascript:void()" (click)="doDisplayMail(order)"> <ion-icon name="mail"> </ion-icon></a>
+
+      </div>
+    </ion-item>
+
+    <!-- VALIDATE AT ONCE -->
+    <ion-item class="header">
+      <ion-label class="ion-text-wrap">
+        <div class="title">Valider tous les articles au tarif de base!</div>
+        <div class="quantity" >
+          Note: la correction par article est possible ensuite!
+        </div>
+
+        <div class="actions">
+
+          <!-- REFUND HUB-->
+          <button class="avoid button-refund item-button" 
+            color="danger"  slot="end" 
+            [hidden]="!isPaid(order)"
+            (click)="doRefundHUB(order)">
+            HUB refund
+          </button>
+
+          <button  class="item-button" fill="outline" slot="end" 
+                  [hidden]="isPaid(order)"
+                  (click)="doValidateAll(order)">
+            <ion-icon slot="start" name="checkmark-outline" ></ion-icon>             
+          </button>
+          
+        </div>
+      </ion-label>
+    </ion-item>
+
+    <!-- GLOBAL SAVE ACTION-->
+    <ion-item-sliding *ngFor="let item of sortedItem(order)">    
+      <ion-item-options side="end" [hidden]="!isPaid(order)">
+        <ion-item-option>
+            <ion-button class="avoid button-refund" 
+                    color="danger"  slot="end" 
+                    [disabled]="item.finalprice==0"                    
+                    (click)="doRefund(order,item)">
+              <ion-icon name="card-outline" ></ion-icon>&nbsp;refund
+            </ion-button>
+        </ion-item-option>
+      </ion-item-options>  
+      <ion-item >
+        <ion-label class="ion-text-wrap">
+          <div class="title {{item.fulfillment.status}}" (click)="doOpenProduct(item)" >
+              {{item.title}} 
+            <div [hidden]="!item.variant" class="dark-green link">
+              // {{item.variant?.title}}
+            </div>
+          </div>
+          <div class="quantity {{item.fulfillment.status}}" [class.red.bold]="item.quantity>1">
+            {{item.quantity}}x <span class="part">{{item.part}}</span> 
+            <span class="issue" [hidden]="!item.fulfillment.request">problème:{{item.fulfillment.request}} </span>
+            <span class="issue" [hidden]="!item.fulfillment.refunded"><span [hidden]="item.finalprice==0">partiellement</span> remboursé </span>
+          </div>
+
+  
+          <div class="price {{item.fulfillment.status}}" >
+            <span class="suffix">fr</span>
+            <input type="number" step="0.1" min="0"  class="input-price" 
+                   [(ngModel)]="item.finalprice"   
+                   (keypress)="doKeypress($event.keyCode,order,item)"
+                   (focus)="doSelectAllPrice($event)"/>
+          </div>
+          <div class="actions">
+            <button class="item-button validate" fill="outline" slot="end" 
+                    [class.button-validate]="isItemValid(item)" [hidden]="isPaid(order)"
+                    (click)="doValidate(order, item)">
+              <ion-icon slot="start" name="checkmark-outline" ></ion-icon>
+            </button>
+            <button class="item-button avoid" fill="outline" slot="end" 
+                    [class.button-cancel]="isItemCancel(item)" [hidden]="isPaid(order)"
+                    (click)="doCancel(order,item)">
+              <ion-icon slot="start" name="close-outline" ></ion-icon>
+            </button>                      
+          </div>
+        </ion-label>
+      </ion-item>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+  <br/>
+</ion-content>
+

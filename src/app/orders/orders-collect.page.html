@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }}  </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="picker.open()">
+        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+      </ion-button>      
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-datetime #picker 
+    displayFormat="MM/YYYY" 
+    pickerFormat="MMMM YYYY" 
+    [(ngModel)]="pickerShippingDate" 
+    (ngModelChange)="onDatePicker()" 
+    cancelText="Annuler" 
+    doneText="Fait" 
+    dayValues="1"
+    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
+    max="2024"
+    style="display: none;">
+  </ion-datetime>        
+</ion-header>
+
+<ion-content >
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
+  <h1 class="info" [hidden]="!isReady||(vendors.list.length > 0)">Pas de commandes <br/>pour {{currentHub?.name}}</h1>
+
+  <ion-refresher (ionRefresh)="doRefresh($event)" slot="fixed" [disabled]="false">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-list>
+    <!-- SEARCH & HUB FILTERS-->
+    <ion-item  lines="none">
+      <ion-searchbar
+        mode="ios"
+        showCancelButton="focus"
+        [(ngModel)]="searchFilter"
+        [debounce]="500"
+        [hidden]="!(vendors.list.length)"
+        (ionInput)="onSearchInput($event)"
+        (ionClear)="onSearchCancel($event)">
+      </ion-searchbar>  
+      <ion-chip (click)="toggleCollect($event)" slot="end" [hidden]="!orders.length" tabIndex="-1">
+        <!-- radio-button-off-outline || checkmark-circle-outline -->
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!toCollect"></ion-icon>
+        <ion-label color="primary">A Collecter</ion-label>
+      </ion-chip>    
+    </ion-item>
+    <ion-item class="hub" lines="none" [hidden]="!hubs.length || !orders.length">
+      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
+        <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
+        <ion-label color="primary">{{hub.name}} ({{hub.orders}})</ion-label>
+      </ion-chip>
+    </ion-item>
+  
+    <ion-item-sliding *ngFor="let vendor of getVendors()"
+                      [hidden]="toCollect && isCollected(vendor)">    
+      <ion-item-options side="end">
+        <ion-item-option>
+        <ion-button color="danger" (click)="openPhone(vendor)">
+          <ion-icon name="call-outline"></ion-icon>
+          Appeler
+        </ion-button>        
+      </ion-item-option>
+      </ion-item-options>
+      <ion-item >
+        <ion-avatar slot="start" (click)="updateCollect(vendor)">
+          <span class="check rank collect" [class.collected]="isCollected(vendor)">
+            <ion-icon name="checkmark-done-outline" ></ion-icon>
+          </span>
+        </ion-avatar>
+        <div (click)="openVendorItems(vendor)" >
+          <h3 text-capitalize class="bold">{{vendor}} ({{getCustomerRanks(vendor).length}})</h3>
+          <!-- <p><ion-badge class="ranks" color="secondary" *ngFor="let rank of getCustomerRanks(vendor)">{{rank}}</ion-badge></p> -->
+          <p>Total validé: {{getAmount(vendor)}} fr</p>
+        </div>
+
+        <ion-note slot="end">
+          <span [class.red]="isFulfilled(vendor)">{{getFulfilled(vendor)}}</span><b>/</b>{{vendors[vendor].items.length}} 
+        </ion-note>        
+      </ion-item>
+    </ion-item-sliding>
+  </ion-list>
+
+
+</ion-content>

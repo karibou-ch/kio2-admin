@@ -7,21 +7,21 @@ Kio2-admin is a:
 * an Amazon killer app!
 
 # Prerequisite
-* an instance of karibou.ch
-* nodejs, npm stable
-* the middleware [KingKong II](https://www.npmjs.com/package/kng2-core) 
+* an instance of karibou.ch 
+* node >=v12.15.0, 
+* npm >=6.13.4
+* the middleware [KingKong II v3](https://www.npmjs.com/package/kng2-core) 
+
 
 # Install your available targets (browser, android, ios)
 ```bash
   $ git clone https://github.com/karibou-ch/kio2-admin  
   $ cd kio2-admin && npm i
   $ ionic cordova platform add browser
-  $ ionic cordova platform add android
-  $ ionic cordova platform add ios
 ```  
 # Devel
 ```bash
-  $ ionic serve  
+  $ ionic serve -c devel
 ```
 
 # Run on device
@@ -33,7 +33,7 @@ Kio2-admin is a:
 # Compile
 * note: `--prod` ~equals `--aot --minifycss --optimizejs`
 ```bash
-  $ ionic cordova build browser --prod
+  $ ionic cordova build browser --prod --env prod
   $ ionic cordova build android --prod
 ```
 
@@ -44,6 +44,12 @@ Kio2-admin is a:
 ```  
 
 # Publih for www
+**targets**,
+* admin.beta.karibou.ch
+* admin.karibou.ch
+* testadmin.karibou.ch
+* admin.boulangerie-bretzel.ch
+
 ```bash
   $ ionic cordova build browser --prod --env=bretzel
   $ rsync -avziu --delete-after -e 'ssh -p22' platforms/browser/www/ $user@$server:$path 

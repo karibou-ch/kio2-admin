@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{user.displayName}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Nom</ion-label>
+      <p text-capitalize>{{ user.name.familyName }}</p>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Prenom</ion-label>
+      <p text-capitalize>{{ user.name.givenName }}</p>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Email</ion-label>
+      <p>{{ user.email.address }}</p>
+    </ion-item>
+    <ion-item *ngFor="let phone of user.phoneNumbers">
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Telephone</ion-label>
+      <p>{{ phone.number }}</p>
+    </ion-item>
+      
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Rôle</ion-label>
+      <ul>
+        <li color="secondary">Utilisateur</li>    
+        <li [hidden]="!user.hasRole('logistic')" color="secondary">Logistic</li>      
+        <li [hidden]="!user.isAdmin()" color="secondary">Admin</li>
+        <li [hidden]="!defaultShop" color="secondary">Vendor</li>
+      </ul>
+    </ion-item>
+    <!-- STRIPE -->
+    <ion-item *ngIf="defaultShop">
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Transfert d'argent</ion-label>
+
+      <ul>
+        <li>{{defaultShop.address.name}}</li>
+        <li>{{defaultShop.address.streetAdress}},{{defaultShop.address.postalCode}}, {{defaultShop.address.region}}</li>
+        <li>{{defaultShop.address.phone}}</li>
+        <li>{{defaultShop.account.IBAN}}</li>
+        <!-- <li>{{defaultShop.account.tva.number}}</li>         -->
+        <li [hidden]="!user.connect_state"><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon> Le transfert automatique est actif</li>
+      </ul>
+    </ion-item>
+    <ion-item *ngIf="defaultShop && !user.connect_state && false" class="space">
+      <ion-button size="medium"  expand="block" shape="round" fill="outline" color="primary" [href]="stripeUrl">
+        <ion-icon slot="start" name="card-outline"></ion-icon> Activer le transfert automatique à votre banque
+      </ion-button>
+    </ion-item>
+    <ion-item-divider>
+      <ion-label>
+        Fermer votre session
+      </ion-label>
+    </ion-item-divider>    
+    <ion-item class="space">
+      <!-- <ion-label position="fixed" class="ion-text-wrap" color="primary">Gérer votre compte</ion-label> -->
+      <ion-button size="medium"  expand="block" shape="round" fill="outline" color="primary" href="https://karibou.ch/store/geneva/me/email">
+        <ion-icon slot="start" name="person-circle-outline"></ion-icon> Modifier vos informations de compte
+      </ion-button>
+    </ion-item>
+
+    <ion-item class="space">
+      <ion-button size="medium"  expand="block" shape="round" fill="outline" color="danger" (click)="logout()">
+        <ion-icon slot="start" name="person-circle-outline"></ion-icon> Logout
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>
