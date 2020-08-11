@@ -20,20 +20,21 @@
   <ion-list>
     <!-- DISPLAY ORDERS -->
     <ion-item-sliding *ngFor="let order of orders">
-
-      <ion-item-options side="start" [hidden]="!user.isAdmin()">
-        <ion-item-option>
+      <ion-item-options>
+        <ion-item-option side="start">
           <ion-button mode="ios" expandable (click)="orderCapture(order)">
             fermer
           </ion-button>
         </ion-item-option>
-      </ion-item-options>  
-
-      <ion-item-options side="start">
       </ion-item-options>
+      <ion-item-options>
+        <ion-item-option side="start">
+          <ion-button mode="ios" expandable (click)="orderCapture(order)">
+            fermer
+          </ion-button>
+        </ion-item-option>
 
-      <ion-item-options side="end">
-        <ion-item-option class="phone">
+        <ion-item-option class="phone" side="end">
           <ion-label >
             <ion-button mode="ios" color="primary" (click)="doDisplayMail(order)">
               <ion-icon name="mail"></ion-icon>             

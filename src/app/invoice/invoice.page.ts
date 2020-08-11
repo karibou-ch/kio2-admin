@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OrderService, Order, Config, User } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-invoice',
@@ -21,6 +21,7 @@ export class InvoicePage implements OnInit {
   constructor(
     private $alert: AlertController,
     private $engine: EngineService,
+    public $toast: ToastController,
     private $order: OrderService,
   ) {
     this.orders = [];
@@ -120,10 +121,21 @@ export class InvoicePage implements OnInit {
     this.$order.capture(order).subscribe(
       (ok) => {
         Object.assign(order, ok);
+        this.onDone('Commande payée');
       },
-      error => {
+      status => {
+        this.onDone(status.error);
       }
     );
+
+  }
+
+  onDone(msg) {
+    this.$toast.create({
+      message: msg,
+      duration: 3000,
+      color: 'dark'
+    }).then(alert => alert.present());
 
   }
 
