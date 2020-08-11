@@ -181,6 +181,9 @@ export class ShopperPage implements OnInit, OnDestroy {
       this.orders.forEach(order => {
         this.hubs.find(hub =>  order.hub === hub.id).orders ++;
       });
+
+      const select = this.hubs.find(hub => hub.orders > 0);
+      if (select) {this.setCurrentHub(select); }
     }
 
     this.isReady = true;
@@ -377,7 +380,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
       //
       // list shopper
-      if (order.shipping.shopper && order.shipping.priority) {
+      if (order.shipping.priority) {
         this.shippingShopper[order.shipping.priority] = {
           shopper: order.shipping.shopper,
           plan: order.shipping.priority,

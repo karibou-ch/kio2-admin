@@ -65,18 +65,18 @@
                     <ion-select-option *ngFor="let shopper of shippingShoppers"  [value]="shopper">{{shopper}}</ion-select-option>
                   </ion-select>
 
-      <ion-datetime 
-        [hidden]="!currentHub"
-        placeholder="Time"
-        displayFormat="HH:mm" 
-        pickerFormat="HH mm" 
-        [(ngModel)]="shippingShopper[currentPlanning].time" 
-        (ngModelChange)="setShippingShopper({time:$event})" 
-        cancelText="Annuler" 
-        doneText="Fait" 
-        minuteValues="0,30">
-      </ion-datetime>        
-    
+        <ion-datetime 
+          [hidden]="!currentHub"
+          placeholder="Time"
+          displayFormat="HH:mm" 
+          pickerFormat="HH mm" 
+          [(ngModel)]="shippingShopper[currentPlanning].time" 
+          (ngModelChange)="setShippingShopper({time:$event})" 
+          cancelText="Annuler" 
+          doneText="Fait" 
+          minuteValues="0,30">
+        </ion-datetime>        
+      
 
       </ion-item>
     </div>
