@@ -8,6 +8,7 @@ import { LoaderService, User } from 'kng2-core';
 import { Router } from '@angular/router';
 import { EngineService } from './services/engine.service';
 import { interval } from 'rxjs';
+import { SwUpdate } from '@angular/service-worker';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class Kio2Admin {
     private $network: Network,
     private $loader: LoaderService,
     private $router: Router,
+    private $update: SwUpdate,
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
@@ -46,6 +48,13 @@ export class Kio2Admin {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
       this.NET_INFO = false;
+
+      this.$update.available.subscribe(event => {
+        const msg = 'Une nouvelle version est disponible. Recharger la page maintenant';
+        if (confirm(msg)) {
+          this.$update.activateUpdate().then(() => document.location.reload(true));
+        }
+      });
 
       //
       // SIMPLE NETWORK CHECKER INFO

@@ -1,6 +1,6 @@
 {
   "name": "kio2-admin",
-  "version": "3.1.26",
+  "version": "3.2.0",
   "author": "karibou.ch",
   "homepage": "https://karibou.ch/",
   "scripts": {
@@ -18,7 +18,9 @@
     "@angular/forms": "~8.2.14",
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
+    "@angular/pwa": "^0.1000.5",
     "@angular/router": "~8.2.14",
+    "@angular/service-worker": "~8.2.14",
     "@ionic-native/core": "^5.27.0",
     "@ionic-native/dialogs": "^5.27.0",
     "@ionic-native/geolocation": "^5.27.0",

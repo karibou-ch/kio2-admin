@@ -8,7 +8,6 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Kio2Admin } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { Kng2CoreModule } from 'kng2-core';
-import { environment } from 'src/environments/environment';
 import { HttpClientModule, HttpErrorResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 
@@ -18,6 +17,8 @@ import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { Network } from '@ionic-native/network/ngx';
 import { TokenInterceptorProvider } from './services/token-interceptor/token-interceptor';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 registerLocaleData(localeFr);
 
 
@@ -134,7 +135,8 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
         /** 'shops'  shop is requiered by product-details:L90 */
       ]
     }),
-    AppRoutingModule
+    AppRoutingModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     StatusBar,
