@@ -1,0 +1,49 @@
+ul{
+  padding: 0;
+  width: 100%;
+  li{
+    line-height: 18px;
+    margin: 5px 0;
+    display: flex;
+    button{
+      padding: 6px 4px;
+      background: red;
+      color: white;
+      border-radius: 4px;
+      margin-left: 20px;      
+      margin-right: 0;
+      margin-left: auto;
+    }
+  }
+}
+
+ion-list-header {
+  div{
+    button {
+      margin-left: 20px;      
+      background: red;
+      color: white;
+      border-radius: 5px;   
+      height: 24px; 
+    }
+  
+  }
+}
+
+.invoice-form {
+  display: flex;
+  width: 100%;
+  button {
+    margin-right: 0;
+    margin-left: auto;
+    background: var(--ion-color-primary);
+    color: white;
+    border-radius: 5px;    
+  }
+}
+
+
+ion-list-header{
+  font-size: 18px;
+}
+

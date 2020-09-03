@@ -1,0 +1,132 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{customer?.displayName}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button  (click)="doClose()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list *ngIf="customer">
+    <ion-item>
+      <ion-label>Status</ion-label>
+      <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="customer.status"></ion-toggle>
+    </ion-item>
+
+    <!-- INFO -->
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Nom</ion-label>
+      <p text-capitalize>{{ customer.name.familyName }}</p>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Prenom</ion-label>
+      <p text-capitalize>{{ customer.name.givenName }}</p>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" color="primary">
+        Email
+      </ion-label>
+      <ion-input type="email" placeholder="Email" ngDefaultControl [(ngModel)]="customer.email.address"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="fixed" color="primary">
+        CC
+      </ion-label>
+      <ion-input type="email" placeholder="CC Email" ngDefaultControl [(ngModel)]="customer.email.cc"></ion-input>
+    </ion-item>
+
+    <ion-item *ngFor="let phone of customer.phoneNumbers">
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Télephone</ion-label>
+      <ion-input type="phone" placeholder="Phone" ngDefaultControl [(ngModel)]="phone.number"></ion-input>
+    </ion-item>
+      
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Rôle</ion-label>
+      <ul>
+        <li color="secondary">Utilisateur</li>    
+        <li [hidden]="!customer.hasRole('logistic')" color="secondary">Logistic</li>      
+        <li [hidden]="!customer.isAdmin()" color="secondary">Admin</li>
+        <li [hidden]="!defaultShop" color="secondary">Vendor</li>
+      </ul>
+    </ion-item>
+    <!-- STRIPE -->
+    <ion-item *ngIf="defaultShop && defaultShop.address">
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Transfert d'argent</ion-label>
+
+      <ul>
+        <li>{{defaultShop.address.name}}</li>
+        <li>{{defaultShop.address.streetAdress}},{{defaultShop.address.postalCode}}, {{defaultShop.address.region}}</li>
+        <li>{{defaultShop.address.phone}}</li>
+        <li>{{defaultShop.account.IBAN}}</li>
+        <!-- <li>{{defaultShop.account.tva.number}}</li>         -->
+        <li [hidden]="!customer.connect_state"><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon> Le transfert automatique est actif</li>
+      </ul>
+    </ion-item>
+
+    <!-- PAYMENTS -->
+    <ion-item>
+      <ion-label position="stacked" class="ion-text-wrap" color="primary">Payments</ion-label>
+      <ul>
+        <li *ngFor="let payment of customer.payments"> 
+          {{payment.name}} - {{payment.expiry}} - {{payment.issuer}} 
+          <button class="btn-danger" (click)="doDeletePaymentMethod(payment.alias,customer.id)">SUPPRIMER </button>
+        </li>
+      </ul>
+    </ion-item>
+
+    <!-- INVOICE [hidden]="hasMethod(customer,'invoice')" -->
+    <ion-item >
+      <ion-label position="stacked" class="ion-text-wrap" color="primary">Ajouter le paiement par Facture</ion-label>
+      <div class="invoice-form">
+        <ion-input type="text" placeholder="Nom, prénom" ngDefaultControl [(ngModel)]="invoice.name"></ion-input>
+        <ion-input type="text" placeholder="MM/YYYY" ngDefaultControl [(ngModel)]="invoice.expiry"></ion-input>
+        <button  (click)="doAddInvoiceMethod(invoice,customer.id)">Ajouter</button>
+      </div>
+    </ion-item>
+
+    <!-- ADRESSE -->
+    <ion-list *ngFor="let address of customer.addresses;let idx=index">
+      <ion-list-header color="primary">
+        <b>{{idx + 1}} -</b>&nbsp; {{address.name}} 
+        <div class="align-right">
+          Map <ion-icon  [hidden]="!address.geo || !address.geo.lat" name="map-outline" class="gold "></ion-icon>
+          <button  (click)="customer.addresses.splice(idx, 1)">DEL</button>  
+        </div>
+
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label color="primary" position="stacked">Nom et prénom du contact</ion-label> 
+        <ion-input  type="text"  placeholder="Nom et prénom" [(ngModel)]="address.name" required></ion-input>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label color="primary" position="stacked">Rue et numéro </ion-label> 
+        <ion-input  type="text"  placeholder="rue, numéro" (focusout)="ngOnChanges($event)" [(ngModel)]="address.streetAdress" required></ion-input>
+        <ion-input  type="text"  placeholder="Étage" class="floor" [(ngModel)]="address.floor" required></ion-input>
+      </ion-item>
+      <ion-item >
+        <ion-label color="primary" position="stacked">Code postal et Région</ion-label> 
+        <ion-input  type="text"  placeholder="Code postal" (focusout)="ngOnChanges($event)" [(ngModel)]="address.postalCode" required></ion-input>
+        <ion-input  type="text"  placeholder="Région" [(ngModel)]="address.region" required></ion-input>
+      </ion-item> 
+
+      <ion-item>
+        <ion-label color="primary" position="stacked">Note </ion-label> 
+        <ion-input  type="text"  placeholder="note" [(ngModel)]="address.note" required></ion-input>
+      </ion-item>
+
+    </ion-list>
+
+
+    <!-- SAVE -->
+    <ion-item>
+      <ion-button fill="outline" expand="block" size="large" color="primary"  (click)="doSave(customer)">Enregistrer</ion-button>
+    </ion-item>
+
+  </ion-list>
+</ion-content>
