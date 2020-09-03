@@ -327,3 +327,22 @@
 .uploadcare--page{
   overflow: visible!important;
 }
+
+
+.gold {
+  color: gold;
+}
+
+.align-right {
+  margin-right: 10px;
+  margin-left: auto;
+}
+
+.modal-wrapper {
+  @media  (min-width:426px){
+    --max-width: calc( 100vw - 100px );
+    --width: calc( 100vw - 100px );  
+  }
+
+
+}
