@@ -1,6 +1,6 @@
 {
   "name": "kio2-admin",
-  "version": "3.2.0",
+  "version": "3.2.9",
   "author": "karibou.ch",
   "homepage": "https://karibou.ch/",
   "scripts": {
@@ -31,6 +31,7 @@
     "@ionic/pro": "^2.0.4",
     "@sentry/browser": "^5.19.2",
     "@types/cordova": "0.0.34",
+    "cordova-android": "8.1.0",
     "cordova-browser": "6.0.0",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-geolocation": "^4.0.2",

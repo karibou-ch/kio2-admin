@@ -3,8 +3,8 @@
   "index": "/index.html",
   "assetGroups": [
     {
-      "name": "app",
-      "installMode": "prefetch",
+      "name": "Admin Karibou.ch",
+      "installMode": "lazy",
       "resources": {
         "files": [
           "/favicon.ico",

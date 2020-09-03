@@ -19,6 +19,7 @@ import { SwUpdate } from '@angular/service-worker';
 export class Kio2Admin {
   currentUser: User = new User();
   NET_INFO: boolean;
+  firstInit: boolean;
 
   constructor(
     private $engine: EngineService,
@@ -31,6 +32,7 @@ export class Kio2Admin {
     private statusBar: StatusBar,
     private $toast: ToastController
   ) {
+    this.firstInit = true;
     this.initializeApp();
     this.$loader.update().subscribe((ctx) => {
       if (ctx.config) {
@@ -78,12 +80,18 @@ export class Kio2Admin {
 
     //
     // update global state
-    this.$engine.currentUser = user;    
+    this.$engine.currentUser = user;
 
     if (!user.isAuthenticated()) {
       this.$router.navigateByUrl('/login');
       return;
     }
+
+    if (!this.firstInit) {
+      return;
+    }
+
+    this.firstInit = false;
 
     //
     // navigation is running
