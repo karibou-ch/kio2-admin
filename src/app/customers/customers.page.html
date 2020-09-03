@@ -9,6 +9,7 @@
 
 <ion-content>
   <ion-list>
+    <!-- SEARCH FOR ADMIN -->
     <ion-item [hidden]="!user.isAdmin()">
       <ion-label>Search</ion-label>
       <ion-searchbar
@@ -19,6 +20,7 @@
       </ion-searchbar>  
     </ion-item>  
   
+    <!-- CUSTOMERS -->
     <ion-item>  
       <ion-chip (click)="cache.errors=!cache.errors;sliceCustomers()">
         <ion-icon name="checkmark-circle-outline" [hidden]="!cache.errors"></ion-icon>
@@ -60,12 +62,12 @@
           {{customer.customer.created|date:'MMM y'}} 
         </div>
       </ion-item>
-      <ion-item-options side="start" [hidden]="!user.isAdmin() || !customer.id">
-        <ion-item-option>
+      <ion-item-options side="start" >
+        <ion-item-option [hidden]="!user.isAdmin()">
           <ion-label >
-            <ion-button mode="ios" color="danger" (click)="doRemove(customer,i)">
-              <ion-icon name="trash-outline"></ion-icon> SUPPRIMER
-            </ion-button> 
+            <ion-button mode="ios" color="primary" (click)="doEdit(customer,i)">
+              <ion-icon name="edit-outline"></ion-icon> EDIT
+            </ion-button>                         
           </ion-label>
         </ion-item-option>
       </ion-item-options>

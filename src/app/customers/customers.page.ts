@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Config, ReportCustomer, ReportingService, User, UserService } from 'kng2-core';
-import { ToastController, AlertController } from '@ionic/angular';
+import { ToastController, AlertController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { CustomerPage } from './customer.page';
 
 @Component({
   selector: 'app-customers',
@@ -30,11 +31,11 @@ export class CustomersPage implements OnInit {
   constructor(
     private $engine: EngineService,
     private $alert: AlertController,
+    private $modal: ModalController,
     private $report: ReportingService,
     private $toast: ToastController,
     private $user: UserService
   ) {
-    this.user = this.$engine.currentUser;
     this.customers = [];
     this.cache = {
       search: '',
@@ -81,6 +82,7 @@ export class CustomersPage implements OnInit {
   }
 
   ngOnInit() {
+    this.user = this.$engine.currentUser;
 
     this.$report.getCustomers().subscribe(
       (customers: ReportCustomer[]) => {
@@ -120,29 +122,17 @@ export class CustomersPage implements OnInit {
     }, 100);
   }
 
-  doRemove(customer, idx) {
-    const confirm = window.prompt('SUPPRESSION DE ->' + customer.customer.email.address + '<- DEFINITIVE! \nCONFIRMER AVEC VOTRE MOT-DE-PASSE');
-    if (!confirm) {
-      return;
-    }
+  doEdit(customer, idx) {
 
+    const params = {
+      id: customer.customer.id,
+    };
 
-    this.$user.remove(customer.customer.id, confirm).subscribe(ok => {
-      this.customers.splice(idx, 1);
-      this.$toast.create({
-        message: 'OK',
-        duration: 3000,
-        position: 'bottom'
-      }).then(alert => alert.present());
-    }, status => {
-      this.$toast.create({
-        message: status.error || status.message || status,
-        duration: 3000,
-        color: 'danger',
-        position: 'middle'
-      }).then(alert => alert.present());
+    this.$modal.create({
+      component: CustomerPage,
+      componentProps: params
+    }).then(alert => alert.present());
 
-    });
   }
 
   doSearch($event: any) {
