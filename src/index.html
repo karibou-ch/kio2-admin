@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>K. Vendor/Logistic</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui=yes">
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0">
   <meta http-equiv="expires" content="0">
@@ -23,18 +23,31 @@
   <!-- iOS Safari -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#006a64">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Karibou.ch">
 
+  <!--                                 
+      | |/ /         (_) |                
+      | ' / __ _ _ __ _| |__   ___  _   _ 
+      |  < / _` | '__| | '_ \ / _ \| | | |
+      | . \ (_| | |  | | |_) | (_) | |_| |
+      |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|.ch
 
-  <base href="/" />
+      Contact hello@karibou.ch if you're interested in working with us!
+  < -->          
 
-<body>
-  <app-root></app-root>
-</body>
+  <base href="/"/>
+
+  <link rel="apple-touch-icon" sizes="73x72" href="assets/icons/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="assets/icons/icon-128x128.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512x512.png">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <body>
+    <app-root></app-root>
+    <noscript>Please enable JavaScript to continue using this application.</noscript>
+  </body>
 
   <!-- TODO for production, replace google maps CDN by actual package AIzaSyA93ohXyArk6YIitqhGEs6H4Fov5i25oNs -->
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyA93ohXyArk6YIitqhGEs6H4Fov5i25oNs"
-    ></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&amp;key=AIzaSyA93ohXyArk6YIitqhGEs6H4Fov5i25oNs"></script>
 
 </html>

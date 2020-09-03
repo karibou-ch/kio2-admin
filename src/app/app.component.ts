@@ -8,6 +8,7 @@ import { LoaderService, User } from 'kng2-core';
 import { Router } from '@angular/router';
 import { EngineService } from './services/engine.service';
 import { interval } from 'rxjs';
+import { SwUpdate } from '@angular/service-worker';
 
 
 @Component({
@@ -18,17 +19,20 @@ import { interval } from 'rxjs';
 export class Kio2Admin {
   currentUser: User = new User();
   NET_INFO: boolean;
+  firstInit: boolean;
 
   constructor(
     private $engine: EngineService,
     private $network: Network,
     private $loader: LoaderService,
     private $router: Router,
+    private $update: SwUpdate,
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private $toast: ToastController
   ) {
+    this.firstInit = true;
     this.initializeApp();
     this.$loader.update().subscribe((ctx) => {
       if (ctx.config) {
@@ -46,6 +50,13 @@ export class Kio2Admin {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
       this.NET_INFO = false;
+
+      this.$update.available.subscribe(event => {
+        const msg = 'Une nouvelle version est disponible. Recharger la page maintenant';
+        if (confirm(msg)) {
+          this.$update.activateUpdate().then(() => document.location.reload(true));
+        }
+      });
 
       //
       // SIMPLE NETWORK CHECKER INFO
@@ -69,12 +80,18 @@ export class Kio2Admin {
 
     //
     // update global state
-    this.$engine.currentUser = user;    
+    this.$engine.currentUser = user;
 
     if (!user.isAuthenticated()) {
       this.$router.navigateByUrl('/login');
       return;
     }
+
+    if (!this.firstInit) {
+      return;
+    }
+
+    this.firstInit = false;
 
     //
     // navigation is running

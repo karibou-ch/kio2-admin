@@ -236,7 +236,7 @@ export class ProductDetailsPage implements OnInit {
     const error = this.isProductReadyTosave(product, shopowner);
 
     if (error === 1) {
-      silent || this.$loading.dismiss();
+      // silent || this.$loading.dismiss();
       return this.$toast.create({
         message: 'La boutique n\'a pas été sélectionnée',
         duration: 3000,
@@ -246,7 +246,7 @@ export class ProductDetailsPage implements OnInit {
     }
 
     if (error === 2) {
-      silent || this.$loading.dismiss();
+      // silent || this.$loading.dismiss();
       return this.$toast.create({
         message: 'La sous catégorie  n\'est pas compatible',
         duration: 3000,
@@ -256,10 +256,10 @@ export class ProductDetailsPage implements OnInit {
     }
 
     if (!silent) {
-      const alert = await this.$loading.create({
-        message: 'Please wait...'
-      });
-      alert.present();
+      // const alert = await this.$loading.create({
+      //   message: 'Please wait...'
+      // });
+      // await alert.present();
     }
 
 
@@ -279,7 +279,7 @@ export class ProductDetailsPage implements OnInit {
         this.$engine.setCurrentProduct(this.product);
 
         if (!silent) {
-          this.$loading.dismiss();
+          // this.$loading.dismiss();
           this.$toast.create({
             message: 'Enregistré',
             duration: 3000,
@@ -289,7 +289,7 @@ export class ProductDetailsPage implements OnInit {
       },
       status => {
         if (!silent) {
-          this.$loading.dismiss();
+          // this.$loading.dismiss();
         }
         this.$toast.create({
           message: status.error,

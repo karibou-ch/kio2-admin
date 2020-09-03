@@ -24,7 +24,7 @@
         images-only="true" 
         [value]="image" 
         [public-key]="pubUpcare" 
-        [validator]="ucValidator"
+        [validators]="[ucValidator]"
         (on-dialog-open)="onDialogOpen($event)"
         (on-upload-complete)="onUpload($event)">
   </ngx-uploadcare-widget>
