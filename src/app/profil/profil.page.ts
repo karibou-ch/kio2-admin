@@ -52,7 +52,9 @@ export class ProfilPage implements OnInit {
       this.stripeParameters = {};
       const redirect = window.location.href;
       this.stripeParameters.state = this.user.id;
-      this.stripeParameters.client_id = 'ca_AUrJdJtcFPx2GlG38h2i1XxUld9J2Ya8';//+config.shared.keys.pubStripe;
+      //
+      // FIXME missing implementation for stripe connect
+      this.stripeParameters.client_id = ''; // 'ca_AUrJdJtcFPx2GlG38h2i1XxUld9J2Ya8';//+config.shared.keys.pubStripe;
       this.stripeParameters.redirect_uri = redirect + '/stripe';
       this.stripeParameters['stripe_user[business_type]'] = 'company';
       this.stripeParameters['stripe_user[phone_number]'] = this.defaultShop.address.phone;
