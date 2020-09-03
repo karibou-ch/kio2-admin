@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
 import { ToastController, PopoverController, ModalController, LoadingController } from '@ionic/angular';
 import { CalendarPage } from '../calendar/calendar.page';
 import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 import { Router, ActivatedRoute } from '@angular/router';
+import { interval } from 'rxjs';
 
 export class OrderByItem {
   oid: number;
@@ -23,7 +24,7 @@ export class OrderByItem {
   templateUrl: './orders.page.html',
   styleUrls: ['./orders.page.scss'],
 })
-export class OrdersCustomerPage {
+export class OrdersCustomerPage implements OnInit, OnDestroy {
 
 
   format: string;
@@ -43,6 +44,7 @@ export class OrdersCustomerPage {
 
   pickerShippingDate: string;
   searchFilter: string;
+  interval$;
 
 
   constructor(
@@ -59,6 +61,12 @@ export class OrdersCustomerPage {
     this.orders = [];
     this.cache = {};
     this.items = {};
+  }
+
+  ngOnDestroy() {
+    if (this.interval$) {
+      this.interval$.unsubscribe();
+    }
   }
 
   ngOnInit() {
@@ -98,7 +106,14 @@ export class OrdersCustomerPage {
         this.orders[idx] = order;
       }
     });
+
+    //
+    // pooling data every 10 minutes
+    this.interval$ = interval(60000 * 10).subscribe(() => {
+      this.$engine.findAllOrders();
+    });
   }
+
 
 
   doRefresh(refresher) {
