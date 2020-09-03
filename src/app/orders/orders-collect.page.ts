@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ToastController, ModalController, PopoverController } from '@ionic/angular';
 import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop } from 'kng2-core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { OrdersItemsPage } from './orders-items.page';
 import { CalendarPage } from '../calendar/calendar.page';
 import { ActivatedRoute, Router } from '@angular/router';
+import { interval } from 'rxjs';
 
 
 @Component({
@@ -12,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: 'orders-collect.page.html',
   styleUrls: ['./orders.page.scss'],
 })
-export class OrdersCollectPage  implements OnInit{
+export class OrdersCollectPage  implements OnInit, OnDestroy {
 
   config: Config;
   hubs: any[];
@@ -30,6 +31,7 @@ export class OrdersCollectPage  implements OnInit{
   format: string;
   searchFilter: string;
   toCollect: boolean;
+  interval$;
 
   constructor(
     private $engine: EngineService,
@@ -80,6 +82,12 @@ export class OrdersCollectPage  implements OnInit{
     });
   }
 
+  ngOnDestroy() {
+    if (this.interval$) {
+      this.interval$.unsubscribe();
+    }
+  }
+
   ngOnInit() {
     this.initDate();
     this.format = this.$engine.defaultFormat;
@@ -87,6 +95,12 @@ export class OrdersCollectPage  implements OnInit{
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrders();
+
+    //
+    // pooling data every 10 minutes
+    this.interval$ = interval(60000 * 10).subscribe(() => {
+      this.$engine.findAllOrders();
+    });
   }
 
 
