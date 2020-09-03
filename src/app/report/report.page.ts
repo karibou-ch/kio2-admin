@@ -126,15 +126,15 @@ export class ReportPage implements OnInit {
         //
         // build csvData
         // actual delimiter characters for CSV format
-        const colDelim = '","';
-        const rowDelim = '"\r\n"';
+        // const colDelim = '";"';
+        // const rowDelim = '"\r\n"';
         const csv = this.report.products.map( product => {
           // escape double quotes
           return [
-            '"' + product.title.replace(/"/g, "'") + '"', 
+            '"' + product.title.replace(/"/g, "'") + '"',
             product.count,
-            product.amount.toFixed(2)
-          ].join(',');
+            product.amount.toFixed(2).replace('.', ',')
+          ].join(';');
         }).join('\r\n');
         this.csv = {
           data: this.$sanitizer.bypassSecurityTrustUrl('data:application/csv;charset=utf-8,' + encodeURIComponent(csv)),
