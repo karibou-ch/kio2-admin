@@ -11,6 +11,8 @@ import { Kng2CoreModule } from 'kng2-core';
 import { HttpClientModule, HttpErrorResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 
+import { SwUpdate } from '@angular/service-worker';
+
 //
 // local data
 import { registerLocaleData } from '@angular/common';
@@ -28,7 +30,10 @@ registerLocaleData(localeFr);
 export class Kio2AdminErrorHandler implements ErrorHandler {
   errorHandler: ErrorHandler;
 
-  constructor(injector: Injector) {
+  constructor(
+    public injector: Injector,
+    public $update: SwUpdate
+  ) {
     try {
       // this.errorHandler = injector.get(ErrorHandler);
     } catch (e) {
@@ -87,7 +92,8 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     //
     // Reload App is enough
     if (chunkFailedMessage.test(error.message)) {
-      return window.location.reload(true);
+      this.$update.activateUpdate().then(() => document.location.reload(true));
+      return;
     }
 
     //
