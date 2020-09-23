@@ -21,8 +21,7 @@
     monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
     max="2024"
     style="display: none;">
-  </ion-datetime>        
-
+  </ion-datetime>
 </ion-header>
 <ion-content>
 
@@ -55,7 +54,7 @@
       <!-- WHO AND WHEN -->
       <ion-item class="planning">
         <ion-label class="ion-text-wrap">
-          Tournée {{currentPlanning}} ({{getOrders().length}})
+          T {{currentPlanning}} ({{getOrders().length}})
         </ion-label>
         <ion-select placeholder="Plan ?"         
                     [hidden]="!currentHub"
@@ -64,7 +63,6 @@
                     interface="action-sheet">
                     <ion-select-option *ngFor="let shopper of shippingShoppers"  [value]="shopper">{{shopper}}</ion-select-option>
                   </ion-select>
-
         <ion-datetime 
           [hidden]="!currentHub"
           placeholder="Time"
@@ -75,9 +73,7 @@
           cancelText="Annuler" 
           doneText="Fait" 
           minuteValues="0,30">
-        </ion-datetime>        
-      
-
+        </ion-datetime>
       </ion-item>
     </div>
     <!-- SEARCH -->

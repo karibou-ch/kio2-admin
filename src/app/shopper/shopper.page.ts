@@ -10,6 +10,7 @@ export interface ShopperPlan {
   shopper: string;
   plan: number;
   time: string;
+  hub: string;
 }
 
 @Component({
@@ -384,7 +385,8 @@ export class ShopperPage implements OnInit, OnDestroy {
         this.shippingShopper[order.shipping.priority] = {
           shopper: order.shipping.shopper,
           plan: order.shipping.priority,
-          time: order.shipping.shopper_time
+          time: order.shipping.shopper_time,
+          hub: order.hub
         };
       }
       return planning.sort();
@@ -464,6 +466,10 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.hubs.forEach( h => h.selected = false);
     this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
     this.currentHub.selected = true;
+
+    //
+    // FIXME, currently force find-all-orders to reset local shippingShopper[plan]
+    this.$engine.findAllOrders();
   }
 
   sortOrdersByCP(o1, o2) {
