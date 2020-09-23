@@ -258,8 +258,12 @@
     </ion-list>
     <ion-list>
       <ion-item>
+
           <ion-button [hidden]="detailled" expand="block" fill="outline" size="large" color="primary" (click)="detailled=true">
             Editer plus de paramètres 
+          </ion-button>
+          <ion-button [hidden]="detailled" fill="outline" size="large" color="secondary" (click)="doCreateCopy(product)">
+            <ion-icon slot="icon-only" name="copy"></ion-icon>
           </ion-button>
             
           <ion-button [hidden]="!detailled" expand="block" fill="outline" size="large" color="primary" (click)="doSave(product)">

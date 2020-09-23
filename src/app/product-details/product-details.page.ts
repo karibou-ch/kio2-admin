@@ -3,7 +3,7 @@ import { Product, Config, Category, Shop, User, LoaderService, ProductService, S
 import { LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
 import { UploadImagePage } from '../upload-image/upload-image.page';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, fromEvent, of } from 'rxjs';
 import { debounceTime, filter, map, skip } from 'rxjs/operators';
 
@@ -27,7 +27,6 @@ export class ProductDetailsPage implements OnInit {
   user: User;
   sku: string;
 
-
   constructor(
     private $elem: ElementRef,
     private $engine: EngineService,
@@ -37,7 +36,8 @@ export class ProductDetailsPage implements OnInit {
     private $loader: LoaderService,
     private $product: ProductService,
     private $shops: ShopService,
-    private $route: ActivatedRoute
+    private $route: ActivatedRoute,
+    private $router: Router
   ) {
 
     const loader = this.$route.snapshot.data.loader;
@@ -50,6 +50,7 @@ export class ProductDetailsPage implements OnInit {
 
 
     if (this.sku === 'create') {
+      // create a copy ?
       this.create = true;
       this.product = new Product();
     }
@@ -74,6 +75,8 @@ export class ProductDetailsPage implements OnInit {
 
   }
 
+  ngOnDestroy() {
+  }
 
   ngOnInit() {
 
@@ -128,6 +131,33 @@ export class ProductDetailsPage implements OnInit {
       title: '',
       short: ''
     });
+  }
+
+  //
+  // create a copy of this product
+  doCreateCopy(product: Product) {
+    const copy = (product) => {
+      const details = {
+        description: product.details.description,
+        origin: product.details.origin,
+      };
+      return Object.assign({}, {
+        belong: product.belong,
+        categories: product.categories,
+        details: (details),
+        pricing: product.pricing,
+        quantity: product.quantity,
+        shelflife: product.shelflife,
+        title: product.title,
+      });
+    };
+    const content = JSON.stringify(copy(product));
+    this.$router.navigateByUrl('/product/create');
+
+    this.create = true;
+    this.product = new Product(JSON.parse(content));
+    this.currentCategory = this.categories.find(cat => (cat._id + '') == this.product.categories);
+
   }
 
   categoryChange($event) {
