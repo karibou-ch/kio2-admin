@@ -1,5 +1,6 @@
-import {
-  Component,
+/* tslint:disable:no-output-rename no-input-rename no-output-on-prefix variable-name */
+
+import { Component,
   Input,
   Output,
   AfterViewInit,
@@ -7,36 +8,30 @@ import {
   ElementRef,
   EventEmitter,
   Renderer2,
-  VERSION
-} from '@angular/core';
-
-import { Utils } from 'kng2-core';
-
+  VERSION, PLATFORM_ID, Inject } from '@angular/core';
 import uploadcare from 'uploadcare-widget';
 import uploadcareTabEffects from 'uploadcare-widget-tab-effects';
-// import * as uploadcare from "uploadcare-widget";
 
-// const CDNJS_UPLOADCARE_EFFECTS = 'https://ucarecdn.com/libs/widget-tab-effects/1.x/uploadcare.tab-effects.js';
-// const CDNJS_UPLOADCARE = 'https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js';
+import { isPlatformBrowser} from '@angular/common';
+
+//import { APP_VERSION } from '../../version';
 const APP_VERSION = '3.x';
 
-//https://github.com/uploadcare/ngx-uploadcare-widget/blob/master/projects/ngx-uploadcare-widget/src/lib/ucWidget/ucWidget.component.ts
+
 @Component({
   selector: 'ngx-uploadcare-widget',
   template: '',
 })
 export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
-  // tslint:disable-next-line: no-output-rename
   @Output('on-upload-complete') onUploadComplete = new EventEmitter<any>();
   @Output('on-change') onChange = new EventEmitter<any>();
   @Output('on-progress') onProgress = new EventEmitter<any>();
-  @Output('on-dialog-open') onDialogOpen = new EventEmitter<any>();
-
 
   private element: ElementRef;
   private inputElement: Node;
   private renderer: Renderer2;
   private widget: any;
+  private dialog: any;
   private _publicKey = 'demopublickey';
   private _multiple: boolean;
   private _multipleMax: number;
@@ -58,140 +53,128 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
   private _reinitRequired = false;
   private _isClearValue = false;
   private _validators = [];
+  private isInBrowser: boolean;
 
-  private uploadcare: any;
-
-  constructor(renderer: Renderer2, element: ElementRef) {
+  constructor(renderer: Renderer2, element: ElementRef, @Inject(PLATFORM_ID) platformId: string) {
     this.element = element;
     this.renderer = renderer;
-
-    //
-    // use dynamic loader
-    // https://github.com/ded/script.js/blob/master/src/script.js#L70
-    // this.uploadcare = Promise.all([
-    //   Utils.script(CDNJS_UPLOADCARE, 'uploadcare').toPromise(),
-    //   Utils.script(CDNJS_UPLOADCARE_EFFECTS, 'tabseffects').toPromise()
-    // ]);
-
-    // this.uploadcare.then(([uploadcare, effects]) => {
-      // console.log('DEBUG ',uploadcare);
-      // console.log('DEBUG ',uploadcareTabEffects);
-
-    uploadcare.registerTab('preview', uploadcareTabEffects);
-    uploadcare.start({
-      integration: `Angular/${VERSION.full}; Ngx-Uploadcare-Widget/${APP_VERSION}`,
-      effects: ['rotate', 'flip', 'mirror'],
-    });
-    // });
+    this.isInBrowser = isPlatformBrowser(platformId);
+    if (this.isInBrowser) {
+      uploadcare.registerTab('preview', uploadcareTabEffects);
+      uploadcare.start({
+        integration: `Angular/${VERSION.full}; Ngx-Uploadcare-Widget/${APP_VERSION}`,
+        effects: ['rotate', 'flip', 'mirror']
+      });
+    }
   }
 
   @Input('public-key')
-  set publicKey(publicKey: string) {
+    set publicKey(publicKey: string) {
     this._publicKey = publicKey;
     this.setReinitFlag(true);
   }
   get publicKey() { return this._publicKey; }
 
   @Input('multiple')
-  set multiple(multiple: boolean) {
+    set multiple(multiple: boolean) {
     this._multiple = multiple;
     this.setReinitFlag(true);
   }
   get multiple() { return this._multiple; }
 
   @Input('multiple-max')
-  set multipleMax(multipleMax: number) {
+    set multipleMax(multipleMax: number) {
     this._multipleMax = multipleMax;
     this.setReinitFlag(false);
   }
   get multipleMax() { return this._multipleMax; }
 
   @Input('multiple-min')
-  set multipleMin(multipleMin: number) {
+    set multipleMin(multipleMin: number) {
     this._multipleMin = multipleMin;
     this.setReinitFlag(false);
   }
   get multipleMin() { return this._multipleMin; }
 
   @Input('images-only')
-  set imagesOnly(imagesOnly: boolean) {
+    set imagesOnly(imagesOnly: boolean) {
     this._imagesOnly = imagesOnly;
     this.setReinitFlag(false);
   }
   get imagesOnly() { return this._imagesOnly; }
 
   @Input('preview-step')
-  set previewStep(previewStep: boolean) {
+    set previewStep(previewStep: boolean) {
     this._previewStep = previewStep;
     this.setReinitFlag(false);
   }
   get previewStep() { return this._previewStep; }
 
   @Input('crop')
-  set crop(crop: any) {
+    set crop(crop: any) {
     this._crop = crop;
     this.setReinitFlag(false);
   }
   get crop() { return this._crop; }
 
   @Input('image-shrink')
-  set imageShrink(imageShrink: string) {
+    set imageShrink(imageShrink: string) {
     this._imageShrink = imageShrink;
     this.setReinitFlag(false);
   }
   get imageShrink() { return this._imageShrink; }
 
   @Input('clearable')
-  set clearable(clearable: boolean) {
+    set clearable(clearable: boolean) {
     this._clearable = clearable;
     this.setReinitFlag(false);
   }
   get clearable() { return this._clearable; }
 
   @Input('tabs')
-  set tabs(tabs: string) {
+    set tabs(tabs: string) {
     this._tabs = tabs;
     this.setReinitFlag(false);
   }
   get tabs() { return this._tabs; }
 
   @Input('input-accept-types')
-  set inputAcceptTypes(inputAcceptTypes: string) {
+    set inputAcceptTypes(inputAcceptTypes: string) {
     this._inputAcceptTypes = inputAcceptTypes;
     this.setReinitFlag(false);
   }
   get inputAcceptTypes() { return this._inputAcceptTypes; }
 
   @Input('preferred-types')
-  set preferredTypes(preferredTypes: string) {
+    set preferredTypes(preferredTypes: string) {
     this._preferredTypes = preferredTypes;
     this.setReinitFlag(false);
   }
   get preferredTypes() { return this._preferredTypes; }
 
   @Input('system-dialog')
-  set systemDialog(systemDialog: boolean) {
+    set systemDialog(systemDialog: boolean) {
     this._systemDialog = systemDialog;
     this.setReinitFlag(false);
   }
   get systemDialog() { return this._systemDialog; }
 
   @Input('secure-signature')
-  set secureSignature(secureSignature: string) {
+    set secureSignature(secureSignature: string) {
     this._secureSignature = secureSignature;
     this.setReinitFlag(true);
   }
   get secureSignature() { return this._secureSignature; }
 
   @Input('secure-expire')
-  set secureExpire(secureExpire: string) {
+    set secureExpire(secureExpire: string) {
     this._secureExpire = secureExpire;
     this.setReinitFlag(false);
   }
   get secureExpire() { return this._secureExpire; }
 
   @Input('value')
-  set value(value: string) {
+    set value(value: string) {
     this._value = value;
     if (this.widget) {
       this.setReinitFlag(false);
@@ -200,30 +183,31 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
   }
   get value() { return this._value; }
 
+  @Input('validators')
+  set validators(validatorsArr: any[]) {
+    this._validators = validatorsArr;
+    this.setReinitFlag(false);
+  }
+  get validators() { return this._validators; }
+
   @Input('cdn-base')
-  set cdnBase(cdnBase: string) {
+    set cdnBase(cdnBase: string) {
     this._cdnBase = cdnBase;
     this.setReinitFlag(true);
   }
   get cdnBase() { return this._cdnBase; }
 
   @Input('do-not-store')
-  set doNotStore(doNotStore: boolean) {
+    set doNotStore(doNotStore: boolean) {
     this._doNotStore = doNotStore;
     this.setReinitFlag(false);
   }
   get doNotStore() { return this._doNotStore; }
 
-  @Input('validator')
-  set validator(validator) {
-    this._validators.push(validator);
-    this.setReinitFlag(false);
-  }
-
   ngAfterViewInit() {
-    this.init().then(widget => {
-      this.widget = widget;
-    });
+    if (this.isInBrowser) {
+      this.widget = this.init();
+    }
   }
 
   ngAfterViewChecked() {
@@ -248,7 +232,14 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
 
   openDialog() {
     if (this.widget) {
-      this.widget.openDialog();
+      this.dialog = this.widget.openDialog();
+    }
+  }
+
+  reject() {
+    if (this.dialog) {
+      this.dialog.reject();
+      this.dialog = null;
     }
   }
 
@@ -273,9 +264,7 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
     this.setInputAttr('data-multiple-min', this._multipleMin);
     this.setInputAttr('data-images-only', this._imagesOnly);
     this.setInputAttr('data-preview-step', this._previewStep);
-    this.setInputAttr('data-crop', '1:1');
-    this.setInputAttr('data-effects', 'crop,rotate,flip,mirror,crop');
-    this.setInputAttr('data-mirror', true);
+    this.setInputAttr('data-crop', this._crop);
     this.setInputAttr('data-image-shrink', this._imageShrink);
     this.setInputAttr('data-clearable', this._clearable);
     this.setInputAttr('data-tabs', this._tabs);
@@ -291,30 +280,30 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
     }
   }
 
-  private async init(removeUploads = false) {
+  private init(removeUploads = false) {
     this.inputElement = this.renderer.createElement('input');
     this.renderer.appendChild(this.element.nativeElement, this.inputElement);
     if (removeUploads) {
       this.clearUploads();
     }
     this.initInputElement();
-    //return this.uploadcare.then(([uploadcare, effects]) => {
-    //  uploadcare = (window as any).uploadcare;
     const widget = uploadcare.Widget(this.inputElement);
-
-    widget.onDialogOpen((dialog) => {
-      this.onDialogOpen.emit(dialog);
+    this._validators.forEach(v => {
+      if (typeof v === 'function') {
+        widget.validators.push(v);
+      } else {
+        throw new Error('Only functions allowed in validadators array');
+      }
     });
-
     widget.onUploadComplete((fileInfo) => {
       this.onUploadComplete.emit(fileInfo);
       this._value = fileInfo.uuid;
     });
     widget.onChange((selectionPromise) => {
+      this.onChange.emit(selectionPromise);
       if (!selectionPromise) {
         return;
       }
-      this.onChange.emit(selectionPromise);
       if (typeof selectionPromise.promise === 'function') {
         selectionPromise.promise()
           .progress((progress) => {
@@ -327,30 +316,18 @@ export class UcWidgetComponent implements AfterViewInit, AfterViewChecked {
           });
       }
     });
-
-    //
-    // bind validators
-    this._validators.forEach(validator => {
-      widget.validators.push(validator);
+    widget.onDialogOpen((dialogApi) => {
+      this.dialog = dialogApi;
     });
-
-
     return widget;
-
-//    });
   }
 
   private destroy() {
-    // this.uploadcare.then(([uploadcare, effects]) => {
-    //   uploadcare = (window as any).uploadcare;
-
     const $ = uploadcare.jQuery;
-
     $(this.widget.inputElement.nextSibling).remove();
     $(this.widget.inputElement).clone().appendTo($(this.element.nativeElement));
     $(this.widget.inputElement).remove();
     this.renderer.removeChild(this.element.nativeElement, this.element.nativeElement.children[0]);
     delete this.widget;
-    // });
   }
 }
