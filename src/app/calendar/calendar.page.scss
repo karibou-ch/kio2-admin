@@ -25,14 +25,14 @@
   align-content: center;
   div.day {
     .month{
-      font-size: 0.9rem;
+      font-size: 0.7rem;
     }
     .dd {
       font-size: 1.2rem;
       font-weight: 700;      
     }
     .wd{
-      font-size: 0.6rem;
+      font-size: 0.75rem;
     }
     flex: 0 1 auto;
     background: #eee;
@@ -40,9 +40,9 @@
     margin: 3px;
     font-size: .7rem;
     text-align: center;
-    padding: 8px;
-    width: 64px;
-    height: 64px;    
+    padding: 8px 4px;
+    width: 70px;
+    height: 70px;    
     &.selected{
       background-color: var(--ion-color-primary);
       color: white;
