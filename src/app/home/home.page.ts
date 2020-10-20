@@ -78,6 +78,10 @@ export class HomePage {
     this.$router.navigate(['/vendors']);
   }
 
+  openIssue() {
+    this.$router.navigate(['/issues']);
+  }
+
   openReport() {
     this.$router.navigate(['/report']);
   }

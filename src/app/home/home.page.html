@@ -61,6 +61,11 @@
         <div>Rapport</div>
       </ion-col>
 
+      <ion-col [hidden]="!isAdmin" (click)="openIssue()">
+        <ion-icon name="reader-outline" color="grey-icon"></ion-icon>
+        <div>Qualité</div>
+      </ion-col>
+
       <ion-col [hidden]="!isAdmin" (click)="openInvoices()">
         <ion-icon name="home-outline" color="grey-icon"></ion-icon>
         <div>Factures</div>
