@@ -17,6 +17,7 @@ export class CustomerPage implements OnInit {
   config: Config;
   user: User;
   customer: User;
+  currentGeoIndex: number;
   defaultShop: Shop;
   invoice: {
     name?: string,
@@ -41,21 +42,12 @@ export class CustomerPage implements OnInit {
     };
 
     this.$util.getGeoCode().subscribe(result => {
-
-
-      // if (result.geo && result.geo.location) {
-      //   this.shop.address.geo = result.geo.location;
-      // }
-
-      // (result.components || []).forEach(comp => {
-      //   if (this.locations.indexOf(comp) > -1 && (this.shop.address.postalCode !== comp)) {
-      //     this.shop.address.postalCode = comp;
-      //   }
-      //   if (this.regions.indexOf(comp) > -1 && (this.shop.address.region !== comp)) {
-      //     this.shop.address.region = comp;
-      //   }
-      // });
-
+      const geo = (result.geo || {}).location;
+      if(this.currentGeoIndex >= 0 && geo.lat) {
+        this.customer.addresses[this.currentGeoIndex].geo = geo;
+        this.doToast('La géoloc a bien été modifiée');
+      }
+      this.currentGeoIndex = null;
     });
 
   }
@@ -71,26 +63,14 @@ export class CustomerPage implements OnInit {
   }
 
 
-  ngOnChanges(input) {
-    // const street: any = {
-    //   streetAdress: this.shop.address.streetAdress,
-    //   region: this.shop.address.region,
-    //   postalCode: this.shop.address.postalCode
-    // };
-
-    // if (!this.shop.address.streetAdress ||
-    //   this.shop.address.streetAdress === '') {
-    //   return;
-    // }
-
-    // //
-    // // request new GEO
-    // this.$util.updateGeoCode(
-    //   this.shop.address.streetAdress,
-    //   this.shop.address.postalCode,
-    //   this.shop.address.region);
+  onGeloc(idx, address) {
+    this.currentGeoIndex = idx;
+    this.$util.updateGeoCode(address.street,
+                        address.postalCode,
+                        address.region);
 
   }
+
 
   hasMethod(user, type) {
     if (!user.payments || !user.payments.length) {
@@ -166,7 +146,8 @@ export class CustomerPage implements OnInit {
   doToast(msg) {
     this.$toast.create({
       message: msg,
-      duration: 3000
+      duration: 5000,
+      color:'black'
     }).then(alert => alert.present());
   }
 }

@@ -19,11 +19,11 @@
     <!-- INFO -->
     <ion-item>
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Nom</ion-label>
-      <p text-capitalize>{{ customer.name.familyName }}</p>
+      <ion-input type="text" placeholder="Nom" ngDefaultControl [(ngModel)]="customer.name.familyName"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Prenom</ion-label>
-      <p text-capitalize>{{ customer.name.givenName }}</p>
+      <ion-input type="text" placeholder="Prénom" ngDefaultControl [(ngModel)]="customer.name.givenName"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label position="fixed" color="primary">
@@ -106,12 +106,12 @@
       
       <ion-item>
         <ion-label color="primary" position="stacked">Rue et numéro </ion-label> 
-        <ion-input  type="text"  placeholder="rue, numéro" (focusout)="ngOnChanges($event)" [(ngModel)]="address.streetAdress" required></ion-input>
+        <ion-input  type="text"  placeholder="rue, numéro" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.streetAdress" required></ion-input>
         <ion-input  type="text"  placeholder="Étage" class="floor" [(ngModel)]="address.floor" required></ion-input>
       </ion-item>
       <ion-item >
         <ion-label color="primary" position="stacked">Code postal et Région</ion-label> 
-        <ion-input  type="text"  placeholder="Code postal" (focusout)="ngOnChanges($event)" [(ngModel)]="address.postalCode" required></ion-input>
+        <ion-input  type="text"  placeholder="Code postal" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.postalCode" required></ion-input>
         <ion-input  type="text"  placeholder="Région" [(ngModel)]="address.region" required></ion-input>
       </ion-item> 
 
@@ -126,6 +126,7 @@
     <!-- SAVE -->
     <ion-item>
       <ion-button fill="outline" expand="block" size="large" color="primary"  (click)="doSave(customer)">Enregistrer</ion-button>
+      <ion-button fill="outline" expand="block" size="large" color="danger"  (click)="doRemove(customer)">SUPPRIMER</ion-button>      
     </ion-item>
 
   </ion-list>
