@@ -64,6 +64,11 @@ const routes: Routes = [
     loadChildren: () => import('./report/report.module').then( m => m.ReportPageModule)
   },
   {
+    path: 'issues',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./issues/issues.module').then( m => m.IssuesPageModule)
+  },
+  {
     path: 'vendors',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./vendors/vendors.module').then( m => m.VendorsPageModule)

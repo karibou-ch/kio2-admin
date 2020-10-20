@@ -1,0 +1,96 @@
+.content{
+  overflow-y: auto!important;
+  @media print {
+    position: relative;
+    contain: unset;
+    height: auto!important;
+  }
+
+  ion-datetime {
+    display: none;
+  }
+
+  .scroll-content {
+    position: relative;
+    overflow:visible!important;
+  }
+    
+  .content{
+    width: 100%;
+  }
+  .fab{
+    display: none;
+  }
+
+  table.wrapper{
+    width: 98%;
+    margin:6px;          
+  }
+  .mdl-data-table td:first-child{
+    max-width: calc( 100vw - 115px );
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;      
+    @media screen and (max-width:500px){
+      padding-left:10px; 
+      padding-right:10px;         
+    }
+  }
+  .mdl-data-table td:last-child{
+    @media screen and (max-width:500px){
+      padding-left:10px; 
+      padding-right:10px;         
+    }
+  }
+  
+  .mdl-data-table td, 
+  .mdl-data-table th{
+    text-align: left;
+    &.small {
+      max-width: 72px;
+      width: 72px;
+      padding-right: 5px;
+      overflow: hidden;
+    }
+    &.limit{
+      -max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;      
+    }
+  }
+
+  
+
+  table.items{
+    font-size: 80%;
+  }
+  
+  table .report-last{
+    border-top: 2px solid black;
+  }
+  
+  table .report-separator{
+    border-top: 2px solid #aaa;
+  }
+  
+  h4{
+    margin-top: 50px;
+  }
+                
+
+    
+}
+
+
+
+
+
+
+
+@media print {
+  .report{
+    border: none!important;
+    padding:5px!important; 
+    font-size: xx-small!important;
+  }
+}

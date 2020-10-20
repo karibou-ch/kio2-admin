@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar color="primary" class="hidden-print">
+    <ion-title (click)="picker.open()" class="text-capitalize">{{ (pickerShippingDate| date:format) }}  </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="picker.open()">
+        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+      </ion-button>      
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-datetime #picker 
+    displayFormat="MM/YYYY" 
+    pickerFormat="MMMM YYYY" 
+    [(ngModel)]="pickerShippingDate" 
+    (ngModelChange)="onDatePicker()" 
+    cancelText="Annuler" 
+    doneText="Fait" 
+    dayValues="1"
+    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
+    max="2024"
+    style="display: none;">
+  </ion-datetime>        
+
+</ion-header>
+
+<ion-content class="content">
+  <h4>Qualité</h4>
+  <table class="mdl-data-table wrapper" >
+    <thead>
+      <tr>
+        <th class="small">Année</th>
+        <th class="small">Mois</th>
+        <th class="first-col">Vendeur</th>  
+        <th class="small">Erreurs</th>
+        <th class="small">CHF</th>
+        <th class="small">CMD</th>
+        <th class="small">Ratio</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let report of reports" >
+        <td>{{report._id.year}}</td> 
+        <td>{{report._id.month}}</td>
+        <td class="limit">{{report._id.vendor}}</td>
+        <td>{{report.issues.length}}</td>
+        <td>{{report.amount|currency:'CHF'}}</td>
+        <td>{{report.orders.total}}</td>
+        <td>{{report.issues.length/report.orders.total | percent}}</td>
+      </tr>
+    </tbody>
+    <!-- <tbody *ngFor="let issue of report.issues" class="report-separator">
+      <tr>
+        <td>{{issue.title}}</td><td></td>
+      </tr>
+    </tbody> -->
+  </table>
+
+
+</ion-content>
