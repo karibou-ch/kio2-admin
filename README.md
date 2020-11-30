@@ -6,6 +6,9 @@ Kio2-admin is a:
 * helper for shops (stock, customers, orders, shop admin, ...)
 * an Amazon killer app!
 
+![image](https://user-images.githubusercontent.com/1422935/100597701-0d3b3c80-32fe-11eb-994b-77e9dd050b8f.png)
+
+
 # Prerequisite
 * an instance of karibou.ch 
 * node >=v12.15.0, 
