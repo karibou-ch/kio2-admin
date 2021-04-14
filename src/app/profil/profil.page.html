@@ -21,6 +21,11 @@
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Email</ion-label>
       <p>{{ user.email.address }}</p>
     </ion-item>
+    <ion-item [hidden]="!user.email.cc">
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Email CC</ion-label>
+      <p>{{ user.email.cc }}</p>
+    </ion-item>
+
     <ion-item *ngFor="let phone of user.phoneNumbers">
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Telephone</ion-label>
       <p>{{ phone.number }}</p>
