@@ -38,6 +38,11 @@
         <div>Collecte</div>
       </ion-col>
 
+      <ion-col [hidden]="!isAdminOrVendor" (click)="openOrdersPlanning()">
+        <ion-icon name="calendar-outline" color="grey-icon"></ion-icon>
+        <div>Planning</div>
+      </ion-col>
+
       <ion-col [hidden]="!isAdminOrVendor" (click)="openOrders()">
         <ion-icon name="cart-outline" color="grey-icon"></ion-icon>
         <div>Commandes</div>
@@ -102,6 +107,7 @@
 
     <ion-list >
       <ion-item *ngFor="let shop of user.shops" [routerLink]="['/vendor/',shop.urlpath]">
+        <div tabindex="0" class="fix-safari-14"></div>
         <ion-label>
           <h2>{{shop.name}}</h2>
           <p [hidden]="isShopOpen(shop )" class="red small">

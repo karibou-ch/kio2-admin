@@ -69,6 +69,10 @@ export class HomePage {
     this.$router.navigate(['/orders']);
   }
 
+  openOrdersPlanning() {
+    this.$router.navigate(['/orders/planning']);
+  }
+
   openCollect() {
     this.$router.navigate(['/orders/collect']);
   }
