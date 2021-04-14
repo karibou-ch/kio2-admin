@@ -39,36 +39,71 @@
 
     <!-- VALIDATE AT ONCE -->
     <ion-item class="header">
-      <ion-label class="ion-text-wrap">
-        <div class="title">Valider tous les articles au tarif de base!</div>
-        <div class="quantity" >
-          Note: la correction par article est possible ensuite!
-        </div>
+      <div tabindex="0" class="fix-safari-14"></div>
+      <div class="header-title important" >
+        Vérifier <b class="red">{{order.items.length}}</b> produits sont bien dans le sac
+      </div>
 
-        <div class="actions">
+      <div class="header-actions">
 
-          <!-- REFUND HUB-->
-          <button class="avoid button-refund item-button" 
-            color="danger"  slot="end" 
-            [hidden]="!isPaid(order)"
-            (click)="doRefundHUB(order)">
-            HUB refund
-          </button>
+        <!-- VALIDATE -->
+        <ion-toggle mode="md" class="button-check" [hidden]="orders.length>1" (ionChange)="displayForCheck=!displayForCheck"></ion-toggle>      
+        <!-- REFUND HUB-->
+        <button class="avoid button-refund item-button" 
+          color="danger"  slot="end" 
+          [hidden]="!isPaid(order)"
+          (click)="doRefundHUB(order)">
+          HUB refund
+        </button>
 
-          <button  class="item-button" fill="outline" slot="end" 
-                  [hidden]="isPaid(order)"
-                  (click)="doValidateAll(order)">
-            <ion-icon slot="start" name="checkmark-outline" ></ion-icon>             
-          </button>
-          
-        </div>
-      </ion-label>
+        <button  class="item-button" fill="outline" slot="end" 
+                [hidden]="isPaid(order)"
+                (click)="doValidateAll(order)">
+          <ion-icon slot="start" name="checkmark-outline" ></ion-icon>             
+        </button>
+        
+      </div>
     </ion-item>
+    <ng-container 
+      *ngTemplateOutlet="displayForCheck ? ordersCheckItems : ordersValidateItems;context:{ $implicit: order }">
+    </ng-container>
+  </ion-list>
 
+  <br/>
+</ion-content>
+
+<!-- VALIDATE ITEMS -->
+<ng-template #ordersCheckItems let-order>
+  <ion-item>
+    <!-- SEARCH -->
+    <ion-searchbar
+      mode="ios"
+      placeholder="Filtrer"
+      [debounce]="500"
+      (ionInput)="doFilterInput($event)"
+      (ionClear)="doClearFilter($event)">
+    </ion-searchbar>  
+
+  </ion-item>
+  <ion-item [class.checked]="item.checked" *ngFor="let item of sortedItem(order);let idx=index">
+    <div tabindex="0" class="fix-safari-14"></div>
+    <div class="title {{item.fulfillment.status}}"  (click)="doToggleCheck(item)" >
+      {{idx + 1}} - {{item.title}} <span [class.red.bold]="item.quantity>1">{{item.quantity}}x <span class="part">{{item.part}}</span> </span>
+    <div [hidden]="!item.variant" class="variant dark-green link">
+      // {{item.variant?.title}}
+    </div>
+  </div>
+
+  </ion-item>
+
+</ng-template>
+
+<!-- CHECK CONTENT ITEMS -->
+<ng-template #ordersValidateItems let-order >
     <!-- GLOBAL SAVE ACTION-->
-    <ion-item-sliding *ngFor="let item of sortedItem(order)">    
-      <ion-item-options side="end" [hidden]="!isPaid(order)">
-        <ion-item-option>
+    <ion-item-sliding *ngFor="let item of sortedItem(order)">          
+      <ion-item-options side="end" >
+        <ion-item-option [hidden]="!isPaid(order)">
             <ion-button class="avoid button-refund" 
                     color="danger"  slot="end" 
                     [disabled]="item.finalprice==0"                    
@@ -76,8 +111,17 @@
               <ion-icon name="card-outline" ></ion-icon>&nbsp;refund
             </ion-button>
         </ion-item-option>
+        <ion-item-option>
+          <ion-button mode="ios"
+                  color="danger"  slot="end" 
+                  (click)="doReplace(order,item)">
+            <ion-icon name="card-outline" ></ion-icon>&nbsp;SMS (REPLACE)
+          </ion-button>
+      </ion-item-option>
+
       </ion-item-options>  
       <ion-item >
+        <div tabindex="0" class="fix-safari-14"></div>
         <ion-label class="ion-text-wrap">
           <div class="title {{item.fulfillment.status}}" (click)="doOpenProduct(item)" >
               {{item.title}} 
@@ -107,7 +151,7 @@
             </button>
             <button class="item-button avoid" fill="outline" slot="end" 
                     [class.button-cancel]="isItemCancel(item)" [hidden]="isPaid(order)"
-                    (click)="doCancel(order,item)">
+                    (click)="doAskCancel(order,item)">
               <ion-icon slot="start" name="close-outline" ></ion-icon>
             </button>                      
           </div>
@@ -115,9 +159,4 @@
       </ion-item>
 
     </ion-item-sliding>
-
-  </ion-list>
-
-  <br/>
-</ion-content>
-
+</ng-template>

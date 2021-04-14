@@ -16,6 +16,9 @@ export class OrdersItemsPage implements OnInit {
   public deltaPrice: number;
   public format: string;
   public hubs: any;
+  public displayForCheck: boolean;
+  public filterItem: string;
+
 
   @Input() vendor: string;
   @Input() shipping: Date;
@@ -25,6 +28,26 @@ export class OrdersItemsPage implements OnInit {
   // input props
   @Input() orders: Order[];
   @Input() header: boolean;
+
+
+  //
+  // Message
+  public REPLACE_MSG = [
+    {
+      label: 'Produit annulé dans votre commande karibou.ch',
+      body:
+`Bonjour,\nLe produit «_ITEM_» de votre commande karibou.ch n'est plus disponible.\n
+Nous sommes désolé pour ce désagrement\n`
+    },
+    {
+      label: 'Remplacer un produit manquant de votre commande karibou.ch',
+      body:
+`Bonjour,\nLe produit *_ITEM_* de votre commande karibou.ch n'est plus disponible.\n
+Si cela vous convient, je peux le remplacer par : \n
+- \n
+D'avance merci pour votre retour.`
+    }
+  ];
 
   constructor(
     public $alert: AlertController,
@@ -81,6 +104,43 @@ export class OrdersItemsPage implements OnInit {
     this.isReady = (this.orders.length > 0) || (this.vendor != '') || (!!this.shipping) || (!!this.item.customer);
   }
 
+  buildCustomerMSG(customers, idx, item) {
+    const subject = this.REPLACE_MSG[idx].label.replace(/_ITEM_/g, item.title);
+    const body = this.REPLACE_MSG[idx].body.replace(/_ITEM_/g, item.title).replace(/[«»%]/g, '');
+    //
+    // SMS links are platform dependant
+    // https://stackoverflow.com/a/19126326
+    const prefix = (document.documentElement.classList.contains('ios')) ? '&' : '?';
+
+    const sms = customers.map(customer => {
+      return [customer.name.familyName, customer.phoneNumbers[0].number];
+    });
+
+    const phones = customers.filter(customer => {
+       return (customer.phoneNumbers.some(phone => phone.number.indexOf('022') > -1 || phone.number.indexOf('004122') > -1));
+    }).map(customer => '<li>' + customer.displayName + '</li>').join('\n');
+
+    return {subject, body, prefix, sms, phones};
+  }
+
+  buildCancelMSG(customers, idx, item) {
+    const subject = this.REPLACE_MSG[idx].label.replace(/_ITEM_/g, item.title);
+    const body = this.REPLACE_MSG[idx].body.replace(/_ITEM_/g, item.title).replace(/[«»%]/g, '');
+    //
+    // SMS links are platform dependant
+    // https://stackoverflow.com/a/19126326
+    const prefix = (document.documentElement.classList.contains('ios')) ? '&' : '?';
+
+    const sms = customers.map(customer => {
+      return [customer.name.familyName, customer.phoneNumbers[0].number];
+    });
+
+    const phones = customers.filter(customer => {
+       return (customer.phoneNumbers.some(phone => phone.number.indexOf('022') > -1 || phone.number.indexOf('004122') > -1));
+    }).map(customer => '<li>' + customer.displayName + '</li>').join('\n');
+
+    return {subject, body, prefix, sms, phones};
+  }
   computeDeltaPrice(order: Order) {
     //
     // case of Orders By Item
@@ -102,19 +162,35 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doCustomerContact(item, $event) {
-    const value = $event.detail.value;
-    const emails = item.customers.map(customer => {
-      return customer.email;
-    });
-    const href = 'mailto:' + this.user.email.address +
-                 '?bcc=' + emails.join(',') +
-                 '&subject=' + value;
-    const text = emails.join(',');
+    const idx = +($event.detail && $event.detail.value) || $event;
+
+    //
+    // build content message
+    const customers = item.customers.map(order => order.customer);
+    const {subject, body, prefix, sms, phones} = this.buildCustomerMSG(customers, idx, item);
+
+    // // <a href="sms:/* phone number here */&body=/* body text here */">Link</a>
+    // const mailhref = 'mailto:' + this.user.email.address +
+    //              '?bcc=' + names.join(',') +
+    //              '&subject=' + subject +
+    //              '&body=' + body;
+
+    // <a href="sms:/* phone number here */&body=/* body text here */">Link</a>
+    const sendSMS = '<a class="" href="sms:' + (sms.map(p => p[1]).join(',')) +
+                                                    prefix + 'body=' + encodeURI(body) + '">' +
+                                                    sms.map(p => p[0]).join(', ') + '</a>';
+
+    const message = `
+    Contacter par SMS :
+    <div class="message">${sendSMS}</div>
+    <h4>Sans téléphone mobile</h4>
+    <ul class="message">${phones}</ul>`;
 
     this.$alert.create({
-      header: value,
+      header: this.REPLACE_MSG[idx].label,
       subHeader: item.title,
-      message: `Contacter vos clients par email: <a href="${href}">${text}</a>`
+      message: (message),
+      cssClass: 'customer-message'
     }).then(alert => alert.present());
 
   }
@@ -130,6 +206,7 @@ export class OrdersItemsPage implements OnInit {
 
   doDisplayphone(order) {
     const phone = this.getPhoneNumber(order);
+
     this.$alert.create({
       header: 'Numéro de téléphone',
       subHeader: order.customer.displayName,
@@ -166,7 +243,8 @@ export class OrdersItemsPage implements OnInit {
       ]
     }).then(alert => alert.present());
 
-  }  
+  }
+
   doRefund(order: Order, item: OrderItem) {
     this.$alert.create({
       header: 'Rembousement partiel',
@@ -255,6 +333,83 @@ export class OrdersItemsPage implements OnInit {
       }, error => this.doToast(error.error, error));
   }
 
+  doAskCancel(order, item) {
+    const idx = 1;
+
+    //
+    // build content message
+    const customers = [order.customer];
+    const {subject, body, prefix, sms, phones} = this.buildCustomerMSG(customers, idx, item);
+
+    // <a href="sms:/* phone number here */&body=/* body text here */">Link</a>
+    const sendSMS = '<a class="" href="sms:' + (sms.map(p => p[1]).join(',')) +
+                                                    prefix + 'body=' + encodeURI(body) + '">' +
+                                                    'Contacter client par SMS</a>';
+
+
+    //
+    // dialog center message
+    let message = `<div class="message">${sendSMS}</div></div>`;
+    if (sms.length && sms[0].length) {
+      const  callPhone = '<a class="" href="tel:' + sms[0][1] + '">Contacter client par TEL</a>';
+      message += `<div class="message">${callPhone}</div>`;
+    }
+    message += `<div class="message">Ou informer karibou.ch</div><h5 class="message">L'état du produit est actuellement</h5>`;
+
+    this.$alert.create({
+      header: 'Remplacer le produit avant de l\'annuler?',
+      subHeader: item.title,
+      message: (message),
+      cssClass: 'customer-message',
+      buttons: [{
+        text: 'REMPLACER',
+        cssClass: 'cancel-replace',
+        handler: () => {
+          this.doValidate(order, item);
+        }
+      }, {
+        text: 'ANNULER',
+        role: 'cancel',
+        cssClass: 'cancel-danger',
+        handler: () => {
+          this.doCancel(order, item);
+        }
+      }]
+    }).then(alert => alert.present());
+
+  }
+
+  doReplace(order, item) {
+    const idx = 1;
+
+    //
+    // build content message
+    const customers = [order.customer];
+    const {subject, body, prefix, sms, phones} = this.buildCustomerMSG(customers, idx, item);
+
+    // // <a href="sms:/* phone number here */&body=/* body text here */">Link</a>
+    // const mailhref = 'mailto:' + this.user.email.address +
+    //              '?bcc=' + names.join(',') +
+    //              '&subject=' + subject +
+    //              '&body=' + body;
+
+    // <a href="sms:/* phone number here */&body=/* body text here */">Link</a>
+    const sendSMS = '<a class="" href="sms:' + (sms.map(p => p[1]).join(',')) +
+                                                    prefix + 'body=' + encodeURI(body) + '">' +
+                                                    sms.map(p => p[0]).join(', ') + '</a>';
+
+    const message = `Contacter par SMS : <div class="message">${sendSMS}</div>`;
+
+    this.$alert.create({
+      header: this.REPLACE_MSG[idx].label,
+      subHeader: item.title,
+      message: (message),
+      cssClass: 'customer-message',
+      buttons: ['Annulé sans contact', 'Annulé avec contact']
+    }).then(alert => alert.present());
+
+  }
+
   doClose() {
     this.$modal.dismiss();
   }
@@ -281,9 +436,12 @@ export class OrdersItemsPage implements OnInit {
       }, error => this.doToast(error.error, error));
   }
 
-
   doOpenProduct(item: OrderItem) {
     this.$router.navigate(['/product', item.sku]);
+  }
+
+  doToggleCheck(item: any) {
+   item['checked'] = !item['checked'];
   }
 
   doToast(msg, error?) {
@@ -329,6 +487,15 @@ export class OrdersItemsPage implements OnInit {
     }
   }
 
+  doFilterInput($event) {
+    this.filterItem = ($event.target.value || '').toLocaleLowerCase()
+  }
+
+  doClearFilter($event) {
+    this.filterItem = null;
+  }
+
+
   getOrderRank(order: Order) {
     const prefix = this.hubs[order.hub].prefix;
     return prefix + order.rank;
@@ -359,12 +526,51 @@ export class OrdersItemsPage implements OnInit {
   //
   // First sorted by vendors, then sorted by Cat
   sortedItem(order: Order) {
-    return order.items.sort((a, b) => {
+    const items = (order&&order.items||[]).filter(item => {
+      if(!this.filterItem || this.filterItem.length<3){
+        return true;
+      }
+      //
+      // filter by vendor
+      if([',','.','#'].indexOf(this.filterItem[0])>-1) {
+        const search = this.filterItem.slice(1).toLocaleLowerCase();
+        return item.vendor.indexOf(search) > -1;  
+      }
+
+      //
+      // filter by title
+      return item.title.toLocaleLowerCase().indexOf(this.filterItem) > -1;
+    });
+
+    return items.sort((a, b) => {
         const vendorCmp = a.vendor.localeCompare(b.vendor);
         if (vendorCmp !== 0) {
           return vendorCmp;
         }
         return a.category.localeCompare(b.category);
+    });
+  }
+
+  //
+  // First sorted by vendors, then sorted by Cat
+  sortedItemByName(order: Order) {
+    const items = (order&&order.items||[]).filter(item => {
+      if(!this.filterItem || this.filterItem.length<3){
+        return true;
+      }
+      //
+      // filter by vendor
+      if([',','.','#'].indexOf(this.filterItem[0])>-1) {
+        const search = this.filterItem.slice(1).toLocaleLowerCase();
+        return item.vendor.indexOf(search) > -1;  
+      }
+
+      //
+      // filter by title
+      return item.title.toLocaleLowerCase().indexOf(this.filterItem) > -1;
+    });
+    return items.sort((a, b) => {
+        return a.title.localeCompare(b.title);
     });
   }
 
@@ -378,3 +584,4 @@ export class OrdersItemsPage implements OnInit {
 })
 export class OrdersByItemsPage extends OrdersItemsPage {
 }
+

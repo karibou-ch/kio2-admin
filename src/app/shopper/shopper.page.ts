@@ -258,10 +258,13 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   getOrders() {
-    const filterByHub = (order) => {
-      return !this.currentHub ||
-      order.hub === this.currentHub.id;
-    };
+    //
+    // FIXME removed filter by hub
+    // .filter(filterByHub.bind(this))                    
+    // const filterByHub = (order) => {
+    //   return !this.currentHub ||
+    //   order.hub === this.currentHub.id;
+    // };
 
     const filterByPlan = (order) => {
       if (!this.currentPlanning ) {
@@ -275,12 +278,16 @@ export class ShopperPage implements OnInit, OnDestroy {
       return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
     };
 
+    //
+    // FIXME removed filter by hub
+    // .filter(filterByHub.bind(this))                    
     if (!this.searchFilter) {
-      return this.orders.filter(filterByHub.bind(this))
-                        .filter(filterByPlan.bind(this));
+      return this.orders.filter(filterByPlan.bind(this));
     }
+    //
+    // FIXME removed filter by hub
+    // .filter(filterByHub.bind(this))                    
     return this.orders
-                  .filter(filterByHub.bind(this))
                   .filter(filterByPlan.bind(this))
                   .filter(filterByText.bind(this));
   }
@@ -396,7 +403,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     // update the available shoppers
     // FIXME only avilable for managers ?
     shoppers[this.user.email.address] = true;
-    this.shippingShoppers = Object.keys(shoppers);
+    this.shippingShoppers = Object.keys(shoppers).filter(shopper => !!shopper);
 
   }
 
@@ -440,6 +447,9 @@ export class ShopperPage implements OnInit, OnDestroy {
     }
     if (!/^\d{1,2}:\d{1,2}$/.test(time)) {
       time = new Date(time);
+      if(isNaN(time.getTime())) {
+        return;
+      }
       time = time.getHours() + ':' + ('0' + time.getMinutes()).slice(-2);
     }
 
@@ -466,10 +476,10 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.hubs.forEach( h => h.selected = false);
     this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
     this.currentHub.selected = true;
-
+    this.currentPlanning = null;
     //
     // FIXME, currently force find-all-orders to reset local shippingShopper[plan]
-    this.$engine.findAllOrders();
+    // this.$engine.findAllOrders();
   }
 
   sortOrdersByCP(o1, o2) {

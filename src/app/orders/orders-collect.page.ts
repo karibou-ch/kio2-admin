@@ -158,7 +158,10 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
   private orderItemsByVendorAndHub(vendor) {
     this.currentHub = this.hubs.find(hub => hub.selected) || {};
-    return this.orders.filter(order =>  !this.currentHub || order.hub === this.currentHub.id).map(order => {
+    // 
+    // FIXME removed hub filter
+    // --> this.orders.filter(order =>  !this.currentHub || order.hub === this.currentHub.id)
+    return this.orders.map(order => {
       const o = new Order(order);
       o.items = order.items.filter((item) => item.vendor === vendor);
       return o;
