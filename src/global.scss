@@ -32,6 +32,12 @@
 
 
 .customer-message{
+  .alert-sub-title{
+    font-weight: 800;
+  }
+  div.message {
+    padding: 5px 0 0;
+  }
   ul.message {
     padding: 0;
     li{
@@ -43,3 +49,13 @@
     }
   }
 }
+
+button.cancel-replace {
+  border: 1px solid var(--ion-color-primary)!important;
+}
+
+button.cancel-danger {
+  color: var(--ion-color-danger)!important;
+  border: 1px solid var(--ion-color-danger)!important;
+}
+
