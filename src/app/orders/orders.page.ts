@@ -19,6 +19,13 @@ export class OrderByItem {
   item: OrderItem;
 }
 
+export class PlanningByItem {
+  status: string;
+  item: string;
+  sku: number;
+  quantity: number;
+}
+
 @Component({
   selector: 'app-orders',
   templateUrl: './orders.page.html',
@@ -28,6 +35,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
 
   format: string;
+  formatWeek: string;
   user: User = new User();
   shipping: Date;
   orders: Order[];
@@ -46,6 +54,11 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   searchFilter: string;
   interval$;
 
+  currentDates: Date[];
+  openItems: {
+    [when: number]: (PlanningByItem[]|any);
+  };
+
 
   constructor(
     private $engine: EngineService,
@@ -61,6 +74,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.orders = [];
     this.cache = {};
     this.items = {};
+    this.currentDates = [];
+    this.openItems = {};
   }
 
   ngOnDestroy() {
@@ -79,6 +94,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     });
 
     this.format = this.$engine.defaultFormat;
+    this.formatWeek = this.$engine.defaultWeek;
+
     this.user = this.$engine.currentUser;
     if (this.user.isAdmin()) {
       // change the average
@@ -171,6 +188,13 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     });
   }
 
+  getOrdersCountByDate(when: Date) {
+    return this.openItems[when.getTime()].count || 0;
+  }
+
+  getOrdersByDate(when: Date) {
+    return this.openItems[when.getTime()];
+  }
 
   //
   // get orders by HUB
@@ -285,6 +309,57 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
       }, 0);
     });
 
+  }
+
+
+  mapItemsPlanning() {
+    this.openItems = {};
+    const ordersMap = this.$engine.getAllOrdersByDate();
+    this.currentDates = Array.from(ordersMap.keys()).map(when => new Date(when));
+
+    //
+    // sort planing
+    this.currentDates = this.currentDates.sort((a,b) => a.getTime() - b.getTime());
+
+    //
+    // group items by date
+    this.currentDates.forEach(when => {
+      const time = when.getTime();
+      if (!this.openItems[time]) {
+        this.openItems[time] = [];
+        this.openItems[time].count = ordersMap.get(time).length;
+      }
+
+      ordersMap.get(time).forEach(order => {
+        //
+        // create the list for that time
+        order.items.forEach(item => {
+          const elem = this.openItems[time].find( $i => $i.sku === item.sku && $i.status === item.fulfillment.status);
+          if(elem) {
+            elem.quantity += item.quantity;
+          } else {
+            this.openItems[time].push({
+              status: item.fulfillment.status ,
+              issue: item.fulfillment.issue ,
+              title: item.title,
+              sku: item.sku,
+              quantity: item.quantity
+            });
+          }
+        });
+        //
+        // order the list by title
+        this.openItems[time] = this.openItems[time].sort((a, b) => {
+          if (a.title > b.title) {
+            return 1;
+          }
+          if (b.title > a.title) {
+              return -1;
+          }
+          return 0;
+        });
+      });
+    });
   }
 
   onDone(msg) {
@@ -418,6 +493,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.orders = ctx.orders.sort(this.sortOrdersByRank);
 
     this.mapOrderByItems();
+    this.mapItemsPlanning();
 
     //
     // use shipping day from
@@ -466,4 +542,13 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
   }
 
+}
+
+@Component({
+  selector: 'kio2-orders-planning',
+  templateUrl: 'orders-planning.html',
+  styleUrls: ['./orders.page.scss']
+})
+export class OrdersPlanningPage extends OrdersCustomerPage {
+  displayOnlyFailure: boolean;
 }

@@ -46,10 +46,12 @@ h1.info{
   }
 }
 
+
+
 ion-title{
   text-transform: capitalize;
   font-weight: 700;
-  font-size: 22px;  
+  font-size: 20px;  
   ion-icon {
     transform: translateY(4px);
     color: gold;    
@@ -198,6 +200,51 @@ ion-item-options{
   background: rgba(12, 12, 12, 0.24);
   color: white;
 }
+
+//
+// planning
+.planning{
+  padding: 10px;
+  h1,h2{
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;    
+    text-transform: capitalize;  
+    .light{
+      color: #bbb;
+      text-transform: none;      
+    }
+  }
+
+  ul{
+    list-style: none;
+    background: #fefefe;
+    border-radius: 10px;
+    padding: 5px;    
+    li{
+      padding: 8px 0;
+      font-weight: 400;
+      color: #333;
+      font-size: 16px;
+      border-bottom: 1px solid #eee;
+    }    
+    li:nth-child(odd) {
+    }
+    li:nth-child(even) {
+    }    
+  }
+  .failure{
+    text-decoration: line-through!important;
+  }
+
+  .error{
+    text-decoration: line-through!important;
+    color: red;
+    font-weight: 700;
+  }
+
+  
+}
+
 
 @keyframes rotating {
   from{
