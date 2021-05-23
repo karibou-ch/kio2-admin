@@ -34,12 +34,10 @@
     <ion-item class="customer-contact">
       <ion-select 
         color="primary" 
-        placeholder="Communication avec les clients" 
+        placeholder="Informer les clients" 
         interface="action-sheet"
         (ionChange)="doCustomerContact(item, $event)">
-        <ion-select-option value="Produit manquant">Produit manquant</ion-select-option>
-        <ion-select-option value="Nouveauté">Nouveauté</ion-select-option>
-        <ion-select-option value="Produit remplacé">Produit remplacé</ion-select-option>
+        <ion-select-option *ngFor="let info of REPLACE_MSG;let idx = index" [value]="idx">{{info.label}}</ion-select-option>
       </ion-select>
     </ion-item>
 
