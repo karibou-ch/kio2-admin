@@ -42,6 +42,7 @@ export class EngineService {
   ARCHIVE = { fulfillments: 'fulfilled,partial' };
 
   defaultFormat = 'EEEE d MMM';
+  defaultWeek = 'EEEE MMM';
 
 
   selectedOrders$: ReplaySubject<OrdersCtx>;
@@ -104,6 +105,10 @@ export class EngineService {
 
   get currentOrderStatus() {
     return (!!this.orderStatus.payment);
+  }
+
+  getAllOrdersByDate() {
+    return this.monthOrders;
   }
 
   getOrdersByDay(shipping: Date) {
