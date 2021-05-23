@@ -31,6 +31,13 @@ ion-item {
   }
 }
 
+.block{
+  width: 100%;
+  @media (max-width:426px) {
+    width: auto;    
+  }
+}
+
 .large,
 .stock{
   ion-label{
