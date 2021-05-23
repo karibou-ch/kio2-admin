@@ -57,7 +57,6 @@ export class ReportPage implements OnInit {
 
   ngOnInit() {
     this.user = this.$engine.currentUser;
-
     this.onInitReport();
   }
 
