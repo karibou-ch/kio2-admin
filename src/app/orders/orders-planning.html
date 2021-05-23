@@ -35,7 +35,10 @@
 
       <ul>
         <li *ngFor="let item of getOrdersByDate(date)" [hidden]="(!displayOnlyFailure && item.status !== 'failure')">
-          <span  [class.failure]="item.status === 'failure'"><span [class.red]="item.quantity>1">{{item.quantity}}x</span>  {{item.title}}</span>
+          <span  [class.failure]="item.status === 'failure'" [class.error]="item.issue == 'issue_missing_product_danger'">
+            <span [class.red]="item.quantity>1 && displayOnlyFailure">{{item.quantity}}x</span>  
+            {{item.title}} 
+          </span>
         </li>
       </ul>
     </ng-container>
