@@ -383,8 +383,11 @@ export class ShopperPage implements OnInit, OnDestroy {
       if (order.shipping.priority &&
          planning.indexOf(order.shipping.priority) == -1) {
         planning.push(order.shipping.priority);
+      }
+      if(order.shipping.shopper){
         shoppers[order.shipping.shopper] = true;
       }
+        
 
       //
       // list shopper
@@ -434,6 +437,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   setShippingShopper($event?) {
+    console.log('---DBG',this.shippingShopper[this.currentPlanning].shopper);
     const hub = this.currentHub && this.currentHub.slug;
     const when = new Date(this.pickerShippingDate);
     const plan = this.currentPlanning;
@@ -453,11 +457,14 @@ export class ShopperPage implements OnInit, OnDestroy {
       time = time.getHours() + ':' + ('0' + time.getMinutes()).slice(-2);
     }
 
-    this.$order.updateShippingShopper(hub, shopper, plan, when, time)
+    this.$order.updateShippingShopper('', shopper, plan, when, time)
         .subscribe(ok => {
           this.onDone('Livraisons planifiées');
         }, status => {
           this.onError(status.error || status.message)
+          //
+          // restore all plan
+          this.trackPlanning(this.orders);
         });
   }
 
@@ -468,8 +475,12 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.$order.updateShippingPriority(order, priority, position)
         .subscribe(ok => {
           this.onDone('Tournée planifiée');
+          //
+          // update all plan
           this.trackPlanning(this.orders);
-        }, error => this.onError(error.error));
+        }, status => {
+          this.onError(status.error);          
+        });
   }
 
   setCurrentHub(hub) {
