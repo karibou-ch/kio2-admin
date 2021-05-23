@@ -19,6 +19,7 @@ export class IssuesPage implements OnInit {
   year: number;
 
   reports: ReportIssues[];
+  groups: any;
 
   constructor(
     private $engine: EngineService,
@@ -48,9 +49,15 @@ export class IssuesPage implements OnInit {
     this.onInitReport();
   }
 
+  //
+  // return list of month.year labels for this report of issue
+  get reportLabels() {
+    return Object.keys(this.groups);
+  }
 
   onInitReport() {
     this.reports = [];
+    this.groups = {};
     const month = ('0' + (new Date(this.currentDate).getMonth() + 1)).slice(-2);
     const year = new Date(this.currentDate).getFullYear();
 
@@ -71,11 +78,20 @@ export class IssuesPage implements OnInit {
       // });
       document.title = this.defaultTitle;
       this.reports = reports.map(report => {
+        const key = report._id.month+'.'+report._id.year;
         report['ratio'] = report.issues.length / report.orders.total;
+        report['ratio_danger'] = report.issues.filter(elem => elem.issue == 'issue_missing_product_danger').length / report.orders.total;
+
+        if(!this.groups[key]){
+          this.groups[key] = [];
+        }
+        this.groups[key].push(report);
         return report;
-      }).sort(this.sortByRatio);
+      });//.sort(this.sortByRatio);
+
     });
   }
+  
 
   sortByRatio(a, b) {
     const ratioa = a.issues.length / a.orders.total;

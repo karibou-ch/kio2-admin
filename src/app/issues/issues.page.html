@@ -26,29 +26,28 @@
 </ion-header>
 
 <ion-content class="content">
-  <h4>Qualité</h4>
-  <table class="mdl-data-table wrapper" >
+  <table class="mdl-data-table wrapper"  *ngFor="let label of reportLabels">
     <thead>
       <tr>
-        <th class="small">Année</th>
+        <th class="small hidden-sm">Année</th>
         <th class="small">Mois</th>
         <th class="first-col">Vendeur</th>  
-        <th class="small">Erreurs</th>
-        <th class="small">CHF</th>
-        <th class="small">CMD</th>
-        <th class="small">Ratio</th>
+        <th class="small numbers">létal</th>
+        <th class="small numbers">problèmes</th>
+        <th class="small numbers">couts</th>
+        <th class="small numbers">ventes</th>
 
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let report of reports" >
-        <td>{{report._id.year}}</td> 
+      <tr *ngFor="let report of groups[label].sort(sortByRatio)" >
+        <td class="hidden-sm">{{report._id.year}}</td> 
         <td>{{report._id.month}}</td>
         <td class="limit">{{report._id.vendor}}</td>
-        <td>{{report.issues.length}}</td>
+        <td>{{report['ratio_danger'] | percent}}</td>
+        <td>{{report['ratio'] | percent}}</td>
         <td>{{report.amount|currency:'CHF'}}</td>
         <td>{{report.orders.total}}</td>
-        <td>{{report.issues.length/report.orders.total | percent}}</td>
       </tr>
     </tbody>
     <!-- <tbody *ngFor="let issue of report.issues" class="report-separator">
