@@ -20,6 +20,7 @@ export class IssuesPage implements OnInit {
 
   reports: ReportIssues[];
   groups: any;
+  items : any;
 
   constructor(
     private $engine: EngineService,
@@ -27,6 +28,8 @@ export class IssuesPage implements OnInit {
     private $route: ActivatedRoute,
     private $router: Router,
   ) {
+    this.defaultTitle ='Suivi de la qualité';
+    this.items = {};
   }
 
   ngOnInit() {
@@ -55,9 +58,14 @@ export class IssuesPage implements OnInit {
     return Object.keys(this.groups);
   }
 
+  get itemsQty() {
+    return Object.keys(this.items).sort(this.sortByQty.bind(this));
+  }
+
   onInitReport() {
     this.reports = [];
     this.groups = {};
+    this.items = {};
     const month = ('0' + (new Date(this.currentDate).getMonth() + 1)).slice(-2);
     const year = new Date(this.currentDate).getFullYear();
 
@@ -81,10 +89,23 @@ export class IssuesPage implements OnInit {
         const key = report._id.month+'.'+report._id.year;
         report['ratio'] = report.issues.length / report.orders.total;
         report['ratio_danger'] = report.issues.filter(elem => elem.issue == 'issue_missing_product_danger').length / report.orders.total;
+        report['ratio_refund'] = report.issues.filter(elem => elem.issue == 'issue_wrong_product_quality').length / report.orders.total;
+
+        //
+        // create an array of missing items
+        const items = report.issues.filter(elem => ['issue_wrong_product_quality','issue_missing_product_danger'].indexOf(elem.issue)>-1).map(issue => issue.title);
+        items.forEach(item => {
+          if(!this.items[item]) {
+            this.items[item] = 0;
+          }
+          this.items[item] ++;
+
+        });
 
         if(!this.groups[key]){
           this.groups[key] = [];
         }
+
         this.groups[key].push(report);
         return report;
       });//.sort(this.sortByRatio);
@@ -92,6 +113,9 @@ export class IssuesPage implements OnInit {
     });
   }
   
+  sortByQty(a,b) {
+    return this.items[b] - this.items[a];
+  }
 
   sortByRatio(a, b) {
     const ratioa = a.issues.length / a.orders.total;

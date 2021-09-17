@@ -29,32 +29,53 @@
   <table class="mdl-data-table wrapper"  *ngFor="let label of reportLabels">
     <thead>
       <tr>
-        <th class="small hidden-sm">Année</th>
-        <th class="small">Mois</th>
+        <th class=" hidden-sm">Année</th>
+        <th class="">Mois</th>
         <th class="first-col">Vendeur</th>  
-        <th class="small numbers">létal</th>
-        <th class="small numbers">problèmes</th>
-        <th class="small numbers">couts</th>
-        <th class="small numbers">ventes</th>
+        <th class="red numbers">refund</th>
+        <th class=" numbers">danger</th>
+        <th class=" numbers">annulation</th>
+        <th class=" numbers">couts</th>
+        <th class=" numbers">ventes</th>
 
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let report of groups[label].sort(sortByRatio)" >
-        <td class="hidden-sm">{{report._id.year}}</td> 
-        <td>{{report._id.month}}</td>
-        <td class="limit">{{report._id.vendor}}</td>
-        <td>{{report['ratio_danger'] | percent}}</td>
-        <td>{{report['ratio'] | percent}}</td>
-        <td>{{report.amount|currency:'CHF'}}</td>
-        <td>{{report.orders.total}}</td>
-      </tr>
+      <ng-container *ngFor="let report of groups[label].sort(sortByRatio)">
+        <tr>
+          <td class="hidden-sm">{{report._id.year}}</td> 
+          <td>{{report._id.month}}</td>
+          <td class="limit">{{report._id.vendor}}</td>
+          <td>{{report['ratio_refund'] | percent:'1.1-1'}}</td>
+          <td>{{report['ratio_danger'] | percent:'1.1-1'}}</td>
+          <td>{{report['ratio'] | percent:'1.1-1'}}</td>
+          <td>{{report.amount|currency:'CHF'}}</td>
+          <td>{{report.orders.total}}</td>
+        </tr>
+      </ng-container>
+
     </tbody>
     <!-- <tbody *ngFor="let issue of report.issues" class="report-separator">
       <tr>
         <td>{{issue.title}}</td><td></td>
       </tr>
     </tbody> -->
+  </table>
+
+  <hr/>
+  <table class="mdl-data-table wrapper">
+    <thead>
+      <tr>
+        <th class="red numbers" style="width: 50px;">qty</th>
+        <th class="first-col">Liste des erreurs</th>  
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let label of itemsQty" class="">
+        <td >{{items[label]}}</td>
+        <td >{{label}}</td>
+      </tr>
+    </tbody>
   </table>
 
 
