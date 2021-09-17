@@ -41,13 +41,29 @@ export class LoginPage implements OnInit {
   }
 
   ngOnInit() {
+
+    //
+    // check existance on token
+    let defaultEmail;
+    let defaultPassword;
+    if (window['KB_TOKEN']) {
+      // FIXME split char is hardcoded
+      try{
+        const fields = atob(window['KB_TOKEN']).split('::');
+        if (fields.length === 2) {
+          defaultEmail = fields[0];
+          defaultPassword = fields[1];
+        }  
+      }catch(e) {}
+    }
+
     this.platform.ready().then(() => {
       this.storageGet(this.KIO2_LOGIN_REMEMBER).then(remember => {
         if (!remember) {
           return;
         }
-        this.model.email = remember.mail;
-        this.model.password = remember.password;
+        this.model.email = defaultEmail || remember.mail;
+        this.model.password = defaultPassword || remember.password;
         if (remember.password && remember.password !== '') {
           this.keep = true;
         }
@@ -102,7 +118,9 @@ export class LoginPage implements OnInit {
         try {
           window.location.href = '/';
           this.$loading.dismiss();
-        } catch (e) { }
+        } catch (e) { 
+          console.log('------',e)
+        }
         return;
       }
       this.showError('Erreur d\'authentification :-((');
@@ -138,7 +156,7 @@ export class LoginPage implements OnInit {
     return new Promise((resolve, reject) => {
       try {
         localStorage.setItem(key, JSON.stringify(value));
-        resolve();
+        resolve(value);
       } catch (err) {
         reject(err);
       }

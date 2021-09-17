@@ -33,6 +33,7 @@ export class Kio2Admin {
     private $toast: ToastController
   ) {
     this.firstInit = true;
+    this.storeLoginToken();
     this.initializeApp();
     this.$loader.update().subscribe((ctx) => {
       if (ctx.config) {
@@ -81,6 +82,7 @@ export class Kio2Admin {
     //
     // update global state
     this.$engine.currentUser = user;
+    console.log('----', user);
 
     if (!user.isAuthenticated()) {
       this.$router.navigateByUrl('/login');
@@ -105,5 +107,17 @@ export class Kio2Admin {
       this.$router.navigateByUrl('/shopper');
       return;
     }
+  }
+
+  storeLoginToken() {
+    //
+    // check existance on token
+    try{
+      const token = /token=([^&]*)/gm.exec(window.location.href);
+      if(token && token.length>1){
+        window['KB_TOKEN'] = token[1];
+      }  
+    }catch(e){}
+
   }
 }
