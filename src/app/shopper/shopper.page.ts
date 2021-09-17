@@ -39,6 +39,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   shippingShopper: {[key: string]: ShopperPlan};
   shippingShoppers: string[];
+  shippingComplement: {[key: string]: number};
 
   constructor(
     private $alert: AlertController,
@@ -76,7 +77,7 @@ export class ShopperPage implements OnInit, OnDestroy {
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];
       if (this.user.hubs && this.user.hubs.length === 1) {
-        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
+        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]) || this.currentHub;
       }
       this.currentHub.selected = true;
 
@@ -118,7 +119,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     return prefix + order.rank;
   }
 
-
   initDate() {
     const currentDate = this.$engine.currentShippingDate;
     const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
@@ -135,7 +135,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     // use full Date for Display
     this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
   }
-
 
   isDeposit(order) {
     // undefined test is for Bretzel
@@ -161,7 +160,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.$router.navigate([], {queryParams: { when: (date.getTime()) }});
   }
 
-
   onEngineStatus(status: OrderStatus) {
     this.isReady = !status.running;
   }
@@ -174,6 +172,16 @@ export class ShopperPage implements OnInit, OnDestroy {
     // this.orders.filter(o => o.shipping.priority === 1).forEach(order => {
     //   console.log('---- priority,position',order.rank,order.shipping.priority, order.shipping.position);
     // });
+
+    //
+    // map parent orders with complement count
+    this.shippingComplement = {};
+    this.orders.forEach(order => {
+      if(order.shipping.parent) {
+        this.shippingComplement[order.shipping.parent] = this.shippingComplement[order.shipping.parent] || 0;
+        this.shippingComplement[order.shipping.parent]++;
+      }
+    });
 
     //
     // IFF HUBs are available
@@ -200,6 +208,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     }).then(alert => alert.present());
 
   }
+
   onError(msg) {
     this.$toast.create({
       message: msg,
@@ -238,7 +247,6 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   isPlanified() {
-
   }
 
   doRefresh(refresher) {
@@ -288,9 +296,14 @@ export class ShopperPage implements OnInit, OnDestroy {
     // FIXME removed filter by hub
     // .filter(filterByHub.bind(this))                    
     return this.orders
-                  .filter(filterByPlan.bind(this))
-                  .filter(filterByText.bind(this));
+                .filter(order => !order.shipping.parent)
+                .filter(filterByPlan.bind(this))
+                .filter(filterByText.bind(this));
   }
+
+  getOrdersComplement(order) {
+    return this.shippingComplement[order.oid] || 0;
+  } 
 
   isOrderSelected(order) {
     return this.selectedOrder[order.oid];
@@ -311,7 +324,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     initials = initials[0] + initials[1];
     return '(' + order.shipping.priority + ')(' + initials + ')';
   }
-
 
   debug() {
     // this.orders.forEach(o=>{
@@ -437,7 +449,6 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   setShippingShopper($event?) {
-    console.log('---DBG',this.shippingShopper[this.currentPlanning].shopper);
     const hub = this.currentHub && this.currentHub.slug;
     const when = new Date(this.pickerShippingDate);
     const plan = this.currentPlanning;

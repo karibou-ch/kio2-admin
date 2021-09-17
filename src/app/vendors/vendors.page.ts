@@ -63,7 +63,7 @@ export class VendorsPage implements OnInit {
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];
       if (this.user.hubs && this.user.hubs.length === 1) {
-        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
+        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0])||this.currentHub;
       }
       this.currentHub.selected = true;
     }

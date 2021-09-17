@@ -59,7 +59,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];
       if (this.user.hubs && this.user.hubs.length === 1) {
-        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]);
+        this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]) || this.currentHub;
         this.currentHub.selected = true;
       } else {
         this.hubs[0].selected = true;
@@ -132,8 +132,8 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
       //
       // init item for this vendor
       if (!this.vendors[item.vendor]) {
-        const collected = order.vendors.some(v => v.slug === item.vendor && v.collected);
-        const vendor = order.vendors.find(v  => v.slug === item.vendor);
+        const vendor = order.vendors.find(v => v.slug === item.vendor);
+        const collected = vendor.collected;
         const address = vendor.address.split('tel:');
         this.vendors[item.vendor] = {};
         this.vendors[item.vendor].address = address[0];
@@ -143,6 +143,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         this.vendors[item.vendor].items = [];
         this.vendors[item.vendor].ranks = [];
         this.vendors[item.vendor].collected = collected;
+        this.vendors[item.vendor].collected_timestamp = vendor.collected_timestamp? new Date(vendor.collected_timestamp):vendor.collected_timestamp;
         this.vendors.list.push(item.vendor);
 
       }
@@ -222,14 +223,21 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
   getVendors() {
-    if (!this.searchFilter) {
-      return this.vendors.list.sort();
-    }
+    const collected = this.vendors.list.every(slug => !!this.vendors[slug].collected_timestamp);
+    const sortByCollect =(a,b) => {
+      if(collected){
+        return this.vendors[a].collected_timestamp.getTime() - this.vendors[b].collected_timestamp.getTime();
+      }
+      return a.localeCompare(b);
+    };
 
+    if (!this.searchFilter) {
+      return this.vendors.list.sort(sortByCollect);
+    }
     const search = this.searchFilter.toLocaleLowerCase();
     return this.vendors.list.filter(vendor => {
       return vendor.indexOf(search) > -1;
-    }).sort();
+    }).sort(sortByCollect);
   }
 
   isFulfilled(vendor: string): boolean {
