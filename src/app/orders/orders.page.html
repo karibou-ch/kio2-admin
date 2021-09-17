@@ -172,6 +172,7 @@
         </ion-note>
         <ion-avatar slot="start" (click)="openByOrder(order)">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
+          <div class="complement" [hidden]="!getOrdersComplement(order)">{{getOrdersComplement(order)}}</div>
           <span class="rank">{{getOrderRank(order)}}</span>
         </ion-avatar>
         <ion-label class="ion-text-wrap">

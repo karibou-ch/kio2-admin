@@ -153,6 +153,20 @@ ion-item {
 
   ion-avatar {
     position: relative;
+    div.complement{
+      position: absolute;
+      font-size: 10px;
+      top: 0px;
+      z-index: 1;
+      left: 0px;
+      background: red;
+      width: 11px;
+      height: 11px;
+      color: white;
+      text-align: center;
+      line-height: 13px;
+      border-radius: 1px;        
+    }
 
     span.rank{
       &.selected{

@@ -142,6 +142,7 @@
         </ion-note>        
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
+          <div class="complement" [hidden]="!getOrdersComplement(order)">{{getOrdersComplement(order)}}</div>
           <span class="rank" [class.orphan]="!order.shipping.priority" [class.selected]="isOrderSelected(order)">
             {{getOrderRank(order)}}
           </span>

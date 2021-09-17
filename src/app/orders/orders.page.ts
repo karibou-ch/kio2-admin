@@ -59,6 +59,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     [when: number]: (PlanningByItem[]|any);
   };
 
+  shippingComplement: {[key: string]: number};
+
 
   constructor(
     private $engine: EngineService,
@@ -76,6 +78,11 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.items = {};
     this.currentDates = [];
     this.openItems = {};
+    this.shippingComplement = {};
+  }
+
+  get ordersCount() {
+    return this.orders.filter(order => !order.shipping.parent).length;
   }
 
   ngOnDestroy() {
@@ -187,6 +194,10 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
         return a.vendor.localeCompare(b.vendor);
     });
   }
+
+  getOrdersComplement(order) {
+    return this.shippingComplement[order.oid] || 0;
+  } 
 
   getOrdersCountByDate(when: Date) {
     return this.openItems[when.getTime()].count || 0;
@@ -494,6 +505,15 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
     this.mapOrderByItems();
     this.mapItemsPlanning();
+
+    //
+    // map child orders that have parent complement
+    this.shippingComplement = {};
+    this.orders.forEach(order => {
+      if(order.shipping.parent) {
+        this.shippingComplement[order.oid] = 1;
+      }
+    });
 
     //
     // use shipping day from
