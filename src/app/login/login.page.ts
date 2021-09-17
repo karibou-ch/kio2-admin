@@ -51,8 +51,8 @@ export class LoginPage implements OnInit {
       try{
         const fields = atob(window['KB_TOKEN']).split('::');
         if (fields.length === 2) {
-          defaultEmail = fields[0];
-          defaultPassword = fields[1];
+          this.model.email = defaultEmail = fields[0];
+          this.model.password = defaultPassword = fields[1];
         }  
       }catch(e) {}
     }
