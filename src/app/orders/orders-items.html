@@ -19,7 +19,7 @@
       <span  class="rank">{{getOrderRank(order)}}</span>
       <ion-label class="ion-text-wrap">
         <h2>
-          {{order.customer.displayName}}
+          {{order.customer.displayName}} &nbsp;<span [hidden]="order.customer.orders>5" class="customer-new">NEW!{{order.customer.orders}}</span>
         </h2>
         <p> 
           {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>            
