@@ -73,6 +73,16 @@ ion-item.customer{
     height: 44px;
     font-size: 1.2rem;      
   }
+  
+  span.customer-new {
+    background: red;
+    color: white;
+    padding: 0px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;  
+  }
+  
 
   div.note {
     transform: translateY(10px) translateX(8px);      
