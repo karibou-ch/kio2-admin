@@ -34,6 +34,7 @@ export class PlanningByItem {
 export class OrdersCustomerPage implements OnInit, OnDestroy {
 
 
+  maxErrors:number;
   format: string;
   formatWeek: string;
   user: User = new User();
@@ -92,6 +93,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+
+    this.maxErrors = this.$engine.currentConfig.shared.issue.verification;
     //
     // load Hubs
     this.hubs = {undefined: { prefix: ''}};
@@ -511,7 +514,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.shippingComplement = {};
     this.orders.forEach(order => {
       if(order.shipping.parent) {
-        this.shippingComplement[order.oid] = 1;
+        const parent = this.orders.find(o => o.oid == order.shipping.parent);
+        this.shippingComplement[order.oid] = (parent)? parent.rank : 0;
       }
     });
 
@@ -520,6 +524,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // force current shipping day
     this.shipping = ctx.when;
     this.pickerShippingDate = ctx.when.toISOString();
+    // console.log('---- ctx.when',ctx.when.getTime(),ctx.when);
 
     // AVG
     this.orderTotal = this.orders.reduce((sum, order, i) => {
@@ -537,6 +542,18 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.searchFilter = null;
   }
 
+  //
+  // sort by (parent)->rank, 
+  sortOrdersByRankAndComplement(o1, o2) {
+    // get source rank
+    const rank1 = this.shippingComplement[o1.oid] || o1.rank;
+    const rank2 = this.shippingComplement[o2.oid] || o2.rank;
+    const sorted = (rank1 - rank2);
+    if(!sorted) {
+      return o1.shipping.name.localeCompare(o2.shipping.name);
+    }
+    return sorted;
+  }
 
   sortOrdersByRank(o1, o2) {
     return o1.rank - o2.rank;

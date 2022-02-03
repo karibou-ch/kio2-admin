@@ -119,7 +119,7 @@
         </ion-button>
       </ion-note>
     </ion-item>
-    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByRank);let i=index;">
+    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByRankAndComplement.bind(this));let i=index;">
       <ion-item-options side="start" [hidden]="!user.isAdmin()">
         <ion-item-option>
           <ion-button mode="ios" expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
@@ -173,16 +173,18 @@
         <ion-avatar slot="start" (click)="openByOrder(order)">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <div class="complement" [hidden]="!getOrdersComplement(order)">{{getOrdersComplement(order)}}</div>
-          <span class="rank">{{getOrderRank(order)}}</span>
+          <span class="rank" [class.rank-danger]="order.customer.latestErrors">{{getOrderRank(order)}}</span>
         </ion-avatar>
         <ion-label class="ion-text-wrap">
           <h3 text-capitalize (click)="openByOrder(order)">
-            {{ order.oid }} - {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
+            <span class="red" [class.red]="order.customer.latestErrors">{{order.customer.latestErrors}}/{{maxErrors}}</span> - {{ order.oid }} - {{ order.shipping.name }}
+            <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
           </h3>
           <h2>
             <span class="label counter">{{i+1}}</span>
             <span class="label">{{order.payment.status}}</span>
-            {{order.getFulfilledProgress()}}/{{order.items.length}} - {{order.shipping.bags}}
+            <span> - {{order.getFulfilledProgress()}}/{{order.items.length}} - {{order.shipping.bags}} </span>
+            &nbsp;<span [hidden]="order.customer.orders>5" class="customer-new">NEW! {{order.customer.orders}}</span>
           </h2>
         </ion-label>
         <button mode="ios" expandable color="danger" class="hidden-sm capture" (click)="orderCapture(order)"

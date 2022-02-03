@@ -146,19 +146,27 @@ ion-item {
   
   ion-avatar {
     position: relative;
-    div.complement{
+    div.complement,
+    div.latest-errors{
       position: absolute;
       font-size: 10px;
       top: 0px;
       z-index: 1;
       left: 0px;
       background: red;
-      width: 11px;
-      height: 11px;
+      width: 16px;
+      height: 14px;
       color: white;
       text-align: center;
-      line-height: 13px;
-      border-radius: 1px;        
+      line-height: 16px;
+      border-radius: 2px;        
+    }
+    div.latest-errors{
+      left: unset;
+      right: -5px;
+      top:-0px;
+      width: 14px;
+      background-color: blue;
     }
 
     span.rank{
@@ -219,6 +227,21 @@ ion-item-options{
   z-index: 1;
   background: rgba(12, 12, 12, 0.24);
   color: white;
+}
+
+//
+// customers
+.customer-new {
+  background: red;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;  
+}
+
+.rank-danger {
+  border: 2px dotted red;
 }
 
 //
