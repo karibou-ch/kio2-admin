@@ -54,9 +54,8 @@ export class Kio2Admin {
 
       this.$update.available.subscribe(event => {
         const msg = 'Une nouvelle version est disponible. Recharger la page maintenant';
-        if (confirm(msg)) {
-          this.$update.activateUpdate().then(() => document.location.reload(true));
-        }
+        alert (msg); 
+        this.$update.activateUpdate().then(() => document.location.reload(true));
       });
 
       //
