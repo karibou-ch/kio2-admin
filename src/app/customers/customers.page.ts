@@ -94,10 +94,10 @@ export class CustomersPage implements OnInit {
   }
 
   doDisplayPhone(order) {
-    const phone = order.customer.phoneNumbers[0].number;
+    const phone = order.phoneNumbers[0].number;
     this.$alert.create({
       header: 'Numéro de téléphone',
-      subHeader: order.customer.displayName,
+      subHeader: order.displayName,
       message: 'Appeler <a href="tel:' + phone + '">' + phone + '</a>',
     }).then(alert => alert.present());
   }
@@ -105,7 +105,7 @@ export class CustomersPage implements OnInit {
   doDisplayMail(order) {
     this.$alert.create({
       header: 'Mail de la commande',
-      subHeader: order.customer.displayName,
+      subHeader: order.displayName,
       message: 'Contacter <a href="mailto:' + order.email + '">' + order.email + '</a>',
     }).then(alert => alert.present());
   }
@@ -125,7 +125,7 @@ export class CustomersPage implements OnInit {
   doEdit(customer, idx) {
 
     const params = {
-      id: customer.customer.id,
+      id: customer._id,
     };
 
     this.$modal.create({

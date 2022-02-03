@@ -44,7 +44,7 @@
           <span class="rank">{{customer.orders}}</span>
         </ion-avatar>
         <ion-label>
-          <h2>{{customer.customer.displayName}} 
+          <h2>{{customer.displayName}} 
             <span [hidden]="!user.isPremium(customer)">
               <ion-icon color="danger" name="star"></ion-icon> 
               <ion-icon color="danger" name="star" class="small"></ion-icon>
@@ -59,7 +59,7 @@
         </ion-label>
         <div class="note">
           <div class="label">{{customer.avg|currency:'CHF'}} </div> 
-          {{customer.customer.created|date:'MMM y'}} 
+          {{customer.created|date:'MMM y'}} 
         </div>
       </ion-item>
       <ion-item-options side="start" >
