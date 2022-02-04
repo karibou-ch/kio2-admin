@@ -62,7 +62,6 @@ export class InvoicePage implements OnInit {
       this.orders = orders as Order[];
       this.isReady = true;
 
-      console.log('---',this.orders[0].getSubTotal());
     });
   }
 
