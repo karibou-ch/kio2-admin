@@ -99,7 +99,7 @@
     <ion-reorder-group [disabled]="!reorder" (ionItemReorder)="reorderItems($event)">
 
     <!-- DISPLAY ORDERS -->
-    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition)  ">
+    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition.bind(this))  ">
 
       <ion-item-options side="start">
         <ion-item-option class="shopper"  color="secondary">
@@ -148,7 +148,10 @@
           </span>
         </ion-avatar>
         <ion-label class="ion-text-wrap">
-          <h3 text-capitalize>{{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>
+          <h3 text-capitalize>
+            {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
+            &nbsp;<span [hidden]="order.customer.orders>5" class="customer-new">NEW!{{order.customer.orders}}</span>
+          </h3>
           <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
           <p class="note">{{ order.shipping.note }}</p>
           <div class="shopper-info" >

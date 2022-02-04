@@ -17,6 +17,18 @@ h2 {
     font-weight: bold;
 }
 
+//
+// customers
+.customer-new {
+  background: red;
+  color: white;
+  padding: 0px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;  
+}
+
+
 ion-datetime{
   font-size: 15px;
 }
@@ -160,17 +172,20 @@ ion-item {
       z-index: 1;
       left: 0px;
       background: red;
-      width: 11px;
-      height: 11px;
+      width: 16px;
+      height: 14px;
       color: white;
       text-align: center;
-      line-height: 13px;
+      line-height: 15px;
       border-radius: 1px;        
     }
 
     span.rank{
       &.selected{
-        background-color: var(--ion-color-danger);
+        background-color: var(--ion-color-danger)!important;
+      }
+      &.orphan{
+        background-color: #ccc;
       }
     
       position: absolute;
@@ -185,9 +200,6 @@ ion-item {
       border-radius: 50%;
       line-height: 40px;
       text-align: center;
-      &.orphan{
-        background: #ccc;
-      }
     }
   }
 }

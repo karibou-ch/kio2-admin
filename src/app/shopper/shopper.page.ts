@@ -178,8 +178,8 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.shippingComplement = {};
     this.orders.forEach(order => {
       if(order.shipping.parent) {
-        this.shippingComplement[order.shipping.parent] = this.shippingComplement[order.shipping.parent] || 0;
-        this.shippingComplement[order.shipping.parent]++;
+        const parent = this.orders.find(o => o.oid == order.shipping.parent);
+        this.shippingComplement[order.oid] = (parent)? parent.rank : 0;
       }
     });
 
@@ -188,6 +188,9 @@ export class ShopperPage implements OnInit, OnDestroy {
     if (this.hubs.length) {
       this.hubs.forEach(hub => hub.orders = 0);
       this.orders.forEach(order => {
+        if(order.shipping.parent){
+          return;
+        }
         this.hubs.find(hub =>  order.hub === hub.id).orders ++;
       });
 
@@ -290,7 +293,8 @@ export class ShopperPage implements OnInit, OnDestroy {
     // FIXME removed filter by hub
     // .filter(filterByHub.bind(this))                    
     if (!this.searchFilter) {
-      return this.orders.filter(filterByPlan.bind(this));
+      return this.orders.filter(order => !order.shipping.parent)
+                        .filter(filterByPlan.bind(this));
     }
     //
     // FIXME removed filter by hub
@@ -515,8 +519,22 @@ export class ShopperPage implements OnInit, OnDestroy {
     const delta = (+o1.shipping.position) - (+o2.shipping.position);
     if (delta === 0) {
       return o1.rank - o2.rank;
+      //return this.sortOrdersByRankAndComplement(o1,o2);
     }
     return delta;
+  }
+
+  //
+  // sort by (parent)->rank, 
+  sortOrdersByRankAndComplement(o1, o2) {
+    // get source rank
+    const rank1 = this.shippingComplement[o1.oid] || o1.rank;
+    const rank2 = this.shippingComplement[o2.oid] || o2.rank;
+    const sorted = (rank1 - rank2);
+    if(!sorted) {
+      return o1.shipping.name.localeCompare(o2.shipping.name);
+    }
+    return sorted;
   }
 
 
