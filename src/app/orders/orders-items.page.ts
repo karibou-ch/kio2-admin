@@ -73,7 +73,8 @@ D'avance merci pour votre retour.`
 
   }
 
-  ngOnInit() {
+
+  ngOnInit() {    
     //
     // load Hubs
     this.hubs = {undefined: { prefix: ''}};
@@ -144,21 +145,25 @@ D'avance merci pour votre retour.`
   computeDeltaPrice(order: Order) {
     //
     // case of Orders By Item
-    if (!order.getSubTotal) {
-      return;
-    }
-
-    let originAmount = 0;
-    const finalAmount: number = order.getSubTotal({ withoutCharge: true });
-    this.deltaPrice = 0;
-    order.items.forEach((item) => {
-      //
-      // item should not be failure (fulfillment)
-      if (item.fulfillment.status !== EnumFulfillments[EnumFulfillments.failure]) {
-        originAmount += (item.price * item.quantity);
+    try{
+      if (!order.getSubTotal) {
+        return;
       }
-    });
-    this.deltaPrice = parseFloat((finalAmount / originAmount - 1).toFixed(2));
+  
+      let originAmount = 0;
+      const finalAmount: number = order.getSubTotal({ withoutCharge: true });
+      this.deltaPrice = 0;
+      order.items.forEach((item) => {
+        //
+        // item should not be failure (fulfillment)
+        if (item.fulfillment.status !== EnumFulfillments[EnumFulfillments.failure]) {
+          originAmount += (item.price * item.quantity);
+        }
+      });
+      this.deltaPrice = parseFloat((finalAmount / originAmount - 1).toFixed(2));  
+    }catch(err) {
+      console.log('---- ERROR',err);
+    }
   }
 
   doCustomerContact(item, $event) {
@@ -322,9 +327,9 @@ D'avance merci pour votre retour.`
           order.items = order.items.filter(i => i.vendor === item.vendor);
         }
 
-        // FIXME this items filter should be on server for NON admin user
-        // For Admin we should ALWAYS constraint to the vendor
-        // vendor is set on collect page
+        // // FIXME this items filter should be on server for NON admin user
+        // // For Admin we should ALWAYS constraint to the vendor
+        // // vendor is set on collect page
         if (this.vendor) {
           order.items = order.items.filter(i => i.vendor === this.vendor);
         }
