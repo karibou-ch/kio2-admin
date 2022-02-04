@@ -33,7 +33,7 @@
     <ng-container *ngFor="let date of currentDates">
       <h2>{{date|date:format}} <span class="light">({{getOrdersCountByDate(date)}} cmds)</span></h2>      
       <p>
-        <span  class="link" (click)="doOpenOrders($event)">Voir les préparations</span>
+        <span  class="link" (click)="doOpenOrders($event, date)">Voir les préparations</span>
       </p>
       <ul>
         <li *ngFor="let item of getOrdersByDate(date)" [hidden]="(!displayOnlyFailure && item.status !== 'failure')">

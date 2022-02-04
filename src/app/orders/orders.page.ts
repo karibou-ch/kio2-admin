@@ -589,9 +589,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 export class OrdersPlanningPage extends OrdersCustomerPage {
   displayOnlyFailure: boolean;
 
-  doOpenOrders($event) {
-    const when = (this.$engine.currentShippingDate);
-    console.log('----',when)
-    this.$router.navigate(['/orders'], { queryParams: { when: (when.getTime()) }});
+  doOpenOrders($event, date) {
+    this.$router.navigate(['/orders'], { queryParams: { when: (date.getTime()) }});
   }
 }
