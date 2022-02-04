@@ -59,3 +59,13 @@ button.cancel-danger {
   border: 1px solid var(--ion-color-danger)!important;
 }
 
+.boost-zindex{
+  z-index: 100000!important;
+}
+
+
+.link{
+  color: var(--ion-color-primary);
+  border-bottom: 1px dotted var(--ion-color-primary);
+  cursor: pointer;  
+}

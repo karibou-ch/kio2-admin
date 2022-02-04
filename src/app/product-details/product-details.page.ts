@@ -1,11 +1,10 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef } from '@angular/core';
 import { Product, Config, Category, Shop, User, LoaderService, ProductService, ShopService } from 'kng2-core';
 import { LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
 import { UploadImagePage } from '../upload-image/upload-image.page';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest, fromEvent, of } from 'rxjs';
-import { debounceTime, filter, map, skip } from 'rxjs/operators';
+import { combineLatest, of } from 'rxjs';
 
 @Component({
   selector: 'app-product-details',
@@ -76,9 +75,13 @@ export class ProductDetailsPage implements OnInit {
   }
 
   ngOnDestroy() {
+    const routerOutlet = document.getElementsByTagName('ion-router-outlet');
+    routerOutlet.length && (routerOutlet[0].classList.remove('boost-zindex'));
   }
 
   ngOnInit() {
+    const routerOutlet = document.getElementsByTagName('ion-router-outlet');
+    routerOutlet.length && (routerOutlet[0].classList.add('boost-zindex'));
 
     const product$ = (this.create) ? of(this.product) : this.$product.get(this.sku);
     if( !this.shops.length) {
