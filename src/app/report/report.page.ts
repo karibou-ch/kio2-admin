@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Config, ReportOrders, ReportingService, User } from 'kng2-core';
+import { Config, ReportOrders, ReportingService, User, config } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
 import { ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-report',
@@ -30,9 +31,12 @@ export class ReportPage implements OnInit {
   pickerShippingDate: string;
   user: User;
 
+  isAdmin = false;
+
 
   constructor(
     private $engine: EngineService,
+    private $http: HttpClient,
     private $report: ReportingService,
     private $route: ActivatedRoute,
     private $router: Router,
@@ -55,9 +59,35 @@ export class ReportPage implements OnInit {
     // });
   }
 
+  get downloadLink(){
+    return config.API_SERVER+'/v1/orders/transfert/'+this.month+'/'+this.year;
+  }
+
   ngOnInit() {
     this.user = this.$engine.currentUser;
+    this.isAdmin = this.user.isAdmin();
     this.onInitReport();
+  }
+
+  doDownloadPaymentXML($event) {
+    this.$http.get(this.downloadLink,{ responseType: 'blob' })
+    .subscribe(blob => {
+      // It is necessary to create a new blob object with mime-type explicitly set
+      // otherwise only Chrome works like it should
+      //const newBlob = new Blob([blob], { type: "application/pdf" });
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      // the filename you want
+      a.download = 'k-payment-'+this.month+'-'+this.year+'.xml';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      alert('your file has downloaded!'); // or you know, something with better UX...
+    })
+    $event.stopPropagation();
   }
 
 

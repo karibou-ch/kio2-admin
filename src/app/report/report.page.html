@@ -46,6 +46,7 @@
       <li>Date du relevé: {{today|date:"d MMM y"}}</li>
       <li>Période comptable:  {{report.from|date:"d MMM y"}} au {{report.to|date:"d MMM y"}}</li>
       <li>CA total <b>{{report.amount-report.discount-report.ca|currency:'CHF'}}</b>, <b>{{report.orders.length}}</b> commandes, <b>{{totalErrors()}}</b> erreurs dont <b>{{totalRefunds()}}</b> remboursement</li>
+      <li><a class="hidden-print small" [hidden]="!isAdmin" [href]="downloadLink" (click)="doDownloadPaymentXML($event)">download pain.001.001.03.ch.02</a></li>
     </ul>
 
     <div  >
