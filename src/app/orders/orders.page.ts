@@ -64,14 +64,14 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
 
   constructor(
-    private $engine: EngineService,
-    private $modal: ModalController,
+    public $engine: EngineService,
+    public $modal: ModalController,
     public $toast: ToastController,
     public $loader: LoaderService,
-    private $loading: LoadingController,
-    private $popup: PopoverController,
-    private $route: ActivatedRoute,
-    private $router: Router,
+    public $loading: LoadingController,
+    public $popup: PopoverController,
+    public $route: ActivatedRoute,
+    public $router: Router,
     public $order: OrderService
   ) {
     this.orders = [];
@@ -588,4 +588,10 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 })
 export class OrdersPlanningPage extends OrdersCustomerPage {
   displayOnlyFailure: boolean;
+
+  doOpenOrders($event) {
+    const when = (this.$engine.currentShippingDate);
+    console.log('----',when)
+    this.$router.navigate(['/orders'], { queryParams: { when: (when.getTime()) }});
+  }
 }
