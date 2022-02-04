@@ -132,6 +132,10 @@ export class EngineService {
       params.padding = true;
     }
 
+    const today = new Date();
+    //
+    // FIXME some orders dates overlapp 
+    // when initial currentShippingDate.month() is not equal to today.month()
 
 
     this.monthOrders = new Map();
@@ -162,11 +166,14 @@ export class EngineService {
       // get the must recent value
       const times = Array.from(this.monthOrders.keys()).sort((a, b) => a - b);
 
-
       //
       // sort shipping dates
       this.shippingWeek = this.shippingWeek.sort((a: Date, b: Date) => a.getTime() - b.getTime());
 
+      // this.shippingWeek.forEach(date => {
+      //   console.log('----> shippingWeek',date,date.getTime());
+      // })
+      
       //
       // publish status
       this.status$.next({running: false});
@@ -175,6 +182,7 @@ export class EngineService {
       // select current Times
       const currentTime = this.currentShippingDate.getTime();
       let preferredWhen;
+
 
       if (queryWhen && this.monthOrders.get(queryWhen)) {
         preferredWhen = queryWhen;
