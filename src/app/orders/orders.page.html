@@ -3,7 +3,11 @@
     <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }} <ion-icon name="chevron-down-outline"></ion-icon> </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
+
+
     </ion-buttons>
+
+
     <ion-buttons slot="end">
       <ion-button (click)="picker.open()">
         <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
@@ -12,7 +16,15 @@
   </ion-toolbar>
   <ion-toolbar [hidden]="isReady&&!orders?.length" color="primary">
     <div class="metabar " >
-      <ion-label>Afficher les commandes par produits</ion-label>
+      <div class="planning" *ngIf="planning.length">
+        <ion-icon class="icon" name="bicycle"></ion-icon>
+        <button round color="light"  [class.selected]="currentPlanning===plan"
+                outline  (click)="doTogglePlanning(plan)"
+                *ngFor="let plan of planning  "><b>{{plan}}</b>
+        </button>
+      </div>    
+  
+      <ion-label>Grouper par produits</ion-label>
       <ion-toggle mode="md" (ionChange)="displayByItems=!displayByItems"></ion-toggle>      
     </div>
   </ion-toolbar>
@@ -110,7 +122,7 @@
         </span>
       </ion-avatar>
       <h3>
-        {{orders.length}} cmds / <b>{{orderTotal|number:'1.0-0'}} fr</b>
+        {{orderLength}} cmds / <b>{{orderTotal|number:'1.0-0'}} fr</b>
         <span [hidden]="orders.length<2">, AVG <b>{{orderAvg|number:'1.0-0'}} fr</b></span>
       </h3>
       <ion-note slot="end">

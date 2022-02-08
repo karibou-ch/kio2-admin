@@ -34,6 +34,9 @@ export class PlanningByItem {
 export class OrdersCustomerPage implements OnInit, OnDestroy {
 
 
+  planning = [];
+  currentPlanning;
+
   maxErrors:number;
   format: string;
   formatWeek: string;
@@ -42,6 +45,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   orders: Order[];
   cache: any;
   isReady: boolean;
+  orderLength: number;
   orderAvg: number;
   orderTotal: number;
   orderBaseAmount = 0;
@@ -80,6 +84,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.currentDates = [];
     this.openItems = {};
     this.shippingComplement = {};
+    this.orderLength = 0;
   }
 
   get ordersCount() {
@@ -151,6 +156,13 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     window.location.reload();
   }
 
+  doTogglePlanning(plan) {
+    if (this.currentPlanning === plan) {
+      return this.currentPlanning = undefined;
+    }
+    this.currentPlanning = plan;
+  }
+
   emailVendors() {
     // inform all shops: 'shops'||false
     // FIXME sent ISO date get wrong on server
@@ -211,15 +223,25 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
   //
+  // FIXME use localOrders
+  getOrdersLength() {
+
+  } 
+  //
   // get orders by HUB
   getOrders() {
+    let orders = [];
     if (!this.searchFilter) {
-      return this.orders;
+      orders = this.orders.filter(order => (!this.currentPlanning || this.currentPlanning === order.shipping.priority));
+    } else  {
+      orders = this.orders.filter(order => {
+        const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
+        const planning = (!this.currentPlanning || this.currentPlanning === order.shipping.priority);
+        return planning && filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
+      });  
     }
-    return this.orders.filter(order => {
-      const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
-      return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
-    });
+    this.orderLength = orders.length;
+    return orders;
   }
 
   getOrderRank(order: Order) {
@@ -517,6 +539,14 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
         const parent = this.orders.find(o => o.oid == order.shipping.parent);
         this.shippingComplement[order.oid] = (parent)? parent.rank : 0;
       }
+
+      if (order.shipping.priority &&
+        this.planning.indexOf(order.shipping.priority) == -1) {
+        this.planning.push(order.shipping.priority);
+        this.planning = this.planning.sort();
+      }
+
+
     });
 
     //
@@ -568,6 +598,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     }
     return delta;
   }
+
+
 
   updateBag(order, count) {
     this.$order.updateBagsCount(order, count).subscribe(ok => {

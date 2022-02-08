@@ -150,6 +150,7 @@ export class EngineService {
 
     orders$.subscribe(orders => {
 
+      // FIXME, compute planning from here
       orders.forEach((order: Order) => {
         order.shipping.when = new Date(order.shipping.when);
         order.shipping.when.setHours(0, 0, 0, 0);

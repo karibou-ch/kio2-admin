@@ -41,9 +41,33 @@ h1.info{
   justify-content: center;
   background-color: rgba(5, 105, 98, 0.8) !important;
   ion-label{
-    padding-left: 20px;
-    font-weight: 600;
+    padding-left: 10px;
+    font-weight: 500;
     color: white;      
+  }
+  .icon {
+    font-size: 19px;
+    transform: translateY(3px);    
+  }
+
+  .planning{
+    padding: 3px;
+    button{
+      &.selected{
+        background: white;
+        color: var(--ion-color-kio-primary);        
+      }
+      outline: 0;
+      border: 1px solid white;
+      border-radius: 5px;
+      margin: 0 3px;
+      margin-left: 6px;
+      padding-left: 8px;
+      padding-right: 8px;
+      background: var(--ion-color-kio-primary);
+      color: white;
+      font-size: 15px;      
+    }
   }
 }
 
