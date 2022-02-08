@@ -442,7 +442,7 @@ D'avance merci pour votre retour.`
   }
 
   doOpenProduct(item: OrderItem) {
-    this.$router.navigate(['/product', item.sku]);
+    this.$router.navigate(['/product', item.sku],{ queryParams: { option: 'zindex' } });
   }
 
   doToggleCheck(item: any) {

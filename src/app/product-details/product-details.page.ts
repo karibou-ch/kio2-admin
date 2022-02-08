@@ -80,8 +80,10 @@ export class ProductDetailsPage implements OnInit {
   }
 
   ngOnInit() {
-    const routerOutlet = document.getElementsByTagName('ion-router-outlet');
-    routerOutlet.length && (routerOutlet[0].classList.add('boost-zindex'));
+    if(this.$route.snapshot.queryParamMap.has('option')) {
+      const routerOutlet = document.getElementsByTagName('ion-router-outlet');
+      routerOutlet.length && (routerOutlet[0].classList.add('boost-zindex'));  
+    }
 
     const product$ = (this.create) ? of(this.product) : this.$product.get(this.sku);
     if( !this.shops.length) {
@@ -179,7 +181,7 @@ export class ProductDetailsPage implements OnInit {
   }
 
   getVendors() {
-    const options: any = {
+    const options: any = {      
     };
     this.$shops.query(options).subscribe(shops => {
       this.shops = shops.sort(this.sortByVendor);
@@ -344,14 +346,7 @@ export class ProductDetailsPage implements OnInit {
   }
 
   sortByVendor(p1: Shop, p2: Shop) {
-    if (p1.available.active) {
-      return -1;
-    }
-    if (p2.available.active) {
-      return 1;
-    }
-
-    return p1.urlpath.localeCompare(p2.urlpath);
+    return p1.name.localeCompare(p2.name);
   }
 
   uploadImage(product: Product) {
