@@ -56,7 +56,10 @@ export class CustomersPage implements OnInit {
                         user.orders.last6Month +
                         user.orders.after6Month;
           return {
-            id: user.id,
+            _id: user.id,
+            // latestErrors: user.orders.latestErrors,
+            // latestRating: user.orders.latestRating,    
+            displayName: user.displayName,
             last1Month: user.orders.last1Month,
             last3Month: user.orders.last3Month,
             last6Month: user.orders.last6Month,
@@ -64,8 +67,7 @@ export class CustomersPage implements OnInit {
             avg: user.orders.avg,
             orders: count,
             errors: user.orders.errors,
-            refunds: user.orders.refunds,
-            customer: user
+            refunds: user.orders.refunds
           };
         });
         this.customers = this.sliceCustomers();
