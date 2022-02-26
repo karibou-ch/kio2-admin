@@ -58,6 +58,14 @@ export class LoginPage implements OnInit {
     }
 
     this.platform.ready().then(() => {
+      //
+      // reset the auto formfill when token is valid
+      setTimeout(()=>{
+        if(defaultEmail && defaultPassword) {
+          this.model.email = defaultEmail;
+          this.model.password = defaultPassword;  
+        }
+      },2000);
       this.storageGet(this.KIO2_LOGIN_REMEMBER).then(remember => {
         if (!remember) {
           return;
