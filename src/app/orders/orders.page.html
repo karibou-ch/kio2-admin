@@ -191,6 +191,9 @@
           <h3 text-capitalize (click)="openByOrder(order)">
             <span class="red" [class.red]="order.customer.latestErrors">{{order.customer.latestErrors}}/{{maxErrors}}</span> - {{ order.oid }} - {{ order.shipping.name }}
             <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
+            <span class="bold" [hidden]="!order.customer.latestRating">
+              {{ order.customer.latestRating + 1 }} <ion-icon name="star"></ion-icon>
+            </span>
           </h3>
           <h2>
             <span class="label counter">{{i+1}}</span>
