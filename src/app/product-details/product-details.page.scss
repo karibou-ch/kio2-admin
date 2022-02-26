@@ -88,6 +88,8 @@ ion-list-header {
 }
 .button-stock{
   margin-left: 10px;
+  border:1px solid var(--ion-color-primary);
+  padding:1px;
 }
 
 :host(textarea) {
