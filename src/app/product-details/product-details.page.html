@@ -131,22 +131,25 @@
         <ion-input type="number" min="0" placeholder="0.00" ngDefaultControl [(ngModel)]="product.pricing.price"></ion-input>
       </ion-item>
       <ion-item class="">
-        <ion-label color="danger" position="stacked">Portion <b>(le signe ~ pour un poids variable)</b></ion-label>
+        <ion-label color="danger" position="stacked">La portion que le client peut commander</ion-label>
         <div class="info" *ngIf="product.pricing.part">
           <span [hidden]="product.hasFixedPortion()">
-            Avec {{product.pricing.part}} le client doit recevoir <br/>
+            Le client va recevoir une
            {{portionStr(product.pricing.part)}}</span>
         </div>                        
         <div class="info" [hidden]="product.pricing.part">
-          Avec <b>~200gr</b> le client recevra {{portionStr('~200gr')}}
+          Informez le client de la portion d'une unité. Elle peut être fixe (<b>1pce, 1botte, 200gr</b>, ...) ou variable 
+          pour un produit à la coupe, par exemple avec <b>~200gr</b> le client doit recevoir une {{portionStr('~200gr')}}
         </div> 
 
 
-        <ion-input class="input-special" type="text"  placeholder="portions ?" ngDefaultControl [(ngModel)]="product.pricing.part"></ion-input>    
+        <ion-input class="input-special" type="text"  placeholder="Portions ? Modifier un des exemples --v " ngDefaultControl [(ngModel)]="product.pricing.part"></ion-input>    
       </ion-item>
       <ion-item>
         <button class="button-stock small" slot="end" (click)="product.pricing.part='0.75L'">0.75L</button>
+        <button class="button-stock small" slot="end" (click)="product.pricing.part='1pce'">1tranche</button>
         <button class="button-stock small" slot="end" (click)="product.pricing.part='1pce'">1pce</button>
+        <button class="button-stock small" slot="end" (click)="product.pricing.part='1pce'">1botte</button>
         <button class="button-stock small" slot="end" (click)="product.pricing.part='200gr'">200gr</button>
         <button class="button-stock small" slot="end" (click)="product.pricing.part='~200gr'">~200gr</button>
       </ion-item>
@@ -173,6 +176,24 @@
           <ion-radio [value]="tva"></ion-radio>
         </ion-item>    
       </ion-radio-group>    
+    </ion-list>
+
+    <!-- RECIPES -->
+    <ion-list [hidden]="!detailled || !recipes.length">    
+      <ion-list-header color="primary">
+        Cuisine du monde
+      </ion-list-header>
+      <div class="sub-header">
+        Spécialité ou recette du pays. Pour permettre au client d'organiser facilement ses repas. 
+        <div [hidden]="product.recipes.length<3" class="info">
+          <b>Psst;</b> C'est très rare d'avoir un produit alimentaire qui fait penser à plusieurs pays!
+        </div>
+      </div>
+      
+      <ion-item *ngFor="let recipe of recipes">
+        <ion-label>{{recipe.label.fr}}</ion-label>
+        <ion-checkbox value="" [checked]="recipeChecked(recipe)" ngDefaultControl (ionChange)="recipeUpdate(recipe)"></ion-checkbox>
+      </ion-item>
     </ion-list>
 
     <!-- LABELS -->

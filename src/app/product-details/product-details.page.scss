@@ -67,17 +67,27 @@ ion-list-header {
   padding-bottom: 10px;  
 }
 
+.sub-header{
+  padding: 15px 15px 0;
+  color: #444;    
+}
+
+
 .input-special{
   min-height: 30px;  
 }
 
 .info{
-  font-size: 11px;
+  font-size: 13px;
   color: gray;  
-  line-height: 13px;
+  line-height: 18px;
   padding: 5px 0;
-  background: #eee;
-  margin-top: 5px;    
+  -background: #eee;
+  margin-top: 5px;  
+  width: 100%;  
+}
+.button-stock{
+  margin-left: 10px;
 }
 
 :host(textarea) {

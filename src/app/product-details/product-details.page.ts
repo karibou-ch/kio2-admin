@@ -19,6 +19,7 @@ export class ProductDetailsPage implements OnInit {
   config: Config;
   categories: Category[] = [];
   currentCategory: Category;
+  recipes: string[] = [];
   product: Product;
   shops: Shop[];
   TVAs: number[];
@@ -44,6 +45,8 @@ export class ProductDetailsPage implements OnInit {
 
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
+    this.recipes = this.$engine.currentConfig.shared.recipes ||[];
+
     this.shops = this.user.shops || [];
     this.sku = this.$route.snapshot.params.sku;
 
@@ -151,6 +154,7 @@ export class ProductDetailsPage implements OnInit {
         categories: product.categories,
         details: (details),
         pricing: product.pricing,
+        recipes: product.recipes,
         quantity: product.quantity,
         shelflife: product.shelflife,
         title: product.title,
@@ -341,12 +345,28 @@ export class ProductDetailsPage implements OnInit {
   }
 
 
+
   getCategories() {
     return this.categories;
   }
 
   sortByVendor(p1: Shop, p2: Shop) {
     return p1.name.localeCompare(p2.name);
+  }
+
+
+  recipeChecked(recipe){
+    const position = this.product.recipes.indexOf(recipe.slug);
+    return (position > -1);
+  }
+
+  recipeUpdate(recipe){
+    const position = this.product.recipes.indexOf(recipe.slug);
+    if(position == -1){
+      this.product.recipes.push(recipe.slug);
+    } else{
+      this.product.recipes.splice(position,1);
+    }
   }
 
   uploadImage(product: Product) {
