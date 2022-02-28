@@ -66,7 +66,7 @@ export class EngineService {
 
   initDate() {
     const today = new Date();
-    this.currentShippingDate = today.dayToDates([2, 3, 4, 5, 6])[0];
+    this.currentShippingDate = today.dayToDates([1, 2, 3, 4, 5, 6])[0];
   }
 
   get availableDates() {
