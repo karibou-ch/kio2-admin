@@ -55,6 +55,7 @@ ion-list{
   --background: var(--ion-color-kio-light)!important;
 }
 
+
 ion-item.customer{
   left: 0px;
   margin: 0px!important;
@@ -62,6 +63,17 @@ ion-item.customer{
   --background: #dbe6e5;
   margin: 8px 0!important;
   margin-bottom: 1px!important;
+  ion-label.verify {
+    border: 1px solid red;
+    border-radius: 4px;  
+  }
+
+  .label-error{
+    line-height: 22px;
+    color: red;
+    font-weight: 500;    
+  }
+  
   span.rank{
     background: #000;
     padding: 11px 2px;

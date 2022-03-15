@@ -15,19 +15,22 @@
   <h1 class="info" [hidden]="orders.length&&!item.customers">Pas de commandes  pour la boutique {{vendor}} </h1>
   <ion-list *ngFor="let order of orders">
     <!-- CUSTOMER HEADER -->
-    <ion-item class="customer" *ngIf="order.shipping">
+    <ion-item class="customer" *ngIf="order.shipping" >
       <span  class="rank">{{getOrderRank(order)}}</span>
-      <ion-label class="ion-text-wrap">
+      <ion-label class="ion-text-wrap" [class.verify]="order.customer.latestErrors">
         <h2>
-          {{order.customer.displayName}} &nbsp;<span [hidden]="order.customer.orders>5" class="customer-new">NEW!{{order.customer.orders}}</span>
+          {{order.customer.displayName}} <span [hidden]="order.customer.orders>5" class="customer-new">NEW!{{order.customer.orders}}</span>
         </h2>
         <p> 
           {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>            
+          <span [hidden]="!order.customer.latestErrors" class="label-error">
+            Double vérification!
+          </span>
         </p>  
       </ion-label>
       <ion-note slot="end" >
         {{order.getSubTotal({ withoutCharge:true })|currency:'CHF'}} <br/>
-        <span [class.red]="deltaPrice>0.15">{{deltaPrice|percent}}</span>
+        <span [class.red]="deltaPrice>0.15">{{deltaPrice|percent}}</span><br/>
       </ion-note>
       <div class="note" slot="end">
         <a [hidden]="!getPhoneNumber(order)"

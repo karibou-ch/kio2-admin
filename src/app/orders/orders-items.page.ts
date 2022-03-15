@@ -18,6 +18,7 @@ export class OrdersItemsPage implements OnInit {
   public hubs: any;
   public displayForCheck: boolean;
   public filterItem: string;
+  public maxErrors: number;
 
 
   @Input() vendor: string;
@@ -70,11 +71,15 @@ D'avance merci pour votre retour.`
     this.vendor = '';
 
     this.format = this.$engine.defaultFormat;
-
+    this.maxErrors = 1;
   }
 
 
   ngOnInit() {    
+    //
+    // error history
+    this.maxErrors = this.$engine.currentConfig.shared.issue.verification;
+
     //
     // load Hubs
     this.hubs = {undefined: { prefix: ''}};
