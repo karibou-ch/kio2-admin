@@ -18,7 +18,7 @@ export class OrdersItemsPage implements OnInit {
   public hubs: any;
   public displayForCheck: boolean;
   public filterItem: string;
-  public maxErrors: number;
+  public doubleCheck: boolean;
 
 
   @Input() vendor: string;
@@ -71,15 +71,11 @@ D'avance merci pour votre retour.`
     this.vendor = '';
 
     this.format = this.$engine.defaultFormat;
-    this.maxErrors = 1;
+    this.doubleCheck = false;
   }
 
 
   ngOnInit() {    
-    //
-    // error history
-    this.maxErrors = this.$engine.currentConfig.shared.issue.verification;
-
     //
     // load Hubs
     this.hubs = {undefined: { prefix: ''}};
@@ -91,6 +87,11 @@ D'avance merci pour votre retour.`
     if (this.orders.length == 1) {
       this.shipping = this.orders[0].shipping.when;
       this.computeDeltaPrice(this.orders[0]);
+      if(this.user.hasRole('logistic')){
+        this.doubleCheck = this.orders[0].customer.latestErrors>0;
+      }else{
+        this.doubleCheck = this.orders[0].customer.latestErrors == 0 && this.orders[0].getSubTotal()>120;
+      }
     }
 
     //
