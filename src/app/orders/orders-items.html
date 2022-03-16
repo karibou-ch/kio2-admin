@@ -46,8 +46,7 @@
         <ion-toggle mode="md" class="button-check" [hidden]="orders.length>1" [checked]="displayForCheck"></ion-toggle>      
 
         <span [hidden]="doubleCheck" >Vérification rapide des <b class="red">{{order.items.length}}</b> produits </span>
-        <span [hidden]="!doubleCheck" class="label-error">⚠️ double vérification pour ce client, merci! </span>
-
+        <span [hidden]="!doubleCheck" class="label-error">double vérification recommandée, merci 🙏 </span>
       </div>
 
       <div class="header-actions">
