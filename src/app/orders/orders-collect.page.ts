@@ -125,9 +125,10 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   private orderToVendor(order) {
     //
     // select visible HUB
-    if (this.currentHub && this.currentHub.id !== order.hub) {
-      return;
-    }
+    // FIXME: this is not a good solution, needs to update specs
+    // if (this.currentHub && this.currentHub.id !== order.hub) {
+    //   return;
+    // }
     order.items.forEach((item: OrderItem) => {
       //
       // init item for this vendor
@@ -140,6 +141,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         this.vendors[item.vendor].geo = vendor.geo;
         this.vendors[item.vendor].phone = (address.length > 1) ? address[1] : null;
         this.vendors[item.vendor].shipping = order.shipping;
+        this.vendors[item.vendor].hubs = [order.hub];
         this.vendors[item.vendor].items = [];
         this.vendors[item.vendor].ranks = [];
         this.vendors[item.vendor].collected = collected;
@@ -147,6 +149,13 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         this.vendors.list.push(item.vendor);
 
       }
+
+      // add hub to this vendor 
+      if(this.vendors[item.vendor].hubs.indexOf(order.hub) == -1){
+        this.vendors[item.vendor].hubs.push(order.hub);
+      }
+      
+
       // add item to this vendor
       this.vendors[item.vendor].items.push(item);
       //
@@ -243,10 +252,18 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   isFulfilled(vendor: string): boolean {
     return this.vendors[vendor].items.find(i => i.fulfillment.status !== EnumFulfillments[EnumFulfillments.fulfilled]);
   }
+
+
   //
   // check if current vendor is already collected
   isCollected(vendor: string): boolean {
     return this.vendors[vendor].collected;
+  }
+
+  isActiveHub(vendor: string): boolean {    
+    const hubId = (this.currentHub && this.currentHub.id);
+    const isActiveHub = (!this.currentHub || this.vendors[vendor].hubs.indexOf(hubId) >-1);
+    return isActiveHub;
   }
 
 
@@ -389,7 +406,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     const when = this.vendors[vendor].shipping.when;
     this.currentHub = this.hubs.find(hub => hub.selected) || {};
     when.setHours(22, 0, 0, 0);
-    this.$order.updateCollect( vendor, true, when, this.currentHub.slug)
+    this.$order.updateCollect( vendor, true, when)
       .subscribe(orders => {
         if(orders.length) {
           this.doToast('Collecte enregistrée');

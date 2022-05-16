@@ -324,7 +324,6 @@ D'avance merci pour votre retour.`
       .subscribe(ok => {
         const len = 18;
         const title = item.title.substring(0, len) + (item.title.length > len ? '...' : '');
-        this.doToast(title + ' dans sac ' + order.rank);
         Object.assign(order, ok);
         //
         // when not admin, we should remove other vendor items
@@ -341,6 +340,7 @@ D'avance merci pour votre retour.`
         }
 
         this.computeDeltaPrice(order);
+        this.doToast(title + ' dans sac ' + order.rank);
       }, error => this.doToast(error.error, error));
   }
 
@@ -491,6 +491,7 @@ D'avance merci pour votre retour.`
   }
 
   doKeypress(kcode, order, item) {
+    console.log('---- keycode',kcode)
     //
     // case of enter
     if (kcode === 13) {

@@ -183,7 +183,7 @@ ion-item{
     letter-spacing: -.8px;
     font-size: 16px;
     position: absolute;
-    width: 90%;
+    width: 75%;
     top:3px;
     color: var(--ion-color-kio-primary);
     white-space: nowrap;
@@ -230,7 +230,7 @@ ion-item{
     }
     -webkit-appearance: none;
     position: absolute;
-    top:38px;
+    top:20px;
     right: 80px;
     width: 90px;
     .input-price{
@@ -238,21 +238,22 @@ ion-item{
       border:0px;
       border: 1px solid #eee;
       border-radius: 1px;
-      max-width: 70px;
+      max-width: 60px;
       padding: 4px 0;
       float: right;
       font-weight:500;
       margin-top: -7px;
-      padding-right: 13px;
+      padding-right: 15px;
       text-align: right;        
       margin-right: 5px;
       font-weight: 600;
+      height: 50px;
     }
     span.suffix{
       color:#ccc;
       margin-left:-10px;
       float: right;
-      transform:translate(-69%, -2px);
+      transform:translate(-69%, 7px);
     }
     
   }
@@ -260,7 +261,7 @@ ion-item{
   .actions{
     position: absolute;
     right: 0px;
-    top: 34px;      
+    top: 12px;      
   }
 
   .header-actions{
@@ -291,6 +292,10 @@ ion-item{
     border: 1px solid #0d716c;      
     ion-icon {
       font-size: 22px;
+    }
+    &.validate,
+    &.avoid {
+      height: 52px!important;
     }
   }
   button.phone{
