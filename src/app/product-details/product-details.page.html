@@ -124,36 +124,42 @@
       <ion-item class="header">
         <h3>Prix</h3>
       </ion-item>       
+      <ion-item class="">
+        <ion-label color="danger" position="stacked">La portion que le client peut commander</ion-label>
+        <div class="info" *ngIf="product.pricing.part">
+          <span class="block" [hidden]="product.hasFixedPortion()">
+            Le client va recevoir une portion entre  
+            {{(portion.part - portion.offset)}}  {{portion.unit}}  et {{(portion.part + portion.offset)}}  {{portion.unit}}</span>
+        </div>                        
+        <div class="info " [hidden]="product.getPortionParts().offset">
+          <span class="block">
+            Informez le client de la portion d'une unité. Elle peut être fixe (<b>1pce, 1botte, 200gr</b>, ...) ou variable 
+            pour un produit à la coupe, par exemple avec <b>~200gr</b> le client sait qu'il va recevoir une portion proche de 200gr.  
+          </span>
+        </div> 
+        <ion-input class="input-special" type="text"  placeholder="Portions ? Modifier un des exemples --v " 
+                  (input)="doUpdatePart($event.target.value)" [value]="product.pricing.part"></ion-input>    
+      </ion-item>
+      <ion-item>
+        <button class="button-stock small" slot="end" (click)="doUpdatePart('0.75L')">0.75L</button>
+        <button class="button-stock small" slot="end" (click)="doUpdatePart('1pce')">1pce</button>
+        <button class="button-stock small" slot="end" (click)="doUpdatePart('1tranche')">1tranche</button>
+        <button class="button-stock small" slot="end" (click)="doUpdatePart('1botte')">1botte</button>
+        <button class="button-stock small" slot="end" (click)="doUpdatePart('200gr')">200gr</button>
+        <button class="button-stock small" slot="end" (click)="doUpdatePart('~200gr')">~200gr</button>
+      </ion-item>
+
+      <ion-item class="helper" [hidden]="!product.getPortionParts().isWeight">
+        <ion-label position="stacked">Le prix au Kg en pour {{product.pricing.part}}</ion-label>
+        <ion-input class="input-special" type="text"  placeholder="Prix au Kg"  (input)="doUpdatePriceKG($event)"></ion-input>    
+      </ion-item>
+
       <ion-item class="large">
         <ion-label color="primary" position="stacked">
           Prix (TVA inc.)
         </ion-label>
         <ion-input type="number" min="0" placeholder="0.00" ngDefaultControl [(ngModel)]="product.pricing.price"></ion-input>
       </ion-item>
-      <ion-item class="">
-        <ion-label color="danger" position="stacked">La portion que le client peut commander</ion-label>
-        <div class="info" *ngIf="product.pricing.part">
-          <span [hidden]="product.hasFixedPortion()">
-            Le client va recevoir une
-           {{portionStr(product.pricing.part)}}</span>
-        </div>                        
-        <div class="info" [hidden]="product.pricing.part">
-          Informez le client de la portion d'une unité. Elle peut être fixe (<b>1pce, 1botte, 200gr</b>, ...) ou variable 
-          pour un produit à la coupe, par exemple avec <b>~200gr</b> le client doit recevoir une {{portionStr('~200gr')}}
-        </div> 
-
-
-        <ion-input class="input-special" type="text"  placeholder="Portions ? Modifier un des exemples --v " ngDefaultControl [(ngModel)]="product.pricing.part"></ion-input>    
-      </ion-item>
-      <ion-item>
-        <button class="button-stock small" slot="end" (click)="product.pricing.part='0.75L'">0.75L</button>
-        <button class="button-stock small" slot="end" (click)="product.pricing.part='1pce'">1pce</button>
-        <button class="button-stock small" slot="end" (click)="product.pricing.part='1tranche'">1tranche</button>
-        <button class="button-stock small" slot="end" (click)="product.pricing.part='1botte'">1botte</button>
-        <button class="button-stock small" slot="end" (click)="product.pricing.part='200gr'">200gr</button>
-        <button class="button-stock small" slot="end" (click)="product.pricing.part='~200gr'">~200gr</button>
-      </ion-item>
-
       <ion-item class="promotion" size="large">
         <ion-label color="danger" position="stacked">
           Prix pendant promotion <br>Note: activer la promotion à droite
@@ -293,6 +299,15 @@
           <!-- <ion-button expand="block" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button> -->
       </ion-item>      
     </ion-list>
+    <ion-list>
+      <ion-item>            
+          <ion-button [hidden]="create" expand="block" fill="outline"  color="danger" (click)="doRemove(product)">
+            SUPPRIMER
+          </ion-button>            
+          <!-- <ion-button expand="block" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button> -->
+      </ion-item>      
+    </ion-list>
+
   <!--
   </form> -->
 

@@ -77,6 +77,11 @@ ion-list-header {
   min-height: 30px;  
 }
 
+.helper{
+  --background: #eee;
+  font-size: 18px;  
+}
+
 .info{
   font-size: 13px;
   color: gray;  
@@ -85,9 +90,15 @@ ion-list-header {
   -background: #eee;
   margin-top: 5px;  
   width: 100%;  
+  span.block{
+    padding: 10px;
+    display: inline-block;
+    min-height: 59px;    
+    background-color: #eee;
+  }
 }
 .button-stock{
-  margin-left: 10px;
+  margin-left: 5px;
   border:1px solid var(--ion-color-primary);
   padding:1px;
 }

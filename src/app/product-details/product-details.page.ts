@@ -1,5 +1,5 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
-import { Product, Config, Category, Shop, User, LoaderService, ProductService, ShopService } from 'kng2-core';
+import { Component, OnInit, ElementRef, KeyValueDiffers, KeyValueDiffer } from '@angular/core';
+import { Product, ProductPortion, Utils, Config, Category, Shop, User, LoaderService, ProductService, ShopService } from 'kng2-core';
 import { LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
 import { UploadImagePage } from '../upload-image/upload-image.page';
@@ -21,13 +21,21 @@ export class ProductDetailsPage implements OnInit {
   currentCategory: Category;
   recipes: string[] = [];
   product: Product;
+  portion: ProductPortion;
   shops: Shop[];
   TVAs: number[];
   title: string;
   user: User;
   sku: string;
 
+  //
+  // TODO make this compliant with the server.
+  productDiff:KeyValueDiffer<string, any>;
+  saveBeforeQuit = false;
+
+
   constructor(
+    private $differs: KeyValueDiffers,
     private $elem: ElementRef,
     private $engine: EngineService,
     private $loading: LoadingController,
@@ -55,6 +63,7 @@ export class ProductDetailsPage implements OnInit {
       // create a copy ?
       this.create = true;
       this.product = new Product();
+      this.portion = this.product.getPortionParts();
     }
 
 
@@ -76,6 +85,14 @@ export class ProductDetailsPage implements OnInit {
   //  });
 
   }
+
+
+
+  //
+  // ngOnChanges
+  // https://angular.io/guide/lifecycle-hooks#using-change-detection-hooks
+  // ngDoCheck() {
+  // }  
 
   ngOnDestroy() {
     const routerOutlet = document.getElementsByTagName('ion-router-outlet');
@@ -109,26 +126,39 @@ export class ProductDetailsPage implements OnInit {
 
       this.TVAs = this.config.shared.TVA;
 
-      this.product = product;
-      this.product.categories = product.categories || {};
-      this.product.categories = product.categories._id || this.product.categories;
-      this.product.vendor = product.vendor._id || this.product.vendor;
-      this.product.belong = product.belong || {name: null, weight: 0};
-      this.product.details = product.details || {};
-      this.title = product.title;
-
-      //
-      // default vendor
-      if ((this.shops.length > 0 && this.shops.length < 3) &&
-         (typeof this.product.vendor !== 'string')) {
-        this.product.vendor = this.shops[0]._id;
-      }
-
+      this.doInitProduct(product);
       //
       // default categories
       this.currentCategory = this.categories.find(cat => (cat._id + '') == this.product.categories);
+
     });
 
+  }
+
+  doInitProduct(product){
+    this.product = product;
+    this.product.sku = product.sku;
+    this.product.categories = product.categories || {};
+    this.product.categories = product.categories._id || this.product.categories;
+    this.product.vendor = product.vendor._id || this.product.vendor;
+    this.product.belong = product.belong || {name: null, weight: 0};
+    this.product.details = product.details || {};
+    this.title = product.title;
+
+    this.portion = product.getPortionParts();
+
+    //
+    // default vendor
+    if ((this.shops.length > 0 && this.shops.length < 3) &&
+       (typeof this.product.vendor !== 'string')) {
+      this.product.vendor = this.shops[0]._id;
+    }
+
+      //
+      // default product differ!
+      const dotNotation = this.$product.dotNotation(this.product);
+      this.productDiff = this.$differs.find(dotNotation).create();
+      this.productDiff.diff(dotNotation);
   }
 
   doCreateVariant(product: Product) {
@@ -169,6 +199,20 @@ export class ProductDetailsPage implements OnInit {
 
   }
 
+  doUpdatePart(part) {
+    this.product.pricing.part = part;
+    this.portion = this.product.getPortionParts();
+  }
+
+  doUpdatePriceKG($event) {
+    const price = parseFloat($event.target.value);
+    if(isNaN(price)) {
+      return;
+    }
+    this.product.pricing.price = Utils.roundAmount(price/1000 * this.portion.part);
+    this.portion = this.product.getPortionParts();
+  }
+
   categoryChange($event) {
     // this.product.categories = $event.detail.value;
     if(!$event.detail.value) {
@@ -178,7 +222,6 @@ export class ProductDetailsPage implements OnInit {
     this.currentCategory = this.categories.find(cat => (cat._id + '') == id);
     this.product.categories = this.currentCategory._id;
   }
-
 
   isDisabled() {
     return !this.product || !!this.product.attributes.available;
@@ -213,6 +256,29 @@ export class ProductDetailsPage implements OnInit {
     return this.product.vendor && this.product.categories;
   }
 
+  isProductModified() {
+    let changed = false;
+    if(!this.productDiff ) {
+      return false;
+    }
+    const changes = this.productDiff.diff(this.$product.dotNotation(this.product));
+    if (changes) {      
+      changes.forEachAddedItem((record) => {
+        const previous = record.previousValue && record.previousValue.valueOf();
+        console.log(record.key,'added',previous,'=>',record.currentValue.valueOf());        
+        changed = true;
+      });      
+
+      changes.forEachChangedItem((record) => {
+        const previous = record.previousValue && record.previousValue.valueOf();
+        console.log(record.key,'update',previous,'=>',record.currentValue.valueOf());        
+        changed = true;
+      });      
+    }
+    return changed;
+  }
+
+
   isProductReadyTosave(product: Product, shopowner: Shop): number {
     if (!shopowner || !shopowner.urlpath) {
       //
@@ -244,30 +310,21 @@ export class ProductDetailsPage implements OnInit {
     return 0;
   }
 
-  roundN(val, N?) {
-    if (val <= 5) {
-      return val.toFixed(1);
-    }
-    if (val <= 50) {
-      return Math.round(val);
-    }
-    N = N || 5;
-    return (Math.round(val / N) * N);
-  }
 
-  portionStr(part, def?) {
-    const delta = 0.15;
-    if (!def) {def = ''; }
-    if (!part) { return ''; }
-    let m = part.match(/~([0-9.]+) ?(.+)/);
-    if (!m && def) {m = def.match(/~([0-9.]+) ?(.+)/); }
-    if (!m || m.length < 2) {return ''; }
-    const w = parseFloat(m[1]), unit = (m[2]).toLowerCase();
-    return 'portion entre ' + this.roundN(w - w * delta) + unit + ' et ' + this.roundN(w + w * delta) + '' + unit;
-  }
+  async doBack() {
+    try{
+      //
+      // automatique saving 
+      if(this.isProductModified()) {
+        if (confirm('Voulez-vous enregistrer avant de quitter?')) {
+          await this.doSave(this.product);
+        }
+      }
+      window.history.back();
+    }catch(err) {
+      console.log('--- ERR doBack',err)
 
-  doBack() {
-    window.history.back();
+    }
   }
 
   async doSave(product: Product, silent?: boolean) {
@@ -303,19 +360,25 @@ export class ProductDetailsPage implements OnInit {
 
 
     // this.product.hasFixedPortion();
-    const product$ = (this.create) ?
-      this.$product.create(this.product, shopowner.urlpath) : this.$product.save(this.product);
+    const promise = (this.create) ?
+      this.$product.create(this.product, shopowner.urlpath).toPromise() : this.$product.save(this.product).toPromise();
 
-    product$.subscribe(
+    promise.then(
       (product) => {
         this.create = false;
-        this.product.sku = product.sku;
-        // this.product.categories = product.categories._id || product.categories;
-        this.product.vendor = product.vendor._id || product.vendor;
 
+        this.doInitProduct(product);        
         //
         // cached
         this.$engine.setCurrentProduct(this.product);
+
+        //
+        // update diff engine
+        setTimeout(()=> {
+          const dotNotation = this.$product.dotNotation(this.product);
+          this.productDiff = this.$differs.find(dotNotation).create();
+          this.productDiff.diff(dotNotation);
+        },200);
 
         if (!silent) {
           // this.$loading.dismiss();
@@ -325,23 +388,31 @@ export class ProductDetailsPage implements OnInit {
             color: 'dark'
           }).then(alert => alert.present());
         }
-      },
-      status => {
+      });
+      promise.catch(status => {
         if (!silent) {
           // this.$loading.dismiss();
         }
-        this.$toast.create({
+        console.log('----- ERREUR',status.error);
+        return this.$toast.create({
           message: status.error,
           duration: 5000,
           position: 'middle',
           color: 'danger'
         }).then(alert => alert.present());
-      }
+      },
     );
+
+    return promise;
   }
 
-  doCreate() {
+  doRemove() {
+    const password = prompt("Confirmer la suppression avec votre mot de passe");
 
+    this.$product.remove(this.product.sku,password).subscribe(()=>{
+      console.log('--- DBG delete',this.product.sku)
+      this.$router.navigateByUrl('/products');
+    })
   }
 
 
