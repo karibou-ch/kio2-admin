@@ -45,6 +45,10 @@ export class HomePage {
     return (shop.status === true) && !shop.available.active;
   }
 
+  openAnalytics(){
+    this.$router.navigate(['/analytics']);
+  }
+
   openShopper() {
     this.$router.navigate(['/shopper']);
   }

@@ -1,0 +1,53 @@
+.analytics{
+  padding: 10px;
+}
+.funnel{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  height: 150px;
+  font-family: monospace;
+  .action{
+    background: #415cc3;
+    color: white;
+    flex: 1;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    &.landing{
+      background-color:#415cc366;
+    }
+    &.home{
+      background-color:#415cc3aa;
+    }
+    &.cart{
+      background-color:#415cc3cc;
+    }
+    &.order{
+      background-color:#415cc3ee;
+    }
+
+
+    .amount{
+      margin-top: auto;
+      margin-bottom: 0px;
+      text-align: center;
+      font-size: 70%;    
+      &.home{
+        color: greenyellow;
+      }  
+    }
+    .value{
+      margin-top: 20%;
+      text-align: center;
+    }
+
+    .label{
+      font-size: 70%;      
+      margin-top: auto;
+      margin-bottom: 0px;
+      text-align: center;
+    }
+  }
+}

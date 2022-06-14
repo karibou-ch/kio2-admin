@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Analytics</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  ></ion-back-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="end">
+      <ion-button (click)="picker.open()">
+        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+      </ion-button>      
+    </ion-buttons> -->
+  </ion-toolbar>
+  <ion-toolbar >
+    <ion-title>{{month}}</ion-title>
+
+    <ion-chip slot="start" (click)="onBackMonth()" fill="outline" color="primary" >
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <ion-label class="text-capitalize">back</ion-label>
+    </ion-chip>
+    <!-- <span class="text-capitalize">&nbsp; {{month()}}</span> -->
+    <ion-chip slot="end" (click)="onForwardMonth()" fill="outline" color="primary">
+      <ion-icon name="arrow-forward-outline"></ion-icon>
+      <ion-label class="text-capitalize">forward</ion-label>
+    </ion-chip>
+  </ion-toolbar>
+
+</ion-header>
+<ion-content>
+
+  <div class="analytics">
+    <div *ngFor="let hub of hubs;let i = index" class="hub">
+      <h4 class="text-capitalize">{{hub}}</h4>
+      <div class="funnel">
+        <div *ngFor="let action of actions;let i = index" class="action" [ngClass]="action">
+          <div class="value">{{getActionHit(hub,action)}}</div>
+          <div class="amount home" [hidden]="action!='home'">
+            {{getActionHit(hub,action) * 145|currency:'CHF' }}
+          </div>
+
+          <div class="amount" [hidden]="!getActionAmount(hub,action)">
+            {{getActionAmount(hub,action)|currency:'CHF'}}
+          </div>
+          <div class="label">{{action}}</div>
+        </div>  
+      </div>
+      <ul class="sources">
+        <li *ngFor="let source of getSources(hub);let i = index" >{{source}}</li>
+      </ul>
+    </div>
+
+  </div>
+  
+
+</ion-content>

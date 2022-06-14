@@ -71,6 +71,11 @@
         <div>Qualité</div>
       </ion-col>
 
+      <ion-col [hidden]="!isAdmin" (click)="openAnalytics()">
+        <ion-icon name="analytics-outline" color="grey-icon"></ion-icon>
+        <div>Statistique</div>
+      </ion-col>
+
       <ion-col [hidden]="!isAdmin" (click)="openInvoices()">
         <ion-icon name="home-outline" color="grey-icon"></ion-icon>
         <div>Factures</div>

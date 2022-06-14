@@ -24,6 +24,11 @@ const routes: Routes = [
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
   },
   {
+    path: 'analytics',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./analytics/analytics.module').then( m => m.AnalyticsPageModule)
+  },
+  {
     path: 'profile',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./profil/profil.module').then( m => m.ProfilPageModule)
@@ -78,7 +83,11 @@ const routes: Routes = [
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./vendor-details/vendor-details.module').then( m => m.VendorDetailsPageModule)
   },
-  { path: '**', redirectTo: '/home', pathMatch: 'full' }
+  { path: '**', redirectTo: '/home', pathMatch: 'full' },
+  {
+    path: 'analytics',
+    loadChildren: () => import('./analytics/analytics.module').then( m => m.AnalyticsPageModule)
+  }
 ];
 
 @NgModule({
