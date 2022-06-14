@@ -338,35 +338,46 @@ export class ShopperPage implements OnInit, OnDestroy {
   //
   // manual reorder of items
   reorderItems(index) {
-    const orders = this.orders.filter(order => !this.currentPlanning || order.shipping.priority === this.currentPlanning);
-    // console.log('--- index f,t', index.detail.from, index.detail.to);
-    const order = orders[index.detail.from];
-    const priority = order.shipping.priority;
-
     //
-    // depending the direction, we should sum or substract the DELTA
-    const direction = (index.detail.from < index.detail.to) ? 1 : -1;
+    // list orders for this planning
+    const orders = this.getOrders();
     //
-    // get priority value from  previous order (order[index - 1])
-    const pFrom = (index.detail.to > 1) ?
-          orders[index.detail.to - 1].shipping.position : orders[index.detail.from].shipping.position;
+    // depending the direction, we should compare the position 
+    const direction = (index.detail.from > index.detail.to) ? -1 : 1;
+    const to = orders[index.detail.to];
+    const from = orders[index.detail.from];
+    let priority = to.shipping.priority;
+    let position;
 
-    const pTo = orders[index.detail.to].shipping.position;
+    // orders.forEach(order=>console.log('--- sort',order.rank,order.shipping.position))
+    // console.log('----DBG from',index.detail.from,'to',index.detail.to,'direction',direction,'length',orders.length);
+    // console.log('----DBG',to.rank,to.shipping.priority,to.shipping.position);
 
-    //
-    // if position are equal, we should add one unit to compute a DELTA
-    const inc = (pTo === pFrom) ? 1 : 0;
+    // place the order before the first one
+    if((index.detail.to + direction) < 0) {
+      position=(orders[0].shipping.position)-2;
+    }
+    // place the order after the last one
+    else if((index.detail.to + direction) >= orders.length) {
+      position=orders[orders.length-1].shipping.position+2;
+    }else {
+      // get the position of the previous//next order AND add//substract 1
+      position=orders[index.detail.to+direction].shipping.position - direction;
+    }
+
+    // console.log('----DBG',from.rank,from.shipping.priority,from.shipping.position);
 
     //
     // final position is an Epsylon added or substracted on the destination
-    const pFinal = pTo + (Math.abs(pTo - pFrom) + inc) / 2 * direction;
+    const pFinal = (Math.abs(to.shipping.position + position)) / 2 ;
+    // console.log('----DBG ----->',to.shipping.position,position,'new',pFinal,'direction',direction)
 
-    order.shipping.position = pFinal;
+    from.shipping.position = pFinal;
 
 
-    this.orders = this.orders.sort(this.sortOrdersByPosition);
+    // console.log('----DBG ',from.rank,priority,position)
 
-    this.$order.updateShippingPriority(order, priority, order.shipping.position)
+    this.$order.updateShippingPriority(from, priority, position)
       .subscribe(ok => {
         // UX is not nice
         // index.detail.complete();
