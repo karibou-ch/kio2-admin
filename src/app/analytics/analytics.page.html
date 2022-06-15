@@ -28,8 +28,11 @@
 <ion-content>
 
   <div class="analytics">
+    <p class="time">Dernière activité enregistrée {{lastAction|date:'d MMM HH:mm'}}</p>
+
     <div *ngFor="let hub of hubs;let i = index" class="hub">
       <h4 class="text-capitalize">{{hub}}</h4>
+
       <div class="funnel">
         <div *ngFor="let action of actions;let i = index" class="action" [ngClass]="action">
           <div class="value">{{getActionHit(hub,action)}}</div>
