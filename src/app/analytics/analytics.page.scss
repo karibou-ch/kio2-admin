@@ -1,7 +1,7 @@
 .analytics{
   padding: 10px;
   .time{
-    
+
   }
 }
 .funnel{
@@ -42,12 +42,16 @@
       }  
     }
     .value{
-      margin-top: 20%;
+      font-size: 70%;    
+      margin-top: 2%;
       text-align: center;
+    }
+    .uid{
+      color: lightgreen;
     }
 
     .label{
-      font-size: 70%;      
+      font-size: 80%;      
       margin-top: auto;
       margin-bottom: 0px;
       text-align: center;

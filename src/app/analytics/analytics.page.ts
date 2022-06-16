@@ -47,6 +47,7 @@ export class AnalyticsPage implements OnInit {
 
 
       console.log('----DBG',metrics);
+      console.log('----DBG','artamis',this.getSources('artamis'));
       console.log('----DBG','artamis',this.getDays('artamis'));
       console.log('----DBG','artamis','landing',this.getActionHit('artamis','landing'));
       console.log('----DBG','artamis','home',this.getActionHit('artamis','home'));
@@ -54,6 +55,7 @@ export class AnalyticsPage implements OnInit {
   }
 
   resetCache() {
+    this.hubs.forEach(hub => this.cache[hub]={});
     this.actions.forEach(action => {
       this.hubs.forEach(hub => this.cache[hub+action]={});
     })
@@ -107,14 +109,33 @@ export class AnalyticsPage implements OnInit {
     return this.cache[hub+action].amount;
   }
 
+  getActionUID(hub,action){
+    if(this.cache[hub+action].uid){
+      return this.cache[hub+action].uid;
+    }
+    let uid = [];
+    const days = this.getDays(hub);
+    days.forEach(day => {
+      uid = (this.metrics[hub][day][action]&&this.metrics[hub][day][action].uid||[]).concat(uid);
+    });
+    return this.cache[hub+action].uid = uid;
+  }
+
 
   getSources(hub){
+    if(this.cache[hub].sources){
+      return this.cache[hub].sources;
+    }
+    let sources = [];
     const days = this.getDays(hub);
-    const sources =days.reduce((sources,day) => {
+    days.forEach(day => {
       const actions = Object.keys(this.metrics[hub][day]);
-      const values = actions.map(action => this.metrics[hub][day][action]&&this.metrics[hub][day][action].source).filter(source => source);
-      return sources.concat(values);
-    },[]);
-    return sources;
+      actions.forEach(action => {
+        sources = (this.metrics[hub][day][action]&&this.metrics[hub][day][action].source||[]).concat(sources);
+      });
+    });
+    return this.cache[hub].sources = sources.filter(source => source && source!='');
   }
+
+
 }

@@ -36,6 +36,7 @@
       <div class="funnel">
         <div *ngFor="let action of actions;let i = index" class="action" [ngClass]="action">
           <div class="value">{{getActionHit(hub,action)}}</div>
+          <div class="value uid">{{getActionUID(hub,action).length}}</div>
           <div class="amount home" [hidden]="action!='home'">
             {{getActionHit(hub,action) * 145|currency:'CHF' }}
           </div>
@@ -46,6 +47,7 @@
           <div class="label">{{action}}</div>
         </div>  
       </div>
+      <h4 class="text-capitalize">sources</h4>
       <ul class="sources">
         <li *ngFor="let source of getSources(hub);let i = index" >{{source}}</li>
       </ul>
