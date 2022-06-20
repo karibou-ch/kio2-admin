@@ -323,8 +323,10 @@ D'avance merci pour votre retour.`
     this.$order.updateItem(order, [copy], EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
-        const title = item.title.substring(0, len) + (item.title.length > len ? '...' : '');
-        Object.assign(order, ok);
+        const indexOf = order.items.findIndex(i=> item.sku == item.sku);
+        if(order.items[indexOf].sku == ok.items[indexOf].sku){
+          Object.assign(order.items[indexOf],ok.items[indexOf]);
+        }
         //
         // when not admin, we should remove other vendor items
         // FIXME this items filter should be on server for NON admin user
@@ -338,9 +340,10 @@ D'avance merci pour votre retour.`
         if (this.vendor) {
           order.items = order.items.filter(i => i.vendor === this.vendor);
         }
-
         this.computeDeltaPrice(order);
+        const title = item.title.substring(0, len) + (item.title.length > len ? '...' : '');
         this.doToast(title + ' dans sac ' + order.rank);
+
       }, error => this.doToast(error.error, error));
   }
 
@@ -429,7 +432,11 @@ D'avance merci pour votre retour.`
     this.$order.updateItem(order, [item], EnumFulfillments.failure)
       .subscribe(ok => {
         this.doToast('Annulation enregistrée');
-        Object.assign(order, ok);
+        const indexOf = order.items.findIndex(i=> item.sku == item.sku);
+        if(order.items[indexOf].sku == ok.items[indexOf].sku){
+          Object.assign(order.items[indexOf],ok.items[indexOf]);
+        }
+
         //
         // when not admin, we should remove other vendor items
         // FIXME this items filter should be on server for NON admin user
