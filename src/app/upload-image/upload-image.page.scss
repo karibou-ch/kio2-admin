@@ -13,13 +13,10 @@
 img {
   width: 100%;
   min-height: 200px;
+  max-width: 512px;
   height: auto;
   margin-left: auto;
   margin-right: auto;
   background-color: #eee;
   max-height: calc( 100vh - 100px );
-
-  -background-repeat: no-repeat;
-  -background-size: contain;
-  -background-image: url('/assets/img/placeholder.png');  
 }

@@ -32,7 +32,7 @@ export class HomePage {
 
 
     this.isAdmin = this.user.isAdmin();
-    this.isAdminOrVendor = (!!this.user.shops.length) || this.user.isAdmin();
+    this.isAdminOrVendor = (!!this.user.shops.length) || this.user.isAdmin() || this.user.hasRole('operator');
     this.isAdminOrLogistic = this.user.hasRole('logistic') || this.user.isAdmin();
   }
 
