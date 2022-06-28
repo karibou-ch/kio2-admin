@@ -323,10 +323,11 @@ D'avance merci pour votre retour.`
     this.$order.updateItem(order, [copy], EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
-        const indexOf = order.items.findIndex(i=> item.sku == item.sku);
-        if(order.items[indexOf].sku == ok.items[indexOf].sku){
-          Object.assign(order.items[indexOf],ok.items[indexOf]);
-        }
+        const indexSrc = order.items.findIndex(i=> i.sku == item.sku);
+        const indexDst = ok.items.findIndex(i=> i.sku == item.sku);
+        Object.assign(order.items[indexSrc],ok.items[indexDst]);
+        Object.assign(item,ok.items[indexDst]);
+
         //
         // when not admin, we should remove other vendor items
         // FIXME this items filter should be on server for NON admin user
@@ -432,10 +433,11 @@ D'avance merci pour votre retour.`
     this.$order.updateItem(order, [item], EnumFulfillments.failure)
       .subscribe(ok => {
         this.doToast('Annulation enregistrée');
-        const indexOf = order.items.findIndex(i=> item.sku == item.sku);
-        if(order.items[indexOf].sku == ok.items[indexOf].sku){
-          Object.assign(order.items[indexOf],ok.items[indexOf]);
-        }
+        const indexSrc = order.items.findIndex(i=> i.sku == item.sku);
+        const indexDst = ok.items.findIndex(i=> i.sku == item.sku);
+        Object.assign(order.items[indexSrc],ok.items[indexDst]);
+        Object.assign(item,ok.items[indexDst]);
+
 
         //
         // when not admin, we should remove other vendor items
