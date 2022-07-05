@@ -139,6 +139,9 @@ D'avance merci pour votre retour.`
     const prefix = (document.documentElement.classList.contains('ios')) ? '&' : '?';
 
     const sms = customers.map(customer => {
+      if(!customer.phoneNumbers.length){
+        return [];
+      }
       return [customer.name.familyName, customer.phoneNumbers[0].number];
     });
 
