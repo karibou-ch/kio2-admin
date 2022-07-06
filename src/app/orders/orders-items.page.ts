@@ -119,7 +119,11 @@ D'avance merci pour votre retour.`
     // https://stackoverflow.com/a/19126326
     const prefix = (document.documentElement.classList.contains('ios')) ? '&' : '?';
 
+    // FIXME impossible missing customer phone 
     const sms = customers.map(customer => {
+      if(!customer.phoneNumbers.length){
+        return [];
+      }
       return [customer.name.familyName, customer.phoneNumbers[0].number];
     });
 
