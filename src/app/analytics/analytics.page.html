@@ -11,14 +11,14 @@
     </ion-buttons> -->
   </ion-toolbar>
   <ion-toolbar >
-    <ion-title>{{month}}</ion-title>
+    <ion-title>{{currentWeek|date:'d MMM'}}</ion-title>
 
-    <ion-chip slot="start" (click)="onBackMonth()" fill="outline" color="primary" >
+    <ion-chip slot="start" (click)="onBackWeek()" fill="outline" color="primary" >
       <ion-icon name="arrow-back-outline"></ion-icon>
       <ion-label class="text-capitalize">back</ion-label>
     </ion-chip>
     <!-- <span class="text-capitalize">&nbsp; {{month()}}</span> -->
-    <ion-chip slot="end" (click)="onForwardMonth()" fill="outline" color="primary">
+    <ion-chip slot="end" (click)="onForwardWeek()" fill="outline" color="primary">
       <ion-icon name="arrow-forward-outline"></ion-icon>
       <ion-label class="text-capitalize">forward</ion-label>
     </ion-chip>
@@ -49,7 +49,7 @@
       </div>
       <h4 class="text-capitalize">sources</h4>
       <ul class="sources">
-        <li *ngFor="let source of getSources(hub);let i = index" >{{source}}</li>
+        <li *ngFor="let source of getSources(hub)| keyvalue" >{{source.key}} ({{source.value}})</li>
       </ul>
     </div>
 

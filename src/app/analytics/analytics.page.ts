@@ -23,6 +23,7 @@ export class AnalyticsPage implements OnInit {
   months: string[];
   currentShipping: Date;
   currentMonth: number;
+  currentWeek: Date;
   metrics: any = {};
   hubs: string[] = [];
   lastAction: Date;
@@ -33,25 +34,13 @@ export class AnalyticsPage implements OnInit {
   ) {
     this.months = 'janvier,fevrier,mars,avril,mai,juin,juillet,aout,septembre,octobre,novembre,decembre'.split(',');
     this.cache = {};
+    this.currentWeek = new Date(Date.now() - 86400000 * 7)
   }
 
   ngOnInit() {
     this.currentShipping = this.$engine.currentShippingDate;
     this.currentMonth = this.currentShipping.getMonth();
-    this.$analytics.get().subscribe((metrics: any)=> {
-      this.lastAction = new Date(metrics['lastUpdate']);
-      delete metrics['lastUpdate'];
-      this.hubs=Object.keys(metrics);
-      this.metrics = metrics;
-      this.resetCache();
-
-
-      console.log('----DBG',metrics);
-      console.log('----DBG','artamis',this.getSources('artamis'));
-      console.log('----DBG','artamis',this.getDays('artamis'));
-      console.log('----DBG','artamis','landing',this.getActionHit('artamis','landing'));
-      console.log('----DBG','artamis','home',this.getActionHit('artamis','home'));
-    });
+    this.getMetrics();
   }
 
   resetCache() {
@@ -65,6 +54,36 @@ export class AnalyticsPage implements OnInit {
     return this.months[this.currentMonth];
   }
 
+  getMetrics(){
+    const params ={
+      from:this.currentWeek.getTime()
+    }
+    this.$analytics.get(params).subscribe((metrics: any)=> {
+      this.lastAction = new Date(metrics['lastUpdate']);
+      delete metrics['lastUpdate'];
+      this.hubs=Object.keys(metrics);
+      this.metrics = metrics;
+      this.resetCache();
+
+
+      console.log('----DBG',metrics);
+      console.log('----DBG','artamis',this.getSources('artamis'));
+      console.log('----DBG','artamis',this.getDays('artamis'));
+      console.log('----DBG','artamis','landing',this.getActionHit('artamis','landing'));
+      console.log('----DBG','artamis','home',this.getActionHit('artamis','home'));
+    });
+
+  }
+
+  onBackWeek(){
+    this.currentWeek = new Date(this.currentWeek.getTime() - 86400000 * 7)
+    this.getMetrics();
+  }
+
+  onForwardWeek(){
+    this.currentWeek = new Date(this.currentWeek.getTime() + 86400000 * 7)
+    this.getMetrics();
+  }
 
   onBackMonth() {
     this.currentMonth = this.modulo( this.currentMonth - 1, 12);
@@ -82,10 +101,17 @@ export class AnalyticsPage implements OnInit {
 
 
   getDays(hub) {
+    if(!this.hubs.length) {
+      return [];
+    }
+
     return Object.keys(this.metrics[hub]);
   }
 
   getActionHit(hub,action){
+    if(!this.hubs.length) {
+      return 0;
+    }
     if(this.cache[hub+action].hit>=0){
       return this.cache[hub+action].hit;
     }
@@ -98,6 +124,10 @@ export class AnalyticsPage implements OnInit {
   }
 
   getActionAmount(hub,action){
+    if(!this.hubs.length) {
+      return 0;
+    }
+
     if(this.cache[hub+action].amount>=0){
       return this.cache[hub+action].amount;
     }
@@ -110,6 +140,9 @@ export class AnalyticsPage implements OnInit {
   }
 
   getActionUID(hub,action){
+    if(!this.hubs.length) {
+      return 0;
+    }
     if(this.cache[hub+action].uid){
       return this.cache[hub+action].uid;
     }
@@ -123,6 +156,9 @@ export class AnalyticsPage implements OnInit {
 
 
   getSources(hub){
+    if(!this.hubs.length) {
+      return {};
+    }
     if(this.cache[hub].sources){
       return this.cache[hub].sources;
     }
@@ -134,7 +170,12 @@ export class AnalyticsPage implements OnInit {
         sources = (this.metrics[hub][day][action]&&this.metrics[hub][day][action].source||[]).concat(sources);
       });
     });
-    return this.cache[hub].sources = sources.filter(source => source && source!='');
+    const map = this.cache[hub].sources = {};
+    sources.filter(source => source).forEach(source=> {
+      map[source] = map[source] || 0;
+      map[source]++;
+    })
+    return this.cache[hub].sources;
   }
 
 
