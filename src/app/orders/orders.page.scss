@@ -170,6 +170,12 @@ ion-item {
   }
   
   ion-avatar {
+    .audio{
+      color: red;
+      margin-top: 10px;
+      margin-left: -17px;
+      position: absolute;      
+    }
     position: relative;
     div.complement,
     div.latest-errors{

@@ -38,7 +38,7 @@
       </div>
     </ion-item>
 
-    <!-- VALIDATE AT ONCE -->
+    <!-- DOUBLE CHECK CUSTOMER ITEMS -->
     <ion-item class="header">
       <div tabindex="0" class="fix-safari-14"></div>
       <div class="header-title important" [class.verify]="doubleCheck" (click)="displayForCheck=!displayForCheck">
@@ -49,9 +49,10 @@
         <span [hidden]="!doubleCheck" class="label-error">double vérification recommandée, merci 🙏 </span>
       </div>
 
+      <!-- REFUND HUB-->
+      <!-- VALIDATE AT ONCE -->
       <div class="header-actions">
 
-        <!-- REFUND HUB-->
         <button class="avoid button-refund item-button" 
           color="danger"  slot="end" 
           [hidden]="!isPaid(order)"
@@ -67,6 +68,17 @@
         
       </div>
     </ion-item>
+
+    <!-- CUSTOMER MESSAGE -->
+    <ion-item class="header-audio" [hidden]="!item.audio">
+      <audio  controls=""  [src]="item.audio"></audio>
+      <div class="phone" slot="end">
+        <a [hidden]="!getPhoneNumber(order)"
+         color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
+      </div>
+
+    </ion-item>
+
     <ng-container 
       *ngTemplateOutlet="displayForCheck ? ordersCheckItems : ordersValidateItems;context:{ $implicit: order }">
     </ng-container>

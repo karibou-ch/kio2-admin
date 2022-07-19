@@ -22,6 +22,29 @@ h2{
   margin-top: -4px;
 }
   
+.header-audio{
+  --background: #dbe6e5;
+  audio{
+    scale: .9;
+    margin: 5px;
+    width: 70%;
+    margin-left: -12px;    
+  }
+  .phone{
+    width: 45px;
+    height: 45px;
+    border: 1px solid var(--ion-color-kio-primary);
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ff6666;
+    margin-right: 0;
+    ion-icon{
+      color: white;
+    }
+  }
+}
   
 span.rank{
   margin-left: 0px;
@@ -285,10 +308,10 @@ ion-item{
     border-radius: 2px;
     padding-left: 2px;
     margin-left:0;
-    width: 27px;      
-    height: 27px!important;
+    width: 29px;      
+    height: 35px!important;
     box-shadow: initial;    
-    margin-right: 8px;
+    margin-right: 9px;
     background: white;
     border: 1px solid #0d716c;      
     ion-icon {

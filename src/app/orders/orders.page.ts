@@ -44,6 +44,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   shipping: Date;
   orders: Order[];
   cache: any;
+  hasAudio: any;
   isReady: boolean;
   orderLength: number;
   orderAvg: number;
@@ -81,6 +82,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.orders = [];
     this.cache = {};
     this.items = {};
+    this.hasAudio = {};
     this.currentDates = [];
     this.openItems = {};
     this.shippingComplement = {};
@@ -271,6 +273,10 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // use full Date for Display
     this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
   }
+
+  isAudio(order){
+    return !!this.hasAudio[order.oid];
+  }  
 
   isDeposit(order) {
     // undefined test is for Bretzel
@@ -535,6 +541,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // map child orders that have parent complement
     this.shippingComplement = {};
     this.orders.forEach(order => {
+      this.hasAudio[order.oid] = order.items.some(item => item.audio);
+
       if(order.shipping.parent) {
         const parent = this.orders.find(o => o.oid == order.shipping.parent);
         this.shippingComplement[order.oid] = (parent)? parent.rank : 0;

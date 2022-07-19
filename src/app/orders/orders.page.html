@@ -186,6 +186,7 @@
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <div class="complement" [hidden]="!getOrdersComplement(order)">{{getOrdersComplement(order)}}</div>
           <span class="rank" [class.rank-danger]="order.customer.latestErrors">{{getOrderRank(order)}}</span>
+          <ion-icon [hidden]="!isAudio(order)" class="audio" name="volume-high"></ion-icon>
         </ion-avatar>
         <ion-label class="ion-text-wrap">
           <h3 text-capitalize (click)="openByOrder(order)">
