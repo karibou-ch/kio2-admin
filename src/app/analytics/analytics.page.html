@@ -49,7 +49,8 @@
       </div>
       <h4 class="text-capitalize">sources</h4>
       <ul class="sources">
-        <li *ngFor="let source of getSources(hub)| keyvalue" >{{source.key}} ({{source.value}})</li>
+        <li *ngFor="let source of getSources(hub)| keyvalue: sortSourceDesc" >{{source.key}} ({{source.value.hit}}) <a (click)="setSourceFilter(hub,source.key)" href="javascript:;">filter</a> </li>
+        <li><a (click)="setSourceFilter(hub,'')" href="javascript:;">reset</a> </li>
       </ul>
     </div>
 
