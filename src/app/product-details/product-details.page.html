@@ -39,6 +39,10 @@
         <ion-label>Boost</ion-label>
         <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
       </ion-item>
+      
+      <ion-item>
+        <ion-button fill="outline" expand="block"  color="primary" [disabled]="!isReady()" (click)="getHistory()">Historique</ion-button>
+      </ion-item>
 
       <ion-item class="header">
         <h3>Informations</h3>

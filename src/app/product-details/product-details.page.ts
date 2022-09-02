@@ -36,9 +36,7 @@ export class ProductDetailsPage implements OnInit {
 
   constructor(
     private $differs: KeyValueDiffers,
-    private $elem: ElementRef,
     private $engine: EngineService,
-    private $loading: LoadingController,
     private $modal: ModalController,
     private $toast: ToastController,
     private $loader: LoaderService,
@@ -225,6 +223,16 @@ export class ProductDetailsPage implements OnInit {
 
   isDisabled() {
     return !this.product || !!this.product.attributes.available;
+  }
+
+  getHistory() {
+    this.$product.history(this.sku).subscribe(history => {
+      history.forEach(activity => {
+        console.log('-- ',(new Date(activity.when)).toDateString(),activity.who.email);
+        console.log('',activity.content);
+      });
+  
+    });
   }
 
   getVendors() {
