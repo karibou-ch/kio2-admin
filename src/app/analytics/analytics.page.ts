@@ -94,6 +94,26 @@ export class AnalyticsPage implements OnInit {
 
   }
 
+  countIpInFunnel(hub,action, ips) {
+    const filter = this.filterByIP[hub] || '';
+    if(filter=='') {
+      return true;
+    }
+    if(!ips || !ips.length) {
+      return false;
+    }
+
+    if(!this.cache[hub].sources ) {
+      return true;
+    }
+    const sources = this.cache[hub].sources[filter].ip;
+    const count = sources.reduce((sum, sourceIp)=>{
+      return sum + ips.filter(ip=>ip==sourceIp).length;
+    },0)
+    //if(hub=='halle-de-rive'&&action=='signup')console.log('----DBG funnel 0',hub,action,match,sources,ip)
+    return count;
+  }
+
 
   modulo(n, mod) {
     return ((n % mod) + mod) % mod;
@@ -125,10 +145,11 @@ export class AnalyticsPage implements OnInit {
       //
       // request filter by IP ?
       const value = this.metrics[hub][day][action] || {hit:0, ip:[]};
-      if(!this.isIpInFunnel(hub,action,value.ip)){
-        return sum;
+      if(filter == ''){
+        return sum + value.hit;
       }
-      return sum + value.hit;
+      const ipHit = this.countIpInFunnel(hub,action,value.ip);
+      return sum + ipHit;
     },0);
     return this.cache[hub+action+filter].hit;
   }
@@ -147,9 +168,12 @@ export class AnalyticsPage implements OnInit {
     const days = this.getDays(hub);
     this.cache[hub+action+filter].amount = days.reduce((sum,day) => {
       const value = this.metrics[hub][day][action] || {amount:0,ip:[]};
+      const ipHit = this.countIpInFunnel(hub,action,value.ip);
+      
       //
-      // request filter by IP ?
-      if(!this.isIpInFunnel(hub,action,value.ip)){
+      // FIXME, this is not the right amount value
+      // we should use total amount / by total hit * ipHit
+      if(!ipHit){
         return sum;
       }
 
@@ -180,24 +204,6 @@ export class AnalyticsPage implements OnInit {
 
   isFilterActive(hub,key){
     return this.filterByIP[hub] == key;
-  }
-
-  isIpInFunnel(hub,action, ip) {
-    const filter = this.filterByIP[hub] || '';
-    if(filter=='') {
-      return true;
-    }
-    if(!ip || !ip.length) {
-      return false;
-    }
-
-    if(!this.cache[hub].sources ) {
-      return true;
-    }
-    const sources = this.cache[hub].sources[filter].ip;
-    const match = sources.some(source => ip.indexOf(source)>-1);
-    //if(hub=='halle-de-rive'&&action=='signup')console.log('----DBG funnel 0',hub,action,match,sources,ip)
-    return match;
   }
 
 
