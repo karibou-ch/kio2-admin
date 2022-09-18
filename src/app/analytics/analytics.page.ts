@@ -21,6 +21,7 @@ export class AnalyticsPage implements OnInit {
   cache:any = {};
   
   months: string[];
+  pickerDate: string;
   currentShipping: Date;
   currentMonth: number;
   currentWeek: Date;
@@ -42,7 +43,7 @@ export class AnalyticsPage implements OnInit {
   ngOnInit() {
     this.currentShipping = this.$engine.currentShippingDate;
     this.currentMonth = this.currentShipping.getMonth();
-    this.getMetrics();
+    this.getMetrics({fromMonth:this.currentMonth+1});
   }
 
   resetCache() {
@@ -60,10 +61,7 @@ export class AnalyticsPage implements OnInit {
     return this.months[this.currentMonth];
   }
 
-  getMetrics(){
-    const params ={
-      from:this.currentWeek.getTime()
-    }
+  getMetrics(params){
     this.$analytics.get(params).subscribe((metrics: any)=> {
       this.lastAction = new Date(metrics['lastUpdate']);
       delete metrics['lastUpdate'];
@@ -237,15 +235,22 @@ export class AnalyticsPage implements OnInit {
     return this.cache[hub].sources;
   }
 
+  onDatePicker(){
+    const date = (new Date(this.pickerDate))
+    date.setDate(1);
+    this.currentMonth = date.getMonth();
+    this.currentWeek =date;
+    this.getMetrics({fromMonth:this.currentMonth+1});
+  }
 
   onBackWeek(){
     this.currentWeek = new Date(this.currentWeek.getTime() - 86400000 * 7)
-    this.getMetrics();
+    this.getMetrics({from:this.currentWeek});
   }
 
   onForwardWeek(){
     this.currentWeek = new Date(this.currentWeek.getTime() + 86400000 * 7)
-    this.getMetrics();
+    this.getMetrics({from:this.currentWeek});
   }
 
   onBackMonth() {

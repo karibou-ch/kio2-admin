@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Analytics</ion-title>
+    <ion-title (click)="picker.open()" class="text-capitalize">{{ (currentWeek| date:'MMM yyyy') }}  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  ></ion-back-button>
     </ion-buttons>
@@ -8,7 +8,7 @@
       <ion-button (click)="picker.open()">
         <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
       </ion-button>      
-    </ion-buttons> -->
+    </ion-buttons> -->    
   </ion-toolbar>
   <ion-toolbar >
     <ion-title>{{currentWeek|date:'d MMM'}}</ion-title>
@@ -23,6 +23,18 @@
       <ion-label class="text-capitalize">forward</ion-label>
     </ion-chip>
   </ion-toolbar>
+  <ion-datetime #picker 
+    displayFormat="MM/YYYY" 
+    pickerFormat="MMMM YYYY" 
+    [(ngModel)]="pickerDate" 
+    (ngModelChange)="onDatePicker()" 
+    cancelText="Annuler" 
+    doneText="Fait" 
+    dayValues="1"
+    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
+    max="2024"
+    style="display: none;">
+  </ion-datetime>        
 
 </ion-header>
 <ion-content>
