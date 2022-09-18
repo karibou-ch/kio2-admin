@@ -40,12 +40,12 @@
     </ion-item>
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary" >Le jour de fermeture</ion-label>
-      <ion-datetime displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.from=$event" [ngModel]="formatToGMT(shop.available.from)" max="2024"></ion-datetime>
+      <ion-datetime [disabled]="shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.from=$event" [ngModel]="formatToGMT(shop.available.from)" max="2024"></ion-datetime>
     </ion-item>
 
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary">Le jour de ré-ouverture</ion-label>
-      <ion-datetime displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.to=$event" [ngModel]="formatToGMT(shop.available.to)" max="2024"></ion-datetime>
+      <ion-datetime [disabled]="shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.to=$event" [ngModel]="formatToGMT(shop.available.to)" max="2024"></ion-datetime>
     </ion-item>
       
   </ion-list>
