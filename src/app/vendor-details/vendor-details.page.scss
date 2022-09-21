@@ -2,6 +2,16 @@
   opacity: .5;
 }
 
+ion-toggle{
+  --background: #aaa; 
+  --handle-background: #eee;     
+}
+
+
+ion-toggle.important{
+  --background-checked: red;
+  --handle-background-checked: red;
+}
 
 .invalid-iban:not(.ng-untouched){
   background-color: rgba(255, 0, 0, 0.1) !important;

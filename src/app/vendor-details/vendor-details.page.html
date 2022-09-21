@@ -35,17 +35,17 @@
       Informez vos clients
     </ion-list-header>
     <ion-item>
-      <ion-label [class.red]="shop.available.active">Ma boutique est fermée</ion-label>
-      <ion-toggle color="positive" [(ngModel)]="shop.available.active" ></ion-toggle>
+      <ion-label [class.red]="shop.available.active">Activer la fermerture de la boutique</ion-label>
+      <ion-toggle  class="important" [(ngModel)]="shop.available.active" ></ion-toggle>
     </ion-item>
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary" >Le jour de fermeture</ion-label>
-      <ion-datetime [disabled]="shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.from=$event" [ngModel]="formatToGMT(shop.available.from)" max="2024"></ion-datetime>
+      <ion-datetime [disabled]="!shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.from=$event" [ngModel]="formatToGMT(shop.available.from)" max="2024"></ion-datetime>
     </ion-item>
 
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary">Le jour de ré-ouverture</ion-label>
-      <ion-datetime [disabled]="shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.to=$event" [ngModel]="formatToGMT(shop.available.to)" max="2024"></ion-datetime>
+      <ion-datetime [disabled]="!shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.to=$event" [ngModel]="formatToGMT(shop.available.to)" max="2024"></ion-datetime>
     </ion-item>
       
   </ion-list>
