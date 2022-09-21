@@ -39,6 +39,15 @@
         <ion-label>Boost</ion-label>
         <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
       </ion-item>
+
+      <ion-item>
+        <ion-label>Le produit personalisé</ion-label>
+        <div class="info">
+          Ce produit va permettre aux clients de choisir un article de votre vitrine qui n'est pas en ligne 
+          associé avec une note, son téléphone et un budget qu'il aura précisé <b>(par exemple 5x 20 fr)</b>
+        </div>
+        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.customized"></ion-toggle>
+      </ion-item>
       
       <ion-item>
         <ion-button fill="outline" expand="block"  color="primary" [disabled]="!isReady()" (click)="getHistory()">Historique</ion-button>
