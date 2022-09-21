@@ -143,7 +143,8 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         this.vendors[item.vendor].shipping = order.shipping;
         this.vendors[item.vendor].hubs = [order.hub];
         this.vendors[item.vendor].items = [];
-        this.vendors[item.vendor].ranks = [];
+        this.vendors[item.vendor].oids = [];
+        this.vendors[item.vendor].complements = [];
         this.vendors[item.vendor].collected = collected;
         this.vendors[item.vendor].collected_timestamp = vendor.collected_timestamp? new Date(vendor.collected_timestamp):vendor.collected_timestamp;
         this.vendors.list.push(item.vendor);
@@ -160,8 +161,12 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
       this.vendors[item.vendor].items.push(item);
       //
       // filter unique ranks
-      if (this.vendors[item.vendor].ranks.indexOf(+order.rank) === -1){
-        this.vendors[item.vendor].ranks.push((+order.rank));
+      
+      if(order.shipping.parent && this.vendors[item.vendor].complements.indexOf(order.oid) === -1){
+        this.vendors[item.vendor].complements.push((order.oid));
+      }
+      if (this.vendors[item.vendor].oids.indexOf(order.oid) === -1){
+        this.vendors[item.vendor].oids.push((order.oid));
       }
     });
   }
@@ -217,8 +222,12 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     }, 0);
   }
 
-  getCustomerRanks(vendor: string) {
-    return this.vendors[vendor].ranks;
+  getVendorOids(vendor: string) {
+    return this.vendors[vendor].oids;
+  }
+
+  getVendorComplements(vendor: string) {
+    return this.vendors[vendor].complements;
   }
 
 
@@ -353,6 +362,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     const params = {
       orders: this.orderItemsByVendorAndHub(vendor),
       shipping: this.shipping,
+      defaultSmall: true,
       vendor: (vendor)
     };
 

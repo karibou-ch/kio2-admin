@@ -15,6 +15,7 @@ h1.info{
 }
 h2{
   color: #333;
+  font-weight: 500;
 }
 
 .header{
@@ -81,11 +82,10 @@ ion-list{
 
 ion-item.customer{
   left: 0px;
-  margin: 0px!important;
   width: 100%;
   --background: #dbe6e5;
-  margin: 8px 0!important;
-  margin-bottom: 1px!important;
+  --min-height: 90px;
+  margin: 2px 0!important;
   
   span.rank{
     background: #000;
@@ -161,15 +161,16 @@ ion-item{
   }
 
   .verify {
-    border-bottom: 1px solid red;
+    border-bottom: 1px solid #333;
     border-radius: 0px;  
     font-size: 15px!important;
   }
 
   .label-error{
     line-height: 22px;
-    color: red;
+    color: #666;
     font-weight: 500;    
+    margin-left: -14px;
   }
 
   &.checked {
@@ -201,12 +202,12 @@ ion-item{
       margin-left: 5px;
       transform: translateY(-4px);        
     }
+    width: 90%!important;
     padding: 3px 0;
     font-weight: 300;
     letter-spacing: -.8px;
     font-size: 16px;
     position: absolute;
-    width: 75%;
     top:3px;
     color: var(--ion-color-kio-primary);
     white-space: nowrap;
@@ -261,7 +262,7 @@ ion-item{
       border:0px;
       border: 1px solid #eee;
       border-radius: 1px;
-      max-width: 60px;
+      max-width: 65px;
       padding: 4px 0;
       float: right;
       font-weight:500;

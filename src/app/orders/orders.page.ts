@@ -46,7 +46,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   cache: any;
   hasAudio: any;
   isReady: boolean;
-  orderLength: number;
+  complementsLength: number;
   orderAvg: number;
   orderTotal: number;
   orderBaseAmount = 0;
@@ -86,7 +86,6 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.currentDates = [];
     this.openItems = {};
     this.shippingComplement = {};
-    this.orderLength = 0;
   }
 
   get ordersCount() {
@@ -242,8 +241,12 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
         return planning && filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
       });  
     }
-    this.orderLength = orders.length;
+    this.complementsLength = orders.filter(order => order.shipping.parent).length;
     return orders;
+  }
+
+  getUniqueOrders(){
+    return (this.orders).filter(order => !order.shipping.parent);
   }
 
   getOrderRank(order: Order) {
@@ -568,7 +571,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.orderTotal = this.orders.reduce((sum, order, i) => {
       return order.getSubTotal({ withoutCharge: true }) + sum + this.orderBaseAmount;
     }, 0);
-    this.orderAvg = this.orderTotal / this.orders.length;
+    this.orderAvg = this.orderTotal / this.ordersCount;
 
   }
 

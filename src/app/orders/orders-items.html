@@ -39,19 +39,19 @@
     </ion-item>
 
     <!-- DOUBLE CHECK CUSTOMER ITEMS -->
-    <ion-item class="header">
+    <ion-item class="header" >
       <div tabindex="0" class="fix-safari-14"></div>
       <div class="header-title important" [class.verify]="doubleCheck" (click)="displayForCheck=!displayForCheck">
         <!-- VALIDATE -->
         <ion-toggle mode="md" class="button-check" [hidden]="orders.length>1" [checked]="displayForCheck"></ion-toggle>      
 
-        <span [hidden]="doubleCheck" >Vérification rapide des <b class="red">{{order.items.length}}</b> produits </span>
-        <span [hidden]="!doubleCheck" class="label-error">double vérification recommandée, merci 🙏 </span>
+        <span [hidden]="doubleCheck" >Veuiller faire une <span class="red bold">double</span> vérification, merci </span>
+        <span [hidden]="!doubleCheck" class="label-error">Activer la vue simplifiée </span>
       </div>
 
       <!-- REFUND HUB-->
       <!-- VALIDATE AT ONCE -->
-      <div class="header-actions">
+      <div class="header-actions" [hidden]="defaultSmall">
 
         <button class="avoid button-refund item-button" 
           color="danger"  slot="end" 
@@ -89,7 +89,7 @@
 
 <!-- VALIDATE ITEMS -->
 <ng-template #ordersCheckItems let-order>
-  <ion-item>
+  <ion-item [hidden]="defaultSmall">
     <!-- SEARCH -->
     <ion-searchbar
       mode="ios"
@@ -103,7 +103,7 @@
   <ion-item [class.checked]="item.checked" *ngFor="let item of sortedItem(order);let idx=index">
     <div tabindex="0" class="fix-safari-14"></div>
     <div class="title {{item.fulfillment.status}}"  (click)="doToggleCheck(item)" >
-      {{idx + 1}} - {{item.title}} <span [class.red.bold]="item.quantity>1">{{item.quantity}}x <span class="part">{{item.part}}</span> </span>
+      {{idx + 1}} - <span [class.red.bold]="item.quantity>1">{{item.quantity}}x</span> - {{item.title}} - <span class="part">{{item.part}}</span> 
     <div [hidden]="!item.variant" class="variant dark-green link">
       // {{item.variant?.title}}
     </div>

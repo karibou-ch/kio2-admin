@@ -122,7 +122,7 @@
         </span>
       </ion-avatar>
       <h3>
-        {{orderLength}} cmds / <b>{{orderTotal|number:'1.0-0'}} fr</b>
+        {{ordersCount}} ({{complementsLength}}) cmds / <b>{{orderTotal|number:'1.0-0'}} fr</b>
         <span [hidden]="orders.length<2">, AVG <b>{{orderAvg|number:'1.0-0'}} fr</b></span>
       </h3>
       <ion-note slot="end">

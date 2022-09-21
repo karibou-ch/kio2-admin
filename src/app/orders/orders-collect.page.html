@@ -77,8 +77,7 @@
           </span>
         </ion-avatar>
         <div (click)="openVendorItems(vendor)" >
-          <h3 text-capitalize class="bold">{{vendor}} ({{getCustomerRanks(vendor).length}})</h3>
-          <!-- <p><ion-badge class="ranks" color="secondary" *ngFor="let rank of getCustomerRanks(vendor)">{{rank}}</ion-badge></p> -->
+          <h3 text-capitalize class="bold">{{vendor}} ({{getVendorOids(vendor).length}})</h3>
           <p><span class="time-collected">{{vendors[vendor].collected_timestamp|date:'HH:mm'}}</span>Total validé: {{getAmount(vendor)}} fr</p>
         </div>
 

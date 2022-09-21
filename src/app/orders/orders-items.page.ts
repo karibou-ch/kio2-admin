@@ -29,6 +29,7 @@ export class OrdersItemsPage implements OnInit {
   // input props
   @Input() orders: Order[];
   @Input() header: boolean;
+  @Input() defaultSmall:boolean;
 
 
   //
@@ -60,7 +61,6 @@ D'avance merci pour votre retour.`
     public $toast: ToastController
   ) {
 
-    this.header = true;
     this.deltaPrice = 0;
     this.user = this.$engine.currentUser;
 
@@ -72,10 +72,17 @@ D'avance merci pour votre retour.`
 
     this.format = this.$engine.defaultFormat;
     this.doubleCheck = false;
+    this.header = true;
   }
 
 
-  ngOnInit() {    
+  ngOnInit() {  
+    
+    if(this.defaultSmall) {
+      this.doubleCheck = true;
+      this.displayForCheck = true;
+      //this.header = false;
+    }
     //
     // load Hubs
     this.hubs = {undefined: { prefix: ''}};
