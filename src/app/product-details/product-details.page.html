@@ -23,34 +23,37 @@
         <ion-label color="primary">
           Produit actif à la vente
         </ion-label>
-        <ion-toggle  color="positive" ngDefaultControl [(ngModel)]="product.attributes.available"></ion-toggle>
+        <ion-toggle  color="primary" ngDefaultControl [(ngModel)]="product.attributes.available"></ion-toggle>
       </ion-item>
 
       <ion-item>
         <ion-label>En promotion</ion-label>
-        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
       </ion-item>
 
       <ion-item [hidden]="!user.isAdmin()">
         <ion-label>Sélection</ion-label>
-        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.home"></ion-toggle>
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.home"></ion-toggle>
       </ion-item>
       <ion-item [hidden]="!user.isAdmin()">
         <ion-label>Boost</ion-label>
-        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
       </ion-item>
 
       <ion-item>
-        <ion-label>Le produit personalisé</ion-label>
-        <div class="info">
-          Ce produit va permettre aux clients de choisir un article de votre vitrine qui n'est pas en ligne 
-          associé avec une note, son téléphone et un budget qu'il aura précisé <b>(par exemple 5x 20 fr)</b>
-        </div>
-        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.customized"></ion-toggle>
+        <ion-label>
+          Le produit personalisé
+          <div class="info">
+            Ce produit va permettre aux clients de choisir un article de votre vitrine qui n'est pas disponible en ligne. 
+            Il sera associé avec une note, son téléphone et un budget qu'il aura précisé <b>(par exemple 5x 20 fr)</b>
+          </div>          
+        </ion-label>
+        
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.customized"></ion-toggle>
       </ion-item>
       
       <ion-item>
-        <ion-button fill="outline" expand="block"  color="primary" [disabled]="!isReady()" (click)="getHistory()">Historique</ion-button>
+        <ion-button fill="outline" expand="block"  color="primary" [disabled]="!isReady()" (click)="getHistory()">Historique des modifications</ion-button>
       </ion-item>
 
       <ion-item class="header">
@@ -111,12 +114,12 @@
       <ion-item>
         <ion-label color="primary" position="stacked">Péremption</ion-label>
         <ion-input type="text" placeholder="ex. Se conserve 3 jours"  ngDefaultControl [(ngModel)]="product.shelflife.comment"></ion-input>    
-        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.shelflife.display"></ion-toggle>        
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.shelflife.display"></ion-toggle>        
       </ion-item>
       <ion-item>
         <ion-label color="primary" position="stacked">Quantité</ion-label>
         <ion-input type="text"  placeholder="ex. Convient pour 1-2 personnes" ngDefaultControl [(ngModel)]="product.quantity.comment"></ion-input>    
-        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.quantity.display"></ion-toggle>        
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.quantity.display"></ion-toggle>        
       </ion-item>
       
       <!-- STOCK -->
@@ -178,7 +181,7 @@
           Prix pendant promotion <br>Note: activer la promotion à droite
         </ion-label>
         <ion-input type="number" min="0" placeholder="0.00" ngDefaultControl [(ngModel)]="product.pricing.discount"></ion-input>
-        <ion-toggle  color="positive" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
       </ion-item>
     </ion-list>
 
