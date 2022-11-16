@@ -14,6 +14,7 @@ export class InvoicePage implements OnInit {
   hubsRank: any;
   currentHub: any;
   orders: Order[];
+  paids: Order[];
   user: User;
   config: Config;
   isReady: boolean;
@@ -25,6 +26,7 @@ export class InvoicePage implements OnInit {
     private $order: OrderService,
   ) {
     this.orders = [];
+    this.paids = [];
 
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
@@ -52,6 +54,10 @@ export class InvoicePage implements OnInit {
 
   }
 
+  get ordersAll(){
+    return this.paids.concat(this.orders);
+  }
+
   ngOnInit() {
     const options = {
       fulfillments: 'fulfilled',
@@ -61,8 +67,13 @@ export class InvoicePage implements OnInit {
     this.$order.findAllOrders(options).subscribe(orders => {
       this.orders = orders as Order[];
       this.isReady = true;
-
     });
+    options.payment='invoice_paid'
+    this.$order.findAllOrders(options).subscribe(orders => {
+      this.paids = orders as Order[];
+      this.isReady = true;
+    });
+
   }
 
 
@@ -105,8 +116,12 @@ export class InvoicePage implements OnInit {
     return order.customer.phoneNumbers[0].number;
   }
 
+  getTotal(order: Order) {
+    return order.getTotalPrice();
+  }
+
   getSubTotal(order: Order) {
-    return order.getSubTotal({ withoutCharge: true });
+    return order.getSubTotal();
   }
 
 

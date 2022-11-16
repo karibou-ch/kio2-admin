@@ -19,18 +19,11 @@
 
   <ion-list>
     <!-- DISPLAY ORDERS -->
-    <ion-item-sliding *ngFor="let order of orders">
+    <ion-item-sliding *ngFor="let order of ordersAll">
       <ion-item-options>
-        <ion-item-option side="start">
+        <ion-item-option side="start" [hidden]="order.payment.status=='invoice'">
           <ion-button mode="ios" expandable (click)="orderCapture(order)">
-            fermer
-          </ion-button>
-        </ion-item-option>
-      </ion-item-options>
-      <ion-item-options>
-        <ion-item-option side="start">
-          <ion-button mode="ios" expandable (click)="orderCapture(order)">
-            fermer
+            VALIDER
           </ion-button>
         </ion-item-option>
 
@@ -49,10 +42,9 @@
           </ion-label>
         </ion-item-option>
       </ion-item-options>
-      <ion-item  >
+      <ion-item  [class.pending]="order.payment.status=='invoice'">
         <ion-note slot="end">
-          <b>{{order.shipping.postalCode}}</b>
-          <span class="price" >{{ order.shipping.bags }} sac - {{getSubTotal(order)|number:'1.0-0'}} fr</span>
+          <span class="price" >{{getSubTotal(order)|number:'1.0-2'}} fr | <b>{{getTotal(order)|number:'1.0-2'}} fr</b></span>
         </ion-note>        
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->

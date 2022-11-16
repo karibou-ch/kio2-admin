@@ -12,6 +12,10 @@ ion-item {
   --background: var(--ion-color-kio-primary);
   --color:white;
 }
+&.pending{
+  --background: #eee;
+  --color:red;
+}
 &.header{
   min-height: 1.9rem;
   background: var(--ion-color-kio-primary);
@@ -81,8 +85,8 @@ span.price{
   background: transparent;
   color: white;
   width: 100px;
-  padding-top: 1px;
-  border-radius: 3px;
+  padding: 2px;
+  border-radius: 1px;
   background: var(--ion-color-kio-info);
   right: 10px;
 }
