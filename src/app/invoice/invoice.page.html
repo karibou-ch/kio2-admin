@@ -1,7 +1,16 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>Factures ouvertes</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar color="primary">
+      <ion-label for="invoice-toggle" [hidden]="!displayOnlyPaid">paid</ion-label>
+      <ion-label for="invoice-toggle" [hidden]="displayOnlyPaid">pending</ion-label>
+      <ion-toggle id="invoice-toggle" slot="end" mode="md" (ionChange)="doToggleInvoicesStatus()"></ion-toggle>      
+  </ion-toolbar>       
+
 </ion-header>
 
 <ion-content>
@@ -14,10 +23,8 @@
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
 
-  <!--  LOGISTIC HEADER -->
-  <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Rien à afficher <br/>pour {{currentHub?.name}}</h1>
+  <ion-list>  
 
-  <ion-list>
     <!-- DISPLAY ORDERS -->
     <ion-item-sliding *ngFor="let order of ordersAll">
       <ion-item-options>

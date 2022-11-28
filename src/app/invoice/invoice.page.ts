@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OrderService, Order, Config, User } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
 import { AlertController, ToastController } from '@ionic/angular';
+import { combineLatest, concat } from 'rxjs';
 
 @Component({
   selector: 'app-invoice',
@@ -14,10 +15,10 @@ export class InvoicePage implements OnInit {
   hubsRank: any;
   currentHub: any;
   orders: Order[];
-  paids: Order[];
   user: User;
   config: Config;
   isReady: boolean;
+  displayOnlyPaid = false;
 
   constructor(
     private $alert: AlertController,
@@ -26,7 +27,6 @@ export class InvoicePage implements OnInit {
     private $order: OrderService,
   ) {
     this.orders = [];
-    this.paids = [];
 
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
@@ -55,25 +55,11 @@ export class InvoicePage implements OnInit {
   }
 
   get ordersAll(){
-    return this.paids.concat(this.orders);
+    return (this.orders);
   }
 
   ngOnInit() {
-    const options = {
-      fulfillments: 'fulfilled',
-      payment: 'invoice'
-    };
-
-    this.$order.findAllOrders(options).subscribe(orders => {
-      this.orders = orders as Order[];
-      this.isReady = true;
-    });
-    options.payment='invoice_paid'
-    this.$order.findAllOrders(options).subscribe(orders => {
-      this.paids = orders as Order[];
-      this.isReady = true;
-    });
-
+    this.doLoadInvoices();
   }
 
 
@@ -84,6 +70,26 @@ export class InvoicePage implements OnInit {
       window.location.reload();
       refresher.target.complete();
     }, 500);
+  }
+
+  doToggleInvoicesStatus() {
+    this.displayOnlyPaid = ! this.displayOnlyPaid;
+    this.doLoadInvoices();
+  }
+
+  doLoadInvoices(){
+    this.orders = [];
+    const optionsInvoice = {
+      fulfillments: 'fulfilled',
+      payment: (this.displayOnlyPaid?'invoice_paid':'invoice'),
+      closed:false
+    };
+
+    this.$order.findAllOrders(optionsInvoice).subscribe((orders) => {
+      this.orders = this.orders.concat(orders as Order[]);
+      this.isReady = true;
+    });
+
   }
 
   doDisplayPhone(order) {

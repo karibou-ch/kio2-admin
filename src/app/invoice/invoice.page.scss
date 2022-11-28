@@ -7,6 +7,11 @@ padding-top: 0;
 margin-bottom: 50px;
 }
 
+ion-label{
+  margin-left: 20px;
+  font-weight: 600;  
+}
+
 ion-item {
 &.planning{
   --background: var(--ion-color-kio-primary);
@@ -89,6 +94,7 @@ span.price{
   border-radius: 1px;
   background: var(--ion-color-kio-info);
   right: 10px;
+  width: 120px;
 }
 
 span.bag{
