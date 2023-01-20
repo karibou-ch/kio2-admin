@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { OrderService, Order, Config, User } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
 import { AlertController, ToastController } from '@ionic/angular';
-import { combineLatest, concat } from 'rxjs';
 
 @Component({
   selector: 'app-invoice',
@@ -86,7 +85,9 @@ export class InvoicePage implements OnInit {
     };
 
     this.$order.findAllOrders(optionsInvoice).subscribe((orders) => {
-      this.orders = this.orders.concat(orders as Order[]);
+      this.orders = this.orders.concat(orders as Order[]).sort((a,b)=>{
+        return a.email.localeCompare(b.email);
+      });
       this.isReady = true;
     });
 
@@ -137,7 +138,7 @@ export class InvoicePage implements OnInit {
   }
 
 
-  orderCapture(order: Order) {
+  orderInvoiceCapture(order: Order) {
     this.$order.capture(order).subscribe(
       (ok) => {
         Object.assign(order, ok);
@@ -149,6 +150,20 @@ export class InvoicePage implements OnInit {
     );
 
   }
+
+  orderInvoicePaid(order: Order) {
+    this.$order.updateInvoices([order.oid]).subscribe(
+      (ok) => {
+        Object.assign(order, ok);
+        this.onDone('Commande payée par le client');
+      },
+      status => {
+        this.onDone(status.error);
+      }
+    );
+
+  }
+
 
   onDone(msg) {
     this.$toast.create({

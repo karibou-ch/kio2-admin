@@ -72,6 +72,15 @@ export class TrackerPage implements OnInit, OnDestroy {
     this.$tracker.stop();
   }
 
+  getAddressDirection(order: Order) {
+    const currentOrder = order;
+    const address = currentOrder.shipping.streetAdress + ',' +
+                    currentOrder.shipping.postalCode + ',' +
+                    currentOrder.shipping.region;
+    const geos = [currentOrder.shipping.geo.lat, currentOrder.shipping.geo.lng];
+    const destination = (currentOrder.shipping.geo) ? address : geos ;
+    return destination.toString();    
+  }
   //
   // refresh standby state
   // ionViewWillEnter(){
@@ -155,12 +164,9 @@ export class TrackerPage implements OnInit, OnDestroy {
     this.$modal.dismiss();
   }
 
-  openDirection() {
-    const address = this.orders[0].shipping.streetAdress + ',' +
-                    this.orders[0].shipping.postalCode + ',' +
-                    this.orders[0].shipping.region;
-    const geos = [this.orders[0].shipping.geo.lat, this.orders[0].shipping.geo.lng];
-    const destination = (this.orders[0].shipping.geo) ? address : geos ;
+  openDirection(order? : Order) {
+    const currentOrder = order? order: this.orders[0];
+    const destination = this.getAddressDirection(currentOrder);
 
     // console.log('direction',destination)
     // this.launchNavigator.navigate(destination, options)
@@ -178,7 +184,7 @@ export class TrackerPage implements OnInit, OnDestroy {
     //         error => alert('Error launching navigator: ' + error)
     // );
     try {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination.toString()}&dir_action=navigate`);
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}&dir_action=navigate`);
     } catch (error) {
     }
   }
@@ -186,6 +192,8 @@ export class TrackerPage implements OnInit, OnDestroy {
 
   setMapMarkers(orders: Order[]) {
     this.deleteMarkers();
+    // global marker popop
+    let currentInfoWindow=null;
     orders.forEach((order, i) => {
       if (!order.shipping.geo) {
         return;
@@ -198,16 +206,24 @@ export class TrackerPage implements OnInit, OnDestroy {
       });
       this.markers.push(marker);
       // set popup window on marker
+
+      const destination = this.getAddressDirection(order);
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&dir_action=navigate`;
       const phone = order.customer.phoneNumbers[0] ? order.customer.phoneNumbers[0].number : '';
       const infowindow = new google.maps.InfoWindow({
-        content: `<b><a href="tel:${phone}">${order.shipping.name}</a></b><br>
+        content: `<b><a href="tel:${phone}">call ${order.shipping.name} - ${phone}</a></b><br>
                   ${order.shipping.streetAdress}, é:${order.shipping.floor}<br/>
-                  ${order.shipping.note}
-                    `
+                  ${order.shipping.note}<br>
+                  <a href="${url}" target="_new">utiliser map</a>
+                  `
       });
       marker.infowindow = infowindow;
       marker.addListener('click', () => {
         infowindow.open(this.map, marker);
+        if(currentInfoWindow) {
+          currentInfoWindow.close();
+        }
+        currentInfoWindow = infowindow;
       });
 
       this.markerBounds.extend(pos); // extend markerBounds with each marker (for the zoom)
