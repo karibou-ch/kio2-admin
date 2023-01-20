@@ -33,8 +33,7 @@
       <div class="note" slot="end">
         <a [hidden]="!getPhoneNumber(order)"
          color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
-     <a  color="info"  href="javascript:void()" (click)="doDisplayMail(order)"> <ion-icon name="mail"> </ion-icon></a>
-
+        <a color="info"  href="javascript:void()" (click)="doDisplayMail(order)"> <ion-icon name="mail"> </ion-icon></a>
       </div>
     </ion-item>
 
@@ -67,16 +66,6 @@
         </button>
         
       </div>
-    </ion-item>
-
-    <!-- CUSTOMER MESSAGE -->
-    <ion-item class="header-audio" [hidden]="!item.audio">
-      <audio  controls=""  [src]="item.audio"></audio>
-      <div class="phone" slot="end">
-        <a [hidden]="!getPhoneNumber(order)"
-         color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
-      </div>
-
     </ion-item>
 
     <ng-container 
@@ -171,6 +160,15 @@
             </button>                      
           </div>
         </ion-label>
+      </ion-item>
+      
+      <!-- CUSTOMER MESSAGE -->
+      <ion-item class="header-audio" [hidden]="!item.audio">
+        <audio  controls=""  [src]="item.audio"></audio>
+        <div class="phone" slot="end">
+          <a [hidden]="!getPhoneNumber(order)"
+          color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
+        </div>
       </ion-item>
 
     </ion-item-sliding>

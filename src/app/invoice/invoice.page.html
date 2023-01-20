@@ -28,8 +28,14 @@
     <!-- DISPLAY ORDERS -->
     <ion-item-sliding *ngFor="let order of ordersAll">
       <ion-item-options>
-        <ion-item-option side="start" [hidden]="order.payment.status=='invoice'">
-          <ion-button mode="ios" expandable (click)="orderCapture(order)">
+        <ion-item-option side="start" [hidden]="order.payment.status!='invoice'">
+          <ion-button mode="ios" expandable (click)="orderInvoicePaid(order)">
+            VALIDER
+          </ion-button>
+        </ion-item-option>
+
+        <ion-item-option side="start" [hidden]="order.payment.status!='invoice_paid'">
+          <ion-button mode="ios" expandable (click)="orderInvoiceCapture(order)">
             VALIDER
           </ion-button>
         </ion-item-option>
@@ -56,11 +62,11 @@
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <span class="rank" [class.orphan]="!order.shipping.priority">
-            {{getOrderRank(order)}}
+            {{order.customer.displayName.slice(0,2)}}
           </span>
         </ion-avatar>
         <ion-label class="ion-text-wrap">
-          <h3 text-capitalize>{{order.payment.status}} - {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>
+          <h3 text-capitalize><b>{{order.oid}}</b> - {{ order.shipping.name }} <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span></h3>
           <h2>{{ order.shipping.streetAdress }},  <b>é:{{order.shipping.floor}}</b> </h2>
           <p class="note">{{ order.shipping.note }}</p>
         </ion-label>
