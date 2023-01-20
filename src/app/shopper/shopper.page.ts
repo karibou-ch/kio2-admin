@@ -341,41 +341,39 @@ export class ShopperPage implements OnInit, OnDestroy {
     //
     // list orders for this planning
     const orders = this.getOrders();
+    const lastIdx = orders.length - 1;
     //
     // depending the direction, we should compare the position 
     const direction = (index.detail.from > index.detail.to) ? -1 : 1;
     const to = orders[index.detail.to];
     const from = orders[index.detail.from];
-    let priority = to.shipping.priority;
     let position;
 
-    // orders.forEach(order=>console.log('--- sort',order.rank,order.shipping.position))
-    // console.log('----DBG from',index.detail.from,'to',index.detail.to,'direction',direction,'length',orders.length);
-    // console.log('----DBG',to.rank,to.shipping.priority,to.shipping.position);
-
-    // place the order before the first one
-    if((index.detail.to + direction) < 0) {
-      position=(orders[0].shipping.position)-2;
-    }
-    // place the order after the last one
-    else if((index.detail.to + direction) >= orders.length) {
-      position=orders[orders.length-1].shipping.position+2;
-    }else {
-      // get the position of the previous//next order AND add//substract 1
-      position=orders[index.detail.to+direction].shipping.position - direction;
-    }
-
-    // console.log('----DBG',from.rank,from.shipping.priority,from.shipping.position);
+    // console.log('----DBG from',from.rank,index.detail.from,lastIdx);
+    // console.log('----DBG to',to.rank,index.detail.to);
 
     //
-    // final position is an Epsylon added or substracted on the destination
-    const pFinal = (Math.abs(to.shipping.position + position)) / 2 ;
-    // console.log('----DBG ----->',to.shipping.position,position,'new',pFinal,'direction',direction)
+    // place the order before the first one
+    if(index.detail.to == 0) {
+      position=(orders[0].shipping.position)-2;
+    }
+    //
+    // place the order after the last one
+    else if(index.detail.to == lastIdx) {
+      position=orders[lastIdx].shipping.position+2;
+    }else {
+      // get the position of the previous//next order AND add//substract 1
+      // Going UP == -1
+      // Going DOWN == +1
+      const forceAVG = (to.shipping.position==orders[index.detail.to+direction].shipping.position)?5:0;
+      position=(to.shipping.position+orders[index.detail.to+direction].shipping.position+forceAVG)/2;
+      //console.log('--DBG position',from.rank,'=>',(to.shipping.position+orders[index.detail.to+direction].shipping.position+forceAVG)/2,direction)
+    }
+    let priority = from.shipping.priority;
 
-    from.shipping.position = pFinal;
 
-
-    // console.log('----DBG ',from.rank,priority,position)
+    from.shipping.position = position;
+    this.orders = this.orders.sort(this.sortOrdersByPosition);
 
     this.$order.updateShippingPriority(from, priority, position)
       .subscribe(ok => {
@@ -445,6 +443,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     const selected = Object.keys(this.selectedOrder).filter(oid => this.selectedOrder[oid]);
     const countSelected = selected.length;
     const orders = this.orders.filter(order => !countSelected || (selected.indexOf(order.oid + '') > -1))
+                              .filter(order => !order.shipping.parent)
                               .filter(this.filterByPlan.bind(this));
     const params = {
       orders: (orders)
