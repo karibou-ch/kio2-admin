@@ -132,7 +132,7 @@
       </ion-note>
     </ion-item>
     <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByRankAndComplement.bind(this));let i=index;">
-      <ion-item-options side="start" [hidden]="!user.isAdmin()">
+      <ion-item-options side="start" [hidden]="!user.isAdmin() && !user.hasRole('operator')">
         <ion-item-option>
           <ion-button mode="ios" expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
             facturer
@@ -142,7 +142,7 @@
           </ion-button>
         </ion-item-option>
       </ion-item-options>  
-      <ion-item-options side="end" class="shipping" [hidden]="!user.isAdmin()">
+      <ion-item-options side="end" class="shipping" [hidden]="!user.isAdmin() && !user.hasRole('operator')">
         <ion-item-option color="secondary">
           <ion-select [(ngModel)]="order.payment.fees.shipping" 
                       color="primary" 

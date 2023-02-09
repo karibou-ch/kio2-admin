@@ -114,15 +114,14 @@
                     (click)="doRefund(order,item)">
               <ion-icon name="card-outline" ></ion-icon>&nbsp;refund
             </ion-button>
+          </ion-item-option>
+          <ion-item-option>
+            <ion-button mode="ios"
+                    color="danger"  slot="end" 
+                    (click)="doReplace(order,item)">
+              <ion-icon name="card-outline" ></ion-icon>&nbsp;SMS (REPLACE)
+            </ion-button>
         </ion-item-option>
-        <ion-item-option>
-          <ion-button mode="ios"
-                  color="danger"  slot="end" 
-                  (click)="doReplace(order,item)">
-            <ion-icon name="card-outline" ></ion-icon>&nbsp;SMS (REPLACE)
-          </ion-button>
-      </ion-item-option>
-
       </ion-item-options>  
       <ion-item >
         <div tabindex="0" class="fix-safari-14"></div>
