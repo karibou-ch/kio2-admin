@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ToastController, ModalController, PopoverController } from '@ionic/angular';
-import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop } from 'kng2-core';
+import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop, HubService } from 'kng2-core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { OrdersItemsPage } from './orders-items.page';
 import { CalendarPage } from '../calendar/calendar.page';
@@ -17,6 +17,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
   config: Config;
   hubs: any[];
+  hubsVendors: any;
   currentHub: any;
   orders: Order[];
   shipping: Date;
@@ -36,6 +37,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   constructor(
     private $engine: EngineService,
     private $modal: ModalController,
+    private $hub: HubService,
     private $order: OrderService,
     private $popup: PopoverController,
     private $route: ActivatedRoute,
@@ -49,6 +51,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     this.config = this.$engine.currentConfig;
     this.hubs = (this.config.shared.hubs || []).slice();
     this.orders = [];
+    this.hubsVendors = {};
 
     //
     // Manage HUB selections
@@ -65,6 +68,12 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         this.hubs[0].selected = true;
       }
     }
+
+    //
+    // get vendors by HUB
+    this.$hub.list().subscribe(hubs => {
+      hubs.forEach(hub => this.hubsVendors[hub.name]=hub.vendors);
+    });
 
     //
     // keep orders sync
@@ -137,6 +146,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         const collected = vendor.collected;
         const address = vendor.address.split('tel:');
         this.vendors[item.vendor] = {};
+        this.vendors[item.vendor]._id = vendor.ref;
         this.vendors[item.vendor].address = address[0];
         this.vendors[item.vendor].geo = vendor.geo;
         this.vendors[item.vendor].phone = (address.length > 1) ? address[1] : null;
@@ -270,9 +280,8 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
   isActiveHub(vendor: string): boolean {    
-    const hubId = (this.currentHub && this.currentHub.id);
-    const isActiveHub = (!this.currentHub || this.vendors[vendor].hubs.indexOf(hubId) >-1);
-    return isActiveHub;
+    const name = (this.currentHub && this.currentHub.name);
+    return (this.hubsVendors[name]||[]).indexOf(this.vendors[vendor]._id)>-1;
   }
 
 
