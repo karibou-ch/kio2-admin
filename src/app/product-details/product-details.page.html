@@ -20,7 +20,7 @@
 
       <ion-item *ngFor="let order of productInOrders;let idx=index" size="large" >
         <ion-label>
-          <b class="red">Psst;</b> Produit dans une commande ouverte
+          <b class="red">Psst;</b> commande en cours avec l'article
           <div class="info">
             {{order.email}} - <b class="red">{{order.shipping.when|date:'d MMM y'}}</b> 
           </div>            
