@@ -1,5 +1,5 @@
 import { Component, OnInit, ElementRef, KeyValueDiffers, KeyValueDiffer } from '@angular/core';
-import { Product, ProductPortion, Utils, Config, Category, Shop, User, LoaderService, ProductService, ShopService } from 'kng2-core';
+import { Product, ProductPortion, Utils, Config, Category, Shop, User, LoaderService, ProductService, ShopService, OrderService } from 'kng2-core';
 import { LoadingController, ToastController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
 import { UploadImagePage } from '../upload-image/upload-image.page';
@@ -21,6 +21,7 @@ export class ProductDetailsPage implements OnInit {
   currentCategory: Category;
   recipes: string[] = [];
   product: Product;
+  productInOrders: any[];
   portion: ProductPortion;
   shops: Shop[];
   TVAs: number[];
@@ -42,6 +43,7 @@ export class ProductDetailsPage implements OnInit {
     private $loader: LoaderService,
     private $product: ProductService,
     private $shops: ShopService,
+    private $orders: OrderService,
     private $route: ActivatedRoute,
     private $router: Router
   ) {
@@ -55,6 +57,7 @@ export class ProductDetailsPage implements OnInit {
 
     this.shops = this.user.shops || [];
     this.sku = this.$route.snapshot.params.sku;
+    this.productInOrders = [];
 
 
     if (this.sku === 'create') {
@@ -103,6 +106,8 @@ export class ProductDetailsPage implements OnInit {
       routerOutlet.length && (routerOutlet[0].classList.add('boost-zindex'));  
     }
 
+    const orders$ = (this.create)? of([]):this.$orders.findProductsInPendingOrders([this.sku]);
+
     const product$ = (this.create) ? of(this.product) : this.$product.get(this.sku);
     if( !this.shops.length) {
       this.getVendors();
@@ -111,8 +116,10 @@ export class ProductDetailsPage implements OnInit {
     combineLatest([
       this.$loader.ready(),
       product$,
-    ]).subscribe(([loader, product]: any) => {
+      orders$
+    ]).subscribe(([loader, product,orders]: any) => {
 
+      this.productInOrders = orders || [];
       //
       // only interrested by active category
       this.categories = (loader[2] || []).filter(c => c.type === 'Category' && c.active);

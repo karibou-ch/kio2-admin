@@ -11,12 +11,20 @@
 
 
 <ion-content *ngIf="product">
-  <!--
-  <form (ngSubmit)="doSave()">-->
 
     <ion-list >
+
       <ion-item>
         <ion-button fill="outline" expand="block" size="large" color="primary" [disabled]="!isReady()" (click)="doSave(product)">Enregistrer</ion-button>
+      </ion-item>
+
+      <ion-item *ngFor="let order of productInOrders;let idx=index" size="large" >
+        <ion-label>
+          <b class="red">Psst;</b> Produit dans une commande ouverte
+          <div class="info">
+            {{order.email}} - <b class="red">{{order.shipping.when|date:'d MMM y'}}</b> 
+          </div>            
+        </ion-label>
       </ion-item>
 
       <ion-item>
@@ -324,7 +332,5 @@
       </ion-item>      
     </ion-list>
 
-  <!--
-  </form> -->
 
 </ion-content>

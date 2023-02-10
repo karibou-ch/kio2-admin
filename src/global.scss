@@ -50,6 +50,12 @@
   }
 }
 
+ion-toggle{
+  --background: #aaa; 
+  --background-checked: #aaa; 
+  --handle-background: #eee!important;     
+  --handle-background-checked: #eee!important;     
+}
 button.cancel-replace {
   border: 1px solid var(--ion-color-primary)!important;
 }
