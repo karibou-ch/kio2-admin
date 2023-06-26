@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Product, Config, User, ProductService } from 'kng2-core';
-import { EngineService } from '../services/engine.service';
-import { ToastController, ModalController } from '@ionic/angular';
-import { ProductDetailsPage } from '../product-details/product-details.page';
-import { Router } from '@angular/router';
+import { Product, Config, User, ProductService, ShopService, Shop } from 'kng2-core';
+import { EngineService, OrdersCtx } from '../services/engine.service';
+import { ToastController } from '@ionic/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-products',
@@ -18,9 +17,12 @@ export class ProductsPage implements OnInit {
   noShop: boolean;
   config: Config;
   user: User;
+  defaultShop: string;
+  skus: string[];
   products: Product[];
   cache: {
     discount: boolean;
+    subscription: boolean;
     active: boolean;
     boost: boolean;
     search: string;
@@ -31,13 +33,16 @@ export class ProductsPage implements OnInit {
 
 
   constructor(
+    private $route: ActivatedRoute,
     private $router: Router,
     private $engine: EngineService,
     private $product: ProductService,
+    private $shop: ShopService,
     private toast: ToastController,
   ) {
     this.cache = {
       discount: false,
+      subscription:false,
       active: true,
       boost: false,
       search: '',
@@ -48,7 +53,23 @@ export class ProductsPage implements OnInit {
 
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
+
+    const loader = this.$route.snapshot.data.loader;
+    //
+    // filter active shop and order by name
+    this.skus = [];
+    this.$engine.findVendors();
+
   }
+
+  get isManager() {
+    return this.user.isAdmin() || this.user.hasRole('manager');
+  }
+
+  get shops(): Shop[]{
+    return this.$engine.shops;
+  }
+
 
   ngAfterViewInit() {
     // console.log('---', window.history)
@@ -86,22 +107,18 @@ export class ProductsPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadProducts();
+    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
+    this.$engine.findAllOrders()
+
   }
 
-  loadProducts() {
+  loadProducts(forceShops?) {
     this.isReady = false;
 
+
     const params:any = {};
-    //
-    // get select products
-    if (this.user.shops.length) {
-      params.shopname = this.user.shops.map(shop => shop.urlpath);
-    }
-    if (!this.user.isAdmin() && !this.user.shops.length) {
-      params.shopname = ['no-shop-to-list'];
-      this.noShop = true;
-    }
+    params.shopname = ['no-shop-to-list'];
+    this.noShop = true;
 
     if (!this.user.isAuthenticated()) {
       this.loadError = true;
@@ -109,9 +126,29 @@ export class ProductsPage implements OnInit {
     }
 
     //
+    // get selected product for admin or manager
+    //
+    
+    // case of admin
+    if(forceShops) {
+      params.shopname = forceShops;
+      params.skus = [];
+    }
+    else if (this.user.isAdmin() || this.user.hasRole('manager')){
+      params.skus = this.skus.slice();
+      params.shopname = [];
+    }
+
+    //
+    // get select products for vendor
+    if (this.user.shops.length) {
+      params.shopname = this.user.shops.map(shop => shop.urlpath);
+    }
+
+
+    //
     // force reload
     params.rnd = Date.now();
-
 
     this.$product.select(params).subscribe(
       (products: Product[]) => {
@@ -122,6 +159,22 @@ export class ProductsPage implements OnInit {
         this.products = this.sliceProducts();
       }
     );
+  }
+
+  onInitOrders(ctx: OrdersCtx) {
+    //
+    // set default order value based on postalCode
+    const skus = ctx.orders.map(order => order.items.map(item => item.sku));
+    this.skus = [...new Set([].concat.apply([], skus))] as string[];
+
+    this.loadProducts();
+  }
+
+  onSelectDefaultShop($event) {
+    const shop = $event.detail.value;
+    console.log('def ',shop);
+    this.loadProducts([shop]);
+
   }
 
   onDone(msg) {
@@ -188,6 +241,13 @@ export class ProductsPage implements OnInit {
         }
         return product.attributes.discount;
       })
+      .filter((product) => {
+        if(!this.cache.subscription){
+          return true;
+        }
+        return product.attributes.subscription;
+      })
+
       .filter((product) => {
         return this.cache.active === product.attributes.available;
       })

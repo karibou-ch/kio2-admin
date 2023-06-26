@@ -50,10 +50,10 @@
         <li>{{defaultShop.address.phone}}</li>
         <li>{{defaultShop.account.IBAN}}</li>
         <!-- <li>{{defaultShop.account.tva.number}}</li>         -->
-        <li [hidden]="!user.connect_state"><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon> Le transfert automatique est actif</li>
+        <li [hidden]="!user.identity.connect_state"><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon> Le transfert automatique est actif</li>
       </ul>
     </ion-item>
-    <ion-item *ngIf="defaultShop && !user.connect_state && false" class="space">
+    <ion-item *ngIf="defaultShop && !user.identity.connect_state && false" class="space">
       <ion-button size="medium"  expand="block" shape="round" fill="outline" color="primary" [href]="stripeUrl">
         <ion-icon slot="start" name="card-outline"></ion-icon> Activer le transfert automatique à votre banque
       </ion-button>

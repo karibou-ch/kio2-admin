@@ -41,6 +41,10 @@ button.action{
   color: white;
 }
 
+ion-chip{
+  font-size: 12px;
+}
+
 @keyframes rotating {
   from{
       -webkit-transform: rotate(0deg);

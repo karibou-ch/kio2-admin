@@ -37,11 +37,26 @@
       <ion-label color="primary">Discount</ion-label>
     </ion-chip>        
 
+    <ion-chip (click)="cache.subscription=!cache.subscription;sliceProducts()">
+      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.subscription"></ion-icon>
+      <ion-label color="primary">Panier</ion-label>
+    </ion-chip>        
+
     <ion-chip (click)="cache.boost=!cache.boost;sliceProducts()" [hidden]="!user.isAdmin()">
       <ion-icon name="checkmark-circle-outline" [hidden]="!cache.boost"></ion-icon>
-      <ion-label color="primary">Boost</ion-label>
+      <ion-label color="primary">BB</ion-label>
     </ion-chip>        
   </ion-item>
+  <ion-item *ngIf="isManager">
+    <ion-label>Choisir un vendeur</ion-label>
+
+    <ion-select interface="action-sheet" color="primary" (ionChange)="onSelectDefaultShop($event)">
+    
+      <ion-select-option  *ngFor="let shop of shops" [value]="shop.urlpath">{{shop.name}}</ion-select-option>
+  </ion-select>
+
+  </ion-item>
+
 
   <div *ngIf="loadError" class="error">
     <b>Ouups!</b> <br/>

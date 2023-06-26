@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User, Order, OrderService, Product, Config } from 'kng2-core';
+import { User, Order, OrderService, Product, Config, ShopService, Shop } from 'kng2-core';
 import { ReplaySubject, from } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
@@ -27,6 +27,7 @@ export class EngineService {
   private user: User;
 
   private cached: any;
+  private _shops: Shop [];
 
   //
   // calendar of loaded Orders
@@ -52,6 +53,7 @@ export class EngineService {
   constructor(
     private $order: OrderService,
     private $route: ActivatedRoute,
+    private $shop: ShopService
     ) {
 
     //
@@ -62,6 +64,7 @@ export class EngineService {
     this.status$ = new ReplaySubject(1);
     this.cached = {};
     this.user = new User();
+    this._shops = [];
   }
 
   initDate() {
@@ -107,6 +110,9 @@ export class EngineService {
     return (!!this.orderStatus.payment);
   }
 
+  get shops() {
+    return this._shops;
+  }
   getAllOrdersByDate() {
     return this.monthOrders;
   }
@@ -114,6 +120,23 @@ export class EngineService {
   getOrdersByDay(shipping: Date) {
     return (this.monthOrders.get(shipping.getTime())) || [];
   }
+
+  findVendors() {
+    const hubs = (this.config.shared.hubs || []).slice();
+
+    //
+    // set default HUB
+    const options: any = {
+      hub: hubs[0].slug
+    };
+
+    this.$shop.query(options).subscribe(shops => {
+      this._shops = shops.filter(a=>a.status).sort((a,b)=> a.urlpath.localeCompare(b.urlpath));
+    }, status => {
+    });
+  }
+
+
   //
   // load orders for Shipping and for Vendors
   findAllOrders() {
