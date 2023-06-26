@@ -1,6 +1,6 @@
 {
   "name": "kio2-admin",
-  "version": "4.0.13",
+  "version": "4.1.0",
   "author": "karibou.ch",
   "homepage": "https://karibou.ch/",
   "scripts": {
@@ -29,7 +29,7 @@
     "@ionic-native/status-bar": "^5.36.0",
     "@ionic/angular": "^5.7.0",
     "@ionic/pro": "^2.0.4",
-    "@sentry/browser": "^@6.16.1",
+    "@sentry/browser": "^6.16.1",
     "@types/cordova": "0.0.34",
     "cordova-android": "8.1.0",
     "cordova-browser": "6.0.0",
@@ -38,7 +38,7 @@
     "cordova-plugin-ionic": "^5.4.7",
     "cordova-plugin-network-information": "^2.0.2",
     "core-js": "^2.5.4",
-    "kng2-core": "file:../kng2-core/dist",
+    "kng2-core": "^3.9.6",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
     "uploadcare-widget": "^3.10.1",
