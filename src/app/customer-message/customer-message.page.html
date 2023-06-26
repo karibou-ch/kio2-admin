@@ -1,0 +1,43 @@
+
+<ion-content class="customer-message">
+
+  <div [hidden]="selected!=0">
+    <p class="details " [innerHtml]="replaceMsg"></p> 
+    <p class="form">
+      <ion-input ngDefaultControl [(ngModel)]="itemName" placeholder="proposer un article ici ..." ></ion-input>
+      <ion-button mode="ios"  size="small" expand="block" (click)="doCustomerContact()" [disabled]="!itemName" color="primary" >Envoyer le SMS à {{customerName}}</ion-button>    
+    </p>
+  </div>
+
+  <div [hidden]="selected!=1">
+    <p class="details" [innerHtml]="replaceCommonMsg"></p> 
+    <ion-button mode="ios"  size="small" expand="block" (click)="doCustomerContact()"  color="primary" > Envoyer le SMS à {{customerName}}</ion-button>    
+  </div>
+
+  <div [hidden]="selected!=2">
+    <p class="details" [innerHtml]="cancelMsg"></p> 
+    <ion-button mode="ios"  size="small" expand="block" (click)="doCustomerContact()"  color="primary" > Envoyer le SMS à {{customerName}}</ion-button>    
+  </div>  
+
+  <p class="info" [hidden]="!failureItems">
+    <span class="red">Déjà <b>{{failureItems}}</b> article(s) annulé(s) de la commande</span><br>
+    Merci de proposer au client un produit de substitution avant de l'annuler l'article de la commande.
+  </p>
+
+
+  <div class="tabs">
+    <div class="tab" [class.selected]="!selected" (click)="selected=0">
+      Proposer
+    </div>
+    <div class="tab" [class.selected]="selected==1" (click)="selected=1">
+      Remplacer
+    </div>
+    <div class="tab red" [class.selected]="selected==2" (click)="selected=2">
+      Annuler
+    </div>
+  </div>
+
+
+  
+
+</ion-content>

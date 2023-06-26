@@ -20,7 +20,6 @@ export class CustomerPage implements OnInit {
   currentGeoIndex: number;
   defaultShop: Shop;
   invoice: {
-    name?: string,
     expiry?: string;
     issuer: string
   }
@@ -36,7 +35,6 @@ export class CustomerPage implements OnInit {
   ) {
     this.user = this.$engine.currentUser;
     this.invoice = {
-      name: '',
       expiry: '',
       issuer: 'invoice'
     };
@@ -54,8 +52,9 @@ export class CustomerPage implements OnInit {
 
   ngOnInit() {
     const id: number = this.id || Number(this.$route.snapshot.paramMap.get('id'));
-    this.$user.get(id).subscribe(customer => {
-      this.customer = customer;
+    const forceload = true;
+    this.$user.get(id,forceload).subscribe(user => {
+      this.customer = user;
       if (this.customer.shops.length) {
         this.defaultShop = this.customer.shops[0];
       }
@@ -81,9 +80,9 @@ export class CustomerPage implements OnInit {
     });
   }
 
-  doAddInvoiceMethod(invoice, cid) {
-    invoice.id = Date.now();
-    this.$user.addPaymentMethod(invoice,cid).subscribe(user => {
+  doAddInvoiceMethod(invoice,uid) {
+    const [month,year] = invoice.expiry.split('/');
+    this.$user.addPaymentCreditMethod(uid, month, year).subscribe(user => {
       this.doToast('La méthode de paiement a été ajoutée');
       this.customer = user;
     }, status => {

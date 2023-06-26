@@ -16,13 +16,13 @@
   <ion-list *ngFor="let order of orders">
     <!-- CUSTOMER HEADER -->
     <ion-item class="customer" *ngIf="order.shipping" >
-      <span  class="rank" [class.red]="doubleCheck">{{getOrderRank(order)}}</span>
+      <span  class="rank" [class.rank-red]="!doubleCheck">{{getOrderRank(order)}}</span>
       <ion-label class="ion-text-wrap" >
         <h2>
           {{order.customer.displayName}} 
         </h2>
         <p> 
-          {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>            
+          {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>{{order.oid}}
         </p>  
       </ion-label>
       <ion-note slot="end" >
@@ -30,42 +30,31 @@
         <span [class.red]="deltaPrice>0.15">{{deltaPrice|percent}}</span><br/>
         <span [hidden]="order.customer.orders>5" class="customer-new">NEW!{{order.customer.orders}}</span>
       </ion-note>
-      <div class="note" slot="end">
-        <a [hidden]="!getPhoneNumber(order)"
-         color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>
-        <a color="info"  href="javascript:void()" (click)="doDisplayMail(order)"> <ion-icon name="mail"> </ion-icon></a>
-      </div>
     </ion-item>
 
+    <!-- CONTACT CUSTOMER -->
+    <ion-item class="customer-actions" *ngIf="order.shipping" >
+      <ion-button mode="ios"  expand="block"  color="primary" (click)="doDisplayMail(order)"><ion-icon name="mail"> </ion-icon> E-mail</ion-button>
+      <ion-button mode="ios"  expand="block"  color="primary" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> Téléphone</ion-button>
+    </ion-item>
+
+
     <!-- DOUBLE CHECK CUSTOMER ITEMS -->
-    <ion-item class="header" >
-      <div tabindex="0" class="fix-safari-14"></div>
-      <div class="header-title important" [class.verify]="doubleCheck" (click)="displayForCheck=!displayForCheck">
-        <!-- VALIDATE -->
-        <ion-toggle mode="md" class="button-check" [hidden]="orders.length>1" [checked]="displayForCheck"></ion-toggle>      
+    <ion-item class="customer-actions" >
+      <ion-button fill="outline" expand="block"  [hidden]="isPaid(order)" 
+                  [color]="doubleCheck?'danger':'primary'" (click)="displayForCheck=!displayForCheck">
+        <span [hidden]="doubleCheck" class="label-error red bold">Double check ce client! </span>
+        <span [hidden]="!doubleCheck">Vue simplifiée</span>
+      </ion-button>
+      <ion-button fill="outline"   color="primary" [hidden]="defaultSmall" [hidden]="isPaid(order)" (click)="doValidateAll(order)">
+        <ion-icon slot="start" name="checkmark-outline" ></ion-icon> 
+        Tout valider
+      </ion-button>
 
-        <span [hidden]="doubleCheck" >Veuiller faire une <span class="red bold">double</span> vérification, merci </span>
-        <span [hidden]="!doubleCheck" class="label-error">Activer la vue simplifiée </span>
-      </div>
+      <ion-button fill="outline" expand="block"  color="danger" [hidden]="defaultSmall" [hidden]="!isPaid(order)" (click)="doRefundHUB(order)">
+        Remboursement
+      </ion-button>
 
-      <!-- REFUND HUB-->
-      <!-- VALIDATE AT ONCE -->
-      <div class="header-actions" [hidden]="defaultSmall">
-
-        <button class="avoid button-refund item-button" 
-          color="danger"  slot="end" 
-          [hidden]="!isPaid(order)"
-          (click)="doRefundHUB(order)">
-          HUB refund
-        </button>
-
-        <button  class="item-button" fill="outline" slot="end" 
-                [hidden]="isPaid(order)"
-                (click)="doValidateAll(order)">
-          <ion-icon slot="start" name="checkmark-outline" ></ion-icon>             
-        </button>
-        
-      </div>
     </ion-item>
 
     <ng-container 
@@ -115,13 +104,6 @@
               <ion-icon name="card-outline" ></ion-icon>&nbsp;refund
             </ion-button>
           </ion-item-option>
-          <ion-item-option>
-            <ion-button mode="ios"
-                    color="danger"  slot="end" 
-                    (click)="doReplace(order,item)">
-              <ion-icon name="card-outline" ></ion-icon>&nbsp;SMS (REPLACE)
-            </ion-button>
-        </ion-item-option>
       </ion-item-options>  
       <ion-item >
         <div tabindex="0" class="fix-safari-14"></div>
@@ -154,7 +136,7 @@
             </button>
             <button class="item-button avoid" fill="outline" slot="end" 
                     [class.button-cancel]="isItemCancel(item)" [hidden]="isPaid(order)"
-                    (click)="doAskCancel(order,item)">
+                    (click)="doAskCancel($event, order,item)">
               <ion-icon slot="start" name="close-outline" ></ion-icon>
             </button>                      
           </div>

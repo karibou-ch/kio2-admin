@@ -30,16 +30,6 @@
         <div  class="rank big">{{item.progress}}/{{item.customers.length}}</div>
       </ion-note>
     </ion-item>
-    <!-- CUSTOMER -->
-    <ion-item class="customer-contact">
-      <ion-select 
-        color="primary" 
-        placeholder="Informer les clients" 
-        interface="action-sheet"
-        (ionChange)="doCustomerContact(item, $event)">
-        <ion-select-option *ngFor="let info of REPLACE_MSG;let idx = index" [value]="idx">{{info.label}}</ion-select-option>
-      </ion-select>
-    </ion-item>
 
     <ion-item-sliding *ngFor="let customer of item.customers">
       <ion-item >        

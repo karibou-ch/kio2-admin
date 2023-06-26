@@ -39,6 +39,14 @@
       <ion-input type="email" placeholder="CC Email" ngDefaultControl [(ngModel)]="customer.email.cc"></ion-input>
     </ion-item>
 
+    <!-- portefeuille -->
+    <ion-item>
+      <ion-label position="fixed" color="primary">
+        portefeuille
+      </ion-label>
+      <ion-input type="number" disabled placeholder="portefeuille" ngDefaultControl [(ngModel)]="customer.balance"></ion-input>
+    </ion-item>
+
     <ion-item *ngFor="let phone of customer.phoneNumbers">
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Télephone</ion-label>
       <ion-input type="phone" placeholder="Phone" ngDefaultControl [(ngModel)]="phone.number"></ion-input>
@@ -63,7 +71,7 @@
         <li>{{defaultShop.address.phone}}</li>
         <li>{{defaultShop.account.IBAN}}</li>
         <!-- <li>{{defaultShop.account.tva.number}}</li>         -->
-        <li [hidden]="!customer.connect_state"><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon> Le transfert automatique est actif</li>
+        <li [hidden]="!customer.identity.connect_state"><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon> Le transfert automatique est actif</li>
       </ul>
     </ion-item>
 
@@ -82,7 +90,6 @@
     <ion-item >
       <ion-label position="stacked" class="ion-text-wrap" color="primary">Ajouter le paiement par Facture</ion-label>
       <div class="invoice-form">
-        <ion-input type="text" placeholder="Nom, prénom" ngDefaultControl [(ngModel)]="invoice.name"></ion-input>
         <ion-input type="text" placeholder="MM/YYYY" ngDefaultControl [(ngModel)]="invoice.expiry"></ion-input>
         <button  (click)="doAddInvoiceMethod(invoice,customer.id)">Ajouter</button>
       </div>
