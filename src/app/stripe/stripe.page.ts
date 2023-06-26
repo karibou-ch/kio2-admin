@@ -38,7 +38,7 @@ export class StripePage implements OnInit {
 
 
     this.isValid = (!!this.code && !!this.state);
-    this.isOK = this.user.connect_state;
+    this.isOK = this.user.identity.connect_state;
   }
 
   ngOnInit() {

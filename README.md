@@ -36,7 +36,7 @@ Kio2-admin is a:
 # Compile
 * note: `--prod` ~equals `--aot --minifycss --optimizejs`
 ```bash
-  $ ionic cordova build browser --prod --env prod
+  $ npx ionic cordova build browser --prod --env prod
   $ ionic cordova build android --prod
 ```
 
@@ -55,8 +55,7 @@ Kio2-admin is a:
 
 ```bash
   $ ionic cordova build browser --prod --env=bretzel
-  $ rsync -avziu --delete-after -e 'ssh -p22' platforms/browser/www/ $user@$server:$path 
-  $ rsync -avziu --stats --progress --delete-after -e 'ssh -p22' platforms/browser/www/ evaleto@evaletolab.ch:www/admin.boulangerie-bretzel.ch/
+  $ rsync -avziu --delete-after  platforms/browser/www/ $user@$server:www/testadmin.76e01bcb2f3e102802/
 ```
 
 # Debug

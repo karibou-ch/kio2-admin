@@ -57,7 +57,7 @@
       </ion-item-options>
       <ion-item  [class.pending]="order.payment.status=='invoice'">
         <ion-note slot="end">
-          <span class="price" >{{getSubTotal(order)|number:'1.0-2'}} fr | <b>{{getTotal(order)|number:'1.0-2'}} fr</b></span>
+          <span class="price" ><b>{{getTotal(order)|number:'1.0-2'}} fr</b></span>
         </ion-note>        
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->

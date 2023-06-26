@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, NavigationExtras } from '@angular/router';
+import { Router } from '@angular/router';
 import { EngineService } from '../services/engine.service';
 import { User, Config, Shop } from 'kng2-core';
 
