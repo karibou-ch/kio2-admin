@@ -415,7 +415,7 @@ export class OrdersItemsPage implements OnInit {
   }
 
   isPaid(order: Order) {
-    return (['paid', 'partially_refunded', 'manually_refunded'].indexOf(order.payment.status) > -1);
+    return (['invoice','paid', 'partially_refunded', 'manually_refunded'].indexOf(order.payment.status) > -1);
   }
 
   //
