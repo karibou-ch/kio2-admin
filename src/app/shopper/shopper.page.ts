@@ -482,7 +482,7 @@ export class ShopperPage implements OnInit, OnDestroy {
       time = time.getHours() + ':' + ('0' + time.getMinutes()).slice(-2);
     }
 
-    this.$order.updateShippingShopper('', shopper, plan, when, time)
+    this.$order.updateShippingShopper(hub, shopper, plan, when, time)
         .subscribe(ok => {
           this.onDone('Livraisons planifiées');
         }, status => {
