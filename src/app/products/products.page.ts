@@ -66,6 +66,10 @@ export class ProductsPage implements OnInit {
     return this.user.isAdmin() || this.user.hasRole('manager');
   }
 
+  get isManagerOrLogistic(){
+    return this.user.isAdmin() || this.user.hasRole('manager') || this.user.hasRole('logistic');
+  }
+
   get shops(): Shop[]{
     return this.$engine.shops;
   }
@@ -134,7 +138,7 @@ export class ProductsPage implements OnInit {
       params.shopname = forceShops;
       params.skus = [];
     }
-    else if (this.user.isAdmin() || this.user.hasRole('manager')){
+    else if (this.user.isAdmin() || this.user.hasRole('manager') || this.user.hasRole('logistic')){
       params.skus = this.skus.slice();
       params.shopname = [];
     }

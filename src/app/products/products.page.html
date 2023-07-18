@@ -47,7 +47,7 @@
       <ion-label color="primary">BB</ion-label>
     </ion-chip>        
   </ion-item>
-  <ion-item *ngIf="isManager">
+  <ion-item *ngIf="isManagerOrLogistic">
     <ion-label>Choisir un vendeur</ion-label>
 
     <ion-select interface="action-sheet" color="primary" (ionChange)="onSelectDefaultShop($event)">
