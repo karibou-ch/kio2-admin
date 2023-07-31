@@ -89,6 +89,7 @@ D'avance merci pour votre compréhension.`
   doCustomerContact(action) {
 
 
+    this.selected = action;
     //
     // SMS links are platform dependant
     // https://stackoverflow.com/a/19126326
@@ -103,7 +104,6 @@ D'avance merci pour votre compréhension.`
     console.log('--- link',aLink.href);
 
     aLink.click();
-    console.log('---',action)
     this.$popup.dismiss(action);
   }
 
@@ -111,7 +111,6 @@ D'avance merci pour votre compréhension.`
 
 
   onClose(action) {
-    console.log('---',action)
     this.$popup.dismiss(action||'');
   }
 }
