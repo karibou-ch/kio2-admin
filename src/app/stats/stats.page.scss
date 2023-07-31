@@ -1,0 +1,141 @@
+.content{
+  overflow-y: auto!important;
+  height: 100%;
+  margin: 0;
+  background-color: white;
+  color: #333;
+  input{
+    color: #333;
+  }
+  @media print {
+    position: relative;
+    contain: unset;
+    height: auto!important;
+  }
+
+  .header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    .mail{
+      width: 50%;
+      margin: auto;
+      display: flex;
+      button{
+        padding: 20px 30px;
+        background-color: #eee;
+        border-radius: 15px;
+        margin: auto;
+        font-weight: bold;
+        font-size: 18px;
+      }
+    }
+
+  }
+  a{
+    cursor: pointer;
+  }
+
+  .crm{
+    width: 100%;
+    .column{
+      display: flex;
+      flex-direction: row ;
+      flex-wrap: nowrap;
+      .thread{
+        &.premium, 
+        &.recurrent{
+          h4{
+            color: green;
+          }
+        }
+        
+        border: 1px solid #ddd;
+        border-radius: 14px;
+        margin: 5px;
+        padding: 5px;        
+        min-width: 300px;
+        height: calc(100vh - 200px);
+        overflow: hidden;
+        overflow-y: auto;
+        position: relative;
+        h4{
+          position: sticky;
+          top:-5px;
+          width: calc(100% + 10px);
+          border-bottom: 1px solid #ddd;
+          background-color: white;
+          padding: 6px 9px;
+          margin: -4px!important;
+          font-weight: bold;
+          .count{
+            float: right;
+          }
+        }        
+        .actions{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 5px;
+          background:#eee;
+          position: sticky;
+          top: 32px;
+          .when{
+            margin-left: auto;
+            margin-right: 10px;
+            cursor: pointer;
+          }          
+        }
+        .customer {
+          display: flex;
+          padding: 2px;
+          input{
+            margin: 3px;
+          }
+          .name{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 250px;
+          }
+          .orders{
+            width: 34px;
+            min-width: 34px;
+            margin-right: 0;
+            text-align: right;
+          }
+          .funnel{
+            width: 45px;
+            margin-right: 0;
+            text-align: right;
+            font-size: 14px;
+            overflow: hidden;
+            text-wrap: nowrap;            
+            color: green;
+            font-weight: bold;
+          }
+          .when{
+            margin-left: auto;
+            margin-right: 25px;            
+            color: green;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+@media print {
+  .report{
+    border: none!important;
+    padding:5px!important; 
+    font-size: xx-small!important;
+  }
+}

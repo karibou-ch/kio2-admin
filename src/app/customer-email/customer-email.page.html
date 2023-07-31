@@ -1,0 +1,66 @@
+
+<ion-content class="customer-email">
+
+  <ion-list>
+    <ion-item>
+      <ion-textarea label="BCC:" 
+                    labelPlacement="stacked" 
+                    errorText="La liste d'email n'est pas correcte"
+                    [(ngModel)]="customersEmail"
+                    [autoGrow]="true"
+                    placeholder="Destinataires" ></ion-textarea>
+    </ion-item>
+    <ion-item >
+      <ion-input label="from" [(ngModel)]="from" labelPlacement="stacked" placeholder="from ...@karibou.ch"></ion-input>
+    </ion-item>
+    <ion-item >
+      <ion-input label="Sujet" [(ngModel)]="subject" labelPlacement="stacked" placeholder="Sujet du mail"></ion-input>
+      <select  [(ngModel)]="funnel">
+        <option value="new">New</option>
+        <option value="early">Early</option>
+        <option value="recurrent">Recurrent</option>
+        <option value="premium">Premium</option>
+        <option value="quit">Quit</option>
+        <option value="oblivious">Oblivious</option>
+        <option value="removed">removed</option>
+      </select>
+
+    </ion-item>
+
+    <ion-item>
+      <ion-textarea label="Message" 
+                    labelPlacement="stacked"                     
+                    [autoGrow]="true"
+                    [(ngModel)]="content"
+                    placeholder="Message à envoyer" ></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <p>
+        <a href="https://jonschlinkert.github.io/remarkable/demo/" target="_new">Markdown documentation</a>
+      </p>
+    </ion-item>
+  </ion-list>
+
+
+  <div class="actions">
+    <ion-button mode="ios"  size="small" expand="block" (click)="onCustomerContact()"  color="primary" > 
+      Envoyer l'e-mail <span class="bold">{{funnel}}</span>
+    </ion-button>    
+    <ion-button mode="ios" [disabled]="!from"  size="small" expand="block" (click)="onCustomerTest()"  color="primary" > 
+      Envoyer un test à {{from}}
+    </ion-button>    
+
+    <ion-button mode="ios" [disabled]="!from||!funnel" size="small" expand="block" (click)="onCustomerFunnel()"  color="primary" > 
+      Modifier la position {{funnel}}
+    </ion-button>    
+
+    <ion-button mode="ios"  size="small" color="alert" (click)="onCancel()"  color="primary" > 
+      Annuler
+    </ion-button>    
+
+  </div>  
+
+  <p class="info">
+  </p>
+
+</ion-content>

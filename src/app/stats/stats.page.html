@@ -1,0 +1,131 @@
+<ion-header>
+  <ion-toolbar color="primary" class="hidden-print">
+    <ion-title class="text-capitalize">uCRM</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<div class="content" ion-content-print>
+  <div class="header">
+    <ul >
+      <li><b>New:</b> Comptes  avec <b>0</b> cmd et créés les <b>2/ans</b></li>
+      <li><b>Early:</b> Comptes avec <b>&lt;6</b> cmd</li>
+      <li><b>Recurrent:</b> Au moins <b>>1</b> commande dans les <b>6/mois</b> et <b>&gt;5</b> cmd totales</li>
+      <li><b>Quit:</b> Pas de nouvelle commande depuis <b>6/mois</b> avec un solde <b>&gt;5</b> cmd totales</li>
+    </ul>
+    <div class="mail">
+      <ul>
+        <li><b>Oblivious:</b> Comptes sans commande qui nous ont oubliés (<a (click)="onOblivious()">afficher</a> )</li>
+        <li><b>Clients:</b> {{totalCustomers}}, (<a (click)="toggleRecurrent=!toggleRecurrent">toggle-recurrent</a> )</li>
+        <li><b>Filtrer:</b> (<a (click)="funnelFilter='oblivious'">oblivious</a>) (<a (click)="funnelFilter='new'">new</a>) (<a (click)="funnelFilter='early'">early</a>) (<a (click)="funnelFilter='removed'">removed</a>) (<a (click)="funnelFilter='quit'">quit</a>) (<a class="red" (click)="funnelFilter=''">all</a>)</li>
+      </ul>
+      <button (click)="onEmail()">Envoyer un e-mail à la selection {{emailsSelectedCount}}</button>
+    </div>
+  </div>
+
+  <div class="crm">
+    <div class="column">
+      <div class="thread oblivious" *ngIf="$crm.customerOblivious.length">
+        <h4 class="red">Oblivious <span class="count">{{$crm.customerOblivious.length}}</span></h4>
+        <div class="actions">
+          <input type="checkbox" (click)="onCheckedAll('customerOblivious')">
+          <div class="when" (click)="sortCustomers('customerOblivious','created')">↕️ created</div>
+          <div class="count" (click)="sortCustomers('customerOblivious','count')">↕️ funnel</div>          
+        </div>
+        <div class="customer" *ngFor="let user of customerOblivious">
+          <input type="checkbox" (click)="onChecked(user)" [checked]="user.selected" >
+          <div class="name">{{user.displayName||user.email.address}}</div>
+          <div class="when">{{user.created|date:'M/yy'}}</div>
+          <div class="funnel">{{user.orders.funnel}}</div>
+        </div>
+      </div>
+
+
+      <div class="thread new">
+        <h4>New <span class="count">{{$crm.customerNew.length}}</span></h4>
+        <div class="actions">
+          <input type="checkbox" (click)="onCheckedAll('customerNew')">
+          <div class="when" (click)="sortCustomers('customerNew','when')">↕️ when</div>
+          <div class="count" (click)="sortCustomers('customerNew','count')">↕️ funnel</div>          
+        </div>
+        <div class="customer" *ngFor="let user of customerNew">
+          <input type="checkbox" (click)="onChecked(user)" [checked]="user.selected" >
+          <div class="name">{{user.displayName||user.email.address}}</div>
+          <div class="when">{{user.created|date:'M/yy'}}</div>
+          <div class="funnel">{{user.orders.funnel}}</div>
+        </div>
+      </div>
+      <div class="thread early">
+        <h4>Early <span class="count">{{$crm.customerEarly.length}}</span></h4>
+        <div class="actions">
+          <input type="checkbox" (click)="onCheckedAll('customerEarly')">
+          <div class="when" (click)="sortCustomers('customerEarly','when')">↕️ when</div>
+          <div class="count" (click)="sortCustomers('customerEarly','count')">↕️ orders</div>          
+        </div>
+        <div class="customer" *ngFor="let user of customerEarly">
+          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="!!user.selected">
+          <div class="name">{{user.displayName}}</div>
+          <div class="funnel">{{user.orders.funnel||''}}</div>
+          <div class="when">{{user.orders.latest|date:'M/yy'}}</div>
+          <div class="orders">{{user.orders.count}}</div>
+        </div>
+
+      </div>
+
+      <div class="thread recurrent" [hidden]="toggleRecurrent">
+        <h4>Recurrent <span class="count">{{$crm.customerRecurrent.length}}</span></h4>
+        <div class="actions">
+          <input type="checkbox" (click)="onCheckedAll('customerRecurrent')">
+          <div class="when" (click)="sortCustomers('customerRecurrent','when')">↕️ when</div>
+          <div class="count" (click)="sortCustomers('customerRecurrent','count')">↕️ orders</div>          
+        </div>
+        <div class="customer" *ngFor="let user of customerRecurrent">
+          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="user.selected">
+          <div class="name">{{user.displayName}}</div>
+          <div class="funnel">{{user.orders.funnel||''}}</div>
+          <div class="when">{{user.orders.latest|date:'M/yy'}}</div>
+          <div class="orders">{{user.orders.count}}</div>
+        </div>
+      </div>
+      <div class="thread premium" [hidden]="toggleRecurrent">
+        <h4>Premium <span class="count">{{$crm.customerPremium.length}}</span></h4>
+        <div class="actions">
+          <input type="checkbox" (click)="onCheckedAll('customerPremium')">
+          <div class="when" (click)="sortCustomers('customerPremium','when')">↕️ when</div>
+          <div class="count" (click)="sortCustomers('customerPremium','count')">↕️ orders</div>          
+        </div>
+        <div class="customer" *ngFor="let user of customerPremium">
+          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="!!user.selected">
+          <div class="name">{{user.displayName}}</div>
+          <div class="funnel">{{user.orders.funnel||''}}</div>
+          <div class="when">{{user.orders.latest|date:'M/yy'}}</div>
+          <div class="orders">{{user.orders.count}}</div>
+        </div>
+      </div>
+
+      <div class="thread quit">
+        <h4>Quit <span class="count">{{$crm.customerQuit.length}}</span></h4>
+        <div class="actions">
+          <input type="checkbox" (click)="onCheckedAll('customerQuit')">
+          <div class="when" (click)="sortCustomers('customerQuit','when')">↕️ when</div>
+          <div class="count" (click)="sortCustomers('customerQuit','count')">↕️ orders</div>          
+        </div>
+        <div class="customer" *ngFor="let user of customerQuit">
+          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="!!user.selected">
+          <div class="name">{{user.displayName}}</div>
+          <div class="funnel">{{user.orders.funnel||''}}</div>
+          <div class="when">{{user.orders.latest|date:'M/yy'}}</div>
+          <div class="orders">{{user.orders.count}}</div>
+        </div>
+
+      </div>
+    </div>
+    
+
+    <div class="page-break"></div>    
+  </div>    
+</div>
+    

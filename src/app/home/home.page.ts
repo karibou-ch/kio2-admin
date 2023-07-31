@@ -90,6 +90,10 @@ export class HomePage {
     this.$router.navigate(['/issues']);
   }
 
+  openCRM() {
+    this.$router.navigate(['/crm']);
+  }
+
   openReport() {
     this.$router.navigate(['/report']);
   }

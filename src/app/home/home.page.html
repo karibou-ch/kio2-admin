@@ -73,7 +73,12 @@
 
       <ion-col [hidden]="!isAdmin" (click)="openAnalytics()">
         <ion-icon name="analytics-outline" color="grey-icon"></ion-icon>
-        <div>Statistique</div>
+        <div>Analytic</div>
+      </ion-col>
+
+      <ion-col [hidden]="!isAdmin" (click)="openCRM()">
+        <ion-icon name="analytics-outline" color="grey-icon"></ion-icon>
+        <div>uCRM</div>
       </ion-col>
 
       <ion-col [hidden]="!isAdmin" (click)="openInvoices()">
