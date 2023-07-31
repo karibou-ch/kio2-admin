@@ -1,6 +1,7 @@
 # Specifies intentionally untracked files to ignore when using Git
 # http://git-scm.com/docs/gitignore
 
+
 *~
 *.sw[mnpcod]
 *.log
@@ -23,6 +24,7 @@ node_modules/
 **/node_modules/
 tmp/
 temp/
+trash/
 hooks/
 platforms/
 plugins/

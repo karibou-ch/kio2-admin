@@ -83,11 +83,11 @@ const routes: Routes = [
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./vendor-details/vendor-details.module').then( m => m.VendorDetailsPageModule)
   },
-  { path: '**', redirectTo: '/home', pathMatch: 'full' },
   {
-    path: 'analytics',
-    loadChildren: () => import('./analytics/analytics.module').then( m => m.AnalyticsPageModule)
-  }
+    path: 'crm',
+    loadChildren: () => import('./stats/stats.module').then( m => m.StatsPageModule)
+  },
+  { path: '**', redirectTo: '/home', pathMatch: 'full' }
 ];
 
 @NgModule({

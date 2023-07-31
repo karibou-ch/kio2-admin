@@ -1,6 +1,6 @@
 {
   "name": "kio2-admin",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "author": "karibou.ch",
   "homepage": "https://karibou.ch/",
   "scripts": {
@@ -38,7 +38,7 @@
     "cordova-plugin-ionic": "^5.4.7",
     "cordova-plugin-network-information": "^2.0.2",
     "core-js": "^2.5.4",
-    "kng2-core": "^3.9.6",
+    "kng2-core": "^3.10.3",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
     "uploadcare-widget": "^3.10.1",

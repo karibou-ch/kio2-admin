@@ -21,8 +21,8 @@ export class CustomerMessage implements OnInit {
 
   message={
     cancel:
-`Bonjour,\nLe produit «_ITEM_» n'est pas disponible pour votre commande karibou.ch.\n
-Nous sommes désolé pour ce désagrement.\n`,
+`Bonjour,\nLe produit «_ITEM_» n'est pas disponible pour votre commande karibou.ch, il sera supprimé de votre facture finale.\n
+Nous sommes désolés pour ce désagrement.\n`,
     replace:
 `Bonjour,\nLe produit «_ITEM_» n'est pas disponible pour votre commande karibou.ch.\n
 Si cela vous convient, il sera remplacé par : \n
@@ -86,23 +86,7 @@ D'avance merci pour votre compréhension.`
   }
 
 
-  doCustomerContact() {
-
-    //
-    // build content message
-    // const customers = item.customers.map(order => order.customer);
-    // const {subject, body, prefix, sms, phones} = this.buildCustomerMSG(customers, idx, item);
-
-    // // <a href="sms:/* phone number here */&body=/* body text here */">Link</a>
-    // const mailhref = 'mailto:' + this.user.email.address +
-    //              '?bcc=' + names.join(',') +
-    //              '&subject=' + subject +
-    //              '&body=' + body;
-
-    // <a href="sms:/* phone number here */&body=/* body text here */">Link</a>
-    // const sendSMS = '<a class="" href="sms:' + (sms.map(p => p[1]).join(',')) +
-    //                                                 prefix + 'body=' + encodeURI(body) + '">' +
-    //                                                 sms.map(p => p[0]).join(', ') + '</a>';
+  doCustomerContact(action) {
 
 
     //
@@ -119,13 +103,15 @@ D'avance merci pour votre compréhension.`
     console.log('--- link',aLink.href);
 
     aLink.click();
-    this.$popup.dismiss(this.action);
+    console.log('---',action)
+    this.$popup.dismiss(action);
   }
 
 
 
 
-  onClose() {
-    this.$popup.dismiss('');
+  onClose(action) {
+    console.log('---',action)
+    this.$popup.dismiss(action||'');
   }
 }

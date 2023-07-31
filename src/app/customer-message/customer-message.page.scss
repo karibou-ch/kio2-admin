@@ -17,6 +17,28 @@
   align-content: center;
   flex-direction: column;
 
+  .replace, .cancel{
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+    
+  }
+
+  .cancel{
+    p{
+      color: red;
+    }
+  }
+
+  .done{
+    ion-button{
+      width: 100%;
+      --border-radius: 8px;  
+    }
+  }
+
   .tabs{
     display: flex;
     width: 100%;
@@ -41,23 +63,27 @@
   }
 
   ion-input{
-    border: 1px solid #eee;
     padding: 4px 10px !important;
     background-color: #eee;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border: 0px solid #ddd;
+    border-radius: 0px;
   }
   ion-button{
-    margin: 4px 0;    
+    margin: 0px 0;    
+    height: 45px;
+    margin-left: auto;
+    --border-radius: 45px;
+    width: 45px;
   }
 
   p{
-    margin: 5px 0;
+    margin: 0px 0;
     width: 100%;
     padding: 8px;
   }
   .form{
     padding: 0px;
+    display: flex;
   }
 
   .details{
@@ -76,8 +102,9 @@
     margin: 0;
     color: #000;
     font-size: 16px;    
-    border: 1px solid #ddd;
+    border: 2px solid #ddd;
     border-radius: 5px;    
+    margin-bottom: 20px;
   }
 
   .info{

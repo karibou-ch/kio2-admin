@@ -1,31 +1,37 @@
 
 <ion-content class="customer-message">
 
-  <div [hidden]="selected!=0">
-    <p class="details " [innerHtml]="replaceMsg"></p> 
-    <p class="form">
-      <ion-input ngDefaultControl [(ngModel)]="itemName" placeholder="proposer un article ici ..." ></ion-input>
-      <ion-button mode="ios"  size="small" expand="block" (click)="doCustomerContact()" [disabled]="!itemName" color="primary" >Envoyer le SMS à {{customerName}}</ion-button>    
-    </p>
-  </div>
-
-  <div [hidden]="selected!=1">
-    <p class="details" [innerHtml]="replaceCommonMsg"></p> 
-    <ion-button mode="ios"  size="small" expand="block" (click)="doCustomerContact()"  color="primary" > Envoyer le SMS à {{customerName}}</ion-button>    
-  </div>
-
-  <div [hidden]="selected!=2">
-    <p class="details" [innerHtml]="cancelMsg"></p> 
-    <ion-button mode="ios"  size="small" expand="block" (click)="doCustomerContact()"  color="primary" > Envoyer le SMS à {{customerName}}</ion-button>    
-  </div>  
-
+  <h4>Écrire à {{customerName}}</h4>
   <p class="info" [hidden]="!failureItems">
     <span class="red">Déjà <b>{{failureItems}}</b> article(s) annulé(s) de la commande</span><br>
     Merci de proposer au client un produit de substitution avant de l'annuler l'article de la commande.
   </p>
 
+  <div  class="replace">
+    <p class="details " [innerHtml]="replaceMsg"></p> 
+    <p class="form">
+      <ion-input ngDefaultControl [(ngModel)]="itemName" placeholder="proposer un article ici ..." ></ion-input>
+      <ion-button mode="ios"    (click)="doCustomerContact('replace')" [disabled]="!itemName" color="primary" >SMS</ion-button>    
+    </p>
+  </div>
 
-  <div class="tabs">
+  <div  class="replace">
+    <p class="details" [innerHtml]="replaceCommonMsg"></p> 
+    <ion-button mode="ios"    (click)="doCustomerContact('replace')"  color="primary" > SMS</ion-button>    
+  </div>
+
+  <div  class="cancel">
+    <p class="details" [innerHtml]="cancelMsg"></p> 
+    <ion-button mode="ios"    (click)="doCustomerContact('cancel')"  color="primary" > SMS</ion-button>    
+  </div>  
+
+
+  <div  class="done">
+    <ion-button mode="ios"   expand="block"  (click)="onClose('cancel')"  color="danger" >Annuler sans SMS</ion-button>    
+  </div>  
+
+
+  <div class="tabs hide">
     <div class="tab" [class.selected]="!selected" (click)="selected=0">
       Proposer
     </div>
