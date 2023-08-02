@@ -17,7 +17,7 @@
 
   <div  class="replace">
     <p class="details" [innerHtml]="replaceCommonMsg"></p> 
-    <ion-button mode="ios"    (click)="doCustomerContact('replace')"  color="primary" > SMS</ion-button>    
+    <ion-button mode="ios"    (click)="doCustomerContact('replacecommon')"  color="primary" > SMS</ion-button>    
   </div>
 
   <div  class="cancel">
@@ -30,18 +30,6 @@
     <ion-button mode="ios"   expand="block"  (click)="onClose('cancel')"  color="danger" >Annuler sans SMS</ion-button>    
   </div>  
 
-
-  <div class="tabs hide">
-    <div class="tab" [class.selected]="!selected" (click)="selected=0">
-      Proposer
-    </div>
-    <div class="tab" [class.selected]="selected==1" (click)="selected=1">
-      Remplacer
-    </div>
-    <div class="tab red" [class.selected]="selected==2" (click)="selected=2">
-      Annuler
-    </div>
-  </div>
 
 
   

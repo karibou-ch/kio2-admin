@@ -14,7 +14,7 @@ export class CustomerMessage implements OnInit {
   @Input() item: OrderItem;
 
 
-  selected=0;
+  selected="cancel";
   countItems = 0;
   failureItems = 0;
   itemName ="";
@@ -62,19 +62,12 @@ D'avance merci pour votre compréhension.`
 
   get body() {
     switch(this.selected){
-      case 0: return this.replaceMsg;
-      case 1: return this.replaceCommonMsg;
-      case 2: return this.cancelMsg;
+      case "replace": return this.replaceMsg;
+      case "replacecommon": return this.replaceCommonMsg;
+      case "cancel": return this.cancelMsg;
     }
   }
 
-  get action(){
-    switch(this.selected){
-      case 0: return "replace";
-      case 1: return "replace";
-      case 2: return "cancel";
-    }
-  }
 
   ngOnInit() {
     this.failureItems = this.order.items.reduce((sum,item) => {
@@ -111,6 +104,6 @@ D'avance merci pour votre compréhension.`
 
 
   onClose(action) {
-    this.$popup.dismiss(action||'');
+    this.$popup.dismiss('cancel');
   }
 }
