@@ -91,7 +91,10 @@
           display: flex;
           padding: 2px;
           input{
-            margin: 3px;
+            margin: 2px;
+            min-width: 17px;
+            width: 17px;
+            height: 17px;
           }
           .name{
             text-overflow: ellipsis;

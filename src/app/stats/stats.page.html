@@ -18,12 +18,30 @@
     </ul>
     <div class="mail">
       <ul>
-        <li><b>Oblivious:</b> Comptes sans commande qui nous ont oubliés (<a (click)="onOblivious()">afficher</a> )</li>
-        <li><b>Clients:</b> {{totalCustomers}}, (<a (click)="toggleRecurrent=!toggleRecurrent">toggle-recurrent</a> )</li>
-        <li><b>Filtrer:</b> (<a (click)="funnelFilter='oblivious'">oblivious</a>) (<a (click)="funnelFilter='new'">new</a>) (<a (click)="funnelFilter='early'">early</a>) (<a (click)="funnelFilter='removed'">removed</a>) (<a (click)="funnelFilter='quit'">quit</a>) (<a class="red" (click)="funnelFilter=''">all</a>)</li>
+        <li><b>Clients total:</b> {{totalCustomers}}, </li>
       </ul>
       <button (click)="onEmail()">Envoyer un e-mail à la selection {{emailsSelectedCount}}</button>
     </div>
+  </div>
+  <div class="filters options">
+    <ion-chip color="primary" (click)="onToggleSource()">Switch:Source</ion-chip>    
+    <ion-chip color="danger" (click)="onOblivious()">View:Oblivious</ion-chip>    
+    <ion-chip color="warning" (click)="toggleRecurrent=!toggleRecurrent">View:Recurrent</ion-chip>
+    <ion-chip color="success" (click)="funnelFilter='new'">Funnel:New</ion-chip>
+    <ion-chip color="success" (click)="funnelFilter='early'">Funnel:Early</ion-chip>
+    <ion-chip color="success" (click)="funnelFilter='removed'">Funnel:Removed</ion-chip>
+    <ion-chip color="success" (click)="funnelFilter='quit'">Funnel:Quit</ion-chip>
+    <ion-chip color="dark" (click)="funnelFilter='';toggleSource=0">Reset</ion-chip>
+  </div>
+  <div class="filters active">
+    <ion-chip outline>View:<b>{{sourceLabel[toggleSource]}}</b></ion-chip>    
+    <ion-chip outline [disabled]="!toggleRecurrent"><b>View:Recurrent</b></ion-chip>
+    <ion-chip outline [disabled]="!$crm.customerOblivious.length"><b>View:Oblivious</b></ion-chip>
+    <ion-chip outline [disabled]="funnelFilter!='new'"><b>Filter:New</b></ion-chip>
+    <ion-chip outline [disabled]="funnelFilter!='early'"><b>Filter:Early</b></ion-chip>
+    <ion-chip outline [disabled]="funnelFilter!='removed'"><b>Filter:Removed</b></ion-chip>
+    <ion-chip outline [disabled]="funnelFilter!='quit'"><b>Filter:Quit</b></ion-chip>
+
   </div>
 
   <div class="crm">
@@ -42,31 +60,29 @@
           <div class="funnel">{{user.orders.funnel}}</div>
         </div>
       </div>
-
-
       <div class="thread new">
-        <h4>New <span class="count">{{$crm.customerNew.length}}</span></h4>
+        <h4>New <span class="count">{{customerNew.length}}</span></h4>
         <div class="actions">
           <input type="checkbox" (click)="onCheckedAll('customerNew')">
           <div class="when" (click)="sortCustomers('customerNew','when')">↕️ when</div>
           <div class="count" (click)="sortCustomers('customerNew','count')">↕️ funnel</div>          
         </div>
         <div class="customer" *ngFor="let user of customerNew">
-          <input type="checkbox" (click)="onChecked(user)" [checked]="user.selected" >
+          <input type="checkbox" (click)="onChecked(user)" [attr.checked]="user.selected" >
           <div class="name">{{user.displayName||user.email.address}}</div>
           <div class="when">{{user.created|date:'M/yy'}}</div>
           <div class="funnel">{{user.orders.funnel}}</div>
         </div>
       </div>
       <div class="thread early">
-        <h4>Early <span class="count">{{$crm.customerEarly.length}}</span></h4>
+        <h4>Early <span class="count">{{customerEarly.length}}</span></h4>
         <div class="actions">
           <input type="checkbox" (click)="onCheckedAll('customerEarly')">
           <div class="when" (click)="sortCustomers('customerEarly','when')">↕️ when</div>
           <div class="count" (click)="sortCustomers('customerEarly','count')">↕️ orders</div>          
         </div>
         <div class="customer" *ngFor="let user of customerEarly">
-          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="!!user.selected">
+          <input type="checkbox" (click)="onChecked(user)" [attr.checked]="user.selected">
           <div class="name">{{user.displayName}}</div>
           <div class="funnel">{{user.orders.funnel||''}}</div>
           <div class="when">{{user.orders.latest|date:'M/yy'}}</div>
@@ -74,16 +90,15 @@
         </div>
 
       </div>
-
       <div class="thread recurrent" [hidden]="toggleRecurrent">
-        <h4>Recurrent <span class="count">{{$crm.customerRecurrent.length}}</span></h4>
+        <h4>Recurrent <span class="count">{{customerRecurrent.length}}</span></h4>
         <div class="actions">
           <input type="checkbox" (click)="onCheckedAll('customerRecurrent')">
           <div class="when" (click)="sortCustomers('customerRecurrent','when')">↕️ when</div>
           <div class="count" (click)="sortCustomers('customerRecurrent','count')">↕️ orders</div>          
         </div>
         <div class="customer" *ngFor="let user of customerRecurrent">
-          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="user.selected">
+          <input type="checkbox" (click)="onChecked(user)" [attr.checked]="user.selected">
           <div class="name">{{user.displayName}}</div>
           <div class="funnel">{{user.orders.funnel||''}}</div>
           <div class="when">{{user.orders.latest|date:'M/yy'}}</div>
@@ -91,30 +106,29 @@
         </div>
       </div>
       <div class="thread premium" [hidden]="toggleRecurrent">
-        <h4>Premium <span class="count">{{$crm.customerPremium.length}}</span></h4>
+        <h4>Premium <span class="count">{{customerPremium.length}}</span></h4>
         <div class="actions">
           <input type="checkbox" (click)="onCheckedAll('customerPremium')">
           <div class="when" (click)="sortCustomers('customerPremium','when')">↕️ when</div>
           <div class="count" (click)="sortCustomers('customerPremium','count')">↕️ orders</div>          
         </div>
         <div class="customer" *ngFor="let user of customerPremium">
-          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="!!user.selected">
+          <input type="checkbox" (click)="user.selected = !user.selected" [attr.checked]="user.selected">
           <div class="name">{{user.displayName}}</div>
           <div class="funnel">{{user.orders.funnel||''}}</div>
           <div class="when">{{user.orders.latest|date:'M/yy'}}</div>
           <div class="orders">{{user.orders.count}}</div>
         </div>
       </div>
-
       <div class="thread quit">
-        <h4>Quit <span class="count">{{$crm.customerQuit.length}}</span></h4>
+        <h4>Quit <span class="count">{{customerQuit.length}}</span></h4>
         <div class="actions">
           <input type="checkbox" (click)="onCheckedAll('customerQuit')">
           <div class="when" (click)="sortCustomers('customerQuit','when')">↕️ when</div>
           <div class="count" (click)="sortCustomers('customerQuit','count')">↕️ orders</div>          
         </div>
         <div class="customer" *ngFor="let user of customerQuit">
-          <input type="checkbox" (click)="user.selected = !user.selected" [checked]="!!user.selected">
+          <input type="checkbox" (click)="onChecked(user)" [attr.checked]="user.selected">
           <div class="name">{{user.displayName}}</div>
           <div class="funnel">{{user.orders.funnel||''}}</div>
           <div class="when">{{user.orders.latest|date:'M/yy'}}</div>

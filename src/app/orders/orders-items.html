@@ -51,7 +51,7 @@
         Tout valider
       </ion-button>
 
-      <ion-button fill="outline" expand="block"  color="danger" [hidden]="defaultSmall" [hidden]="!isPaid(order)" (click)="doRefundHUB(order)">
+      <ion-button fill="outline" expand="block"  color="danger" [hidden]="defaultSmall" [hidden]="!isPaid(order)" one-click debounceTime="2000" (click)="doRefundHUB(order)">
         Remboursement
       </ion-button>
 

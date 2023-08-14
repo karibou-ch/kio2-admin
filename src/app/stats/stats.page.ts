@@ -5,6 +5,7 @@ import { PopoverController, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerEmail } from '../customer-email/customer-email.page';
 
+
 @Component({
   selector: 'app-report',
   templateUrl: './stats.page.html',
@@ -23,6 +24,13 @@ export class StatsPage implements OnInit {
   currentDate: Date;
   user: User;
   toggleRecurrent:boolean;
+  toggleSource:number = 0;
+  sourceLabel = {
+    0:'all',
+    1:'artamis',
+    2:'hdr'
+  }
+  
   funnelFilter:string;
 
   isAdmin = false;
@@ -72,12 +80,12 @@ export class StatsPage implements OnInit {
   }
 
   get totalCustomers() {
-    return this.$crm.customerEarly.length + 
-           this.$crm.customerNew.length + 
-           this.$crm.customerPremium.length + 
-           this.$crm.customerQuit.length + 
-           this.$crm.customerRecurrent.length +
-           this.$crm.customerOblivious.length;
+    return this.$crm.customerEarly.filter(this.filterSource(this.toggleSource)).length + 
+           this.$crm.customerNew.filter(this.filterSource(this.toggleSource)).length + 
+           this.$crm.customerPremium.filter(this.filterSource(this.toggleSource)).length + 
+           this.$crm.customerQuit.filter(this.filterSource(this.toggleSource)).length + 
+           this.$crm.customerRecurrent.filter(this.filterSource(this.toggleSource)).length +
+           this.$crm.customerOblivious.filter(this.filterSource(this.toggleSource)).length;
   }
 
   get emailsSelected() {
@@ -97,39 +105,39 @@ export class StatsPage implements OnInit {
 
   get customerEarly() {
     if(!this.funnelFilter) {
-      return this.$crm.customerEarly;
+      return this.$crm.customerEarly.filter(this.filterSource(this.toggleSource));
     }
-    return this.$crm.customerEarly.filter(user => user.orders.funnel == this.funnelFilter)
+    return this.$crm.customerEarly.filter(this.filterSource(this.toggleSource)).filter(user => user.orders.funnel == this.funnelFilter)
   }
   get customerNew() {
     if(!this.funnelFilter) {
-      return this.$crm.customerNew;
+      return this.$crm.customerNew.filter(this.filterSource(this.toggleSource));
     }
-    return this.$crm.customerNew.filter(user => user.orders.funnel == this.funnelFilter)
+    return this.$crm.customerNew.filter(this.filterSource(this.toggleSource)).filter(user => user.orders.funnel == this.funnelFilter)
   }
   get customerPremium() {
     if(!this.funnelFilter) {
-      return this.$crm.customerPremium;
+      return this.$crm.customerPremium.filter(this.filterSource(this.toggleSource));
     }
-    return this.$crm.customerPremium.filter(user => user.orders.funnel == this.funnelFilter)
+    return this.$crm.customerPremium.filter(this.filterSource(this.toggleSource)).filter(user => user.orders.funnel == this.funnelFilter)
   }
   get customerQuit() {
     if(!this.funnelFilter) {
-      return this.$crm.customerQuit;
+      return this.$crm.customerQuit.filter(this.filterSource(this.toggleSource));
     }
-    return this.$crm.customerQuit.filter(user => user.orders.funnel == this.funnelFilter)
+    return this.$crm.customerQuit.filter(this.filterSource(this.toggleSource)).filter(user => user.orders.funnel == this.funnelFilter)
   }
   get customerRecurrent() {
     if(!this.funnelFilter) {
-      return this.$crm.customerRecurrent;
+      return this.$crm.customerRecurrent.filter(this.filterSource(this.toggleSource));
     }
-    return this.$crm.customerRecurrent.filter(user => user.orders.funnel == this.funnelFilter)
+    return this.$crm.customerRecurrent.filter(this.filterSource(this.toggleSource)).filter(user => user.orders.funnel == this.funnelFilter)
   }
   get customerOblivious() {
     if(!this.funnelFilter) {
-      return this.$crm.customerOblivious;
+      return this.$crm.customerOblivious.filter(this.filterSource(this.toggleSource));
     }
-    return this.$crm.customerOblivious.filter(user => user.orders.funnel == this.funnelFilter)
+    return this.$crm.customerOblivious.filter(user => user.orders.funnel == this.funnelFilter).filter(this.filterSource(this.toggleSource))
   }
   
   ngOnInit() {
@@ -138,6 +146,17 @@ export class StatsPage implements OnInit {
     this.onInitStats();
   }
 
+
+  filterSource(toggleSource){
+    return (user:any) => {
+      switch(toggleSource){
+        case 0: return true;
+        case 1: return user.email.source != 'halle-de-rive';
+        case 2: return user.email.source == 'halle-de-rive';
+      }
+    };
+  }
+  
 
   doToast(msg) {
     this.$toast.create({
@@ -156,7 +175,7 @@ export class StatsPage implements OnInit {
    this.$crm.customerNew = await this.$user.customerNew().toPromise();
    this.$crm.customerEarly = await this.$user.customerEarly().toPromise();
    this.$crm.customerPremium = await this.$user.customerPremium().toPromise();
-   this.$crm.customerRecurrent = await this.$user.customerRecurrent().toPromise();
+   this.$crm.customerRecurrent = (await this.$user.customerRecurrent().toPromise()).filter(user => user.orders.count>5);
    this.$crm.customerQuit = await this.$user.customerQuit().toPromise();
   }
 
@@ -168,13 +187,21 @@ export class StatsPage implements OnInit {
     user.selected? (delete user.selected):(user.selected=true);
   }
 
+  onToggleSource() {
+    this.toggleSource = (++this.toggleSource) % 3;
+    console.log('----- toggle source', this.toggleSource)
+  }
 
   onCheckedAll(thread) {
     if(!this.$crm[thread]) {
       return;
     }
-    this.$crm[thread].forEach(user => {
-      user.selected? (delete user.selected):(user.selected=true);
+    this.$crm[thread].filter(this.filterSource(this.toggleSource)).forEach(user => {
+      if(user.selected){
+        delete user.selected;
+      }else{
+        user.selected = true;
+      }
     })
     this.$crm.selected = thread;
   }
