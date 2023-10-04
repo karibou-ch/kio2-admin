@@ -49,7 +49,7 @@ export class TrackerPage implements OnInit, OnDestroy {
     this.orders = [];
 
     //
-    //<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyAffgNvW9dFU0GGlQRqK2fIZ0R22Nu0SwI"></script>
+    //<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=key"></script>
   }
 
   async ngOnInit() {
