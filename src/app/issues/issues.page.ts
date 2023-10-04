@@ -13,7 +13,7 @@ export class IssuesPage implements OnInit {
   format = 'MMM yyyy';
   defaultTitle: string;
   user: User;
-  pickerShippingDate: string;
+  pickerShippingDate: Date;
   currentDate: Date;
   month: number;
   year: number;
@@ -32,6 +32,16 @@ export class IssuesPage implements OnInit {
     this.items = {};
   }
 
+  set pickerShippingString(date: string){
+    this.pickerShippingDate = new Date(date);
+    this.pickerShippingDate.setHours(0,0,0,0);
+  }
+
+  get pickerShippingString(){
+    return this.pickerShippingDate.toYYYYMMDD('-');
+  }
+
+
   ngOnInit() {
     this.user = this.$engine.currentUser;
     this.onInitReport();
@@ -39,17 +49,17 @@ export class IssuesPage implements OnInit {
 
   //
   // on selected date
-  onDatePicker() {
-    const date = new Date(this.pickerShippingDate);
+  onDatePicker(popover) {
+    const date = (this.pickerShippingDate);
     date.setHours(0, 0, 0, 0);
     date.setDate(2);
 
-    this.pickerShippingDate = date.toISOString();
     this.currentDate = date;
     this.month = (this.currentDate.getMonth() + 1);
     this.year = (this.currentDate.getFullYear());
     this.$router.navigate(['/issues', this.month, this.year]);
     this.onInitReport();
+    popover.dismiss();
   }
 
   //

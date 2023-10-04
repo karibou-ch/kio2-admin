@@ -26,7 +26,6 @@ export class VendorDetailsPage implements OnChanges {
   locations: any[];
 
   constructor(
-    private $alert: AlertController,
     private $engine: EngineService,
     private $modal: ModalController,
     private $route: ActivatedRoute,
@@ -40,8 +39,8 @@ export class VendorDetailsPage implements OnChanges {
     // loader[1] = Config
     // loader[2] = Category[]
     // loader[3] = Shop[]
-    const loader = this.$route.snapshot.data.loader;
-    const urlpath = this.$route.snapshot.params.shop;
+    const loader = this.$route.snapshot.data['loader'];
+    const urlpath = this.$route.snapshot.params['shop'];
     this.config = this.$engine.currentConfig;
     this.shop = new Shop();
 
@@ -130,7 +129,7 @@ export class VendorDetailsPage implements OnChanges {
     // new Date(date.valueOf() + date.getTimezoneOffset() * 60000);
     // Sat Jan 28 2017 00:16:35 GMT-0600 (CST)
     if (!date) {
-      return;
+      return '';
     }
     return  (new Date(date)).toUTCString();
   }
@@ -244,7 +243,7 @@ export class VendorDetailsPage implements OnChanges {
 
   }
 
-  doSave() {
+  doSave():any {
 
 
     //

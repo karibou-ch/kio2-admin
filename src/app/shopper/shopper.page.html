@@ -1,29 +1,32 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }} <ion-icon name="chevron-down-outline"></ion-icon>  </ion-title>
+    <ion-title mode="md">{{ (pickerShippingDate|date:format) }} </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button (click)="picker.open()">
+      <ion-button id="click-open-datetime">
         <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
       </ion-button>      
     </ion-buttons>
   </ion-toolbar>
-  <ion-datetime #picker 
-    displayFormat="MM/YYYY" 
-    pickerFormat="MMMM YYYY" 
-    [(ngModel)]="pickerShippingDate" 
-    (ngModelChange)="onDatePicker()" 
-    cancelText="Annuler" 
-    doneText="Fait" 
-    dayValues="1"
-    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
-    max="2024"
-    style="display: none;">
-  </ion-datetime>
 </ion-header>
 <ion-content>
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+    <ng-template>
+      <ion-datetime 
+        presentation="date"
+        locale="fr-FR"
+        [highlightedDates]="highlightedOrders"
+        [(ngModel)]="pickerShippingString" 
+        (ngModelChange)="onDatePicker(popover)" 
+        cancelText="Annuler" 
+        doneText="Fait" 
+        firstDayOfWeek="1"
+        max="2030">
+      </ion-datetime>
+    </ng-template>    
+  </ion-popover>
 
   <ion-refresher slot="fixed" [disabled]="false" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -54,7 +57,7 @@
       <!-- WHO AND WHEN -->
       <ion-item class="planning">
         <ion-label class="ion-text-wrap">
-          T {{currentPlanning}} ({{getOrders().length}})
+          T {{currentPlanning}} ({{currentOrders.length}})
         </ion-label>
         <ion-select placeholder="Plan ?"         
                     [hidden]="!currentHub"
@@ -99,7 +102,7 @@
     <ion-reorder-group [disabled]="!reorder" (ionItemReorder)="reorderItems($event)">
 
     <!-- DISPLAY ORDERS -->
-    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition.bind(this))  ">
+    <ion-item-sliding *ngFor="let order of currentOrders.sort(sortOrdersByPosition.bind(this))  ">
 
       <ion-item-options side="start">
         <ion-item-option class="shopper"  color="secondary">

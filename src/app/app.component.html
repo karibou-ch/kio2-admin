@@ -1,5 +1,5 @@
 <ion-app>
-  <div *ngIf="NET_INFO" class="network-alert">
+  <div class="network-alert" [class.issue]="NETWORK_ISSUE">
     <ion-icon name="wifi-outline" color="primary"></ion-icon> Aucun accès à Internet !
   </div>
   <ion-router-outlet></ion-router-outlet>

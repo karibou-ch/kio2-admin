@@ -1,4 +1,6 @@
+:host ::ng-deep  {
 
+}
 .toast-message{
   font-size: 2.5rem!important;
   color: gold!important; 
@@ -81,7 +83,6 @@ ion-list{
 
 ion-item.customer-actions{
   left: 0px;
-  width: 100%;
   margin: 0px;
   padding: 0;
   --min-height:34px;
@@ -89,9 +90,11 @@ ion-item.customer-actions{
 
 ion-item.customer{
   left: 0px;
-  width: 100%;
   --background: #dbe6e5;
   --min-height: 90px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+
   margin: 0px;
   padding: 0;
   
@@ -182,111 +185,124 @@ ion-item{
   &.checked {
     --background: #dbe6e5;
   }
+
+  --padding-start: 8px;
+  --padding-end: 8px;
+  
   padding: 1px;
   display: flex;
-  width: 100%;
+  width: calc(100% + 16px);
   position: relative;
-  ion-label{
-    min-height: 55px;
-  }
+  display: flex;
+  div.item{
+    min-height: 50px;
+    &.large{
+      min-height: 70px;
+    }
+    display: flex;
 
-  .rank{
-    text-align: center;
-  }
-
-  .title{
-    &.failure{
-      text-decoration: line-through!important;
+    .rank{
+      text-align: center;
     }
-    &.padding{
-      left: 42px;
-    }
-    a:not(.failure){
-      text-decoration: none!important;                
-    }
-    a.info{
-      margin-left: 5px;
-      transform: translateY(-4px);        
-    }
-    width: 90%!important;
-    padding: 3px 0;
-    font-weight: 300;
-    letter-spacing: -.8px;
-    font-size: 16px;
-    position: absolute;
-    top:3px;
-    color: var(--ion-color-kio-primary);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    max-width: 95vw;
-    >div{
-      margin-left: 75px;
-      margin-top: 2px;        
-      color: #444;
-    }
-    >div.variant {
-      margin-left: 5px;
-      font-size: 14px;
-      color: red;
-    }
-  }
-  .quantity{
-    &.failure{
-      text-decoration: line-through!important;
+    .vendor{
+      margin-left: 0;
+      margin-top: 4px;
+      color: #aaa;
+      font-size: 13px;
     }
 
-    &.padding{
-      left: 42px;
+    .title{
+      &.failure{
+        text-decoration: line-through!important;
+      }
+      &.padding{
+        left: 42px;
+      }
+      a:not(.failure){
+        text-decoration: none!important;                
+      }
+      a.info{
+        margin-left: 5px;
+        transform: translateY(-4px);        
+      }
+      width: 90%!important;
+      padding: 3px 0;
+      font-weight: 300;
+      letter-spacing: -.8px;
+      font-size: 16px;
+      position: absolute;
+      top:6px;
+      color: var(--ion-color-kio-primary);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 95vw;
+      >div.variant {
+        margin-left: 5px;
+        font-size: 14px;
+        color: red;
+      }
     }
-    font-size: 0.9rem;
-    position: absolute;
-    top:34px;
-    color: #333;      
-    width: 240px;
-    text-align: left;
-    .issue{
-      position: relative;
-      color: red;
+    .quantity{
+      &.failure{
+        text-decoration: line-through!important;
+      }
+  
+      &.padding{
+        left: 42px;
+      }
+      font-size: 0.9rem;
+      position: absolute;
+      top:34px;
+      color: #333;      
+      width: 240px;
+      text-align: left;
+      .issue{
+        position: relative;
+        color: red;
+      }
     }
-  }
-  .price{
-    &.fulfilled{
-      color:var(--ion-color-kio-info)!important;
-    }
-
-    &.failure{
-      color: red;
-    }
-    -webkit-appearance: none;
-    position: absolute;
-    top:20px;
-    right: 80px;
-    width: 90px;
-    .input-price{
+    .price{
+      &.fulfilled{
+        color:var(--ion-color-kio-info)!important;
+      }
+  
+      &.failure{
+        color: red;
+      }
       -webkit-appearance: none;
-      border:0px;
-      border: 1px solid #eee;
-      border-radius: 1px;
-      max-width: 65px;
-      padding: 4px 0;
-      float: right;
-      font-weight:500;
-      margin-top: -7px;
-      padding-right: 15px;
-      text-align: right;        
-      margin-right: 5px;
-      font-weight: 600;
-      height: 50px;
+      position: absolute;
+      padding-top: 24px;
+      top:10px;
+      right: 80px;
+      width: 90px;
+      .input-price{
+        -webkit-appearance: none;
+        border:0px;
+        border: 1px solid #eee;
+        border-radius: 1px;
+        max-width: 65px;
+        padding: 4px 0;
+        float: right;
+        font-weight:500;
+        margin-top: -7px;
+        padding-right: 15px;
+        text-align: right;        
+        margin-right: 5px;
+        font-weight: 600;
+        height: 35px;
+      }
+      span.suffix{
+        color:#ccc;
+        margin-left:-10px;
+        float: right;
+        transform:translate(-69%, 1px);
+      }
+      
     }
-    span.suffix{
-      color:#ccc;
-      margin-left:-10px;
-      float: right;
-      transform:translate(-69%, 7px);
-    }
-    
+  
   }
+
 
   .actions{
     position: absolute;

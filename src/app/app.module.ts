@@ -2,14 +2,11 @@ import { NgModule, LOCALE_ID, Injectable, ErrorHandler, Injector } from '@angula
 import { BrowserModule } from '@angular/platform-browser';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { Kio2Admin } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { Kng2CoreModule } from 'kng2-core';
 import { HttpClientModule, HttpErrorResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 import { SwUpdate } from '@angular/service-worker';
 
@@ -17,7 +14,6 @@ import { SwUpdate } from '@angular/service-worker';
 // local data
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
-import { Network } from '@ionic-native/network/ngx';
 import { TokenInterceptorProvider } from './services/token-interceptor/token-interceptor';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
@@ -28,19 +24,9 @@ registerLocaleData(localeFr);
 // preparing Sentry feedback
 @Injectable({ providedIn: 'root' })
 export class Kio2AdminErrorHandler implements ErrorHandler {
-  errorHandler: ErrorHandler;
-
   constructor(
-    public injector: Injector,
-    public $update: SwUpdate
-  ) {
-    try {
-      // this.errorHandler = injector.get(ErrorHandler);
-    } catch (e) {
-      // Unable to get the IonicErrorHandler provider, ensure
-      // IonicErrorHandler has been added to the providers list below
-    }
-  }
+    private $update: SwUpdate
+  ) { }
 
   extractError(error) {
     // Try to unwrap zone.js error.
@@ -50,7 +36,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     }
 
     // We can handle messages and Error objects directly.
-    if (typeof error === 'string' || error instanceof Error) {
+    if (typeof error === "string" || error instanceof Error) {
       return error;
     }
 
@@ -67,7 +53,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
       }
 
       // ...or the request body itself, which we can use as a message instead.
-      if (typeof error.error === 'string') {
+      if (typeof error.error === "string") {
         return `Server returned code ${error.status} with body "${error.error}"`;
       }
 
@@ -79,9 +65,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     return null;
   }
 
-  handleError(error: any): void {
-    const extractedError = this.extractError(error) || "Handled unknown error";
-
+  handleError(error) {
     //
     // Page after new build deploy to load new chunks everything works fine,
     // all we need to either show a popup message to user and ask him to reload
@@ -90,41 +74,48 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     const chunkFailedMessage = /Loading chunk [\d]+ failed/;
 
     //
-    // Reload App is enough
-    if (chunkFailedMessage.test(error.message)) {
-      this.$update.activateUpdate().then(() => document.location.reload(true));
-      return;
-    }
-
-    //
-    // IMPORTANT: Rethrow the error otherwise it gets swallowed
-    if (error.statusText === 'Unknown Error' ||
-        error.rejection && error.rejection.status === 0) {
-      window['API_ISSUE'] = true;
-      console.log('--- Network error');
-      return;
+    // Clear cache and Reload App is enough
+    // For PWA, reload is not enough, activeUpdate is mandatory
+    if (!!chunkFailedMessage.test(error.message)) {      
+         
+      try{ caches.keys().then(keys => keys.forEach(c=>caches.delete(c))); } catch(err){}
+      
+      return this.$update.checkForUpdate().then((available)=>{
+        this.$update.activateUpdate().then(() => document.location.reload(true));
+      });      
     }
 
     //
     // LAZY LOADIN SENTRY
-    if (environment.production) {
-      import('./sentry/sentry.module').then(m => {
-        const Sentry = window['Sentry'];
+    import('./sentry/sentry.module').then(m => {
+      const Sentry = window['Sentry'];
+      const extractedError = this.extractError(error) || "Handled unknown error";
+      const email = window['sentry.id']||'anonymous@k.ch';
+      Sentry.setUser({ email });
 
-        Sentry.captureException(extractedError);
-        return m.SentryModule;
-      });
-    }
+      //
+      // POST ERROR
+      if (environment.production &&
+          window.location.origin.indexOf('evaletolab.ch') === -1 &&
+          window.location.origin.indexOf('localhost') === -1) {
+          Sentry.captureException(extractedError);
+      }
 
-    console.log('---- Kio2AdminErrorHandler', 'version', extractedError);
-    // // Pro.monitoring.handleNewError(err);
-    // // Remove this if you want to disable Ionic's auto exception handling
-    // // in development mode.
-    // this.errorHandler && this.errorHandler.handleError(error);
+
+      return m.SentryModule;
+    });
+
+    //
+    // 
+    // this.$zone.run(() =>{
+
+    // });
+
 
     throw error;
   }
 }
+
 
 
 @NgModule({
@@ -148,10 +139,6 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     })
   ],
   providers: [
-    StatusBar,
-    SplashScreen,
-    Geolocation,
-    Network,
     { provide: LOCALE_ID, useValue: 'fr-FR' },
     { provide: ErrorHandler, useClass: Kio2AdminErrorHandler },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorProvider, multi: true}

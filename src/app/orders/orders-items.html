@@ -78,12 +78,14 @@
     </ion-searchbar>  
 
   </ion-item>
-  <ion-item [class.checked]="item.checked" *ngFor="let item of sortedItem(order);let idx=index">
-    <div tabindex="0" class="fix-safari-14"></div>
-    <div class="title {{item.fulfillment.status}}"  (click)="doToggleCheck(item)" >
-      {{idx + 1}} - <span [class.red.bold]="item.quantity>1">{{item.quantity}}x</span> - {{item.title}} - <span class="part">{{item.part}}</span> 
-    <div [hidden]="!item.variant" class="variant dark-green link">
-      // {{item.variant?.title}}
+  <ion-item [class.checked]="mapItem[item.sku]" *ngFor="let item of sortedItem(order);let idx=index">
+    <div class="item">
+      <div class="title {{item.fulfillment.status}}"  (click)="doToggleCheck(item)" >
+        {{idx + 1}} - <span [class.red.bold]="item.quantity>1">{{item.quantity}}x</span> - {{item.title}} - <span class="part">{{item.part}}</span> 
+      <div [hidden]="!item.variant" class="variant dark-green link">
+        // {{item.variant?.title}}
+      </div>  
+      <div class="vendor">{{item.vendor}}</div>
     </div>
   </div>
 
@@ -105,9 +107,8 @@
             </ion-button>
           </ion-item-option>
       </ion-item-options>  
-      <ion-item >
-        <div tabindex="0" class="fix-safari-14"></div>
-        <ion-label class="ion-text-wrap">
+      <ion-item class="" >
+        <div class="item large ion-text-wrap">
           <div class="title {{item.fulfillment.status}}" (click)="doOpenProduct(item)" >
               {{item.title}} 
             <div [hidden]="!item.variant" class="dark-green link">
@@ -140,7 +141,7 @@
               <ion-icon slot="start" name="close-outline" ></ion-icon>
             </button>                      
           </div>
-        </ion-label>
+        </div>
       </ion-item>
       
       <!-- CUSTOMER MESSAGE -->

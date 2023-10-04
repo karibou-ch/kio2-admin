@@ -48,7 +48,7 @@ export class ProductDetailsPage implements OnInit {
     private $router: Router
   ) {
 
-    const loader = this.$route.snapshot.data.loader;
+    const loader = this.$route.snapshot.data['loader'];
     this.categories = loader[2];
 
     this.user = this.$engine.currentUser;
@@ -56,7 +56,7 @@ export class ProductDetailsPage implements OnInit {
     this.recipes = this.$engine.currentConfig.shared.recipes ||[];
 
     this.shops = this.user.shops || [];
-    this.sku = this.$route.snapshot.params.sku;
+    this.sku = this.$route.snapshot.params['sku'];
     this.productInOrders = [];
 
 
@@ -204,7 +204,8 @@ export class ProductDetailsPage implements OnInit {
 
   }
 
-  doUpdatePart(part) {
+  doUpdatePart(part:any) {
+    part = (part.target&&part.target.value) ||part
     this.product.pricing.part = part;
     this.portion = this.product.getPortionParts();
   }

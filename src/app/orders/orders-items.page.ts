@@ -21,6 +21,8 @@ export class OrdersItemsPage implements OnInit {
   public filterItem: string;
   public doubleCheck: boolean;
 
+  public mapItem:any;
+
 
   @Input() vendor: string;
   @Input() shipping: Date;
@@ -50,6 +52,7 @@ export class OrdersItemsPage implements OnInit {
     //
     // OrderItems[] for this vendor
     this.item = {};
+    this.mapItem = {};
     this.orders = [];
     this.vendor = '';
 
@@ -335,7 +338,7 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doToggleCheck(item: any) {
-   item['checked'] = !item['checked'];
+   this.mapItem[item.sku] = !this.mapItem[item.sku];
   }
 
   doToast(msg, error?) {

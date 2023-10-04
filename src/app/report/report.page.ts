@@ -26,7 +26,7 @@ export class ReportPage implements OnInit {
   csv: { data: SafeUrl, filename: string};
 
   format = 'MMM yyyy';
-  pickerDate: string;
+  pickerDate: Date;
   currentDate: Date;
   pickerShippingDate: string;
   user: User;
@@ -45,9 +45,9 @@ export class ReportPage implements OnInit {
   ) {
     this.currentDate = this.$engine.currentShippingDate;
     this.config = this.$engine.currentConfig;
-    this.defaultShop = this.$route.snapshot.params.shop;
-    this.month = this.$route.snapshot.params.month || (this.currentDate.getMonth() + 1);
-    this.year = this.$route.snapshot.params.year || this.currentDate.getFullYear();
+    this.defaultShop = this.$route.snapshot.params['shop'];
+    this.month = this.$route.snapshot.params['month'] || (this.currentDate.getMonth() + 1);
+    this.year = this.$route.snapshot.params['year'] || this.currentDate.getFullYear();
     this.currentDate.setFullYear(this.year);
     this.currentDate.setMonth(this.month - 1);
     this.pickerShippingDate = this.currentDate.toISOString();
@@ -58,6 +58,16 @@ export class ReportPage implements OnInit {
     //   console.log('--',params);
     // });
   }
+
+  set pickerShippingString(date: string){
+    this.pickerDate = new Date(date);
+    this.pickerDate.setHours(0,0,0,0);
+  }
+
+  get pickerShippingString(){
+    return this.pickerDate.toYYYYMMDD('-');
+  }
+
 
   get downloadLink(){
     return config.API_SERVER+'/v1/orders/transfert/'+this.month+'/'+this.year;
@@ -108,17 +118,16 @@ export class ReportPage implements OnInit {
   }
   //
   // on selected date
-  onDatePicker() {
-    const date = new Date(this.pickerShippingDate);
-    date.setHours(0, 0, 0, 0);
+  onDatePicker(popover) {
+    const date = (this.pickerDate);
     date.setDate(2);
 
-    this.pickerShippingDate = date.toISOString();
     this.currentDate = date;
     this.month = (this.currentDate.getMonth() + 1);
     this.year = (this.currentDate.getFullYear());
     this.$router.navigate(['/report', this.month, this.year]);
     this.onInitReport();
+    popover.dismiss();
   }
 
 

@@ -14,7 +14,7 @@ import { CustomerPage } from './customer.page';
 export class CustomersPage implements OnInit {
 
   config: Config;
-  customers: ReportCustomer[] | User[];
+  customers: ReportCustomer[];
   user: User;
   search$: Subject<string>;
 

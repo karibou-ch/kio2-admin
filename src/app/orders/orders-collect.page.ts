@@ -28,7 +28,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
   isReady: boolean;
   user: User;
-  pickerShippingDate: string;
+  pickerShippingDate: Date;
   format: string;
   searchFilter: string;
   toCollect: boolean;
@@ -91,6 +91,17 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     });
   }
 
+
+  set pickerShippingString(date: string){
+    this.pickerShippingDate = new Date(date);
+    this.pickerShippingDate.setHours(0,0,0,0);
+  }
+
+  get pickerShippingString(){
+    return this.pickerShippingDate.toYYYYMMDD('-');
+  }
+
+
   ngOnDestroy() {
     if (this.interval$) {
       this.interval$.unsubscribe();
@@ -100,7 +111,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   ngOnInit() {
     this.initDate();
     this.format = this.$engine.defaultFormat;
-    this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
+    this.pickerShippingDate = this.$engine.currentShippingDate;
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrders();
@@ -115,7 +126,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
   initDate() {
     const currentDate = this.$engine.currentShippingDate;
-    const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
+    const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
     const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
     const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
 
@@ -127,7 +138,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
     //
     // use full Date for Display
-    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
+    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
   }
 
 
@@ -292,7 +303,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     this.shipping = ctx.when;
     this.isReady = true;
     this.vendors = {list: []};
-    this.pickerShippingDate = ctx.when.toISOString();
+    this.pickerShippingDate = ctx.when;
 
     //
     // init orders count
@@ -322,48 +333,19 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
 
-  async openCalendar($event) {
-    const pop = await this.$popup.create({
-      component: CalendarPage,
-      translucent: false,
-      event: $event,
-      componentProps: {
-        orders: this.orders
-      }
-    });
-
-    //
-    // when a shipping date is selected
-    pop.onDidDismiss().then(result => {
-      if (result.data) {
-        const when = result.data[0];
-        const orders = this.$engine.getOrdersByDay(when);
-        this.$router.navigate([], { queryParams: { when: (when.getTime()) }});
-
-        this.onInitOrders({
-          orders: (orders),
-          when: (when)
-        } as OrdersCtx);
-      }
-    });
-
-    return await pop.present();
-  }
-
   //
   // on selected date
-  onDatePicker() {
-    const date = new Date(this.pickerShippingDate);
-    date.setHours(0, 0, 0, 0);
-    date.setDate(1);
+  onDatePicker(popover) {
+    // use one full week
+    const date = new Date(this.pickerShippingDate).plusDays( - this.pickerShippingDate.getDay());
 
 
-    this.pickerShippingDate = date.toISOString();
     this.$engine.currentShippingDate = date;
     this.$engine.findAllOrders();
     //
     // update route
     this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
+    popover.dismiss();
   }
 
 

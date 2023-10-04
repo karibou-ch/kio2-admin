@@ -172,7 +172,7 @@
           </span>
         </div> 
         <ion-input class="input-special" type="text"  placeholder="Portions ? Modifier un des exemples --v " 
-                  (input)="doUpdatePart($event.target.value)" [value]="product.pricing.part"></ion-input>    
+                  (ionInput)="doUpdatePart($event)" [value]="product.pricing.part"></ion-input>    
       </ion-item>
       <ion-item>
         <button class="button-stock small" slot="end" (click)="doUpdatePart('0.75L')">0.75L</button>
@@ -229,11 +229,12 @@
           <b>Psst;</b> C'est très rare d'avoir un produit alimentaire qui fait penser à plusieurs pays!
         </div>
       </div>
-      
-      <ion-item *ngFor="let recipe of recipes">
+
+      <!-- DEPRECATED -->
+      <!-- <ion-item *ngFor="let recipe of recipes">
         <ion-label>{{recipe.label.fr}}</ion-label>
         <ion-checkbox value="" [checked]="recipeChecked(recipe)" ngDefaultControl (ionChange)="recipeUpdate(recipe)"></ion-checkbox>
-      </ion-item>
+      </ion-item> -->
     </ion-list>
 
     <!-- LABELS -->

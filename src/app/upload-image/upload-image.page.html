@@ -17,11 +17,11 @@
   <!-- <button ion-button block large color="primary" (click)="doUpload()">Upload Image</button> -->
 
   <ngx-uploadcare-widget 
-        preview-step="true" 
+        [preview-step]="true" 
         crop="1:1" 
         effects="rotate,mirror,flip" 
         image-shrink="1024x1024"
-        images-only="true" 
+        [images-only]="true" 
         [value]="image" 
         [public-key]="pubUpcare" 
         [validators]="[ucValidator]"

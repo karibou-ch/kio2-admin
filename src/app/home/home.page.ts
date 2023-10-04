@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { EngineService } from '../services/engine.service';
 import { User, Config, Shop } from 'kng2-core';
 
-import { version } from '../../../package.json';
+import pkg from '../../../package.json';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +12,7 @@ import { version } from '../../../package.json';
 })
 export class HomePage {
 
-  VERSION = version;
+  VERSION = pkg.version;
   siteName: string;
   user: User;
   config: Config;

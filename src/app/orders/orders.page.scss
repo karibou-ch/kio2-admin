@@ -1,3 +1,9 @@
+:host {
+  .popover {
+    --width:100%;
+  }
+}
+
 button.fab{
   display: none;
 }
@@ -75,6 +81,10 @@ h1.info{
 
 ion-title{
   text-transform: capitalize;
+  color: black;
+  background-color: #eeeeee82;
+  border-radius: 13px;
+  width: fit-content;  
   font-weight: 700;
   font-size: 20px;  
   ion-icon {
@@ -88,6 +98,7 @@ ion-list{
 }
 
 ion-item {
+  --padding-start: 8px;
   &.header{
     min-height: 1.9rem;
     background: var(--ion-color-kio-primary);
