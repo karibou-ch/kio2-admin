@@ -8,6 +8,8 @@
 </ion-header>
 
 <ion-content>
+  <h1 class="info" [hidden]="!isReady||(subscriptions?.length > 0)">Pas de souscription</h1>
+
   <ion-list>
     <div class="loader" [hidden]="isReady">
       <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
