@@ -91,7 +91,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     // use valid date
     this.initDate();
 
-
     this.pickerShippingDate = this.$engine.currentShippingDate;
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
@@ -437,7 +436,7 @@ export class ShopperPage implements OnInit, OnDestroy {
         this.shippingShopper[order.shipping.priority] = {
           shopper: order.shipping.shopper,
           plan: order.shipping.priority,
-          time: order.shipping.shopper_time,
+          time: (order.shipping.shopper_time),
           hub: order.hub
         };
       }
@@ -449,7 +448,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     // FIXME only avilable for managers ?
     shoppers[this.user.email.address] = true;
     this.shippingShoppers = Object.keys(shoppers).filter(shopper => !!shopper);
-
   }
 
   onEditCustomer(customer) {

@@ -1,0 +1,42 @@
+
+.loader {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  padding: 46%;
+  z-index: 1;
+  background: rgba(12, 12, 12, 0.24);
+  color: white;
+}
+
+ion-chip.toggle {
+  min-width: 100px;
+}
+
+.subscription{
+  .tag {
+    adding: 2px 10px;
+    background: #666;
+    border-radius: 16px;
+    color: yellow;
+    font-size: 14px;    
+  }
+  ul{
+    padding: 0;
+    list-style: none;
+  }
+}
+
+@keyframes rotating {
+  from{
+      -webkit-transform: rotate(0deg);
+  }
+  to{
+      -webkit-transform: rotate(360deg);
+  }
+}
+
+.rotating {
+  -webkit-animation: rotating 2s linear infinite;
+  animation: rotating 2s linear infinite;
+}

@@ -31,6 +31,13 @@ export class UploadImagePage implements OnInit{
     this.config = this.$engine.currentConfig;
   }
 
+  
+  get urlImage() {
+    if(!this.image) return '';
+    return 'https:' + this.image;
+  }
+
+
   ngOnInit() {
     if (this.product) {
       this.image = this.product.photo.url;
@@ -47,11 +54,6 @@ export class UploadImagePage implements OnInit{
     if (this.config) {
       this.pubUpcare = this.config.shared.keys.pubUpcare;
     }
-  }
-
-  getImage() {
-    if(!this.image) return '';
-    return 'https:' + this.image;
   }
 
   isReady() {

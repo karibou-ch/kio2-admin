@@ -1,6 +1,6 @@
 {
   "name": "kio2-admin",
-  "version": "6.0.1",
+  "version": "6.0.6",
   "author": "olivier@karibou.ch",
   "homepage": "https://karibou.ch/",
   "scripts": {
@@ -38,11 +38,14 @@
     "ionicons": "^6.0.0",
     "kng2-core": "file:../kng2-core/dist",
     "markdown-it": "^13.0.2",
+    "ngx-uploadcare-widget": "^3.0.2",
+    "uploadcare-widget": "^3.21.2",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
-    "uploadcare-widget": "^3.10.1",
-    "uploadcare-widget-tab-effects": "^1.4.7",
     "zone.js": "~0.11.4"
+  },
+  "peerDependencies": {
+    "uploadcare-widget-tab-effects": "^1.4.7"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.2.18",

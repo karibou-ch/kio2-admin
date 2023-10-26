@@ -34,6 +34,13 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   toCollect: boolean;
   interval$;
 
+
+  statusColor = {
+    open:{background:"greenyellow",text:"black"},
+    closed:{background:"#777",text:"white"}
+  }
+
+
   constructor(
     private $engine: EngineService,
     private $modal: ModalController,
@@ -100,6 +107,20 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   get pickerShippingString(){
     return this.pickerShippingDate.toYYYYMMDD('-');
   }
+
+  get highlightedOrders() {
+    const highlighted = this.$engine.availableOrders.map(order => {
+      const status = order.closed?'closed':'open'
+      return {
+        date: order.shipping.when.toYYYYMMDD('-'),
+        textColor: this.statusColor[status].text,
+        backgroundColor: this.statusColor[status].background,        
+      }
+    });
+    // console.log(highlighted[0],this.$engine.availableOrders[0].shipping.when)
+    return highlighted;
+  }
+
 
 
   ngOnDestroy() {
@@ -337,7 +358,8 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   // on selected date
   onDatePicker(popover) {
     // use one full week
-    const date = new Date(this.pickerShippingDate).plusDays( - this.pickerShippingDate.getDay());
+    const date = new Date(this.pickerShippingDate);
+    //const date = new Date(this.pickerShippingDate).plusDays( - this.pickerShippingDate.getDay());
 
 
     this.$engine.currentShippingDate = date;

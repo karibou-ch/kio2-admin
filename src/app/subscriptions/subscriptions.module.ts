@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { UploadImagePage } from './upload-image.page';
-import { UcWidgetModule } from 'ngx-uploadcare-widget';
+import { SubscriptionsPageRoutingModule } from './subscriptions-routing.module';
+
+import { SubscriptionsPage } from './subscriptions.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    UcWidgetModule
+    SubscriptionsPageRoutingModule
   ],
-  exports: [UploadImagePage],
-  declarations: [UploadImagePage]
+  declarations: [SubscriptionsPage]
 })
-export class UploadImagePageModule {}
+export class SubscriptionsPageModule {}

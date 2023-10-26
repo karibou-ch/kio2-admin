@@ -81,7 +81,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
       try{ caches.keys().then(keys => keys.forEach(c=>caches.delete(c))); } catch(err){}
       
       return this.$update.checkForUpdate().then((available)=>{
-        this.$update.activateUpdate().then(() => document.location.reload(true));
+        this.$update.activateUpdate().then(() => document.location.reload());
       });      
     }
 

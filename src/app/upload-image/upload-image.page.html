@@ -12,7 +12,7 @@
 
 <ion-content padding>
 
-  <img *ngIf="getImage()" [src]="getImage()" />
+  <img *ngIf="image" [src]="urlImage" />
 
   <!-- <button ion-button block large color="primary" (click)="doUpload()">Upload Image</button> -->
 
@@ -22,7 +22,7 @@
         effects="rotate,mirror,flip" 
         image-shrink="1024x1024"
         [images-only]="true" 
-        [value]="image" 
+        [value]="urlImage" 
         [public-key]="pubUpcare" 
         [validators]="[ucValidator]"
         (on-dialog-open)="onDialogOpen($event)"

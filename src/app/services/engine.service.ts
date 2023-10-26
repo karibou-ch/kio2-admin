@@ -166,7 +166,7 @@ export class EngineService {
     const today = new Date();
     //
     // FIXME some orders dates overlapp 
-    // when initial currentShippingDate.month() is not equal to today.month()
+    // when initial c.plusDays( - this.pickerShippingDate.getDay())urrentShippingDate.month() is not equal to today.month()
 
 
     this.monthOrders = new Map();

@@ -50,8 +50,13 @@ export class Kio2Admin {
 
       this.$update.available.subscribe(event => {
         const msg = 'Une nouvelle version est disponible. Recharger la page maintenant';
+        let force = true;
         alert (msg); 
-        this.$update.activateUpdate().then(() => document.location.reload(true));
+        this.$update.activateUpdate().then(() => {
+          document.location.reload(true);
+          force=false;
+        });
+        setTimeout(()=> force && document.location.reload(true),4000)
       });
 
       //

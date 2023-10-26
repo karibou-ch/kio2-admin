@@ -73,6 +73,9 @@ export class HomePage {
     this.$router.navigate(['/orders']);
   }
 
+  openSubscriptions() {
+    this.$router.navigate(['/subscriptions']);
+  }
   openOrdersPlanning() {
     this.$router.navigate(['/orders/planning']);
   }

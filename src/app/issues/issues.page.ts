@@ -44,6 +44,7 @@ export class IssuesPage implements OnInit {
 
   ngOnInit() {
     this.user = this.$engine.currentUser;
+    this.pickerShippingDate = this.$engine.currentShippingDate;
     this.onInitReport();
   }
 

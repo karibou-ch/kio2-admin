@@ -1,13 +1,8 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>{{ (pickerShippingDate| date:format) }}  </ion-title>
+    <ion-title id="click-open-datetime">{{ (pickerShippingDate| date:format) }}  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button id="click-open-datetime">
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>      
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -18,6 +13,7 @@
       <ion-datetime 
         presentation="date"
         locale="fr-FR"
+        [highlightedDates]="highlightedOrders"
         [(ngModel)]="pickerShippingString" 
         (ngModelChange)="onDatePicker(popover)" 
         cancelText="Annuler" 

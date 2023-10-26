@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Boutiques</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"  text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <div class="loader" [hidden]="isReady">
+      <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+    </div>
+  
+    <ion-item>
+      <ion-label>Rechercher</ion-label>
+      <ion-searchbar
+        mode="ios"
+        [(ngModel)]="cache.search"
+        [debounce]="500"
+        (ionInput)="onSearchInput($event)"
+        (ionClear)="onSearchCancel($event)">
+      </ion-searchbar>  
+      <ion-chip (click)="cache.active=!cache.active" class="toggle">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
+        <ion-label color="primary">Actif</ion-label>
+      </ion-chip>
+  
+    </ion-item>  
+  
+
+    <ion-item-sliding *ngFor="let subscription of subscriptions">    
+        <ion-item  class="subscription" [class.inactive]="subscription.status != 'active'">
+          <ion-label>
+            <h2><span class="tag">{{subscription.plan}}/{{subscription.frequency}}/{{namedDayOfWeek(subscription.dayOfWeek)}}</span> {{subscription.shipping.name}}</h2>      
+            <h3 class="red bold" [hidden]="!subscription.pauseUntil">Abo en pause jusqu'au {{subscription.pauseUntil|date:'mediumDate':'GMT+1':'fr'}}</h3>
+            <ul>
+              <li *ngFor="let item of subscription.items"><span [class.red]="item.quantity>1">{{item.quantity}}x</span> {{item.title}} ({{item.part}}) <span class="bold">{{item.fees}} fr</span></li>
+            </ul>
+          </ion-label>      
+        </ion-item>
+      </ion-item-sliding>    
+  </ion-list>
+</ion-content>

@@ -38,6 +38,8 @@ export class AnalyticsPage implements OnInit {
     this.cache = {};
     this.currentWeek = new Date(Date.now() - 86400000 * 7)
     this.filterByIP = {};
+
+    this.pickerShippingString = (new Date()).toISOString();
   }
 
   ngOnInit() {

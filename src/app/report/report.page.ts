@@ -28,7 +28,6 @@ export class ReportPage implements OnInit {
   format = 'MMM yyyy';
   pickerDate: Date;
   currentDate: Date;
-  pickerShippingDate: string;
   user: User;
 
   isAdmin = false;
@@ -50,7 +49,7 @@ export class ReportPage implements OnInit {
     this.year = this.$route.snapshot.params['year'] || this.currentDate.getFullYear();
     this.currentDate.setFullYear(this.year);
     this.currentDate.setMonth(this.month - 1);
-    this.pickerShippingDate = this.currentDate.toISOString();
+    this.pickerShippingString = this.currentDate.toISOString();
 
     //
     // reload data 
