@@ -66,6 +66,7 @@ D'avance merci pour votre compréhension.`
       case "replacecommon": return this.replaceCommonMsg;
       case "cancel": return this.cancelMsg;
     }
+    return '';
   }
 
 

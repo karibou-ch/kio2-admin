@@ -87,6 +87,11 @@ const routes: Routes = [
     path: 'crm',
     loadChildren: () => import('./stats/stats.module').then( m => m.StatsPageModule)
   },
+  {
+    path: 'subscriptions',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./subscriptions/subscriptions.module').then( m => m.SubscriptionsPageModule)
+  },
   { path: '**', redirectTo: '/home', pathMatch: 'full' }
 ];
 

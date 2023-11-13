@@ -1,18 +1,11 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }} <ion-icon name="chevron-down-outline"></ion-icon> </ion-title>
+    <ion-title mode="md" id="click-open-datetime">{{ (pickerShippingDate|date:format) }} </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
-
-
     </ion-buttons>
 
 
-    <ion-buttons slot="end">
-      <ion-button (click)="picker.open()">
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>      
-    </ion-buttons>
   </ion-toolbar>
   <ion-toolbar [hidden]="isReady&&!orders?.length" color="primary">
     <div class="metabar " >
@@ -28,21 +21,26 @@
       <ion-toggle mode="md" (ionChange)="displayByItems=!displayByItems"></ion-toggle>      
     </div>
   </ion-toolbar>
-  <ion-datetime #picker 
-    displayFormat="MM/YYYY" 
-    pickerFormat="MMMM YYYY" 
-    [(ngModel)]="pickerShippingDate" 
-    (ngModelChange)="onDatePicker()" 
-    cancelText="Annuler" 
-    doneText="Fait" 
-    dayValues="1"
-    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
-    max="2024"
-    style="display: none;">
-  </ion-datetime>        
 </ion-header>
 
 <ion-content >
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+    <ng-template>
+      <ion-datetime 
+        presentation="date"
+        locale="fr-FR"
+        [highlightedDates]="highlightedOrders"
+        [(ngModel)]="pickerShippingString" 
+        (ngModelChange)="onDatePicker(popover)" 
+        cancelText="Annuler" 
+        doneText="Fait" 
+        firstDayOfWeek="1"
+        max="2030">
+      </ion-datetime>
+    </ng-template>    
+  </ion-popover>
+  
+
   <div class="loader" [hidden]="isReady">
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
@@ -131,7 +129,7 @@
         </ion-button>
       </ion-note>
     </ion-item>
-    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByRankAndComplement.bind(this));let i=index;">
+    <ion-item-sliding *ngFor="let order of sortedOrders;let i=index;">
       <ion-item-options side="start" [hidden]="!user.isAdmin() && !user.hasRole('operator')">
         <ion-item-option>
           <ion-button mode="ios" expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
@@ -177,8 +175,8 @@
 
       </ion-item-options>
       <ion-item [class.selected]="isOrderSelected(order)" [class.in-progress]="!isFulfilled(order)">
-        <div tabindex="0" class="fix-safari-14"></div>
         <ion-note slot="end" (click)="openByOrder(order)">
+          <span class="bags" [hidden]="!order.shipping.bags">{{order.shipping.bags}}s</span>
           <span class="price">{{order.getSubTotal({ withoutCharge: true })|number:'1.0-0'}} fr</span>
           <span class="progress">{{order.getProgress()|number:'1.0-0'}} %</span>
         </ion-note>
@@ -190,15 +188,21 @@
         </ion-avatar>
         <ion-label class="ion-text-wrap">
           <h3 text-capitalize (click)="openByOrder(order)">
-            <span class="red" [class.red]="order.customer.latestErrors">{{order.customer.latestErrors}}/{{maxErrors}}</span> - {{ order.oid }} - {{ order.shipping.name }}
+            <span class="red" [class.red]="order.customer.latestErrors">{{order.customer.latestErrors}}/{{maxErrors}}</span> - {{ order.shipping.name }}
             <span [hidden]="!isDeposit(order)"> // {{order.customer.displayName}}</span>
-            <span class="bold" [hidden]="!order.customer.latestRating">
-              {{ order.customer.latestRating + 1 }} <ion-icon name="star"></ion-icon>
-            </span>
           </h3>
           <h2>
             <span class="label counter">{{i+1}}</span>
-            <span> - {{order.getFulfilledProgress()}}/{{order.items.length}} - {{order.shipping.bags}} </span>
+            <span>&nbsp;{{ order.oid }} - {{order.customer.plan}}</span>
+
+            <span class="small  bold" [hidden]="!order.customer.rating">
+              [note:{{ order.customer.rating + 1| number: '1.0-1' }}/4]
+            </span>
+
+            <span class="small  red" [hidden]="!order.payment.subscription">
+              [ABO]
+            </span>
+
             &nbsp;<span [hidden]="order.customer.orders>5" class="customer-new">NEW! {{order.customer.orders}}</span>
           </h2>
         </ion-label>

@@ -1,29 +1,27 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }} <ion-icon name="chevron-down-outline"></ion-icon>  </ion-title>
+    <ion-title id="click-open-datetime" mode="md">{{ (pickerShippingDate|date:format) }} </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button (click)="picker.open()">
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>      
-    </ion-buttons>
   </ion-toolbar>
-  <ion-datetime #picker 
-    displayFormat="MM/YYYY" 
-    pickerFormat="MMMM YYYY" 
-    [(ngModel)]="pickerShippingDate" 
-    (ngModelChange)="onDatePicker()" 
-    cancelText="Annuler" 
-    doneText="Fait" 
-    dayValues="1"
-    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
-    max="2024"
-    style="display: none;">
-  </ion-datetime>
 </ion-header>
 <ion-content>
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+    <ng-template>
+      <ion-datetime 
+        presentation="date"
+        locale="fr-FR"
+        [highlightedDates]="highlightedOrders"
+        [(ngModel)]="pickerShippingString" 
+        (ngModelChange)="onDatePicker(popover)" 
+        cancelText="Annuler" 
+        doneText="Fait" 
+        firstDayOfWeek="1"
+        max="2030">
+      </ion-datetime>
+    </ng-template>    
+  </ion-popover>
 
   <ion-refresher slot="fixed" [disabled]="false" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -53,27 +51,38 @@
     <div *ngIf="currentPlanning" >
       <!-- WHO AND WHEN -->
       <ion-item class="planning">
-        <ion-label class="ion-text-wrap">
-          T {{currentPlanning}} ({{getOrders().length}})
+
+        <ion-label slot="start"   class="time-label ion-text-wrap">
+          <span id="click-open-time" class="chip-label"> T {{currentPlanning}} ({{currentOrders.length}})  {{shippingShopper[currentPlanning].time}}</span>
         </ion-label>
-        <ion-select placeholder="Plan ?"         
-                    [hidden]="!currentHub"
-                    (ngModelChange)="setShippingShopper({shopper:$event})"
-                    [(ngModel)]="shippingShopper[currentPlanning].shopper" 
-                    interface="action-sheet">
-                    <ion-select-option *ngFor="let shopper of shippingShoppers"  [value]="shopper">{{shopper}}</ion-select-option>
-                  </ion-select>
-        <ion-datetime 
-          [hidden]="!currentHub"
-          placeholder="Time"
-          displayFormat="HH:mm" 
-          pickerFormat="HH mm" 
-          [(ngModel)]="shippingShopper[currentPlanning].time" 
-          (ngModelChange)="setShippingShopper({time:$event})" 
-          cancelText="Annuler" 
-          doneText="Fait" 
-          minuteValues="0,30">
-        </ion-datetime>
+
+        <div slot="end">
+          <ion-select  placeholder="Plan ?"         
+            [hidden]="!currentHub"
+            (ngModelChange)="setShippingShopper({shopper:$event})"
+            [(ngModel)]="shippingShopper[currentPlanning].shopper" 
+            interface="popover">
+            <ion-select-option *ngFor="let shopper of shippingShoppers"  [value]="shopper">{{shopper}}</ion-select-option>
+          </ion-select>                
+        </div>
+
+        <!-- TIME SELECTION -->
+        <ion-popover trigger="click-open-time" triggerAction="click" class="datetime-popover">
+          <ng-template>
+            <ion-datetime 
+              presentation="time"
+              locale="fr-FR"
+              [showDefaultButtons]="true"
+              pickerFormat="HH:mm" 
+              [(ngModel)]="shippingShopper[currentPlanning].time" 
+              (ngModelChange)="setShippingShopper({time:$event})" 
+              hourCycle="h23" 
+              minuteValues="0,30">
+            </ion-datetime>
+          </ng-template>    
+        </ion-popover>
+
+
       </ion-item>
     </div>
     <!-- SEARCH -->
@@ -86,7 +95,22 @@
       (ionInput)="onSearchInput($event)"
       (ionClear)="onSearchCancel($event)">
     </ion-searchbar>  
-  
+
+    <!-- TIME SELECTION -->
+    <ion-popover #popover trigger="click-open-time" triggerAction="click" class="datetime-popover">
+      <ng-template>
+        <ion-datetime 
+          presentation="time"
+          locale="fr-FR"
+          pickerFormat="HH mm" 
+          [(ngModel)]="shippingShopper[currentPlanning].time" 
+          (ngModelChange)="setShippingShopper({time:$event})" 
+          hourCycle="h24"
+          minuteValues="0,30">
+        </ion-datetime>
+      </ng-template>    
+    </ion-popover>
+
     <!-- HUBS -->
     <ion-item class="hub" lines="none" [hidden]="!hubs.length || !orders.length">
       <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
@@ -99,7 +123,7 @@
     <ion-reorder-group [disabled]="!reorder" (ionItemReorder)="reorderItems($event)">
 
     <!-- DISPLAY ORDERS -->
-    <ion-item-sliding *ngFor="let order of getOrders().sort(sortOrdersByPosition.bind(this))  ">
+    <ion-item-sliding *ngFor="let order of currentOrders.sort(sortOrdersByPosition.bind(this))  ">
 
       <ion-item-options side="start">
         <ion-item-option class="shopper"  color="secondary">

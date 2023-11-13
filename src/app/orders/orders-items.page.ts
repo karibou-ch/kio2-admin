@@ -21,6 +21,8 @@ export class OrdersItemsPage implements OnInit {
   public filterItem: string;
   public doubleCheck: boolean;
 
+  public mapItem:any;
+
 
   @Input() vendor: string;
   @Input() shipping: Date;
@@ -50,6 +52,7 @@ export class OrdersItemsPage implements OnInit {
     //
     // OrderItems[] for this vendor
     this.item = {};
+    this.mapItem = {};
     this.orders = [];
     this.vendor = '';
 
@@ -73,6 +76,7 @@ export class OrdersItemsPage implements OnInit {
       this.hubs[hub.id] = hub;
       this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
     });
+
 
     if (this.orders.length == 1) {
       this.shipping = this.orders[0].shipping.when;
@@ -238,7 +242,7 @@ export class OrdersItemsPage implements OnInit {
       }, error => this.doToast(error.error, error));
   }
 
-  doValidate(order, item) {
+  doValidate(order, item,$event?) {
     const copy = JSON.parse(JSON.stringify(item));
     this.$order.updateItem(order, [copy], EnumFulfillments.fulfilled)
       .subscribe(ok => {
@@ -264,6 +268,13 @@ export class OrdersItemsPage implements OnInit {
         this.computeDeltaPrice(order);
         const title = item.title.substring(0, len) + (item.title.length > len ? '...' : '');
         this.doToast(title + ' dans sac ' + order.rank);
+        
+          // setTimeout(()=>{
+          //   document.activeElement.dispatchEvent(new KeyboardEvent("keypress", { 
+          //     key: "Tab" 
+          //   }));  
+          // },0)
+  
 
       }, error => this.doToast(error.error, error));
   }
@@ -308,8 +319,13 @@ export class OrdersItemsPage implements OnInit {
         this.doToast('Annulation enregistrée');
         const indexSrc = order.items.findIndex(i=> i.sku == item.sku);
         const indexDst = ok.items.findIndex(i=> i.sku == item.sku);
-        Object.assign(order.items[indexSrc],ok.items[indexDst]);
-        Object.assign(item,ok.items[indexDst]);
+        if(indexSrc>-1 && indexDst>-1){
+          Object.assign(order.items[indexSrc],ok.items[indexDst]);
+        }
+
+        if(indexDst>-1) {
+          Object.assign(item,ok.items[indexDst]);  
+        }
 
 
         //
@@ -335,7 +351,7 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doToggleCheck(item: any) {
-   item['checked'] = !item['checked'];
+   this.mapItem[item.sku] = !this.mapItem[item.sku];
   }
 
   doToast(msg, error?) {

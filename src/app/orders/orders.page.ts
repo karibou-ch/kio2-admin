@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
 import { ToastController, PopoverController, ModalController, LoadingController } from '@ionic/angular';
@@ -56,7 +56,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     [sku: number]: (OrderByItem[]|any);
   };
 
-  pickerShippingDate: string;
+  pickerShippingDate: Date;
   searchFilter: string;
   interval$;
 
@@ -66,6 +66,11 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   };
 
   shippingComplement: {[key: string]: number};
+
+  statusColor = {
+    open:{background:"greenyellow",text:"black"},
+    closed:{background:"#777",text:"white"}
+  }
 
 
   constructor(
@@ -77,7 +82,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     public $popup: PopoverController,
     public $route: ActivatedRoute,
     public $router: Router,
-    public $order: OrderService
+    public $order: OrderService,
+    public $cdr: ChangeDetectorRef
   ) {
     this.orders = [];
     this.cache = {};
@@ -86,11 +92,55 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.currentDates = [];
     this.openItems = {};
     this.shippingComplement = {};
+    this.complementsLength = 0;
+
   }
+
+  set pickerShippingString(date: string){
+    this.pickerShippingDate = new Date(date);
+    this.pickerShippingDate.setHours(0,0,0,0);
+  }
+
+  get pickerShippingString(){
+    return this.pickerShippingDate.toYYYYMMDD('-');
+  }
+
+  get highlightedOrders() {
+    const highlighted = this.$engine.availableOrders.map(order => {
+      const status = order.closed?'closed':'open'
+      return {
+        date: order.shipping.when.toYYYYMMDD('-'),
+        textColor: this.statusColor[status].text,
+        backgroundColor: this.statusColor[status].background,        
+      }
+    });
+    // console.log(highlighted[0],this.$engine.availableOrders[0].shipping.when)
+    return highlighted;
+  }
+
+
 
   get ordersCount() {
     return this.orders.filter(order => !order.shipping.parent).length;
   }
+
+  //
+  // get orders by HUB
+  get sortedOrders() {
+    let orders = [];
+    if (!this.searchFilter) {
+      orders = this.orders.filter(order => (!this.currentPlanning || this.currentPlanning === order.shipping.priority));
+    } else  {
+      orders = this.orders.filter(order => {
+        const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
+        const planning = (!this.currentPlanning || this.currentPlanning === order.shipping.priority);
+        return planning && filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
+      });  
+    }
+    this.complementsLength = orders.filter(order => order.shipping.parent).length;
+    return orders.sort(this.sortOrdersByRankAndComplement.bind(this));
+  }
+
 
   ngOnDestroy() {
     if (this.interval$) {
@@ -122,8 +172,15 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // use correct date
     this.initDate();
 
-    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
-    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
+  }
+
+  ngAfterViewInit(){
+    //
+    // pooling data every 10 minutes
+    this.interval$ = interval(60000 * 10).subscribe(() => {
+      this.$engine.findAllOrders();
+    });
+
     this.$engine.findAllOrders();
 
     //
@@ -140,13 +197,10 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
       }
     });
 
-    //
-    // pooling data every 10 minutes
-    this.interval$ = interval(60000 * 10).subscribe(() => {
-      this.$engine.findAllOrders();
-    });
-  }
+    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
+    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
 
+  }
 
 
   doRefresh(refresher) {
@@ -228,22 +282,6 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   getOrdersLength() {
 
   } 
-  //
-  // get orders by HUB
-  getOrders() {
-    let orders = [];
-    if (!this.searchFilter) {
-      orders = this.orders.filter(order => (!this.currentPlanning || this.currentPlanning === order.shipping.priority));
-    } else  {
-      orders = this.orders.filter(order => {
-        const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
-        const planning = (!this.currentPlanning || this.currentPlanning === order.shipping.priority);
-        return planning && filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
-      });  
-    }
-    this.complementsLength = orders.filter(order => order.shipping.parent).length;
-    return orders;
-  }
 
   getUniqueOrders(){
     return (this.orders).filter(order => !order.shipping.parent);
@@ -255,7 +293,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
   initDate() {
-    const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
+    const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
     //
     // if no date is specified, then make sure that 
     if (isNaN(queryWhen.getTime())) {
@@ -274,7 +312,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
     //
     // use full Date for Display
-    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
+    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
   }
 
   isAudio(order){
@@ -454,35 +492,6 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     );
   }
 
-  async openCalendar($event) {
-    const pop = await this.$popup.create({
-      component: CalendarPage,
-      translucent: true,
-      event: $event,
-      componentProps: {
-        orders: this.orders
-      }
-    });
-
-    //
-    // when a shipping date is selected
-    pop.onDidDismiss().then(result => {
-      if (result.data) {
-        const when = result.data[0];
-        const orders = this.$engine.getOrdersByDay(when);
-        this.$router.navigate([], { queryParams: { when: (when.getTime()) }});
-
-        this.onInitOrders({
-          orders: (orders),
-          when: (when)
-        } as OrdersCtx);
-      }
-    });
-
-    return await pop.present();
-
-  }
-
   openByItem(item: any) {
     // this.navCtrl.push('ItemOrderPage', {
     //   item,
@@ -512,22 +521,41 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     }).then(alert => alert.present());
   }
 
+
   //
   // on selected date
-  onDatePicker() {
-    const date = new Date(this.pickerShippingDate);
+  onDatePicker(popover) {
+    const date = this.$engine.currentShippingDate = this.pickerShippingDate;
+    const orders = this.$engine.getOrdersByDay(date);
+    const today = new Date();    
+    const thisWeek = today.plusDays(- today.getDay());    
+    const nextWeek = today.plusDays(7 - today.getDay());
     date.setHours(0, 0, 0, 0);
-    date.setDate(1);
+
+    if(date < thisWeek && !orders.length) {
+      this.$engine.selectOrderArchives(true);  
+    }else if (date>nextWeek && !orders.length){
+      this.$engine.selectOrderArchives(false);  
+    }else if(!orders.length){
+      this.$engine.selectOrderArchives(false);  
+      this.$engine.currentShippingDate = date;
+    }else{
+      this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
+
+      this.onInitOrders({
+        orders: (orders),
+        when: (date)
+      } as OrdersCtx);
+
+    }
 
 
-    this.pickerShippingDate = date.toISOString();
-    this.$engine.currentShippingDate = date;
-    this.$engine.findAllOrders();
-
+    popover.dismiss();
     //
     // update route
-    this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
+    this.$router.navigate([], {queryParams: { when: (date.getTime()) }});
   }
+
 
   onEngineStatus(status: OrderStatus) {
     this.isReady = !status.running;
@@ -564,7 +592,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // use shipping day from
     // force current shipping day
     this.shipping = ctx.when;
-    this.pickerShippingDate = ctx.when.toISOString();
+    this.pickerShippingDate = ctx.when;
     // console.log('---- ctx.when',ctx.when.getTime(),ctx.when);
 
     // AVG
@@ -573,6 +601,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     }, 0);
     this.orderAvg = this.orderTotal / this.ordersCount;
 
+    this.$cdr.detectChanges();
   }
 
   onSearchInput($event) {

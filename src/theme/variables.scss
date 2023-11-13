@@ -291,7 +291,7 @@
 }
 
 .hidden-sm{
-  @media  (max-width:426px){
+  @media  (max-width:430px){
     display: none!important;
   }
 }
@@ -330,7 +330,8 @@
 }
 
 .uploadcare--page{
-  overflow: visible!important;
+  width: 100%!important;
+  height: 100%!important;
 }
 
 

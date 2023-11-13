@@ -4,7 +4,7 @@ import { EngineService } from '../services/engine.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 
-import { version } from '../../../package.json';
+import pkg from '../../../package.json';
 
 @Component({
   selector: 'app-stripe',
@@ -12,7 +12,7 @@ import { version } from '../../../package.json';
   styleUrls: ['./stripe.page.scss'],
 })
 export class StripePage implements OnInit {
-  VERSION = version;
+  VERSION = pkg.version;
 
   user: User;
   config: Config;

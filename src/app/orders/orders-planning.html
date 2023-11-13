@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Planning  </ion-title>
+    <ion-title mode="md">Planning  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
@@ -12,8 +12,8 @@
   </ion-toolbar>
   <ion-toolbar [hidden]="isReady&&!orders?.length" color="primary">
     <div class="metabar " >
-      <ion-label [hidden]="displayOnlyFailure">Les annulations</ion-label>
-      <ion-label [hidden]="!displayOnlyFailure">Tous les produits</ion-label>
+      <ion-label [hidden]="displayOnlyFailure">Afficher les articles</ion-label>
+      <ion-label [hidden]="!displayOnlyFailure">Afficher les annulations</ion-label>
       <ion-toggle mode="md" (ionChange)="displayOnlyFailure=!displayOnlyFailure"></ion-toggle>      
     </div>
   </ion-toolbar>       

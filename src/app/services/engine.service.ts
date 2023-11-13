@@ -31,7 +31,7 @@ export class EngineService {
 
   //
   // calendar of loaded Orders
-  shippingWeek: Date[];
+  shippingWeekOrders: Order[];
 
 
   //
@@ -58,6 +58,7 @@ export class EngineService {
 
     //
     // order params
+    this.shippingWeekOrders = [];
     this.initDate();
     this.orderStatus = this.OPEN;
     this.selectedOrders$ = new ReplaySubject<OrdersCtx>(1);
@@ -71,9 +72,12 @@ export class EngineService {
     const today = new Date();
     this.currentShippingDate = today.dayToDates([1, 2, 3, 4, 5, 6])[0];
   }
+  get availableOrders() {
+    return this.shippingWeekOrders.slice();
+  }
 
   get availableDates() {
-    return this.shippingWeek;
+    return this.shippingWeekOrders.map(order => order.shipping.when);
   }
   set currentConfig(config: Config) {
     this.config = config;
@@ -112,6 +116,10 @@ export class EngineService {
 
   get shops() {
     return this._shops;
+  }
+
+  dateToString(date) {
+    return
   }
   getAllOrdersByDate() {
     return this.monthOrders;
@@ -158,12 +166,12 @@ export class EngineService {
     const today = new Date();
     //
     // FIXME some orders dates overlapp 
-    // when initial currentShippingDate.month() is not equal to today.month()
+    // when initial c.plusDays( - this.pickerShippingDate.getDay())urrentShippingDate.month() is not equal to today.month()
 
 
     this.monthOrders = new Map();
     this.monthOrders.clear();
-    this.shippingWeek = [];
+    this.shippingWeekOrders = [];
 
 
     //
@@ -180,7 +188,7 @@ export class EngineService {
         const orderTime = order.shipping.when.getTime();
         if (!this.monthOrders.has(orderTime)) {
           this.monthOrders.set(orderTime, []);
-          this.shippingWeek.push(order.shipping.when);
+          this.shippingWeekOrders.push(order);
         }
 
         this.monthOrders.get(orderTime).push(order);
@@ -191,13 +199,10 @@ export class EngineService {
       const times = Array.from(this.monthOrders.keys()).sort((a, b) => a - b);
 
       //
-      // sort shipping dates
-      this.shippingWeek = this.shippingWeek.sort((a: Date, b: Date) => a.getTime() - b.getTime());
+      // sort order by shipping dates
+      this.shippingWeekOrders = this.shippingWeekOrders.sort((a: Order, b: Order) => a.shipping.when.getTime() - b.shipping.when.getTime());
 
-      // this.shippingWeek.forEach(date => {
-      //   console.log('----> shippingWeek',date,date.getTime());
-      // })
-      
+    
       //
       // publish status
       this.status$.next({running: false});

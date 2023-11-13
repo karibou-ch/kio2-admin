@@ -1,32 +1,30 @@
 <ion-header>
   <ion-toolbar color="primary" class="hidden-print">
-    <ion-title (click)="picker.open()" class="text-capitalize">{{ (pickerShippingDate| date:format) }}  </ion-title>
+    <ion-title  class="text-capitalize" id="click-open-datetime">{{ (pickerDate| date:format) }}  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button (click)="picker.open()">
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>      
-    </ion-buttons>
-  </ion-toolbar>
-  <ion-datetime #picker 
-    displayFormat="MM/YYYY" 
-    pickerFormat="MMMM YYYY" 
-    [(ngModel)]="pickerShippingDate" 
-    (ngModelChange)="onDatePicker()" 
-    cancelText="Annuler" 
-    doneText="Fait" 
-    dayValues="1"
-    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
-    max="2024"
-    style="display: none;">
-  </ion-datetime>        
-
+  </ion-toolbar>  
 </ion-header>
 
 
 <div class="content" *ngIf="report" ion-content-print>
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+    <ng-template>
+      <ion-datetime 
+        presentation="month-year"
+        [showDefaultButtons]="true"
+        locale="fr-FR"
+        [(ngModel)]="pickerShippingString" 
+        (ngModelChange)="onDatePicker(popover)" 
+        cancelText="Annuler" 
+        doneText="Fait" 
+        firstDayOfWeek="1"
+        max="2030">
+      </ion-datetime>
+    </ng-template>    
+  </ion-popover>
+
   <div class=" report">
     <address class="small">
       <img [src]="headerImg"  />
@@ -46,7 +44,7 @@
       <li>Date du relevé: {{today|date:"d MMM y"}}</li>
       <li>Période comptable:  {{report.from|date:"d MMM y"}} au {{report.to|date:"d MMM y"}}</li>
       <li>CA total <b>{{report.amount-report.discount-report.ca|currency:'CHF'}}</b>, <b>{{report.orders.length}}</b> commandes, <b>{{totalErrors()}}</b> erreurs dont <b>{{totalRefunds()}}</b> remboursement</li>
-      <li><a class="hidden-print small" [hidden]="!isAdmin" [href]="downloadLink" (click)="doDownloadPaymentXML($event)">download pain.001.001.03.ch.02</a></li>
+      <li><a class="hidden-print small" [hidden]="!isAdmin" href="javascript:void(0)" (click)="doDownloadPaymentXML($event)">download pain.001.001.09</a></li>
     </ul>
 
     <div  >

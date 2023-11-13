@@ -54,7 +54,7 @@ export class ProductsPage implements OnInit {
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
 
-    const loader = this.$route.snapshot.data.loader;
+    const loader = this.$route.snapshot.data['loader'];
     //
     // filter active shop and order by name
     this.skus = [];
@@ -168,8 +168,9 @@ export class ProductsPage implements OnInit {
   onInitOrders(ctx: OrdersCtx) {
     //
     // set default order value based on postalCode
-    const skus = ctx.orders.map(order => order.items.map(item => item.sku));
-    this.skus = [...new Set([].concat.apply([], skus))] as string[];
+    const skus = ctx.orders.map(order => order.items.map(item => item.sku+''))
+                           .reduce((flatten, array) => flatten.concat(array), []);
+    this.skus = [...new Set(skus)] as string[];
 
     this.loadProducts();
   }

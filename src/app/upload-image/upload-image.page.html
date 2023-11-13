@@ -12,17 +12,17 @@
 
 <ion-content padding>
 
-  <img *ngIf="getImage()" [src]="getImage()" />
+  <img *ngIf="image" [src]="urlImage" />
 
   <!-- <button ion-button block large color="primary" (click)="doUpload()">Upload Image</button> -->
 
   <ngx-uploadcare-widget 
-        preview-step="true" 
+        [preview-step]="true" 
         crop="1:1" 
         effects="rotate,mirror,flip" 
         image-shrink="1024x1024"
-        images-only="true" 
-        [value]="image" 
+        [images-only]="true" 
+        [value]="urlImage" 
         [public-key]="pubUpcare" 
         [validators]="[ucValidator]"
         (on-dialog-open)="onDialogOpen($event)"

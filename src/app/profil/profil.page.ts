@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Config, User, ConfigKeyStoreEnum, config, LoaderService, UserService, Shop } from 'kng2-core';
-import { App } from '@ionic/pro';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { EngineService } from '../services/engine.service';

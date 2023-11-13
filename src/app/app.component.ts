@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 
 import { Platform,ToastController  } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { Network } from '@ionic-native/network/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { LoaderService, User } from 'kng2-core';
 import { Router } from '@angular/router';
 import { EngineService } from './services/engine.service';
-import { interval } from 'rxjs';
 import { SwUpdate } from '@angular/service-worker';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Network } from '@capacitor/network';
 
 
 @Component({
@@ -18,23 +17,25 @@ import { SwUpdate } from '@angular/service-worker';
 })
 export class Kio2Admin {
   currentUser: User = new User();
-  NET_INFO: boolean;
+  NETWORK_ISSUE: boolean;
+  NETWORK_APP_ISSUE: boolean;
   firstInit: boolean;
 
   constructor(
     private $engine: EngineService,
-    private $network: Network,
     private $loader: LoaderService,
     private $router: Router,
     private $update: SwUpdate,
     private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
     private $toast: ToastController
   ) {
     this.firstInit = true;
     this.storeLoginToken();
     this.initializeApp();
+    this.$loader.ready().subscribe((ctx)=>{},(status)=> {
+      this.NETWORK_APP_ISSUE = true;
+    })
+
     this.$loader.update().subscribe((ctx) => {
       if (ctx.config) {
         this.$engine.currentConfig = ctx.config;
@@ -48,30 +49,28 @@ export class Kio2Admin {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.statusBar.styleDefault();
-      this.splashScreen.hide();
-      this.NET_INFO = false;
+      StatusBar.setStyle({style:Style.Default}).catch(()=>{});
+      SplashScreen.hide();
+      this.NETWORK_ISSUE = false;
 
       this.$update.available.subscribe(event => {
         const msg = 'Une nouvelle version est disponible. Recharger la page maintenant';
+        let force = true;
         alert (msg); 
-        this.$update.activateUpdate().then(() => document.location.reload(true));
+        this.$update.activateUpdate().then(() => {
+          document.location.reload(true);
+          force=false;
+        });
+        setTimeout(()=> force && document.location.reload(true),4000)
       });
 
       //
       // SIMPLE NETWORK CHECKER INFO
-      const neteork = interval(5000).subscribe(() => {
-        // console.log('---net',this.$network.type, window.navigator.onLine)
-        if((this.$network.type || '').toLocaleLowerCase() === 'none' ||
-          !window.navigator.onLine) {
-          if (this.NET_INFO) {
-            return;
-          }
-          this.NET_INFO = true;
-        } else if (this.NET_INFO) {
-          this.NET_INFO = false;
-        }
+      // 'wifi' | 'cellular' | 'none' | 'unknown'
+      Network.addListener('networkStatusChange', status => {
+        this.NETWORK_ISSUE = ['none','unknown'].indexOf(status.connectionType)>-1||(!window.navigator.onLine);
       });
+
     });
   }
 

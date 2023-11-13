@@ -40,24 +40,36 @@ ion-note{
 }
 
 ion-select {
-  max-width: 70%;
+  max-width: fit-content;
   font-size: 15px;
-  &.block{
-    max-width: 93%;
+  label{
+    width: 150px;
+
   }
+  &.block{
+    max-width: 95%;
+  }
+}
+
+.chip-label{
+  color: black;
+  background-color: #eeeeee82;
+  border-radius: 13px;
+  padding: 2px 10px;  
 }
 
 ion-title{
   text-transform: capitalize;
+  color: black;
+  background-color: #eeeeee82;
+  border-radius: 13px;
+  width: fit-content;
   ion-icon {
     transform: translateY(4px);
     color: gold;    
   }
 }
 
-ion-badge {
-    font-size: 0.8rem;
-}
 
 ion-list{
   padding-top: 0;
@@ -68,6 +80,9 @@ ion-item {
   &.planning{
     --background: var(--ion-color-kio-primary);
     --color:white;
+    ion-label{
+      max-width: 80%;
+    }
   }
   &.header{
     min-height: 1.9rem;

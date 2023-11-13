@@ -3,7 +3,7 @@
   --with: 100vw!important;
   --min-height:400px;
   width: 95vw;
-  height: 95vh;
+  height: 100%;
   padding: 2px!important;
 }
 
@@ -16,6 +16,7 @@
   justify-content: flex-start;
   align-content: center;
   flex-direction: column;
+  overflow: visible!important;
 
   .replace, .cancel{
     border: 2px solid #ddd;

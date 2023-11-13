@@ -25,6 +25,10 @@ export class ShopperPage implements OnInit, OnDestroy {
   config: Config;
   isReady: boolean;
   orders: Order[] = [];
+  statusColor = {
+    open:{background:"greenyellow",text:"black"},
+    closed:{background:"#777",text:"white"}
+  }
   planning = [];
   reorder = false;
 
@@ -34,7 +38,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   currentShopper: string;
   currentPlanning;
   format: string;
-  pickerShippingDate: string;
+  pickerShippingDate: Date;
   searchFilter: string;
 
   shippingShopper: {[key: string]: ShopperPlan};
@@ -87,12 +91,72 @@ export class ShopperPage implements OnInit, OnDestroy {
     // use valid date
     this.initDate();
 
-
-    this.pickerShippingDate = this.$engine.currentShippingDate.toISOString();
+    this.pickerShippingDate = this.$engine.currentShippingDate;
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrders();
   }
+
+  set pickerShippingString(date: string){
+    this.pickerShippingDate = new Date(date);
+    this.pickerShippingDate.setHours(0,0,0,0);
+  }
+
+  get pickerShippingString(){
+    return this.pickerShippingDate.toYYYYMMDD('-');
+  }
+
+  get highlightedOrders() {
+    const highlighted = this.$engine.availableOrders.map(order => {
+      const status = order.closed?'closed':'open'
+      return {
+        date: order.shipping.when.toYYYYMMDD('-'),
+        textColor: this.statusColor[status].text,
+        backgroundColor: this.statusColor[status].background,        
+      }
+    });
+    // console.log(highlighted[0],this.$engine.availableOrders[0].shipping.when)
+    return highlighted;
+  }
+
+
+  get currentOrders() {
+    //
+    // FIXME removed filter by hub
+    // .filter(filterByHub.bind(this))                    
+    // const filterByHub = (order) => {
+    //   return !this.currentHub ||
+    //   order.hub === this.currentHub.id;
+    // };
+
+    const filterByPlan = (order) => {
+      if (!this.currentPlanning ) {
+        return true;
+      }
+      return this.currentPlanning == order.shipping.priority;
+    };
+
+    const filterByText = (order) => {
+      const filter = order.email + ' ' + order.rank + ' ' + order.customer.displayName;
+      return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
+    };
+
+    //
+    // FIXME removed filter by hub
+    // .filter(filterByHub.bind(this))                    
+    if (!this.searchFilter) {
+      return this.orders.filter(order => !order.shipping.parent)
+                        .filter(filterByPlan.bind(this));
+    }
+    //
+    // FIXME removed filter by hub
+    // .filter(filterByHub.bind(this))                    
+    return this.orders
+                .filter(order => !order.shipping.parent)
+                .filter(filterByPlan.bind(this))
+                .filter(filterByText.bind(this));
+  }
+
 
   ngOnDestroy() {
   }
@@ -121,7 +185,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   initDate() {
     const currentDate = this.$engine.currentShippingDate;
-    const queryWhen = new Date(+this.$route.snapshot.queryParams.when);
+    const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
     const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
     const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
 
@@ -133,7 +197,7 @@ export class ShopperPage implements OnInit, OnDestroy {
 
     //
     // use full Date for Display
-    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate.toISOString() : queryWhen.toISOString();
+    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
   }
 
   isDeposit(order) {
@@ -143,18 +207,33 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   //
   // on selected date
-  onDatePicker() {
-    const today = new Date();
-    const date = new Date(this.pickerShippingDate);
+  onDatePicker(popover) {
+    const date = this.$engine.currentShippingDate = this.pickerShippingDate;
+    const orders = this.$engine.getOrdersByDay(date);
+    const today = new Date();    
+    const thisWeek = today.plusDays(- today.getDay());    
+    const nextWeek = today.plusDays(7 - today.getDay());
     date.setHours(0, 0, 0, 0);
-    date.setDate(1);
 
-    this.$engine.selectOrderArchives(date < today);
+    if(date < thisWeek && !orders.length) {
+      this.$engine.selectOrderArchives(true);  
+    }else if (date>nextWeek && !orders.length){
+      this.$engine.selectOrderArchives(false);  
+    }else if(!orders.length){
+      this.$engine.selectOrderArchives(false);  
+      this.$engine.currentShippingDate = date;
+    }else{
+      this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
 
-    this.pickerShippingDate = date.toISOString();
-    this.$engine.currentShippingDate = date;
-    this.$engine.findAllOrders();
+      this.onInitOrders({
+        orders: (orders),
+        when: (date)
+      } as OrdersCtx);
 
+    }
+
+
+    popover.dismiss();
     //
     // update route
     this.$router.navigate([], {queryParams: { when: (date.getTime()) }});
@@ -167,8 +246,8 @@ export class ShopperPage implements OnInit, OnDestroy {
   onInitOrders(ctx: OrdersCtx) {
     //
     // set default order value based on postalCode
-    this.pickerShippingDate = ctx.when.toISOString();
-    this.orders = ctx.orders.sort(this.sortOrdersByPosition);
+    this.pickerShippingDate = ctx.when;
+    this.orders = ctx.orders.sort(this.sortOrdersByPosition);    
     // this.orders.filter(o => o.shipping.priority === 1).forEach(order => {
     //   console.log('---- priority,position',order.rank,order.shipping.priority, order.shipping.position);
     // });
@@ -221,33 +300,6 @@ export class ShopperPage implements OnInit, OnDestroy {
 
   }
 
-  async openCalendar($event) {
-    const pop = await this.$popup.create({
-      component: CalendarPage,
-      translucent: true,
-      event: $event,
-      componentProps: {
-        orders: this.orders
-      }
-    });
-
-    //
-    // when a shipping date is selected
-    pop.onDidDismiss().then(result => {
-      if (result.data) {
-        const when = result.data[0];
-        const orders = this.$engine.getOrdersByDay(when);
-        this.$router.navigate([], { queryParams: { when: (when.getTime()) }});
-
-        this.onInitOrders({
-          orders: (orders),
-          when: (when)
-        } as OrdersCtx);
-      }
-    });
-
-    return await pop.present();
-  }
 
   isPlanified() {
   }
@@ -268,42 +320,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     return order.customer.phoneNumbers[0].number;
   }
 
-  getOrders() {
-    //
-    // FIXME removed filter by hub
-    // .filter(filterByHub.bind(this))                    
-    // const filterByHub = (order) => {
-    //   return !this.currentHub ||
-    //   order.hub === this.currentHub.id;
-    // };
-
-    const filterByPlan = (order) => {
-      if (!this.currentPlanning ) {
-        return true;
-      }
-      return this.currentPlanning == order.shipping.priority;
-    };
-
-    const filterByText = (order) => {
-      const filter = order.email + ' ' + order.rank + ' ' + order.customer.displayName;
-      return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
-    };
-
-    //
-    // FIXME removed filter by hub
-    // .filter(filterByHub.bind(this))                    
-    if (!this.searchFilter) {
-      return this.orders.filter(order => !order.shipping.parent)
-                        .filter(filterByPlan.bind(this));
-    }
-    //
-    // FIXME removed filter by hub
-    // .filter(filterByHub.bind(this))                    
-    return this.orders
-                .filter(order => !order.shipping.parent)
-                .filter(filterByPlan.bind(this))
-                .filter(filterByText.bind(this));
-  }
 
   getOrdersComplement(order) {
     return this.shippingComplement[order.oid] || 0;
@@ -340,7 +356,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   reorderItems(index) {
     //
     // list orders for this planning
-    const orders = this.getOrders();
+    const orders = this.currentOrders;
     const lastIdx = orders.length - 1;
     //
     // depending the direction, we should compare the position 
@@ -420,7 +436,7 @@ export class ShopperPage implements OnInit, OnDestroy {
         this.shippingShopper[order.shipping.priority] = {
           shopper: order.shipping.shopper,
           plan: order.shipping.priority,
-          time: order.shipping.shopper_time,
+          time: (order.shipping.shopper_time),
           hub: order.hub
         };
       }
@@ -432,7 +448,6 @@ export class ShopperPage implements OnInit, OnDestroy {
     // FIXME only avilable for managers ?
     shoppers[this.user.email.address] = true;
     this.shippingShoppers = Object.keys(shoppers).filter(shopper => !!shopper);
-
   }
 
   onEditCustomer(customer) {
@@ -466,7 +481,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     const hub = this.currentHub && this.currentHub.slug;
     const when = new Date(this.pickerShippingDate);
     const plan = this.currentPlanning;
-    const shopper = $event.shopper || this.shippingShopper[plan].shopper;
+    const shopper = $event.shopper || this.shippingShopper[plan].shopper || this.shippingShoppers[0];
     let time: any = (this.shippingShopper[plan].time);
 
     //
@@ -480,6 +495,8 @@ export class ShopperPage implements OnInit, OnDestroy {
         return;
       }
       time = time.getHours() + ':' + ('0' + time.getMinutes()).slice(-2);
+      this.shippingShopper[plan].time = time;
+      this.shippingShopper[plan].shopper = shopper;
     }
 
     this.$order.updateShippingShopper(hub, shopper, plan, when, time)

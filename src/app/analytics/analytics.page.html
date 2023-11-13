@@ -1,14 +1,13 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title (click)="picker.open()" class="text-capitalize">{{ (currentWeek| date:'MMM yyyy') }}  </ion-title>
+    <ion-title  class="text-capitalize">{{ (currentWeek| date:'MMM yyyy') }}  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  ></ion-back-button>
-    </ion-buttons>
-    <!-- <ion-buttons slot="end">
-      <ion-button (click)="picker.open()">
+      <ion-button id="click-open-datetime">
         <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
       </ion-button>      
-    </ion-buttons> -->    
+
+    </ion-buttons>
   </ion-toolbar>
   <ion-toolbar >
     <ion-title>{{currentWeek|date:'d MMM'}}</ion-title>
@@ -23,21 +22,24 @@
       <ion-label class="text-capitalize">forward</ion-label>
     </ion-chip>
   </ion-toolbar>
-  <ion-datetime #picker 
-    displayFormat="MM/YYYY" 
-    pickerFormat="MMMM YYYY" 
-    [(ngModel)]="pickerDate" 
-    (ngModelChange)="onDatePicker()" 
-    cancelText="Annuler" 
-    doneText="Fait" 
-    dayValues="1"
-    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
-    max="2024"
-    style="display: none;">
-  </ion-datetime>        
 
 </ion-header>
 <ion-content>
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+    <ng-template>
+      <ion-datetime 
+        presentation="month-year"
+        [showDefaultButtons]="true"
+        locale="fr-FR"
+        [(ngModel)]="pickerShippingString" 
+        (ngModelChange)="onDatePicker(popover)" 
+        cancelText="Annuler" 
+        doneText="Fait" 
+        firstDayOfWeek="1"
+        max="2030">
+      </ion-datetime>
+    </ng-template>    
+  </ion-popover>
 
   <div class="analytics">
     <p class="time">Dernière activité enregistrée {{lastAction|date:'d MMM HH:mm'}}</p>
@@ -62,7 +64,7 @@
       <h4 class="text-capitalize">sources</h4>
       <ul class="sources">
         <li *ngFor="let source of getSources(hub)| keyvalue: sortSourceDesc" > 
-          <a (click)="setSourceFilter(hub,source.key)" href="javascript:;">{{source.key}}</a> ({{source.value.hit}})
+          <a (click)="setSourceFilter(hub,source.key)" href="javascript:;">{{source.key}}</a> ({{source.value['hit']}})
           &nbsp;<span [hidden]="!isFilterActive(hub,source.key)"><a (click)="setSourceFilter(hub,'')" href="javascript:;">(X)</a> </span>
         </li>        
       </ul>

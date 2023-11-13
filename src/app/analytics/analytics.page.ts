@@ -21,7 +21,7 @@ export class AnalyticsPage implements OnInit {
   cache:any = {};
   
   months: string[];
-  pickerDate: string;
+  pickerDate: Date;
   currentShipping: Date;
   currentMonth: number;
   currentWeek: Date;
@@ -38,6 +38,8 @@ export class AnalyticsPage implements OnInit {
     this.cache = {};
     this.currentWeek = new Date(Date.now() - 86400000 * 7)
     this.filterByIP = {};
+
+    this.pickerShippingString = (new Date()).toISOString();
   }
 
   ngOnInit() {
@@ -57,8 +59,23 @@ export class AnalyticsPage implements OnInit {
     })
   }
 
+
+  set pickerShippingString(date: string){
+    this.pickerDate = new Date(date);
+    this.pickerDate.setHours(0,0,0,0);
+  }
+
+  get pickerShippingString(){
+    return this.pickerDate.toYYYYMMDD('-');
+  }
+
+
   get month() {
     return this.months[this.currentMonth];
+  }
+
+  get highlightedOrders(){
+    return [];
   }
 
   getMetrics(params){
@@ -235,12 +252,13 @@ export class AnalyticsPage implements OnInit {
     return this.cache[hub].sources;
   }
 
-  onDatePicker(){
-    const date = (new Date(this.pickerDate))
+  onDatePicker(popover){
+    const date = (this.pickerDate);
     date.setDate(1);
     this.currentMonth = date.getMonth();
     this.currentWeek =date;
     this.getMetrics({fromMonth:this.currentMonth+1});
+    popover.dismiss();
   }
 
   onBackWeek(){

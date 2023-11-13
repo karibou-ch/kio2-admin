@@ -53,7 +53,7 @@ export class VendorsPage implements OnInit {
   ngOnInit() {
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
-    const loader = this.$route.snapshot.data.loader;
+    const loader = this.$route.snapshot.data['loader'];
 
     //
     // select default HUB 
@@ -145,7 +145,7 @@ export class VendorsPage implements OnInit {
       return this.shops = this.cache.shops;
     }
 
-    this.shops = this.cache.shops.filter((shop: Shop) => {
+    return this.shops = this.cache.shops.filter((shop: Shop) => {
       const content = (shop.name + shop.description) || '';
       return content.toLocaleLowerCase().indexOf(search) > -1;
     });

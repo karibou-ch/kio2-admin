@@ -1,30 +1,29 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title (click)="openCalendar($event)">{{ (pickerShippingDate| date:format) }}  </ion-title>
+    <ion-title id="click-open-datetime">{{ (pickerShippingDate| date:format) }}  </ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button (click)="picker.open()">
-        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
-      </ion-button>      
-    </ion-buttons>
   </ion-toolbar>
-  <ion-datetime #picker 
-    displayFormat="MM/YYYY" 
-    pickerFormat="MMMM YYYY" 
-    [(ngModel)]="pickerShippingDate" 
-    (ngModelChange)="onDatePicker()" 
-    cancelText="Annuler" 
-    doneText="Fait" 
-    dayValues="1"
-    monthNames="janvier, fevrier, mars, avril, mai, juin, juillet, aout, septembre, octobre, novembre, decembre"
-    max="2024"
-    style="display: none;">
-  </ion-datetime>        
 </ion-header>
 
 <ion-content >
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+    <ng-template>
+      <ion-datetime 
+        presentation="date"
+        locale="fr-FR"
+        [highlightedDates]="highlightedOrders"
+        [(ngModel)]="pickerShippingString" 
+        (ngModelChange)="onDatePicker(popover)" 
+        cancelText="Annuler" 
+        doneText="Fait" 
+        firstDayOfWeek="1"
+        max="2030">
+      </ion-datetime>
+    </ng-template>    
+  </ion-popover>
+
   <div class="loader" [hidden]="isReady">
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>

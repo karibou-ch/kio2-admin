@@ -1,8 +1,9 @@
 import { Component, OnInit, Input, NgZone, OnDestroy } from '@angular/core';
-import { Config, Order, User } from 'kng2-core';
+import { Config, Order, User, Utils } from 'kng2-core';
 import { EngineService } from '../services/engine.service';
 import { Platform, ToastController, ModalController } from '@ionic/angular';
 import { TrackerProvider } from '../services/tracker/tracker.provider';
+import { Loader } from "@googlemaps/js-api-loader"
 
 declare const google;
 
@@ -38,20 +39,35 @@ export class TrackerPage implements OnInit, OnDestroy {
   constructor(
     private $engine: EngineService,
     private $modal: ModalController,
-    private $platform: Platform,
     private $toast: ToastController,
     private $tracker: TrackerProvider,
     public zone: NgZone
   ) {
     this.isReady = true;
-    this.directionsService = new google.maps.DirectionsService();
     this.config = this.$engine.currentConfig;
     this.user = this.$engine.currentUser;
     this.orders = [];
-    this.markerBounds = new google.maps.LatLngBounds();
+
+    //
+    //<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=key"></script>
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+
+    const apiKey = this.config.shared.keys.pubMap;
+    const loader = new Loader({
+      apiKey,
+      version: "weekly"
+    });
+
+    loader.load().then(async () => {
+      await google.maps.importLibrary("maps");// as google.maps.MapsLibrary;
+      this.markerBounds = new google.maps.LatLngBounds();
+      this.directionsService = new google.maps.DirectionsService();
+      this.$tracker.fetch();
+      this.createMap();  
+    });
+    
 
     //
     //
@@ -64,8 +80,6 @@ export class TrackerPage implements OnInit, OnDestroy {
 
     //
     // fetch one position and create map
-    this.$tracker.fetch();
-    this.createMap();
   }
 
   ngOnDestroy() {

@@ -8,10 +8,31 @@
 *.tmp
 *.tmp.*
 log.txt
+/.sourcemaps
+/.versions
+/coverage
+
+# Ionic
+/.ionic
+/www
+/platforms
+/plugins
+
 *.sublime-project
 *.sublime-workspace
 .vscode/
 npm-debug.log*
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
 
 .idea/
 .sass-cache/

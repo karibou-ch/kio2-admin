@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 
 
 import { LoaderService, User, UserService, ConfigKeyStoreEnum, Config } from 'kng2-core';
-import { version } from '../../../package.json';
+import pkg from '../../../package.json';
 
 @Component({
   selector: 'kio2-login',
@@ -32,10 +32,10 @@ export class LoginPage implements OnInit {
     private $route: ActivatedRoute,
     private $user: UserService
   ) {
-    this.VERSION = version;
+    this.VERSION = pkg.version;
     this.siteName = '';
     this.isReady = false;
-    const loader = this.$route.snapshot.data.loader;
+    const loader = this.$route.snapshot.data['loader'];
     this.config = loader[0];
     this.user = loader[1];
   }

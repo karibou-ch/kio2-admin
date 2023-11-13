@@ -57,8 +57,8 @@ export class StatsPage implements OnInit {
   ) {
     this.currentDate = this.$engine.currentShippingDate;
     this.config = this.$engine.currentConfig;
-    this.month = this.$route.snapshot.params.month || (this.currentDate.getMonth() + 1);
-    this.year = this.$route.snapshot.params.year || this.currentDate.getFullYear();
+    this.month = this.$route.snapshot.params['month'] || (this.currentDate.getMonth() + 1);
+    this.year = this.$route.snapshot.params['year'] || this.currentDate.getFullYear();
 
     this.funnelFilter = "";
     this.$crm = {
@@ -150,7 +150,7 @@ export class StatsPage implements OnInit {
   filterSource(toggleSource){
     return (user:any) => {
       switch(toggleSource){
-        case 0: return true;
+        default: return true;
         case 1: return user.email.source != 'halle-de-rive';
         case 2: return user.email.source == 'halle-de-rive';
       }

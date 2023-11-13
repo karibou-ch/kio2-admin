@@ -1,15 +1,24 @@
+ion-app{
+  background-image: linear-gradient(to right top,#e3eceb,#fff,#fff,#e3eceb);
+}
 .network-alert {
   left: calc( 100% / 2 - 150px );
   color: white;
   position: fixed;
   bottom: 20px;
-  width: 300px;
-  height: 60px;
-  margin: 15px;
+  width: fit-content;
+  height: 80px;
+  margin: 15px 8px;
   z-index: 1000000;
   background: var(--ion-color-danger);
   color: var(--ion-color-danger-contrast);
-  padding: 20px;
+  padding: 20px 8px;
   border-radius: 5px;  
   font-weight: 600;
+  animation: all 0.5s;
+  visibility: hidden;
+  text-align: center;
+  &.issue{
+    visibility: visible;
+  }
 }

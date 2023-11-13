@@ -5,15 +5,16 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { UploadImagePage } from './upload-image.page';
-import { UcWidgetComponent } from '../components/uc-widget/uc-widget';
+import { UcWidgetModule } from 'ngx-uploadcare-widget';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    UcWidgetModule
   ],
   exports: [UploadImagePage],
-  declarations: [UploadImagePage, UcWidgetComponent]
+  declarations: [UploadImagePage]
 })
 export class UploadImagePageModule {}

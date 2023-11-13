@@ -1,3 +1,18 @@
+ion-title{
+  text-transform: capitalize;
+  color: black;
+  background-color: #eeeeee82;
+  border-radius: 13px;
+  width: fit-content;  
+  font-weight: 700;
+  font-size: 20px;  
+  cursor: pointer;
+  ion-icon {
+    transform: translateY(4px);
+    color: gold;    
+  }
+}
+
 .content{
   overflow-y: auto!important;
   @media print {
@@ -6,6 +21,8 @@
     height: auto!important;
   }
 
+
+  
   ion-datetime {
     display: none;
   }

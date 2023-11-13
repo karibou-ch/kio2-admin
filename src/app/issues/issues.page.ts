@@ -13,7 +13,7 @@ export class IssuesPage implements OnInit {
   format = 'MMM yyyy';
   defaultTitle: string;
   user: User;
-  pickerShippingDate: string;
+  pickerShippingDate: Date;
   currentDate: Date;
   month: number;
   year: number;
@@ -32,24 +32,43 @@ export class IssuesPage implements OnInit {
     this.items = {};
   }
 
+  set pickerShippingString(date: string){
+    this.pickerShippingDate = new Date(date);
+    this.pickerShippingDate.setHours(0,0,0,0);
+  }
+
+  get pickerShippingString(){
+    return this.pickerShippingDate.toYYYYMMDD('-');
+  }
+
+
   ngOnInit() {
     this.user = this.$engine.currentUser;
+    const month = this.$route.snapshot.params['month'];
+    const year = this.$route.snapshot.params['year'];
+    this.pickerShippingDate = this.$engine.currentShippingDate;
+    if(month){
+      this.pickerShippingDate.setMonth(+month-1)
+    }
+    if(year){
+      this.pickerShippingDate.setFullYear(+year)
+    }
+
     this.onInitReport();
   }
 
   //
   // on selected date
-  onDatePicker() {
-    const date = new Date(this.pickerShippingDate);
-    date.setHours(0, 0, 0, 0);
-    date.setDate(2);
+  onDatePicker(popover) {
+    const date = (this.pickerShippingDate);
+    date.setDate(1);
 
-    this.pickerShippingDate = date.toISOString();
     this.currentDate = date;
     this.month = (this.currentDate.getMonth() + 1);
     this.year = (this.currentDate.getFullYear());
     this.$router.navigate(['/issues', this.month, this.year]);
     this.onInitReport();
+    popover.dismiss();
   }
 
   //
@@ -68,7 +87,7 @@ export class IssuesPage implements OnInit {
     this.items = {};
     const month = ('0' + (new Date(this.currentDate).getMonth() + 1)).slice(-2);
     const year = new Date(this.currentDate).getFullYear();
-
+    this.$engine.currentShippingDate = this.currentDate;
     //
     // this value depends on HUB
     // FIXME siteName not available on report

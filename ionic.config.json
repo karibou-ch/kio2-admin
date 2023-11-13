@@ -1,7 +1,7 @@
 {
-  "name": "kio2-admin",
+  "name": "kio2-admin-a11",
   "integrations": {
-    "cordova": {}
+    "capacitor": {}
   },
   "type": "angular"
 }

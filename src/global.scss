@@ -30,15 +30,22 @@
 @import "./theme/md-table.scss";
 @import "./theme/print.scss";
 
+.datetime-popover,
 .customer-contact-popover{
-  --backdrop-opacity:0.5;
-  .popover-content{
-    width: calc(100vw - 10px)!important;
-    left: 5px!important;      
-    top: 50px!important;
-    min-height: 100vh;
+  --width:fit_content!important;  
+
+  @media (max-width:700px) {
+    --width:calc(100% - 20px)!important;  
+  }    
+
+  
+  .calendar-day-highlight{
+    color: red;
   }
+
 }
+
+
 
 
 .customer-message{

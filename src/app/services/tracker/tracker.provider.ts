@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
+import { Geolocation } from '@capacitor/geolocation';
 import { filter } from 'rxjs/operators';
 import { ReplaySubject } from 'rxjs';
 
@@ -15,21 +15,20 @@ export class TrackerProvider {
   public geoLocation$;
   public currentPosition;
 
-  public update$: ReplaySubject<Coordinates>;
+  public update$: ReplaySubject<GeolocationCoordinates>;
   options = {
     enableHighAccuracy: true,
     frequency: 12000
   };
 
   constructor(
-    public $geolocation: Geolocation,
     public $zone: NgZone
   ) {
     this.update$ = new ReplaySubject(1);
   }
 
   fetch() {
-    this.$geolocation.getCurrentPosition(this.options).then(position => {
+    Geolocation.getCurrentPosition(this.options).then(position => {
       this.$zone.run(() => this.update$.next(position.coords));
     }).catch(err=>{
       console.log('--- ',err)
@@ -37,21 +36,22 @@ export class TrackerProvider {
   }
 
   start() {
-    this.watch = this.$geolocation.watchPosition(this.options).pipe(
-      filter((p: any) => p.code === undefined)
-    ).subscribe((position: Geoposition) => {
-      this.$zone.run(() => this.update$.next(position.coords));
-    });
+    return this.fetch();
+    // this.watch = Geolocation.watchPosition(this.options).pipe(
+    //   filter((p: any) => p.code === undefined)
+    // ).subscribe((position: Geoposition) => {
+    //   this.$zone.run(() => this.update$.next(position.coords));
+    // });
 
-    this.$geolocation.getCurrentPosition(this.options).then(position => {
-      this.$zone.run(() => this.update$.next(position.coords));
-    });
+    // this.$geolocation.getCurrentPosition(this.options).then(position => {
+    //   this.$zone.run(() => this.update$.next(position.coords));
+    // });
   }
 
   stop() {
-    if (this.watch) {
-      this.watch.unsubscribe();
-      this.watch = null;
-    }
+    // if (this.watch) {
+    //   this.watch.unsubscribe();
+    //   this.watch = null;
+    // }
   }
 }
