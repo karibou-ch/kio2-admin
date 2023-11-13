@@ -36,7 +36,7 @@
     "@sentry/angular-ivy": "^7.73.0",
     "@types/google.maps": "^3.54.3",
     "ionicons": "^6.0.0",
-    "kng2-core": "file:../kng2-core/dist",
+    "kng2-core": "^5.0.4",
     "markdown-it": "^13.0.2",
     "ngx-uploadcare-widget": "^3.0.2",
     "uploadcare-widget": "^3.21.2",
@@ -79,5 +79,5 @@
     "ts-node": "^8.3.0",
     "typescript": "~4.3.5"
   },
-  "description": "An Ionic project"
+  "description": "Admin App for the Karibou.ch network"
 }
