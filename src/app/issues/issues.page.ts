@@ -44,7 +44,16 @@ export class IssuesPage implements OnInit {
 
   ngOnInit() {
     this.user = this.$engine.currentUser;
+    const month = this.$route.snapshot.params['month'];
+    const year = this.$route.snapshot.params['year'];
     this.pickerShippingDate = this.$engine.currentShippingDate;
+    if(month){
+      this.pickerShippingDate.setMonth(+month-1)
+    }
+    if(year){
+      this.pickerShippingDate.setFullYear(+year)
+    }
+
     this.onInitReport();
   }
 
@@ -52,8 +61,7 @@ export class IssuesPage implements OnInit {
   // on selected date
   onDatePicker(popover) {
     const date = (this.pickerShippingDate);
-    date.setHours(0, 0, 0, 0);
-    date.setDate(2);
+    date.setDate(1);
 
     this.currentDate = date;
     this.month = (this.currentDate.getMonth() + 1);
@@ -79,7 +87,7 @@ export class IssuesPage implements OnInit {
     this.items = {};
     const month = ('0' + (new Date(this.currentDate).getMonth() + 1)).slice(-2);
     const year = new Date(this.currentDate).getFullYear();
-
+    this.$engine.currentShippingDate = this.currentDate;
     //
     // this value depends on HUB
     // FIXME siteName not available on report

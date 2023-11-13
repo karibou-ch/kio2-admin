@@ -1,6 +1,10 @@
-<ion-app>
+<ion-app> 
   <div class="network-alert" [class.issue]="NETWORK_ISSUE">
     <ion-icon name="wifi-outline" color="primary"></ion-icon> Aucun accès à Internet !
   </div>
+  <div class="network-alert" [class.issue]="NETWORK_APP_ISSUE">
+    <ion-icon name="wifi-outline" color="primary"></ion-icon> karibou.ch est (temporairement) innaccessible 😱
+  </div>
+
   <ion-router-outlet></ion-router-outlet>
 </ion-app>

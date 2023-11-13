@@ -78,9 +78,9 @@ export class ReportPage implements OnInit {
     this.onInitReport();
   }
 
-  doDownloadPaymentXML($event) {
-    this.$http.get(this.downloadLink,{ responseType: 'blob' })
-    .subscribe(blob => {
+  async doDownloadPaymentXML($event) {
+    try{
+      const blob = await this.$http.get(this.downloadLink,{ responseType: 'blob' }).toPromise();
       // It is necessary to create a new blob object with mime-type explicitly set
       // otherwise only Chrome works like it should
       //const newBlob = new Blob([blob], { type: "application/pdf" });
@@ -95,7 +95,11 @@ export class ReportPage implements OnInit {
       a.click();
       window.URL.revokeObjectURL(url);
       alert('your file has downloaded!'); // or you know, something with better UX...
-    })
+
+    }catch(err) {
+      console.log('---- download ', err);
+    }
+    $event.preventDefault();
     $event.stopPropagation();
   }
 

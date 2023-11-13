@@ -143,24 +143,27 @@ ion-item {
       border-right: 1px solid #eee;
     }
   }
-  span.price{
+  span.price,span.bags{
     position: absolute;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     top: 10px;
     color: white;
     font-weight: 200;
     padding: 0;
-    width: 18px;
     height: 18px;
-    line-height: 15px;
+    line-height: 16px;
     text-align: center;
     width: 45px;
     padding-top: 1px;
     border-radius: 3px;
     background: var(--ion-color-kio-primary);
-    right: 10px;
-    
+    right: 10px;    
   } 
+  span.bags{
+    width: 25px;
+    right: 60px;    
+    background: var(--ion-color-kio-secondary);
+  }
 
   span.time-collected{
     color: blue;
@@ -283,7 +286,7 @@ ion-item-options{
 }
 
 .rank-danger {
-  border: 2px double #03ff03;
+  border: 2px double #ff3333;
 }
 
 //

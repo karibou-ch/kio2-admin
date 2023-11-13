@@ -18,6 +18,7 @@ import { Network } from '@capacitor/network';
 export class Kio2Admin {
   currentUser: User = new User();
   NETWORK_ISSUE: boolean;
+  NETWORK_APP_ISSUE: boolean;
   firstInit: boolean;
 
   constructor(
@@ -31,6 +32,10 @@ export class Kio2Admin {
     this.firstInit = true;
     this.storeLoginToken();
     this.initializeApp();
+    this.$loader.ready().subscribe((ctx)=>{},(status)=> {
+      this.NETWORK_APP_ISSUE = true;
+    })
+
     this.$loader.update().subscribe((ctx) => {
       if (ctx.config) {
         this.$engine.currentConfig = ctx.config;

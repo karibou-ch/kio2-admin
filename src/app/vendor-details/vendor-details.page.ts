@@ -21,6 +21,7 @@ export class VendorDetailsPage implements OnChanges {
   weekdays = {};
   tvaId;
   catalog;
+  isReady: boolean;
   isCreate: boolean;
   regions: string[];
   locations: any[];
@@ -131,7 +132,7 @@ export class VendorDetailsPage implements OnChanges {
     if (!date) {
       return '';
     }
-    return  (new Date(date)).toUTCString();
+    return  (new Date(date)).toISOString();
   }
 
   ibanCtrl() {
@@ -203,7 +204,7 @@ export class VendorDetailsPage implements OnChanges {
     //
     // model for weekdays
     (this.shop.available.weekdays || []).map(day => this.weekdays[day] = true);
-
+    this.isReady = true;
   }
 
   onDateFrom() {

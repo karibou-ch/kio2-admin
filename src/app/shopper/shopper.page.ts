@@ -481,7 +481,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     const hub = this.currentHub && this.currentHub.slug;
     const when = new Date(this.pickerShippingDate);
     const plan = this.currentPlanning;
-    const shopper = $event.shopper || this.shippingShopper[plan].shopper;
+    const shopper = $event.shopper || this.shippingShopper[plan].shopper || this.shippingShoppers[0];
     let time: any = (this.shippingShopper[plan].time);
 
     //
@@ -495,6 +495,8 @@ export class ShopperPage implements OnInit, OnDestroy {
         return;
       }
       time = time.getHours() + ':' + ('0' + time.getMinutes()).slice(-2);
+      this.shippingShopper[plan].time = time;
+      this.shippingShopper[plan].shopper = shopper;
     }
 
     this.$order.updateShippingShopper(hub, shopper, plan, when, time)

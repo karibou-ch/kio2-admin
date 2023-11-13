@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
 import { ToastController, PopoverController, ModalController, LoadingController } from '@ionic/angular';
@@ -82,7 +82,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     public $popup: PopoverController,
     public $route: ActivatedRoute,
     public $router: Router,
-    public $order: OrderService
+    public $order: OrderService,
+    public $cdr: ChangeDetectorRef
   ) {
     this.orders = [];
     this.cache = {};
@@ -91,6 +92,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.currentDates = [];
     this.openItems = {};
     this.shippingComplement = {};
+    this.complementsLength = 0;
+
   }
 
   set pickerShippingString(date: string){
@@ -120,6 +123,24 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   get ordersCount() {
     return this.orders.filter(order => !order.shipping.parent).length;
   }
+
+  //
+  // get orders by HUB
+  get sortedOrders() {
+    let orders = [];
+    if (!this.searchFilter) {
+      orders = this.orders.filter(order => (!this.currentPlanning || this.currentPlanning === order.shipping.priority));
+    } else  {
+      orders = this.orders.filter(order => {
+        const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
+        const planning = (!this.currentPlanning || this.currentPlanning === order.shipping.priority);
+        return planning && filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
+      });  
+    }
+    this.complementsLength = orders.filter(order => order.shipping.parent).length;
+    return orders.sort(this.sortOrdersByRankAndComplement.bind(this));
+  }
+
 
   ngOnDestroy() {
     if (this.interval$) {
@@ -151,8 +172,15 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // use correct date
     this.initDate();
 
-    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
-    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
+  }
+
+  ngAfterViewInit(){
+    //
+    // pooling data every 10 minutes
+    this.interval$ = interval(60000 * 10).subscribe(() => {
+      this.$engine.findAllOrders();
+    });
+
     this.$engine.findAllOrders();
 
     //
@@ -169,13 +197,10 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
       }
     });
 
-    //
-    // pooling data every 10 minutes
-    this.interval$ = interval(60000 * 10).subscribe(() => {
-      this.$engine.findAllOrders();
-    });
-  }
+    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
+    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
 
+  }
 
 
   doRefresh(refresher) {
@@ -257,22 +282,6 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   getOrdersLength() {
 
   } 
-  //
-  // get orders by HUB
-  getOrders() {
-    let orders = [];
-    if (!this.searchFilter) {
-      orders = this.orders.filter(order => (!this.currentPlanning || this.currentPlanning === order.shipping.priority));
-    } else  {
-      orders = this.orders.filter(order => {
-        const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
-        const planning = (!this.currentPlanning || this.currentPlanning === order.shipping.priority);
-        return planning && filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
-      });  
-    }
-    this.complementsLength = orders.filter(order => order.shipping.parent).length;
-    return orders;
-  }
 
   getUniqueOrders(){
     return (this.orders).filter(order => !order.shipping.parent);
@@ -592,6 +601,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     }, 0);
     this.orderAvg = this.orderTotal / this.ordersCount;
 
+    this.$cdr.detectChanges();
   }
 
   onSearchInput($event) {

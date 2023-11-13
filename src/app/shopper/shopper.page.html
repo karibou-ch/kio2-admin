@@ -72,10 +72,11 @@
             <ion-datetime 
               presentation="time"
               locale="fr-FR"
-              pickerFormat="HH mm" 
+              [showDefaultButtons]="true"
+              pickerFormat="HH:mm" 
               [(ngModel)]="shippingShopper[currentPlanning].time" 
               (ngModelChange)="setShippingShopper({time:$event})" 
-              hourCycle="h24"
+              hourCycle="h23" 
               minuteValues="0,30">
             </ion-datetime>
           </ng-template>    

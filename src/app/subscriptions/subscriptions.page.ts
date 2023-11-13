@@ -69,11 +69,7 @@ export class SubscriptionsPage implements OnInit {
 
     //
     // all available shops
-    if (this.user.isAdmin()||this.user.hasRole('operator')) {
-      this.subscriptionsGet({admin:true});
-    } else {
-      this.subscriptionsGet({});
-    }
+    this.subscriptionsGet();
 
     this.subscriptions = this.cache.subscriptions;
   }
@@ -82,15 +78,13 @@ export class SubscriptionsPage implements OnInit {
     return this.weekdays[day];
   }
 
-  subscriptionsGet(options?) {
-    options = options || {};
-
+  subscriptionsGet() {
     this.cache.subscriptions = [];
 
-    const fnCall = options.admin ? this.$cart.subscriptionsGetAll():this.$cart.subscriptionsGet();
     
-    fnCall.subscribe(subscriptions => {
+    this.$cart.subscriptionsGetAll().subscribe(subscriptions => {
       this.subscriptions = this.cache.subscriptions = subscriptions.sort(this.sortBySubscription);
+      this.isReady = true;
     }, status => {
       this.toast.create({
         message: (status.message || status),
@@ -130,7 +124,8 @@ export class SubscriptionsPage implements OnInit {
       return -1;
     }
 
-    return p2.nextInvoice.getTime() - (p1.nextInvoice.getTime());
+    //return p2.nextInvoice.getTime() - (p1.nextInvoice.getTime());
+    return 1;
   }
 
 }

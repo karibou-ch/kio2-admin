@@ -50,6 +50,15 @@ export class CustomerPage implements OnInit {
 
   }
 
+  get customerPlans() {
+    const config = this.$engine.currentConfig;
+    if(!config||!config.shared||!config.shared.user) {
+      return [];
+    }
+    return config.shared.user.plan;
+  }
+
+
   ngOnInit() {
     const id: number = this.id || Number(this.$route.snapshot.paramMap.get('id'));
     const forceload = true;
@@ -90,6 +99,9 @@ export class CustomerPage implements OnInit {
     });
   }
 
+  doCustomerPlan($event) {
+    this.customer.plan.name = $event.detail.value;
+  }
 
   doClose() {
     this.$modal.dismiss();

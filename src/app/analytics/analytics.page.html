@@ -28,7 +28,8 @@
   <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
     <ng-template>
       <ion-datetime 
-        presentation="month"
+        presentation="month-year"
+        [showDefaultButtons]="true"
         locale="fr-FR"
         [(ngModel)]="pickerShippingString" 
         (ngModelChange)="onDatePicker(popover)" 

@@ -47,6 +47,31 @@
       <ion-input type="number" disabled placeholder="portefeuille" ngDefaultControl [(ngModel)]="customer.balance"></ion-input>
     </ion-item>
 
+    <!-- PLAN . name, defaultShipping, maxInvoices -->
+    <ion-item >
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Catégorie de client</ion-label>
+      <ion-select label="Catégorie de client" 
+                  label-placement="fixed" 
+                  interface="popover" (ionChange)="doCustomerPlan($event)" [(ngModel)]="customer.plan.name">
+        <ion-select-option *ngFor="let plan of customerPlans" [value]="plan.id">{{ plan.id }}</ion-select-option>
+      </ion-select>      
+    </ion-item>
+
+    <ion-item >
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">livraison contracuelle (-1 pour désactiver)</ion-label>
+      <div class="">
+        <ion-input type="number" placeholder="montant -1 à 50 fr" ngDefaultControl [(ngModel)]="customer.plan.defaultShipping"></ion-input>
+      </div>
+    </ion-item>
+
+    <ion-item >
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">factures max</ion-label>
+      <div class="">
+        <ion-input type="number" placeholder="limite 4" ngDefaultControl [(ngModel)]="customer.plan.maxInvoices"></ion-input>
+      </div>
+    </ion-item>
+
+
     <ion-item *ngFor="let phone of customer.phoneNumbers">
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Télephone</ion-label>
       <ion-input type="phone" placeholder="Phone" ngDefaultControl [(ngModel)]="phone.number"></ion-input>
@@ -94,6 +119,7 @@
         <button  (click)="doAddInvoiceMethod(invoice,customer.id)">Ajouter</button>
       </div>
     </ion-item>
+
 
     <!-- ADRESSE -->
     <ion-list *ngFor="let address of customer.addresses;let idx=index">

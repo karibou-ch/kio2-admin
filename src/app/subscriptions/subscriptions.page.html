@@ -36,7 +36,7 @@
         <ion-item  class="subscription" [class.inactive]="subscription.status != 'active'">
           <ion-label>
             <h2><span class="tag">{{subscription.plan}}/{{subscription.frequency}}/{{namedDayOfWeek(subscription.dayOfWeek)}}</span> {{subscription.shipping.name}}</h2>      
-            <h3 class="red bold" [hidden]="!subscription.pauseUntil">Abo en pause jusqu'au {{subscription.pauseUntil|date:'mediumDate':'GMT+1':'fr'}}</h3>
+            <h3 class="red bold" [hidden]="!subscription.pauseUntil">En pause jusqu'au {{subscription.pauseUntil|date:'mediumDate':'GMT+1':'fr'}}</h3>
             <ul>
               <li *ngFor="let item of subscription.items"><span [class.red]="item.quantity>1">{{item.quantity}}x</span> {{item.title}} ({{item.part}}) <span class="bold">{{item.fees}} fr</span></li>
             </ul>

@@ -60,11 +60,20 @@ span.rank{
   font-size: 0.9rem;
   font-weight: 900; 
   text-align: center;
-
   &.big{
     width: 50px;
     height: 50px;
     padding-top: 15px;      
+  }
+
+  .count{
+    font-size: 10px;
+    display: block;
+    background: #c2152c;
+    padding: 1px;
+    padding-top: 2px;
+    width: fit-content;
+    margin: auto;    
   }
 }
 
@@ -86,6 +95,10 @@ ion-item.customer-actions{
   margin: 0px;
   padding: 0;
   --min-height:34px;
+  ion-button{
+    --border-width: 0px;    
+    font-size: 12px;
+  }
 }
 
 ion-item.customer{
@@ -93,7 +106,8 @@ ion-item.customer{
   --background: #dbe6e5;
   --min-height: 90px;
   --padding-start: 8px;
-  --padding-end: 8px;
+  --padding-end: 0px;
+  --inner-padding-end:0px;
 
   margin: 0px;
   padding: 0;
@@ -142,6 +156,7 @@ ion-item.customer{
     line-height: 20px;
     font-weight: 600;      
     margin: 0;
+    margin-top: 16px;
     color: #000;
   }
   a{
@@ -159,7 +174,6 @@ ion-item.customer{
     text-transform: capitalize;
   }
   .item-inner{
-    margin-left:8px!important; 
     p{
       font-size: 0.7rem;        
     }
@@ -186,12 +200,14 @@ ion-item{
     --background: #dbe6e5;
   }
 
-  --padding-start: 8px;
-  --padding-end: 8px;
   
   padding: 1px;
   display: flex;
-  width: calc(100% + 16px);
+  width: calc(100% + 8px);
+  --padding-start:8px;
+  --inner-padding-start:0;
+  --inner-padding-end:0;
+
   position: relative;
   display: flex;
   div.item{
@@ -237,10 +253,10 @@ ion-item{
       text-overflow: ellipsis;
       overflow: hidden;
       max-width: 95vw;
-      >div.variant {
-        margin-left: 5px;
-        font-size: 14px;
+      .variant {
+        font-size: 12px;
         color: red;
+        margin-top: -4px;      
       }
     }
     .quantity{
@@ -253,7 +269,7 @@ ion-item{
       }
       font-size: 0.9rem;
       position: absolute;
-      top:34px;
+      top:40px;
       color: #333;      
       width: 240px;
       text-align: left;

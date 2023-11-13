@@ -32,10 +32,13 @@
 
 .datetime-popover,
 .customer-contact-popover{
-  --width:340px!important;  
+  --width:fit_content!important;  
+
   @media (max-width:700px) {
-    --width:calc(100vw - 10px)!important;  
+    --width:calc(100% - 20px)!important;  
   }    
+
+  
   .calendar-day-highlight{
     color: red;
   }

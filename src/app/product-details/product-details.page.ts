@@ -205,13 +205,13 @@ export class ProductDetailsPage implements OnInit {
   }
 
   doUpdatePart(part:any) {
-    part = (part.target&&part.target.value) ||part
+    part = (part.target&&part.target.value) || "";
     this.product.pricing.part = part;
     this.portion = this.product.getPortionParts();
   }
 
   doUpdatePriceKG($event) {
-    const price = parseFloat($event.target.value);
+    const price = parseFloat($event.target.value || "0");
     if(isNaN(price)) {
       return;
     }

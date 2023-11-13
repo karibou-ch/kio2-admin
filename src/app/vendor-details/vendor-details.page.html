@@ -10,7 +10,7 @@
 </ion-header>
 
 
-<ion-content  *ngIf="shop.available">
+<ion-content  *ngIf="shop.available && isReady">
   <ion-list>
     <ion-item>
         <ion-button expand="block" fill="outline" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button>
@@ -40,12 +40,26 @@
     </ion-item>
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary" >Le jour de fermeture</ion-label>
-      <ion-datetime [disabled]="!shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.from=$event" [ngModel]="formatToGMT(shop.available.from)" max="2024"></ion-datetime>
+      <ion-datetime 
+          [disabled]="!shop.available.active" 
+          presentation="date"
+          locale="fr-FR"
+          firstDayOfWeek="1"
+          displayFormat="DD/MM/YYYY" 
+          (ngModelChange)="shop.available.from=$event" 
+          [ngModel]="formatToGMT(shop.available.from)" max="2030"></ion-datetime>
     </ion-item>
 
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary">Le jour de ré-ouverture</ion-label>
-      <ion-datetime [disabled]="!shop.available.active" displayFormat="DD/MM/YYYY" (ngModelChange)="shop.available.to=$event" [ngModel]="formatToGMT(shop.available.to)" max="2024"></ion-datetime>
+      <ion-datetime 
+          [disabled]="!shop.available.active" 
+          presentation="date"
+          locale="fr-FR"
+          firstDayOfWeek="1"
+          displayFormat="DD/MM/YYYY" 
+          (ngModelChange)="shop.available.to=$event" 
+          [ngModel]="formatToGMT(shop.available.to)" max="2030"></ion-datetime>
     </ion-item>
       
   </ion-list>
@@ -233,6 +247,10 @@
     <ion-item>
       <ion-label color="primary" position="stacked">Votre IBAN</ion-label> 
       <ion-input [class.invalid-iban]="!ibanCtrl()" type="text" placeholder="CH..." [(ngModel)]="shop.account.IBAN"></ion-input>              
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">BIC</ion-label> 
+      <ion-input type="text" placeholder="CRESCH..." [(ngModel)]="shop.account.BIC"></ion-input>              
     </ion-item>
 
 
