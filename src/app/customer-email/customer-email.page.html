@@ -2,14 +2,55 @@
 <ion-content class="customer-email">
 
   <ion-list>
+    <!-- EMAIL ADD-->
     <ion-item>
-      <ion-textarea label="BCC:" 
-                    labelPlacement="stacked" 
+      <ion-textarea label="BCC:"
+                    labelPlacement="stacked"
                     errorText="La liste d'email n'est pas correcte"
                     [(ngModel)]="customersEmail"
                     [autoGrow]="true"
                     placeholder="Destinataires" ></ion-textarea>
     </ion-item>
+    <!-- EMAIL STATS -->
+     <ion-item>
+      <div class="stats" slot="start">
+        <div class="table" >
+          <div class="col">
+            <label for="">New</label>
+            <b>{{emailStats.new}}</b>
+          </div>
+          <div class="col">
+            <label for="">Occasional</label>
+            <b>{{emailStats.early}}</b>
+          </div>
+          <div class="col">
+            <label for="">recurrent</label>
+            <b>{{emailStats.recurrent}}</b>
+          </div>
+          <div class="col">
+            <label for="">premium</label>
+            <b>{{emailStats.premium}}</b>
+          </div>
+          <div class="col">
+            <label for="">quit</label>
+            <b>{{emailStats.quit}}</b>
+          </div>
+        </div>
+        <div class="table" >
+          <div class="col">
+            <label for="">unknown ({{emailStats.unknown.length}})</label>
+            <ion-button mode="ios"  size="small"  (click)="onUnknownClean()"  >
+              clean
+            </ion-button>
+
+            <br/>
+            <span *ngFor="let email of emailStats.unknown">{{email}}, </span>
+          </div>
+        </div>
+      </div>
+
+    </ion-item>
+    <!-- EMAIL FROM -->
     <ion-item >
       <ion-input label="from" [(ngModel)]="from" labelPlacement="stacked" placeholder="from ...@karibou.ch"></ion-input>
     </ion-item>
@@ -17,7 +58,7 @@
       <ion-input label="Sujet" [(ngModel)]="subject" labelPlacement="stacked" placeholder="Sujet du mail"></ion-input>
       <select  [(ngModel)]="funnel">
         <option value="new">New</option>
-        <option value="early">Early</option>
+        <option value="occasional">Occasional</option>
         <option value="recurrent">Recurrent</option>
         <option value="premium">Premium</option>
         <option value="quit">Quit</option>
@@ -28,8 +69,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-textarea label="Message" 
-                    labelPlacement="stacked"                     
+      <ion-textarea label="Message"
+                    labelPlacement="stacked"
                     [autoGrow]="true"
                     [(ngModel)]="content"
                     placeholder="Message à envoyer" ></ion-textarea>
@@ -43,22 +84,22 @@
 
 
   <div class="actions">
-    <ion-button mode="ios"  size="small" expand="block" (click)="onCustomerContact()"  color="primary" > 
+    <ion-button mode="ios"  size="small" expand="block" (click)="onCustomerContact()"  color="primary" >
       Envoyer l'e-mail <span class="bold">{{funnel}}</span>
-    </ion-button>    
-    <ion-button mode="ios" [disabled]="!from"  size="small" expand="block" (click)="onCustomerTest()"  color="primary" > 
+    </ion-button>
+    <ion-button mode="ios" [disabled]="!from"  size="small" expand="block" (click)="onCustomerTest()"  color="primary" >
       Envoyer un test à {{from}}
-    </ion-button>    
+    </ion-button>
 
-    <ion-button mode="ios" [disabled]="!from||!funnel" size="small" expand="block" (click)="onCustomerFunnel()"  color="primary" > 
+    <ion-button mode="ios" [disabled]="!from||!funnel" size="small" expand="block" (click)="onCustomerFunnel()"  color="primary" >
       Modifier la position {{funnel}}
-    </ion-button>    
+    </ion-button>
 
-    <ion-button mode="ios"  size="small" color="alert" (click)="onCancel()"  color="primary" > 
+    <ion-button mode="ios"  size="small" color="alert" (click)="onCancel()"  color="primary" >
       Annuler
-    </ion-button>    
+    </ion-button>
 
-  </div>  
+  </div>
 
   <p class="info">
   </p>

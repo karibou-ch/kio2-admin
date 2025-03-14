@@ -114,7 +114,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
       return {
         date: order.shipping.when.toYYYYMMDD('-'),
         textColor: this.statusColor[status].text,
-        backgroundColor: this.statusColor[status].background,        
+        backgroundColor: this.statusColor[status].background,
       }
     });
     // console.log(highlighted[0],this.$engine.availableOrders[0].shipping.when)
@@ -173,6 +173,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     order.items.forEach((item: OrderItem) => {
       //
       // init item for this vendor
+      // console.log('orderToVendor', item.vendor,order.vendors);
       if (!this.vendors[item.vendor]) {
         const vendor = order.vendors.find(v => v.slug === item.vendor);
         const collected = vendor.collected;
@@ -190,20 +191,19 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         this.vendors[item.vendor].collected = collected;
         this.vendors[item.vendor].collected_timestamp = vendor.collected_timestamp? new Date(vendor.collected_timestamp):vendor.collected_timestamp;
         this.vendors.list.push(item.vendor);
-
       }
 
-      // add hub to this vendor 
+      // add hub to this vendor
       if(this.vendors[item.vendor].hubs.indexOf(order.hub) == -1){
         this.vendors[item.vendor].hubs.push(order.hub);
       }
-      
+
 
       // add item to this vendor
       this.vendors[item.vendor].items.push(item);
       //
       // filter unique ranks
-      
+
       if(order.shipping.parent && this.vendors[item.vendor].complements.indexOf(order.oid) === -1){
         this.vendors[item.vendor].complements.push((order.oid));
       }
@@ -215,7 +215,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
   private orderItemsByVendorAndHub(vendor) {
     this.currentHub = this.hubs.find(hub => hub.selected) || {};
-    // 
+    //
     // FIXME removed hub filter
     // --> this.orders.filter(order =>  !this.currentHub || order.hub === this.currentHub.id)
     return this.orders.map(order => {
@@ -311,7 +311,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     return this.vendors[vendor].collected;
   }
 
-  isActiveHub(vendor: string): boolean {    
+  isActiveHub(vendor: string): boolean {
     const name = (this.currentHub && this.currentHub.name);
     return (this.hubsVendors[name]||[]).indexOf(this.vendors[vendor]._id)>-1;
   }
@@ -331,7 +331,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     this.hubs.forEach(hub => hub.orders = 0);
     this.orders.forEach(order => {
       if (this.hubs.length) {
-        this.hubs.find(hub =>  order.hub === hub.id).orders ++;
+        this.hubs.find(hub =>  (order.hub['_id']||order.hub) === hub.id).orders ++;
       }
       this.orderToVendor(order);
     });

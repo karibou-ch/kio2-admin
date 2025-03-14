@@ -61,7 +61,7 @@ export class VendorDetailsPage implements OnChanges {
         if (this.locations.indexOf(comp) > -1 && (this.shop.address.postalCode !== comp)) {
           this.shop.address.postalCode = comp;
         }
-        if (this.regions.indexOf(comp) > -1 && (this.shop.address.region !== comp)) {
+        if ((this.shop.address.region !== comp)) {
           this.shop.address.region = comp;
         }
       });

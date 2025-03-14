@@ -19,6 +19,7 @@ export class CustomersPage implements OnInit {
   search$: Subject<string>;
 
   cache: {
+    geoloc: boolean;
     premium: boolean;
     refund: boolean;
     errors: boolean;
@@ -42,6 +43,7 @@ export class CustomersPage implements OnInit {
       customers: [],
       step: 50,
       start: 0,
+      geoloc:false,
       refund: false,
       premium: false,
       errors: false
@@ -51,10 +53,7 @@ export class CustomersPage implements OnInit {
     this.search$.pipe(debounceTime(500)).subscribe((text: string) => {
       this.$user.query({search: text }).subscribe(customers => {
         this.cache.customers = customers.map(user => {
-          const count = user.orders.last1Month +
-                        user.orders.last3Month +
-                        user.orders.last6Month +
-                        user.orders.after6Month;
+          const userPlan:any = user.plan|| {};
           return {
             _id: user.id,
             // latestErrors: user.orders.latestErrors,
@@ -64,8 +63,10 @@ export class CustomersPage implements OnInit {
             last3Month: user.orders.last3Month,
             last6Month: user.orders.last6Month,
             after6Month: user.orders.after6Month,
+            missingGeo: user.addresses.some(add => !add.geo ||!add.geo.lat||!add.geo.lng),
             avg: user.orders.avg,
-            orders: count,
+            premium: (user.orders.profile=='premium'||userPlan.name=='premium'||userPlan.name=='shareholder'),
+            orders: user.orders.count,
             errors: user.orders.errors,
             refunds: user.orders.refunds
           };
@@ -173,7 +174,10 @@ export class CustomersPage implements OnInit {
         result = !!customer.errors;
       }
       if (this.cache.premium) {
-        result = this.user.isPremium(customer);
+        result = customer.premium;  
+      }
+      if(this.cache.geoloc) {
+        result = customer.missingGeo;
       }
       return result;
      }).slice(0, this.cache.start + this.cache.step).sort((a,b) => {

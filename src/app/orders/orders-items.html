@@ -22,17 +22,17 @@
 
       </span>
       <ion-label class="ion-text-wrap" >
-        <h2>
-          {{order.customer.displayName}} 
+        <h2 class="bold">
+          {{order.customer.displayName}} <span [routerLink]="['/customers',order.customer.id]" class="link edit" [hidden]="!user.isAdmin()">edit</span>
         </h2>
-        <p> 
+        <p>
           {{order.shipping.streetAdress}},{{order.shipping.floor}}<br/>
           {{order.oid}} - <span class="bold red" [hidden]="!order.payment.subscription">[ABO]</span>
           <span class="small  bold" [hidden]="!order.customer.rating">
             [note:{{ order.customer.rating + 1| number: '1.0-1' }}/4]
           </span>
 
-        </p>  
+        </p>
       </ion-label>
       <ion-note slot="end" >
         {{order.getSubTotal({ withoutCharge:true })|currency:'CHF'}} <br/>
@@ -42,7 +42,7 @@
     </ion-item>
 
     <!-- CONTACT CUSTOMER -->
-    <ion-item class="customer-actions" *ngIf="order.shipping" >
+    <ion-item class="customer-actions" *ngIf="order.shipping" [hidden]="orders.length>1">
       <ion-button mode="ios"  expand="block"  color="primary" (click)="doDisplayMail(order)"><ion-icon name="mail"> </ion-icon> E-mail</ion-button>
       <ion-button mode="ios"  expand="block"  color="primary" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> Téléphone</ion-button>
     </ion-item>
@@ -50,13 +50,13 @@
 
     <!-- DOUBLE CHECK CUSTOMER ITEMS -->
     <ion-item class="customer-actions" >
-      <ion-button mode="ios"  expand="block"   [hidden]="isPaid(order)" 
+      <ion-button mode="ios"  expand="block"   [hidden]="isPaid(order)"
                   color="primary" (click)="displayForCheck=!displayForCheck">
-        <span [hidden]="!doubleCheck" class="label-error bold">😱 Vérif. importante ({{order.customer.latestErrors}} 🌶️)</span>
+        <span [hidden]="!doubleCheck" class="label-error bold">😱 Vérif. importante 🌶️🌶️</span>
         <span [hidden]="doubleCheck">Vérif. du panier</span>
       </ion-button>
       <ion-button mode="ios"  expand="block"    color="primary" [hidden]="defaultSmall" [hidden]="isPaid(order)" (click)="doValidateAll(order)">
-        <ion-icon slot="start" name="checkmark-outline" ></ion-icon> 
+        <ion-icon slot="start" name="checkmark-outline" ></ion-icon>
         Tout valider
       </ion-button>
 
@@ -66,7 +66,7 @@
 
     </ion-item>
 
-    <ng-container 
+    <ng-container
       *ngTemplateOutlet="displayForCheck ? ordersCheckItems : ordersValidateItems;context:{ $implicit: order }">
     </ng-container>
   </ion-list>
@@ -84,20 +84,24 @@
       [debounce]="500"
       (ionInput)="doFilterInput($event)"
       (ionClear)="doClearFilter($event)">
-    </ion-searchbar>  
+    </ion-searchbar>
 
   </ion-item>
-  <ion-item [class.checked]="mapItem[item.sku]" *ngFor="let item of sortedItem(order);let idx=index">
-    <div class="item">
-      <div class="title {{item.fulfillment.status}}"  (click)="doToggleCheck(item)" >
-        {{idx + 1}} - <span [class.red.bold]="item.quantity>1">{{item.quantity}}x</span> - {{item.title}} - <span class="part">{{item.part}}</span> 
-      <div [hidden]="!item.variant" class="variant dark-green link">
-        // {{item.variant?.title}}
-      </div>  
-      <div class="vendor">{{item.vendor}}</div>
-    </div>
-  </div>
+  <ion-item [class.checked]="mapItem[order.oid+item.sku]" *ngFor="let item of sortedItem(order);let idx=index">
+    <div class="item" slot="start" >
+      <div class="title {{item.fulfillment.status}}" (click)="doToggleCheck(order,item)"  >
+        {{idx + 1}} - <span [class.red.bold]="item.quantity>1">{{item.quantity}}x</span> - {{item.title}} - <span class="part">{{item.part}}</span>
+        <div [hidden]="!item.variant" class="variant dark-green link">
+          // {{item.variant?.title}}
+        </div>
+        <div class="vendor"><ion-badge color="light" class="vendor">{{item.vendor}}</ion-badge> <ion-badge color="danger" [hidden]="!item.fulfillment.issue">{{getItemIssue(item)}}</ion-badge> </div>
+      </div>
 
+    </div>
+    <div class="" slot="end" [hidden]="!isLogistic">
+      <button class="item-button issue" fill="outline" slot="end" tabindex="-1"
+      [hidden]="isPaid(order)" (click)="doIssue(order, item)">problème</button>
+    </div>
   </ion-item>
 
 </ng-template>
@@ -105,37 +109,42 @@
 <!-- CHECK CONTENT ITEMS -->
 <ng-template #ordersValidateItems let-order >
     <!-- GLOBAL SAVE ACTION-->
-    <ion-item-sliding *ngFor="let item of sortedItem(order)">          
+    <ion-item-sliding *ngFor="let item of sortedItem(order)">
       <ion-item-options side="end" >
         <ion-item-option [hidden]="!isPaid(order)">
-            <ion-button class="avoid button-refund" 
+            <ion-button class="avoid button-refund"
                     color="danger"  slot="end" tabindex="-1"
-                    [disabled]="item.finalprice==0"                    
+                    [disabled]="item.finalprice == 0"
                     (click)="doRefund(order,item)">
               <ion-icon name="card-outline" ></ion-icon>&nbsp;refund
             </ion-button>
           </ion-item-option>
-      </ion-item-options>  
+      </ion-item-options>
       <ion-item class="" >
         <div class="item large ion-text-wrap">
           <div tabindex="-1" class="title {{item.fulfillment.status}}" (click)="doOpenProduct(item)" >
-              {{item.title}} 
+              {{item.title}}
             <div [hidden]="!item.variant" class="dark-green variant">
-              // {{item.variant?.title}}
+              {{item.variant?.title}}
             </div>
+            <div [hidden]="!item.bundle" class="dark-green variant">
+              {{item.vendor}}
+            </div>
+
           </div>
           <div tabindex="-1" class="quantity {{item.fulfillment.status}}" [class.red.bold]="item.quantity>1">
-            {{item.quantity}}x <span class="part">{{item.part}}</span> 
+            {{item.quantity}}x <span class="part">{{item.part}}</span>&nbsp;
             <span class="issue" [hidden]="!item.fulfillment.request">problème:{{item.fulfillment.request}} </span>
             <span class="issue" [hidden]="!item.fulfillment.refunded"><span [hidden]="item.finalprice==0">partiellement</span> remboursé </span>
+            <span class="issue" [hidden]="!item.fulfillment.issue">{{getItemIssue(item)}}</span>
           </div>
 
-  
+
           <div class="price {{item.fulfillment.status}}" >
             <span class="suffix">fr</span>
             <input type="number" step="0.1" min="0"  class="input-price" tabindex="1"
                    [disabled]="order.payment.subscription"
-                   [(ngModel)]="item.finalprice"   
+                   [(ngModel)]="item.finalprice"
                    (keypress)="doKeypress($event.keyCode,order,item)"
                    (focus)="doSelectAllPrice($event)"/>
           </div>
@@ -150,14 +159,20 @@
                     [disabled]="order.payment.subscription"
                     (click)="doAskCancel($event, order,item)">
               <ion-icon slot="start" name="close-outline" ></ion-icon>
-            </button>                      
+            </button>
           </div>
         </div>
       </ion-item>
-      
+
       <!-- CUSTOMER MESSAGE -->
-      <ion-item class="header-audio" [hidden]="!item.audio">
-        <audio  tabindex="-1" controls=""  [src]="item.audio"></audio>
+      <ion-item class="header-audio" [hidden]="!item.note">
+        <div class="note red"  tabindex="-1" [innerHtml]="item.note"></div>
+      </ion-item>
+      <ion-item class="header-audio" *ngIf="item.audio">
+        <!-- IOS ISSUE -->
+        <audio tabindex="-1" controls>
+          <source [src]="item.audio+'/audio.mp3'">
+        </audio>
         <div class="phone" slot="end">
           <a [hidden]="!getPhoneNumber(order)"
           color="info" href="javascript:void()" (click)="doDisplayphone(order)"><ion-icon name="call"> </ion-icon> </a>

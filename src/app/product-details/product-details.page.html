@@ -22,67 +22,143 @@
         <ion-label>
           <b class="red">Psst;</b> commande en cours avec l'article
           <div class="info">
-            {{order.email}} - <b class="red">{{order.shipping.when|date:'d MMM y'}}</b> 
-          </div>            
+            {{order.email}} - <b class="red">{{order.shipping.when|date:'d MMM y'}}</b>
+          </div>
         </ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-label color="primary">
-          Produit actif à la vente
+      <!-- STOCK -->
+      <ion-item class="stock">
+        <ion-label color="primary" position="stacked">
+          En stock
         </ion-label>
-        <ion-toggle  color="primary" ngDefaultControl [(ngModel)]="product.attributes.available"></ion-toggle>
+        <ion-input type="text" min="0" placeholder="0-1000" ngDefaultControl [(ngModel)]="product.pricing.stock"></ion-input>
+        <button class="button-stock" slot="end" (click)="product.pricing.stock=0">0</button>
+        <button class="button-stock" slot="end" (click)="product.pricing.stock=40">40 </button>
+        <button class="button-stock" slot="end" (click)="product.pricing.stock=100">100</button>
       </ion-item>
 
       <ion-item>
-        <ion-label>Disponible en panier</ion-label>
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.subscription"></ion-toggle>
+        <ion-label >Voir l'historique des prix</ion-label>
+        <ion-button fill="outline"   color="primary" [disabled]="!isReady()" (click)="doGetHistory()">Historique des modifications</ion-button>
       </ion-item>
-
-      <ion-item>
-        <ion-label>Spécifique Entreprise</ion-label>
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.business"></ion-toggle>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>En promotion</ion-label>
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
-      </ion-item>
-
-      <ion-item [hidden]="!user.isAdmin()">
-        <ion-label>Sélection</ion-label>
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.home"></ion-toggle>
-      </ion-item>
-      <ion-item [hidden]="!user.isAdmin()">
-        <ion-label>Boost</ion-label>
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>
-          Le produit personalisé
-          <div class="info">
-            Ce produit va permettre aux clients de choisir un article de votre vitrine qui n'est pas disponible en ligne. 
-            Il sera associé avec une note et un budget que le client aura précisé <b>(par exemple 5x 20 fr)</b>
-          </div>          
-        </ion-label>
-        
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.customized"></ion-toggle>
-      </ion-item>
-      
-      <ion-item>
-        <ion-button fill="outline" expand="block"  color="primary" [disabled]="!isReady()" (click)="getHistory()">Historique des modifications</ion-button>
+      <ion-item [hidden]="!history.length">
+        <ul class="history">
+          <li  *ngFor="let price of history" [innerHtml]="price"></li>
+        </ul>
       </ion-item>
 
       <ion-item class="header">
-        <h3>Informations</h3>
-      </ion-item>       
+        <h3>Les Options</h3>
+      </ion-item>
 
+      <!-- INFO attributes -->
+      <ion-list >
+        <ion-item>
+          <ion-label color="primary">
+            Produit actif à la vente
+          </ion-label>
+          <ion-toggle  color="primary" ngDefaultControl [(ngModel)]="product.attributes.available"></ion-toggle>
+        </ion-item>
+
+        <ion-item  [hidden]="!user.isAdmin()">
+          <ion-label>Disponible en abonement</ion-label>
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.subscription"></ion-toggle>
+        </ion-item>
+
+        <ion-item [hidden]="!user.isAdmin()">
+          <ion-label>
+            Le produit bundle
+            <div class="info">
+              Ce produit vous permet de créer des bundles multicommerçants.
+              Il est associé avec la description et le prix des commandes aux commerçants.
+            </div>
+          </ion-label>
+
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.bundle" (click)="doCheckBundle(product)"></ion-toggle>
+        </ion-item>
+
+        <ion-item [hidden]="!user.isAdmin()">
+          <ion-label>Boost</ion-label>
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.boost"></ion-toggle>
+        </ion-item>
+
+        <ion-item >
+          <ion-label>Spécifique Entreprise</ion-label>
+          <ion-toggle  color="primary" slot="end" ngDefaultControl  [(ngModel)]="product.attributes.business"></ion-toggle>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>
+            Le produit personalisé
+            <div class="info">
+              Ce produit va permettre aux clients de choisir un article de votre vitrine qui n'est pas disponible en ligne.
+              Il sera associé avec une note et un budget que le client aura précisé <b>(par exemple 5x 20 fr)</b>
+            </div>
+          </ion-label>
+
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.customized"></ion-toggle>
+        </ion-item>
+
+        <ion-item class="">
+          <ion-label>
+            Épingler en haut de page!
+            <div class="info">Choisir uniquement les best-of</div>
+          </ion-label>
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.home"></ion-toggle>
+        </ion-item>
+
+
+        <ion-item>
+          <ion-label [class.red]="product.attributes.discount">
+            Activer/Désactiver la promotion <b class="red" [hidden]="!product.pricing.discount">({{product.pricing.discount}} fr)</b>
+            <div class="info" [hidden]="product.pricing.discount">ℹ️ Le montant de la promotion doit être définit ⤵️</div>
+          </ion-label>
+
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
+        </ion-item>
+
+
+        <!-- Timelimit -->
+        <ion-item [hidden]="!user.isAdmin()">
+            <ion-label>
+              Temps préparation: <b class="red" [hidden]="!product.attributes.timelimit">{{product.attributes.timelimit}}h</b>
+              <div class="info">Certains produits ont besoin de plus de temps pour être préparés: <br>
+                Choisir 0h pour l'horaire normal.<br>
+                Choisir 3h pour la disponibilité en last-minute.</div>
+            </ion-label>
+
+          <ion-radio-group ngDefaultControl [(ngModel)]="product.attributes.timelimit">
+            <ion-item *ngFor="let timelimit of timelimits" class="timelimit">
+              <ion-label color="primary">{{timelimit}}h</ion-label>
+              <ion-radio [value]="timelimit"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-item>
+
+      </ion-list>
+
+
+      <ion-item class="header">
+        <h3>Informations</h3>
+      </ion-item>
+
+      <!-- TITLE -->
       <ion-item class="input-toggle">
         <ion-label position="stacked" color="primary">
           Titre
         </ion-label>
         <ion-input type="text" placeholder="titre" ngDefaultControl [(ngModel)]="product.title"></ion-input>
+      </ion-item>
+
+      <!-- DESCRIPTION -->
+      <ion-item color="none" class="description">
+        <ion-textarea placeholder="description" autocorrect="true"  rows="4" autoGrow  ngDefaultControl [(ngModel)]="product.details.description"></ion-textarea>
+      </ion-item>
+
+      <!-- GPT -->
+      <ion-item>
+        <ion-button fill="outline" class="assistant"  expand="block" (click)="doAssistantForDescription(product)">Assistant GPT</ion-button>
       </ion-item>
 
       <!-- VARIANT -->
@@ -94,7 +170,7 @@
           </ion-label>
           <ion-button fill="outline" slot="end" (click)="doCreateVariant(product)">Ajouter</ion-button>
         </ion-item>
-    
+
         <ion-item  *ngFor="let variant of product.variants;let idx=index">
           <ion-input type="text"  placeholder="Descrition courte de la variante" ngDefaultControl [(ngModel)]="variant.short"></ion-input>
           <ion-button shape="round" fill="outline" size="small" slot="end" (click)="product.variants.splice(idx, 1)">
@@ -103,11 +179,25 @@
         </ion-item>
       </ion-list>
 
+      <ion-item>
+        <ion-label color="primary" position="stacked">Ingrédients / Origines </ion-label>
+        <ion-textarea  rows="4" autoGrow placeholder="ex, olive(Grèce), pâte(Italie)... " ngDefaultControl [(ngModel)]="product.details.origin" required></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-label color="primary" position="stacked">Péremption</ion-label>
+        <ion-input type="text" placeholder="ex. Se conserve 3 jours"  ngDefaultControl [(ngModel)]="product.shelflife.comment"></ion-input>
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.shelflife.display"></ion-toggle>
+      </ion-item>
+      <ion-item class="separator">
+        <ion-label color="primary" position="stacked">Quantité</ion-label>
+        <ion-input type="text"  placeholder="ex. Convient pour 1-2 personnes" ngDefaultControl [(ngModel)]="product.quantity.comment"></ion-input>
+        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.quantity.display"></ion-toggle>
+      </ion-item>
 
       <!-- PHOTOS -->
       <ion-item class="header">
         <h3>Photos</h3>
-      </ion-item>       
+      </ion-item>
 
       <ion-item color="none" *ngIf="product.photo.url">
         <ion-thumbnail slot="start" class="image" >
@@ -117,62 +207,34 @@
           <img  [src]="product.photo.url+'/-/resize/400x/'"/>
         </div>
       </ion-item>
+
       <ion-item>
         <ion-button fill="outline" color="primary" expand="block" (click)="uploadImage(product)">Modifier la photo du produit</ion-button>
       </ion-item>
 
-      <!-- DESCRIPTION -->
-      <ion-item color="none">
-        <ion-textarea placeholder="description" autocorrect="true"  rows="4" autoGrow  ngDefaultControl [(ngModel)]="product.details.description"></ion-textarea>
-      </ion-item>
-      <ion-item>
-        <ion-label color="primary" position="stacked">Ingrédients / Origines </ion-label> 
-        <ion-textarea  rows="4" autoGrow placeholder="ex, olive(Grèce), pâte(Italie)... " ngDefaultControl [(ngModel)]="product.details.origin" required></ion-textarea>
-      </ion-item>
-      <ion-item>
-        <ion-label color="primary" position="stacked">Péremption</ion-label>
-        <ion-input type="text" placeholder="ex. Se conserve 3 jours"  ngDefaultControl [(ngModel)]="product.shelflife.comment"></ion-input>    
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.shelflife.display"></ion-toggle>        
-      </ion-item>
-      <ion-item>
-        <ion-label color="primary" position="stacked">Quantité</ion-label>
-        <ion-input type="text"  placeholder="ex. Convient pour 1-2 personnes" ngDefaultControl [(ngModel)]="product.quantity.comment"></ion-input>    
-        <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.quantity.display"></ion-toggle>        
-      </ion-item>
-      
-      <!-- STOCK -->
-      <ion-item class="stock">
-        <ion-label color="primary" position="stacked">
-          En stock
-        </ion-label>
-        <ion-input type="text" min="0" placeholder="0-1000" ngDefaultControl [(ngModel)]="product.pricing.stock"></ion-input>
-        <button class="button-stock" slot="end" (click)="product.pricing.stock=0">0</button>
-        <button class="button-stock" slot="end" (click)="product.pricing.stock=40">40 </button>
-        <button class="button-stock" slot="end" (click)="product.pricing.stock=100">100</button>
-        
-      </ion-item>
     </ion-list>
 
     <!-- PRICE -->
-    <ion-list [hidden]="!detailled">
+    <ion-list >
       <ion-item class="header">
-        <h3>Prix</h3>
-      </ion-item>       
+        <h3>Prix et Portions</h3>
+      </ion-item>
+
       <ion-item class="">
         <ion-label color="danger" position="stacked">La portion que le client peut commander</ion-label>
         <div class="info" *ngIf="product.pricing.part">
           <span class="block" [hidden]="product.hasFixedPortion()">
-            Le client va recevoir une portion entre  
+            Le client va recevoir une portion entre
             {{(portion.part - portion.offset)}}  {{portion.unit}}  et {{(portion.part + portion.offset)}}  {{portion.unit}}</span>
-        </div>                        
+        </div>
         <div class="info " [hidden]="product.getPortionParts().offset">
           <span class="block">
-            Informez le client de la portion d'une unité. Elle peut être fixe (<b>1pce, 1botte, 200gr</b>, ...) ou variable 
-            pour un produit à la coupe, par exemple avec <b>~200gr</b> le client sait qu'il va recevoir une portion proche de 200gr.  
+            Informez le client de la portion d'une unité. Elle peut être fixe (<b>1pce, 1botte, 200gr</b>, ...) ou variable
+            pour un produit à la coupe, par exemple avec <b>~200gr</b> le client sait qu'il va recevoir une portion proche de 200gr.
           </span>
-        </div> 
-        <ion-input class="input-special" type="text"  placeholder="Portions ? Modifier un des exemples --v " 
-                  (ionInput)="doUpdatePart($event)" [value]="product.pricing.part"></ion-input>    
+        </div>
+        <ion-input class="input-special" type="text"  placeholder="Portions ? Modifier un des exemples --v "
+                  (ionInput)="doUpdatePart($event)" [value]="product.pricing.part"></ion-input>
       </ion-item>
       <ion-item>
         <button class="button-stock small" slot="end" (click)="doUpdatePart('0.75L')">0.75L</button>
@@ -183,16 +245,23 @@
         <button class="button-stock small" slot="end" (click)="doUpdatePart('~200gr')">~200gr</button>
       </ion-item>
 
-      <ion-item class="helper" [hidden]="!product.getPortionParts().isWeight">
-        <ion-label position="stacked">Le prix au Kg en pour {{product.pricing.part}}</ion-label>
-        <ion-input class="input-special" type="text"  placeholder="Prix au Kg"  (input)="doUpdatePriceKG($event)"></ion-input>    
-      </ion-item>
-
+      <!-- PRIX A LA PORTION -->
       <ion-item class="large">
         <ion-label color="primary" position="stacked">
           Prix (TVA inc.)
         </ion-label>
-        <ion-input type="number" min="0" placeholder="0.00" ngDefaultControl [(ngModel)]="product.pricing.price"></ion-input>
+        <ion-input type="number" min="0" step="0.1" placeholder="0.00" ngDefaultControl
+                (focus)="doSelectAllPrice($event)"
+                (ionInput)="doKeypressOnPrice($event)"
+                [ngModel]="product.pricing.price"></ion-input>
+      </ion-item>
+      <!-- PRIX AU KG -->
+      <ion-item class="large" [hidden]="!product.getPortionParts().isWeight">
+        <ion-label position="stacked" color="primary">Le prix au Kg en pour {{product.pricing.part}}</ion-label>
+        <ion-input class="input-special " type="number" min="0" step="0.1"  placeholder="Prix au Kg"
+                (focus)="doSelectAllPrice($event)"
+                (ionInput)="doUpdatePriceKG($event)"
+                [ngModel]="priceKg"></ion-input>
       </ion-item>
       <ion-item class="promotion" size="large">
         <ion-label color="danger" position="stacked">
@@ -202,6 +271,53 @@
         <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.discount"></ion-toggle>
       </ion-item>
     </ion-list>
+
+    <!-- BUNDLE -->
+    <ion-list [hidden]="!product.attributes.bundle" class="separator">
+      <ion-list-header color="danger" >
+        Détailler le bundle
+      </ion-list-header>
+      <div class="sub-header">
+        L'article commandé sera divisé en plusieurs commandes pour chaque commerçant.
+        <ion-button fill="outline" class="assistant"  expand="block" (click)="doAddBundle(product)">Ajouter un commerçant</ion-button>
+
+      </div>
+      <div *ngFor="let item of product.bundle;let idx=index" class="bundle">
+        <ion-item>
+          <ion-label color="primary">
+            Vendeur
+          </ion-label>
+          <ion-select ngDefaultControl [(ngModel)]="item.vendor" interface="action-sheet">
+            <ion-select-option *ngFor="let shop of shops"  [value]="shop.urlpath">{{shop.name}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="large">
+          <ion-label position="stacked">Titre</ion-label>
+          <ion-input type="text" placeholder="titre du bundle" ngDefaultControl [(ngModel)]="item.title"></ion-input>
+          <ion-button  slot="end" color="danger" shape="round" (click)="product.bundle.splice(idx, 1)">
+            <ion-icon name="trash-outline" ></ion-icon>          </ion-button>
+
+        </ion-item>
+
+        <ion-item>
+          <ion-textarea rows="5" autoGrow placeholder="note au commerçant lors de la commande" ngDefaultControl [(ngModel)]="item.note"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Prix (forfait)</ion-label>
+          <ion-input type="number" min="0" placeholder="0.00" ngDefaultControl [(ngModel)]="item.price"></ion-input>
+        </ion-item>
+
+
+      </div>
+      <!-- DEPRECATED -->
+      <!-- <ion-item *ngFor="let recipe of recipes">
+        <ion-label>{{recipe.label.fr}}</ion-label>
+        <ion-checkbox value="" [checked]="recipeChecked(recipe)" ngDefaultControl (ionChange)="recipeUpdate(recipe)"></ion-checkbox>
+      </ion-item> -->
+    </ion-list>
+
 
     <!-- TVAs -->
     <ion-list  [hidden]="!detailled">
@@ -214,35 +330,17 @@
         <ion-item *ngFor="let tva of TVAs">
           <ion-label color="primary">TVA {{tva|percent:'1.1-1'}}</ion-label>
           <ion-radio [value]="tva"></ion-radio>
-        </ion-item>    
-      </ion-radio-group>    
+        </ion-item>
+      </ion-radio-group>
     </ion-list>
 
-    <!-- RECIPES -->
-    <ion-list [hidden]="!detailled || !recipes.length">    
-      <ion-list-header color="primary">
-        Cuisine du monde
-      </ion-list-header>
-      <div class="sub-header">
-        Spécialité ou recette du pays. Pour permettre au client d'organiser facilement ses repas. 
-        <div [hidden]="product.recipes.length<3" class="info">
-          <b>Psst;</b> C'est très rare d'avoir un produit alimentaire qui fait penser à plusieurs pays!
-        </div>
-      </div>
-
-      <!-- DEPRECATED -->
-      <!-- <ion-item *ngFor="let recipe of recipes">
-        <ion-label>{{recipe.label.fr}}</ion-label>
-        <ion-checkbox value="" [checked]="recipeChecked(recipe)" ngDefaultControl (ionChange)="recipeUpdate(recipe)"></ion-checkbox>
-      </ion-item> -->
-    </ion-list>
 
     <!-- LABELS -->
-    <ion-list [hidden]="!detailled">    
+    <ion-list [hidden]="!detailled">
         <ion-list-header color="primary">
           Labels
         </ion-list-header>
-        
+
         <ion-item>
           <ion-label>Certifié GRTA </ion-label>
           <ion-checkbox ngDefaultControl [(ngModel)]="product.details.grta"></ion-checkbox>
@@ -264,9 +362,18 @@
           <ion-checkbox ngDefaultControl [(ngModel)]="product.details.local"></ion-checkbox>
         </ion-item>
         <ion-item>
-          <ion-label>Fabrication artisanale</ion-label>      
+          <ion-label>Fabrication artisanale</ion-label>
           <ion-checkbox ngDefaultControl [(ngModel)]="product.details.homemade"></ion-checkbox>
         </ion-item>
+        <ion-item>
+          <ion-label>100% fait par l'artisan</ion-label>
+          <ion-checkbox ngDefaultControl [(ngModel)]="product.details.handmade"></ion-checkbox>
+        </ion-item>
+        <ion-item>
+          <ion-label>Sans Nitrite </ion-label>
+          <ion-checkbox ngDefaultControl [(ngModel)]="product.details.nitrite"></ion-checkbox>
+        </ion-item>
+
         <ion-item>
             <ion-label>Sans chimie de synthèse </ion-label>
             <ion-checkbox ngDefaultControl [(ngModel)]="product.details.natural"></ion-checkbox>
@@ -280,32 +387,32 @@
           <ion-checkbox ngDefaultControl [(ngModel)]="product.details.lactose"></ion-checkbox>
         </ion-item>
         <ion-item>
-          <ion-label>Végétarien </ion-label>    
+          <ion-label>Végétarien </ion-label>
           <ion-checkbox ngDefaultControl [(ngModel)]="product.details.vegetarian"></ion-checkbox>
         </ion-item>
       </ion-list>
-      
 
-    <!-- NAV -->  
+
+    <!-- NAV -->
     <ion-list [hidden]="!detailled">
       <ion-list-header color="primary">
         Navigation
       </ion-list-header>
       <ion-item>
         <ion-label color="primary">
-          Vendeur 
+          Vendeur
         </ion-label>
         <ion-select ngDefaultControl [(ngModel)]="product.vendor" interface="action-sheet">
-          <ion-select-option *ngFor="let shop of shops"  [value]="shop._id">{{shop.name}}</ion-select-option>        
+          <ion-select-option *ngFor="let shop of shops"  [value]="shop._id">{{shop.name}}</ion-select-option>
         </ion-select>
       </ion-item>
-        
+
       <ion-item>
         <ion-label color="primary">
           Categorie (principale)
         </ion-label>
-        <ion-select ngDefaultControl [(ngModel)]="product.categories" (ionChange)="categoryChange($event)" interface="action-sheet">
-          <ion-select-option *ngFor="let cat of getCategories()"  [value]="cat._id">{{cat.name}}</ion-select-option>        
+        <ion-select ngDefaultControl [(ngModel)]="product.categories" (ionChange)="doChangeCategory($event)" interface="action-sheet">
+          <ion-select-option *ngFor="let cat of getCategories()"  [value]="cat._id">{{cat.name}}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item>
@@ -313,7 +420,7 @@
           Categorie (secondaire)
         </ion-label>
         <ion-select ngDefaultControl [(ngModel)]="product.belong.name" interface="action-sheet">
-          <ion-select-option *ngFor="let child of getChild()" [value]="child.name" >{{child.name}}</ion-select-option>        
+          <ion-select-option *ngFor="let child of getChild()" [value]="child.name" >{{child.name}}</ion-select-option>
         </ion-select>
       </ion-item>
 
@@ -322,25 +429,25 @@
       <ion-item>
 
           <ion-button [hidden]="detailled" class="block" fill="outline" size="large" color="primary" (click)="detailled=true">
-            Plus de paramètres 
+            Plus de paramètres
           </ion-button>
           <ion-button [hidden]="detailled" fill="outline" size="large" color="secondary" (click)="doCreateCopy(product)">
             <ion-icon slot="icon-only" name="copy"></ion-icon>
           </ion-button>
-            
+
           <ion-button [hidden]="!detailled" expand="block" fill="outline" size="large" color="primary" (click)="doSave(product)">
             Enregistrer
-          </ion-button>            
+          </ion-button>
           <!-- <ion-button expand="block" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button> -->
-      </ion-item>      
+      </ion-item>
     </ion-list>
     <ion-list>
-      <ion-item>            
+      <ion-item>
           <ion-button [hidden]="create" expand="block" fill="outline"  color="danger" (click)="doRemove()">
             SUPPRIMER
-          </ion-button>            
+          </ion-button>
           <!-- <ion-button expand="block" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button> -->
-      </ion-item>      
+      </ion-item>
     </ion-list>
 
 

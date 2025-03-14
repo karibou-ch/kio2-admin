@@ -8,6 +8,15 @@ button.fab{
   display: none;
 }
 
+button.capture{
+  padding: 2px 10px;
+  margin-top: -18px;
+  margin-right: 30px;
+  color: red;
+  border: 1px solid;
+  border-radius: 4px;    
+}    
+
 h3,
 h4 {
   font-size: 0.85rem;

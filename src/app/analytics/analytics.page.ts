@@ -42,7 +42,12 @@ export class AnalyticsPage implements OnInit {
     this.pickerShippingString = (new Date()).toISOString();
   }
 
+  ngOnDestroy() {
+    document.querySelector(':root').classList.remove('full-width');
+  }
+
   ngOnInit() {
+    document.querySelector(':root').classList.add('full-width');
     this.currentShipping = this.$engine.currentShippingDate;
     this.currentMonth = this.currentShipping.getMonth();
     this.getMetrics({fromMonth:this.currentMonth+1});

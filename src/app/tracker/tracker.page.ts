@@ -91,9 +91,9 @@ export class TrackerPage implements OnInit, OnDestroy {
     const address = currentOrder.shipping.streetAdress + ',' +
                     currentOrder.shipping.postalCode + ',' +
                     currentOrder.shipping.region;
-    const geos = [currentOrder.shipping.geo.lat, currentOrder.shipping.geo.lng];
-    const destination = (currentOrder.shipping.geo) ? address : geos ;
-    return destination.toString();    
+    // const geos = [currentOrder.shipping.geo.lat, currentOrder.shipping.geo.lng];
+    // const destination = (currentOrder.shipping.geo) ? address : geos ;
+    return address;    
   }
   //
   // refresh standby state
@@ -225,7 +225,7 @@ export class TrackerPage implements OnInit, OnDestroy {
       const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&dir_action=navigate`;
       const phone = order.customer.phoneNumbers[0] ? order.customer.phoneNumbers[0].number : '';
       const infowindow = new google.maps.InfoWindow({
-        content: `<b><a href="tel:${phone}">call ${order.shipping.name} - ${phone}</a></b><br>
+        content: `<h1>${order.shipping.name} (${order.rank})</h1><b><a href="tel:${phone}">${phone}</a></b><br>
                   ${order.shipping.streetAdress}, é:${order.shipping.floor}<br/>
                   ${order.shipping.note}<br>
                   <a href="${url}" target="_new">utiliser map</a>

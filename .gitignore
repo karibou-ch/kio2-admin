@@ -58,3 +58,6 @@ backport-pages/
 .DS_Store
 Thumbs.db
 UserInterfaceState.xcuserstate
+
+# Sentry Config File
+.sentryclirc

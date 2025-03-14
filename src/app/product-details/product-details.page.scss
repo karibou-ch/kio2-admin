@@ -1,20 +1,43 @@
 
 ion-item {
   margin: 10px 0;
+  &.description{
+    padding-top: 30px;
+    border-top: 8px solid #999;
+  }
   &.header{
     h3{
       font-size: 16px;
       font-weight: 700;
-      color: var(--ion-color-primary-contrast);      
+      color: var(--ion-color-primary-contrast);
     }
     --background:var(--ion-color-primary-shade);
     --border-color:#000;
   }
 }
 
+.assistant {
+  height: 30px;
+  box-shadow: none;
+  font-weight: bold;
+}
 
+.bundle{
+  border-bottom: 15px solid #ddd;
+  margin-bottom: 10px;
+}
 
+.history{
+  width: 100%;
+  padding: 0 20px;
+  li{
+    padding: 3px 0;
+  }
+}
 
+.separator{
+  border-bottom: 15px solid var(--ion-color-primary);
+}
 .image{
   cursor: pointer;
   img{
@@ -26,19 +49,19 @@ ion-item {
   padding: 10px;
   margin-right: 0;
   display: flex;
-  width: 80%; 
+  width: 80%;
   img{
     max-width: 90%;
     border-radius: 8px;
     margin-right: 0;
-    margin-left: auto;    
+    margin-left: auto;
   }
 }
 
 .block{
   width: 100%;
   @media (max-width:426px) {
-    width: auto;    
+    width: auto;
   }
 }
 
@@ -50,14 +73,14 @@ ion-item {
   button{
     font-size: 16px;
     height: 40px;
-    width: 60px;    
+    width: 60px;
     background-color: #eee;
     border: 1px solid var(--ion-color-primary);
     &.small{
       font-size: 13px;
       height: 30px;
-      width: 50px;    
-      border: 1px solid #eee;  
+      width: 50px;
+      border: 1px solid #eee;
     }
   }
   ion-input{
@@ -67,37 +90,37 @@ ion-item {
 ion-list-header {
   font-size: 17px;
   padding-top: 10px;
-  padding-bottom: 10px;  
+  padding-bottom: 10px;
 }
 
 .sub-header{
   padding: 15px 15px 0;
-  color: #444;    
+  color: #444;
 }
 
 
 .input-special{
-  min-height: 30px;  
+  min-height: 30px;
 }
 
 .helper{
   --background: #eee;
-  font-size: 18px;  
+  font-size: 18px;
 }
 
 .info{
   font-size: 13px;
-  color: gray;  
+  color: gray;
   line-height: 18px;
   padding: 5px 0;
   -background: #eee;
-  margin-top: 5px;  
-  width: 100%;  
+  margin-top: 5px;
+  width: 100%;
   white-space: normal;
   span.block{
     padding: 10px;
     display: inline-block;
-    min-height: 59px;    
+    min-height: 59px;
     background-color: #eee;
   }
 }
@@ -110,10 +133,16 @@ ion-list-header {
 :host(textarea) {
   background: #eee;
   border-radius: 5px;
-  margin-bottom: 1px;  
+  margin-bottom: 1px;
 }
 
 
 .toggle-checked .toggle-inner{
   background-color: var(--ion-color-primary);
+}
+
+.timelimit{
+  margin: 3px;
+  height: 36px;
+  border-bottom: 1px solid #eee;
 }

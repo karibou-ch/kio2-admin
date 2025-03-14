@@ -20,14 +20,22 @@
       [debounce]="500"
       (ionInput)="onSearchInput($event)"
       (ionClear)="onSearchCancel($event)">
-    </ion-searchbar>  
+    </ion-searchbar>
+    <!-- SORT -->
+    <ion-chip (click)="cache.sortByStock=!cache.sortByStock;sliceProducts()" slot="end" mode="ios" >
+      <ion-icon name="funnel-outline" color="danger"></ion-icon>
+      <ion-label>
+        {{products?.length}} <span class="bold" [hidden]="!cache.sortByStock">stock</span><span class="bold" [hidden]="cache.sortByStock">alpha</span>
+      </ion-label>
+    </ion-chip>
+
+    <!-- ADD -->
     <ion-button slot="end" icon-only (click)="doCreateProduct()">
       <ion-icon name="add"></ion-icon>
-    </ion-button>    
-  </ion-item>  
+    </ion-button>
+  </ion-item>
   <ion-item>
-    <ion-badge slot="end" mode="ios" color="primary">> {{products?.length}}</ion-badge>
-
+    <!-- FILTERS -->
     <ion-chip (click)="cache.active=!cache.active;sliceProducts()">
       <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
       <ion-label color="primary">Actif</ion-label>
@@ -35,52 +43,57 @@
     <ion-chip (click)="cache.discount=!cache.discount;sliceProducts()">
       <ion-icon name="checkmark-circle-outline" [hidden]="!cache.discount"></ion-icon>
       <ion-label color="primary">Discount</ion-label>
-    </ion-chip>        
+    </ion-chip>
 
     <ion-chip (click)="cache.subscription=!cache.subscription;sliceProducts()">
       <ion-icon name="checkmark-circle-outline" [hidden]="!cache.subscription"></ion-icon>
       <ion-label color="primary">Panier</ion-label>
-    </ion-chip>        
+    </ion-chip>
 
     <ion-chip (click)="cache.boost=!cache.boost;sliceProducts()" [hidden]="!user.isAdmin()">
       <ion-icon name="checkmark-circle-outline" [hidden]="!cache.boost"></ion-icon>
       <ion-label color="primary">BB</ion-label>
-    </ion-chip>        
+    </ion-chip>
+
+
   </ion-item>
+
+  <!-- ADMIN -->
   <ion-item *ngIf="isManagerOrLogistic">
     <ion-label>Choisir un vendeur</ion-label>
 
     <ion-select interface="action-sheet" color="primary" (ionChange)="onSelectDefaultShop($event)">
-    
+
       <ion-select-option  *ngFor="let shop of shops" [value]="shop.urlpath">{{shop.name}}</ion-select-option>
   </ion-select>
 
   </ion-item>
 
 
+  <!-- ERROR -->
   <div *ngIf="loadError" class="error">
     <b>Ouups!</b> <br/>
     Il y a eu une erreur, veuillez recharger l'application
   </div>
-      
-  <ion-list>    
-    <ion-item-sliding *ngFor="let product of filteredProducts()">    
+
+  <ion-list>
+    <ion-item-sliding *ngFor="let product of filteredProducts()">
         <ion-item (click)="openDetails(product)" [class.inactive]="!cache.active">
           <ion-avatar slot="start">
             <img [src]="getAvatar(product)">
-          </ion-avatar>      
+          </ion-avatar>
           <ion-label>
-            <h2 [class.red]="product.attributes.discount">{{product.title}}</h2>      
+            <h2 [class.red]="product.attributes.discount">{{product.title}}</h2>
             <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}} &nbsp;<span class="gray">// {{product.details.origin}}</span></h3>
             <p>
-              {{getStateLabel(product)}} <span>// {{product.belong.name}}</span>
+              {{getStateLabel(product)}} <span>// {{product.belong.name}}</span> <span class="red" [hidden]="!product.attributes.timelimit">&nbsp;// {{product.attributes.timelimit}}h</span>
               <span [hidden]="!product.attributes.boost" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #boost</span>
-              <span [hidden]="!product.attributes.home" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #select</span>              
-            </p>  
+              <span [hidden]="!product.attributes.home" class="tag">  <ion-icon name="arrow-round-up" color="info"></ion-icon> #select</span>
+            </p>
           </ion-label>
           <span slot="end" [class.red]="product.pricing.stock<6">
               {{product.pricing.stock}}
-          </span>          
+          </span>
         </ion-item>
         <ion-item-options side="end">
           <ion-item-option>
@@ -88,10 +101,10 @@
               <ion-icon name="basket"></ion-icon>
               <span [hidden]="!product.attributes.available">Désactiver</span>
               <span [hidden]="product.attributes.available">Activer</span>
-            </ion-button>          
+            </ion-button>
           </ion-item-option>
           <ion-item-option>
-            <ion-select [(ngModel)]="product.pricing.stock" placeholder="Stock" 
+            <ion-select [(ngModel)]="product.pricing.stock" placeholder="Stock"
             (ngModelChange)="onUpdateStock(product,$event)"
             interface="action-sheet">
               <ion-select-option value="0">O en stock</ion-select-option>
@@ -99,17 +112,17 @@
               <ion-select-option value="50">50 en stock</ion-select-option>
               <ion-select-option value="10">100 en stock</ion-select-option>
               <ion-select-option value="100">1000 en stock</ion-select-option>
-            </ion-select>          
+            </ion-select>
           </ion-item-option>
         </ion-item-options>
-      </ion-item-sliding>    
+      </ion-item-sliding>
   </ion-list>
 
   <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [position]="'bottom'">
       <ion-infinite-scroll-content
       loadingSpinner="bubbles"
       loadingText="Chargement des produits ...">
-    </ion-infinite-scroll-content>    
-  </ion-infinite-scroll>  
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
 </ion-content>

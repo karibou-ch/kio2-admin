@@ -134,8 +134,7 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
     }),
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: environment.production,
-      registrationStrategy: 'registerImmediately'
+      enabled: environment.production
     })
   ],
   providers: [

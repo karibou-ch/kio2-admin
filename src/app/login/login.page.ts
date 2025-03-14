@@ -53,8 +53,13 @@ export class LoginPage implements OnInit {
         if (fields.length === 2) {
           this.model.email = defaultEmail = fields[0];
           this.model.password = defaultPassword = fields[1];
-        }  
+        }
       }catch(e) {}
+    }
+
+    if (window['KB_authlink']) {
+      this.model.password = window['KB_authlink'];
+      console.log('---- DBG authlink', this.model.password);
     }
 
     this.platform.ready().then(() => {
@@ -63,7 +68,7 @@ export class LoginPage implements OnInit {
       setTimeout(()=>{
         if(defaultEmail && defaultPassword) {
           this.model.email = defaultEmail;
-          this.model.password = defaultPassword;  
+          this.model.password = defaultPassword;
         }
       },2000);
       this.storageGet(this.KIO2_LOGIN_REMEMBER).then(remember => {
@@ -96,9 +101,17 @@ export class LoginPage implements OnInit {
     // https://stackoverflow.com/questions/37318472/ionic-2-app-remember-user-on-the-device
   }
 
+  get authLink() {
+    return !!window['KB_authlink'];
+  }
 
-  isValidEmail() {
-    return /\S+@\S+\.\S+/.test(this.model.email || '');
+
+  get isValidEmail() {
+    const email = this.model.email || '';
+    if(window['KB_authlink']) {
+      return email.length > 1;
+    }
+    return /\S+@\S+\.\S+/.test(email || '');
   }
 
   async login() {
@@ -126,7 +139,7 @@ export class LoginPage implements OnInit {
         try {
           window.location.href = '/';
           this.$loading.dismiss();
-        } catch (e) { 
+        } catch (e) {
           console.log('------',e)
         }
         return;

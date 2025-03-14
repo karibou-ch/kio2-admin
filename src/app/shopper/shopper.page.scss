@@ -149,7 +149,12 @@ ion-item {
     line-height: 15px;
     text-align: center;
   } 
-
+  span.postal{
+    display: block;
+    padding: 3px;
+    margin-top: -10px;
+    font-weight: 600;    
+  }
   span.price{
     background: transparent;
     color: white;
@@ -180,7 +185,8 @@ ion-item {
 
   ion-avatar {
     position: relative;
-    div.complement{
+    .ride,
+    .complement{
       position: absolute;
       font-size: 10px;
       top: 0px;
@@ -193,6 +199,12 @@ ion-item {
       text-align: center;
       line-height: 15px;
       border-radius: 1px;        
+    }
+    .ride{
+      background: black;
+      color: white;
+      top:inherit;
+      bottom: -4px;
     }
 
     span.rank{

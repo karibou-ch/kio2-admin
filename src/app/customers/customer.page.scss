@@ -10,23 +10,31 @@ ul{
       background: red;
       color: white;
       border-radius: 4px;
-      margin-left: 20px;      
+      margin-left: 20px;
       margin-right: 0;
       margin-left: auto;
     }
   }
 }
 
+.authlink{
+  font-size: 12px;
+  color: blue;
+  width: 100%;
+  padding: 1rem;
+
+}
+
 ion-list-header {
   div{
     button {
-      margin-left: 20px;      
+      margin-left: 20px;
       background: red;
       color: white;
-      border-radius: 5px;   
-      height: 24px; 
+      border-radius: 5px;
+      height: 24px;
     }
-  
+
   }
 }
 
@@ -38,7 +46,7 @@ ion-list-header {
     margin-left: auto;
     background: var(--ion-color-primary);
     color: white;
-    border-radius: 5px;    
+    border-radius: 5px;
   }
 }
 

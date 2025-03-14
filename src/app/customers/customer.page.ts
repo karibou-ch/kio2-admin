@@ -19,6 +19,7 @@ export class CustomerPage implements OnInit {
   customer: User;
   currentGeoIndex: number;
   defaultShop: Shop;
+  authlinkName: string;
   invoice: {
     expiry?: string;
     issuer: string
@@ -64,6 +65,7 @@ export class CustomerPage implements OnInit {
     const forceload = true;
     this.$user.get(id,forceload).subscribe(user => {
       this.customer = user;
+
       if (this.customer.shops.length) {
         this.defaultShop = this.customer.shops[0];
       }
@@ -73,7 +75,7 @@ export class CustomerPage implements OnInit {
 
   onGeloc(idx, address) {
     this.currentGeoIndex = idx;
-    this.$util.updateGeoCode(address.street,
+    this.$util.updateGeoCode(address.streetAdress,
                         address.postalCode,
                         address.region);
 
@@ -99,12 +101,27 @@ export class CustomerPage implements OnInit {
     });
   }
 
+  doUpdateAuthLink() {
+    console.log('doUpdateAuthLink', this.customer.id);
+    this.$user.createOrUpdateAuthLink(this.customer.id, {
+      name: this.authlinkName,
+      email: this.customer.email.address
+    }).subscribe(result => {
+      this.customer.identity.authlink = result.link;
+      this.doToast('L\'autorisation a été mise à jour');
+    });
+  }
+
   doCustomerPlan($event) {
     this.customer.plan.name = $event.detail.value;
   }
 
-  doClose() {
-    this.$modal.dismiss();
+  async doClose() {
+    try{
+      await this.$modal.dismiss();
+    }catch(err){
+      history.back();
+    }
   }
 
   doDeletePaymentMethod( alias, cid) {

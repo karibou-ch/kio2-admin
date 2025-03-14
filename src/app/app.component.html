@@ -1,6 +1,10 @@
 <ion-app> 
+  
+  <div class="network-alert loading" [class.issue]="isLoading">
+    <ion-icon name="alarm-outline" color="primary"></ion-icon> Le réseau n'est pas rapide, encore un instant ... 🚀
+  </div>
   <div class="network-alert" [class.issue]="NETWORK_ISSUE">
-    <ion-icon name="wifi-outline" color="primary"></ion-icon> Aucun accès à Internet !
+    <ion-icon name="wifi-outline" color="primary"></ion-icon> Vérifier votre accès à Internet !
   </div>
   <div class="network-alert" [class.issue]="NETWORK_APP_ISSUE">
     <ion-icon name="wifi-outline" color="primary"></ion-icon> karibou.ch est (temporairement) innaccessible 😱

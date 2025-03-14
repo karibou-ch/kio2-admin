@@ -1,3 +1,7 @@
+:host {
+  max-width: 100%!important;
+}
+
 .content{
   overflow-y: auto!important;
   height: 100%;
@@ -12,16 +16,34 @@
     contain: unset;
     height: auto!important;
   }
+  .link{
+    cursor: pointer;
+    color: blue;
 
+    &:hover{
+      color: blueviolet;
+    }
+    &.small{
+      font-size: small;
+    }
+  }
   .header{
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    font-size: 14px;
+
     .mail{
       width: 50%;
       margin: auto;
       display: flex;
+      ul{
+        list-style: none;
+        border: 1px solid #eee;
+        padding: 5px 20px;
+        border-radius: 0.5rem;
+      }
       button{
         padding: 20px 30px;
         background-color: #eee;
@@ -36,25 +58,41 @@
   a{
     cursor: pointer;
   }
+  ion-chip.selected {
+    border: 1px solid green;
+  }
 
   .crm{
+
     width: 100%;
     .column{
       display: flex;
       flex-direction: row ;
       flex-wrap: nowrap;
       .thread{
-        &.premium, 
+        &::-webkit-scrollbar {
+          width: 5px;
+          height: 8px;
+          background-color: transparent; /* or add it to the track */
+        }
+
+        /* Add a thumb */
+        &::-webkit-scrollbar-thumb {
+          border-radius: 8px;
+          background: #ddd;
+        }
+
+        &.premium,
         &.recurrent{
           h4{
             color: green;
           }
         }
-        
+
         border: 1px solid #ddd;
         border-radius: 14px;
         margin: 5px;
-        padding: 5px;        
+        padding: 5px;
         min-width: 350px;
         height: calc(100vh - 200px);
         overflow: hidden;
@@ -72,7 +110,7 @@
           .count{
             float: right;
           }
-        }        
+        }
         .actions{
           display: flex;
           align-items: center;
@@ -81,15 +119,21 @@
           background:#eee;
           position: sticky;
           top: 32px;
+          .chrun{
+            cursor: pointer;
+            margin-left: auto;
+            margin-right: 10px;
+          }
           .when{
             margin-left: auto;
             margin-right: 10px;
             cursor: pointer;
-          }          
+          }
         }
         .customer {
           display: flex;
           padding: 2px;
+          font-size: 14px;
           input{
             margin: 2px;
             min-width: 17px;
@@ -100,28 +144,34 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
-            max-width: 250px;
+            max-width: 240px;
+            width: auto;
+            flex: auto;
+            &.blue{
+              color: blue;
+            }
           }
           .orders{
-            width: 34px;
-            min-width: 34px;
+            width: 25px;
             margin-right: 0;
             text-align: right;
           }
           .funnel{
-            width: 45px;
-            margin-right: 0;
+            width: auto;
+            margin-right: 5px;
+            margin-left: auto;
             text-align: right;
-            font-size: 14px;
+            font-size: 11px;
             overflow: hidden;
-            text-wrap: nowrap;            
+            text-wrap: nowrap;
             color: green;
             font-weight: bold;
           }
           .when{
-            margin-left: auto;
-            margin-right: 25px;            
+            width: 2.2rem;
+            margin-right: 5px;
             color: green;
+            text-align: right;
           }
         }
       }
@@ -138,7 +188,7 @@
 @media print {
   .report{
     border: none!important;
-    padding:5px!important; 
+    padding:5px!important;
     font-size: xx-small!important;
   }
 }

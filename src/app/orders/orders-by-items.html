@@ -37,7 +37,7 @@
           <ion-icon slot="start" class="rank">{{customer.rank}}</ion-icon>
 
           <div class="title " >
-              <a href="mailto:{{customer.email}}">{{(customer.customer.name.givenName)[0]}}. {{customer.customer.name.familyName}} </a>
+              <a href="mailto:{{customer.email}}">{{customer.customer.displayName}} </a>
           </div>
           <div class="quantity " [class.red.bold]="customer.item.quantity>1">
             {{customer.item.quantity}}x <span class="part">{{customer.item.part}}</span> 

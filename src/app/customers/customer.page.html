@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>{{customer?.displayName}}</ion-title>
+    <ion-title>{{customer?.displayName}} {{customer?.id}}</ion-title>
     <ion-buttons slot="start">
       <ion-button  (click)="doClose()">
         <ion-icon name="chevron-back-outline"></ion-icon>
@@ -39,6 +39,27 @@
       <ion-input type="email" placeholder="CC Email" ngDefaultControl [(ngModel)]="customer.email.cc"></ion-input>
     </ion-item>
 
+    <!-- AUTH LINK -->
+    <!-- AUTH LINK CREATION -->
+    <ion-item [hidden]="!user.isAdmin()">
+      <ion-input type="text"  slot="start" placeholder="**nom** (en option)" ngDefaultControl [(ngModel)]="authlinkName"></ion-input>
+      <ion-button  slot="end" [hidden]="!customer.identity.authlink && !user.isAdmin()" fill="outline"  expand="block" color="danger" (click)="doUpdateAuthLink()">
+        Créer un lien de login
+      </ion-button>
+    </ion-item>
+    <ion-item>
+      <div>
+        <div class="authlink" >
+          https://karibou.ch/store/superlocal/home?authlink={{customer.identity.authlink}}
+        </div>
+        <div class="authlink" >
+          https://admin.karibou.ch?authlink={{customer.identity.authlink}}
+        </div>
+
+      </div>
+
+    </ion-item>
+
     <!-- portefeuille -->
     <ion-item>
       <ion-label position="fixed" color="primary">
@@ -50,11 +71,21 @@
     <!-- PLAN . name, defaultShipping, maxInvoices -->
     <ion-item >
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Catégorie de client</ion-label>
-      <ion-select label="Catégorie de client" 
-                  label-placement="fixed" 
+      <ion-select label="Catégorie de client"
+                  label-placement="fixed"
                   interface="popover" (ionChange)="doCustomerPlan($event)" [(ngModel)]="customer.plan.name">
         <ion-select-option *ngFor="let plan of customerPlans" [value]="plan.id">{{ plan.id }}</ion-select-option>
-      </ion-select>      
+      </ion-select>
+    </ion-item>
+    <!-- STATS -->
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Statistiques</ion-label>
+      <ul>
+        <li [hidden]="!user.isAdmin()">segment: &nbsp;<b>{{customer.orders.profile}}</b></li>
+        <li>orders: &nbsp;<b>{{customer.orders.count}}</b>&nbsp;since {{customer.created|date:'mediumDate'}}</li>
+        <li>avg: &nbsp;<b>{{customer.orders.avg|number}} fr</b></li>
+        <li>last order: {{customer.orders.latest|date:'mediumDate'}}</li>
+      </ul>
     </ion-item>
 
     <ion-item >
@@ -76,12 +107,12 @@
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Télephone</ion-label>
       <ion-input type="phone" placeholder="Phone" ngDefaultControl [(ngModel)]="phone.number"></ion-input>
     </ion-item>
-      
+
     <ion-item>
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Rôle</ion-label>
       <ul>
-        <li color="secondary">Utilisateur</li>    
-        <li [hidden]="!customer.hasRole('logistic')" color="secondary">Logistic</li>      
+        <li color="secondary">Utilisateur</li>
+        <li [hidden]="!customer.hasRole('logistic')" color="secondary">Logistic</li>
         <li [hidden]="!customer.isAdmin()" color="secondary">Admin</li>
         <li [hidden]="!defaultShop" color="secondary">Vendor</li>
       </ul>
@@ -104,8 +135,8 @@
     <ion-item>
       <ion-label position="stacked" class="ion-text-wrap" color="primary">Payments</ion-label>
       <ul>
-        <li *ngFor="let payment of customer.payments"> 
-          {{payment.name}} - {{payment.expiry}} - {{payment.issuer}} 
+        <li *ngFor="let payment of customer.payments">
+          {{payment.name}} - {{payment.expiry}} - {{payment.issuer}}
           <button class="btn-danger" (click)="doDeletePaymentMethod(payment.alias,customer.id)">SUPPRIMER </button>
         </li>
       </ul>
@@ -124,32 +155,32 @@
     <!-- ADRESSE -->
     <ion-list *ngFor="let address of customer.addresses;let idx=index">
       <ion-list-header color="primary">
-        <b>{{idx + 1}} -</b>&nbsp; {{address.name}} 
+        <b>{{idx + 1}} -</b>&nbsp; {{address.name}}
         <div class="align-right">
-          Map <ion-icon  [hidden]="!address.geo || !address.geo.lat" name="map-outline" class="gold "></ion-icon>
-          <button  (click)="customer.addresses.splice(idx, 1)">DEL</button>  
+          <span class="small">map:[{{address.geo.lat| number: '1.4-5'}},{{address.geo.lng| number: '1.4-5'}}]</span>
+          <button  (click)="customer.addresses.splice(idx, 1)">DEL</button>
         </div>
 
       </ion-list-header>
 
       <ion-item>
-        <ion-label color="primary" position="stacked">Nom et prénom du contact</ion-label> 
+        <ion-label color="primary" position="stacked">Nom et prénom du contact</ion-label>
         <ion-input  type="text"  placeholder="Nom et prénom" [(ngModel)]="address.name" required></ion-input>
       </ion-item>
-      
+
       <ion-item>
-        <ion-label color="primary" position="stacked">Rue et numéro </ion-label> 
+        <ion-label color="primary" position="stacked">Rue et numéro </ion-label>
         <ion-input  type="text"  placeholder="rue, numéro" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.streetAdress" required></ion-input>
         <ion-input  type="text"  placeholder="Étage" class="floor" [(ngModel)]="address.floor" required></ion-input>
       </ion-item>
       <ion-item >
-        <ion-label color="primary" position="stacked">Code postal et Région</ion-label> 
+        <ion-label color="primary" position="stacked">Code postal et Région</ion-label>
         <ion-input  type="text"  placeholder="Code postal" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.postalCode" required></ion-input>
         <ion-input  type="text"  placeholder="Région" [(ngModel)]="address.region" required></ion-input>
-      </ion-item> 
+      </ion-item>
 
       <ion-item>
-        <ion-label color="primary" position="stacked">Note </ion-label> 
+        <ion-label color="primary" position="stacked">Note </ion-label>
         <ion-input  type="text"  placeholder="note" [(ngModel)]="address.note" required></ion-input>
       </ion-item>
 
@@ -159,7 +190,7 @@
     <!-- SAVE -->
     <ion-item>
       <ion-button fill="outline" expand="block" size="large" color="primary"  (click)="doSave(customer)">Enregistrer</ion-button>
-      <ion-button fill="outline" expand="block" size="large" color="danger"  (click)="doRemove(customer)">SUPPRIMER</ion-button>      
+      <ion-button fill="outline" expand="block" size="large" color="danger"  (click)="doRemove(customer)">SUPPRIMER</ion-button>
     </ion-item>
 
   </ion-list>

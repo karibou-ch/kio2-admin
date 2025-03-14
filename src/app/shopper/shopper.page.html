@@ -9,18 +9,18 @@
 <ion-content>
   <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
     <ng-template>
-      <ion-datetime 
+      <ion-datetime
         presentation="date"
         locale="fr-FR"
         [highlightedDates]="highlightedOrders"
-        [(ngModel)]="pickerShippingString" 
-        (ngModelChange)="onDatePicker(popover)" 
-        cancelText="Annuler" 
-        doneText="Fait" 
+        [(ngModel)]="pickerShippingString"
+        (ngModelChange)="onDatePicker(popover)"
+        cancelText="Annuler"
+        doneText="Fait"
         firstDayOfWeek="1"
         max="2030">
       </ion-datetime>
-    </ng-template>    
+    </ng-template>
   </ion-popover>
 
   <ion-refresher slot="fixed" [disabled]="false" (ionRefresh)="doRefresh($event)">
@@ -38,12 +38,12 @@
 
     <!-- FITER BASED ON PLANNING -->
     <ion-item [hidden]="!planning.length" class="header" color="primary">
-      <button 
+      <button
               round color="light"  [class.selected]="currentPlanning===plan"
               outline  (click)="togglePlanning(plan)"
               *ngFor="let plan of planning  "><b>{{plan}}</b>
       </button>
-      <button ion-button slot="end" round color="light" fill="outline"  
+      <button ion-button slot="end" round color="light" fill="outline"
               [class.selected]="reorder"
               (click)="toggleReorder()"><b><ion-icon name="reorder-two-outline"></ion-icon></b>
       </button>
@@ -53,33 +53,33 @@
       <ion-item class="planning">
 
         <ion-label slot="start"   class="time-label ion-text-wrap">
-          <span id="click-open-time" class="chip-label"> T {{currentPlanning}} ({{currentOrders.length}})  {{shippingShopper[currentPlanning].time}}</span>
+          <span id="click-open-time" class="chip-label"> T {{currentPlanning}} ({{currentOrders.length}}) - {{shippingShopper[currentPlanning].time}}</span>
         </ion-label>
 
         <div slot="end">
-          <ion-select  placeholder="Plan ?"         
+          <ion-select  placeholder="Plan ?"
             [hidden]="!currentHub"
             (ngModelChange)="setShippingShopper({shopper:$event})"
-            [(ngModel)]="shippingShopper[currentPlanning].shopper" 
+            [(ngModel)]="shippingShopper[currentPlanning].shopper"
             interface="popover">
             <ion-select-option *ngFor="let shopper of shippingShoppers"  [value]="shopper">{{shopper}}</ion-select-option>
-          </ion-select>                
+          </ion-select>
         </div>
 
         <!-- TIME SELECTION -->
         <ion-popover trigger="click-open-time" triggerAction="click" class="datetime-popover">
           <ng-template>
-            <ion-datetime 
+            <ion-datetime
               presentation="time"
               locale="fr-FR"
               [showDefaultButtons]="true"
-              pickerFormat="HH:mm" 
-              [(ngModel)]="shippingShopper[currentPlanning].time" 
-              (ngModelChange)="setShippingShopper({time:$event})" 
-              hourCycle="h23" 
+              pickerFormat="HH:mm"
+              [(ngModel)]="shippingShopper[currentPlanning].time"
+              (ngModelChange)="setShippingShopper({time:$event})"
+              hourCycle="h23"
               minuteValues="0,30">
             </ion-datetime>
-          </ng-template>    
+          </ng-template>
         </ion-popover>
 
 
@@ -94,28 +94,28 @@
       [debounce]="500"
       (ionInput)="onSearchInput($event)"
       (ionClear)="onSearchCancel($event)">
-    </ion-searchbar>  
+    </ion-searchbar>
 
     <!-- TIME SELECTION -->
     <ion-popover #popover trigger="click-open-time" triggerAction="click" class="datetime-popover">
       <ng-template>
-        <ion-datetime 
+        <ion-datetime
           presentation="time"
           locale="fr-FR"
-          pickerFormat="HH mm" 
-          [(ngModel)]="shippingShopper[currentPlanning].time" 
-          (ngModelChange)="setShippingShopper({time:$event})" 
+          pickerFormat="HH mm"
+          [(ngModel)]="shippingShopper[currentPlanning].time"
+          (ngModelChange)="setShippingShopper({time:$event})"
           hourCycle="h24"
           minuteValues="0,30">
         </ion-datetime>
-      </ng-template>    
+      </ng-template>
     </ion-popover>
 
     <!-- HUBS -->
     <ion-item class="hub" lines="none" [hidden]="!hubs.length || !orders.length">
       <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
         <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
-        <ion-label color="primary">{{hub.name}} ({{hub.orders}})</ion-label>
+        <ion-label color="primary">{{hub.name[0]}} ({{hub.orders}})</ion-label>
       </ion-chip>
     </ion-item>
 
@@ -129,7 +129,7 @@
         <ion-item-option class="shopper"  color="secondary">
           <ion-icon name="bicycle"></ion-icon>
         <ion-select class="block"  placeholder="Tournée"
-                      [(ngModel)]="order.shipping.priority" 
+                      [(ngModel)]="order.shipping.priority"
                       (ngModelChange)="setShippingPriority(order,$event)"
                       interface="action-sheet">
           <ion-select-option value="0">reset</ion-select-option>
@@ -138,7 +138,7 @@
           <ion-select-option value="3">3 tournée</ion-select-option>
           <ion-select-option value="4">4 tournée</ion-select-option>
           <ion-select-option value="5">5 tournée</ion-select-option>
-        </ion-select>        
+        </ion-select>
       </ion-item-option>
       </ion-item-options>
 
@@ -146,30 +146,40 @@
         <ion-item-option class="phone">
           <ion-label >
             <ion-button mode="ios" color="primary" (click)="doDisplayMail(order)">
-              <ion-icon name="mail"></ion-icon>             
-            </ion-button> 
+              <ion-icon name="mail"></ion-icon>
+            </ion-button>
           </ion-label>
 
           <ion-label >
-            <ion-button mode="ios" color="danger" [hidden]="!getPhoneNumber(order)" 
+            <ion-button mode="ios" color="danger" [hidden]="!getPhoneNumber(order)"
             (click)="doDisplayPhone(order)">
-              <ion-icon name="call"></ion-icon>             
-            </ion-button> 
+              <ion-icon name="call"></ion-icon>
+            </ion-button>
           </ion-label>
+
+          <ion-label >
+            <ion-button mode="ios"
+            (click)="onOpenDirection(order)">
+              <ion-icon name="map-outline"></ion-icon>
+            </ion-button>
+          </ion-label>
+
         </ion-item-option>
       </ion-item-options>
       <ion-item  (click)="toggleOrder(order)" >
         <ion-note slot="end">
-          <b>{{order.shipping.postalCode}}</b>
+          <span class="postal">{{order.shipping.postalCode}}</span>
           <span class="price" [hidden]="!order.shipping.bags">{{ order.shipping.bags }} sac</span>
           <span class="price" [hidden]="order.shipping.bags">{{order.getSubTotal({ withoutCharge: true })|number:'1.0-0'}} fr</span>
-        </ion-note>        
+        </ion-note>
         <ion-avatar slot="start">
           <!--<off-ion-icon name="radio-button-on" style="zoom:2.0;" color="primary"></off-ion-icon> -->
           <div class="complement" [hidden]="!getOrdersComplement(order)">{{getOrdersComplement(order)}}</div>
           <span class="rank" [class.orphan]="!order.shipping.priority" [class.selected]="isOrderSelected(order)">
             {{getOrderRank(order)}}
           </span>
+          <div class="ride" [hidden]="!order.shipping.priority">{{order.shipping.priority}}</div>
+
         </ion-avatar>
         <ion-label class="ion-text-wrap">
           <h3 text-capitalize>
@@ -194,6 +204,6 @@
     <ion-fab-button (click)="openTracker()">
       <ion-icon name="map-outline" id="pin-icon"></ion-icon>
     </ion-fab-button>
-  </ion-fab>  
+  </ion-fab>
 
 </ion-content>

@@ -29,7 +29,7 @@
     <address class="small">
       <img [src]="headerImg"  />
       <span class="text-underline bold" >Karibou.ch</span> 
-      <span class="gray"> | 34 route de chêne | 1208 | Genève</span> 
+      <span class="gray"> | 5 chemin du 23 Août| 1205 | Genève</span> 
     </address>
 
     <address *ngIf="defaultShop">
@@ -69,11 +69,17 @@
         </td><td class="bold">{{report.shops[slug].amount-report.shops[slug].discount-report.shops[slug].fees|currency:'CHF'}}</td></tr>
       </tbody>
       <tbody *ngIf="shops.length>1" class="report-last">
-        <tr><td><b>TOTAL</b> {{report.items}} articles / {{report.orders.length}} commandes</td><td>{{report.amount|currency:'CHF'}}</td></tr>
+        <tr class="bg-gray"><td class="link" (click)="onCopyCA(report)"><b>TOTAL</b> (click) </td><td>{{report.from|date:"d MMM y"}} au {{report.to|date:"d MMM y"}}</td></tr>
+        <tr><td>commandes </td><td>{{report.orders.length}}</td></tr>
+        <tr><td>ventes </td><td>{{report.amount|currency:'CHF'}}</td></tr>
+        <tr><td><b>commission</b> </td><td>{{report.ca|currency:'CHF'}}</td></tr>
+        <tr><td><b>service</b> </td><td>{{report.serviceamount|currency:'CHF'}}</td></tr>
+        <tr><td><b>livraison</b> </td><td>{{report.shippingamount|currency:'CHF'}}</td></tr>
+        <tr class="bg-gray"><td><b>CA total</b> </td><td class="bold"><b>{{(report.shippingamount+report.serviceamount+report.ca)|currency:'CHF'}}</b></td></tr>
         <tr><td>Déduction liée à la participation aux frais des clients</td><td>{{report.discount|currency:'CHF'}}</td></tr>
-        <tr><td>Déduction lié au service karibou.ch </td><td>{{report.ca|currency:'CHF'}}</td></tr>
         <tr><td class="bold">Solde en faveur des boutiques</td><td class="bold">{{report.amount-report.discount-report.ca|currency:'CHF'}}</td></tr>
       </tbody>
+
     </table>
     </div>
     <div *ngIf="defaultShop"><!-- BY PRODUCT -->

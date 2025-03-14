@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ToastController, AlertController, ModalController, PopoverController } from '@ionic/angular';
 
-import { Order, EnumFulfillments, OrderService, Product, OrderItem, ProductService, User } from 'kng2-core';
+import { Order, EnumFulfillments, OrderService, OrderItem, audioMimeType, ProductService, User, EnumOrderIssue } from 'kng2-core';
 import { EngineService } from 'src/app/services/engine.service';
 import { Router } from '@angular/router';
 import { CustomerMessage } from '../customer-message/customer-message.page';
@@ -21,7 +21,9 @@ export class OrdersItemsPage implements OnInit {
   public filterItem: string;
   public doubleCheck: boolean;
 
-  public mapItem:any;
+  public static mapItem:any = {};
+  public cmpItemAndVdr = (item) =>  (a) => a.sku == item.sku && a.vendor == item.vendor;
+
 
 
   @Input() vendor: string;
@@ -52,7 +54,6 @@ export class OrdersItemsPage implements OnInit {
     //
     // OrderItems[] for this vendor
     this.item = {};
-    this.mapItem = {};
     this.orders = [];
     this.vendor = '';
 
@@ -61,9 +62,15 @@ export class OrdersItemsPage implements OnInit {
     this.header = true;
   }
 
+  get mapItem(){
+    return OrdersItemsPage.mapItem;
+  }
 
-  ngOnInit() {  
-    
+  get isLogistic() {
+    return this.user.isAdmin() || this.user.hasRole('logistic');
+  }
+
+  ngOnInit() {
     if(this.defaultSmall) {
       this.doubleCheck = true;
       this.displayForCheck = true;
@@ -77,14 +84,27 @@ export class OrdersItemsPage implements OnInit {
       this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
     });
 
-
     if (this.orders.length == 1) {
+      // DEPRECATED audio type is forced to mp3
+      // const loadtype = async (items)=>{
+      //   for(const item of items) {
+      //     if(!item.audio) continue;
+      //     item.audioType =  await audioMimeType(item.audio)
+      //   }
+      // }
       this.shipping = this.orders[0].shipping.when;
       this.computeDeltaPrice(this.orders[0]);
+      // DEPRECATED audio type is forced to mp3
+      //loadtype(this.orders[0].items);
+
+
+      // for logistic team
       if(this.user.hasRole('logistic')){
         this.doubleCheck = this.orders[0].customer.latestErrors>0;
-      }else{
-        this.doubleCheck = this.orders[0].customer.latestErrors == 0 && this.orders[0].getSubTotal()>120;
+      }
+      // for vendors team
+      else{
+        this.doubleCheck = this.orders[0].customer.latestErrors == 0 && this.orders[0].customer.rating < 3.0;
       }
     }
 
@@ -106,6 +126,7 @@ export class OrdersItemsPage implements OnInit {
   }
 
 
+
   computeDeltaPrice(order: Order) {
     //
     // case of Orders By Item
@@ -113,7 +134,7 @@ export class OrdersItemsPage implements OnInit {
       if (!order.getSubTotal) {
         return;
       }
-  
+
       let originAmount = 0;
       const finalAmount: number = order.getSubTotal({ withoutCharge: true });
       this.deltaPrice = 0;
@@ -124,7 +145,7 @@ export class OrdersItemsPage implements OnInit {
           originAmount += (item.price * item.quantity);
         }
       });
-      this.deltaPrice = parseFloat((finalAmount / originAmount - 1).toFixed(2));  
+      this.deltaPrice = parseFloat((finalAmount / originAmount - 1).toFixed(2));
     }catch(err) {
       console.log('---- ERROR',err);
     }
@@ -247,10 +268,14 @@ export class OrdersItemsPage implements OnInit {
     this.$order.updateItem(order, [copy], EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
-        const indexSrc = order.items.findIndex(i=> i.sku == item.sku);
-        const indexDst = ok.items.findIndex(i=> i.sku == item.sku);
-        Object.assign(order.items[indexSrc],ok.items[indexDst]);
-        Object.assign(item,ok.items[indexDst]);
+        const indexSrc = order.items.findIndex(this.cmpItemAndVdr(item));
+        const indexDst = ok.items.findIndex(this.cmpItemAndVdr(item));
+        if(indexSrc>-1 && indexDst>-1){
+          Object.assign(order.items[indexSrc],ok.items[indexDst]);
+        }
+        if(indexDst>-1) {
+          Object.assign(item,ok.items[indexDst]);
+        }
 
         //
         // when not admin, we should remove other vendor items
@@ -268,13 +293,13 @@ export class OrdersItemsPage implements OnInit {
         this.computeDeltaPrice(order);
         const title = item.title.substring(0, len) + (item.title.length > len ? '...' : '');
         this.doToast(title + ' dans sac ' + order.rank);
-        
+
           // setTimeout(()=>{
-          //   document.activeElement.dispatchEvent(new KeyboardEvent("keypress", { 
-          //     key: "Tab" 
-          //   }));  
+          //   document.activeElement.dispatchEvent(new KeyboardEvent("keypress", {
+          //     key: "Tab"
+          //   }));
           // },0)
-  
+
 
       }, error => this.doToast(error.error, error));
   }
@@ -317,14 +342,14 @@ export class OrdersItemsPage implements OnInit {
     this.$order.updateItem(order, [item], EnumFulfillments.failure)
       .subscribe(ok => {
         this.doToast('Annulation enregistrée');
-        const indexSrc = order.items.findIndex(i=> i.sku == item.sku);
-        const indexDst = ok.items.findIndex(i=> i.sku == item.sku);
+        const indexSrc = order.items.findIndex(this.cmpItemAndVdr(item));
+        const indexDst = ok.items.findIndex(this.cmpItemAndVdr(item));
         if(indexSrc>-1 && indexDst>-1){
           Object.assign(order.items[indexSrc],ok.items[indexDst]);
         }
 
         if(indexDst>-1) {
-          Object.assign(item,ok.items[indexDst]);  
+          Object.assign(item,ok.items[indexDst]);
         }
 
 
@@ -345,13 +370,49 @@ export class OrdersItemsPage implements OnInit {
       }, error => this.doToast(error.error, error));
   }
 
+  doIssue(order, item, issue = EnumOrderIssue.issue_missing_product_danger) {
+
+   if (!confirm('MARQUER UNE ERREUR')) {
+    return;
+   }
+   this.$order.updateIssue(order,item,issue)
+   .subscribe(ok => {
+      this.doToast('Erreur enregistrée');
+      const indexSrc = order.items.findIndex(this.cmpItemAndVdr(item));
+      const indexDst = ok.items.findIndex(this.cmpItemAndVdr(item));
+      if(indexSrc>-1 && indexDst>-1){
+        Object.assign(order.items[indexSrc],ok.items[indexDst]);
+      }
+
+      if(indexDst>-1) {
+        Object.assign(item,ok.items[indexDst]);
+      }
+
+
+      //
+      // when not admin, we should remove other vendor items
+      // FIXME this items filter should be on server for NON admin user
+      if (!this.user.isAdmin()) {
+        order.items = order.items.filter(i => i.vendor === item.vendor);
+      }
+
+      // For Admin we should ALWAYS constraint to the vendor
+      // vendor is set on collect page
+      if (this.vendor) {
+        order.items = order.items.filter(i => i.vendor === this.vendor);
+      }
+
+      this.computeDeltaPrice(order);
+    }, error => this.doToast(error.error, error));
+  }
 
   doOpenProduct(item: OrderItem) {
     this.$router.navigate(['/product', item.sku],{ queryParams: { option: 'zindex' } });
   }
 
-  doToggleCheck(item: any) {
-   this.mapItem[item.sku] = !this.mapItem[item.sku];
+  doToggleCheck(order:Order, item: OrderItem) {
+   const key = order.oid+item.sku;
+   OrdersItemsPage.mapItem[key] = !OrdersItemsPage.mapItem[key];
   }
 
   doToast(msg, error?) {
@@ -360,7 +421,7 @@ export class OrdersItemsPage implements OnInit {
     // if (error && error.status == 401) {
     //   this.events.publish('unauthorized');
     // }
-    const out = error && error.message || msg;
+    const out = msg || error && error.message;
     const params: any = {
       message: out,
       cssClass: 'toast-message',
@@ -390,7 +451,6 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doKeypress(kcode, order, item) {
-    console.log('---- keycode',kcode)
     //
     // case of enter
     if (kcode === 13) {
@@ -406,6 +466,16 @@ export class OrdersItemsPage implements OnInit {
     this.filterItem = null;
   }
 
+
+  getItemIssue(item) {
+    const issue = {
+      "issue_missing_product":"missing",
+      "issue_missing_product_danger":"time-consuming",
+      "issue_wrong_product_quality":"quality",
+      "issue_wrong_packing":"emballage",
+    }
+    return issue[item.fulfillment.issue]||item.fulfillment.issue;
+  }
 
   getOrderRank(order: Order) {
     const prefix = this.hubs[order.hub].prefix;
@@ -445,7 +515,7 @@ export class OrdersItemsPage implements OnInit {
       // filter by vendor
       if([',','.','#'].indexOf(this.filterItem[0])>-1) {
         const search = this.filterItem.slice(1).toLocaleLowerCase();
-        return item.vendor.indexOf(search) > -1;  
+        return item.vendor.indexOf(search) > -1;
       }
 
       //
@@ -473,7 +543,7 @@ export class OrdersItemsPage implements OnInit {
       // filter by vendor
       if([',','.','#'].indexOf(this.filterItem[0])>-1) {
         const search = this.filterItem.slice(1).toLocaleLowerCase();
-        return item.vendor.indexOf(search) > -1;  
+        return item.vendor.indexOf(search) > -1;
       }
 
       //

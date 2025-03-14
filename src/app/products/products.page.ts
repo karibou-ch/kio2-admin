@@ -29,15 +29,14 @@ export class ProductsPage implements OnInit {
     products: Product[];
     step: number;
     start: number;
+    sortByStock: boolean;
   };
 
 
   constructor(
-    private $route: ActivatedRoute,
     private $router: Router,
     private $engine: EngineService,
     private $product: ProductService,
-    private $shop: ShopService,
     private toast: ToastController,
   ) {
     this.cache = {
@@ -48,13 +47,13 @@ export class ProductsPage implements OnInit {
       search: '',
       products: [],
       step: 50,
-      start: 0
+      start: 0,
+      sortByStock:true
     };
 
     this.user = this.$engine.currentUser;
     this.config = this.$engine.currentConfig;
 
-    const loader = this.$route.snapshot.data['loader'];
     //
     // filter active shop and order by name
     this.skus = [];
@@ -75,9 +74,6 @@ export class ProductsPage implements OnInit {
   }
 
 
-  ngAfterViewInit() {
-    // console.log('---', window.history)
-  }
 
   doCreateProduct() {
     this.$router.navigateByUrl('/product/create');
@@ -95,7 +91,8 @@ export class ProductsPage implements OnInit {
   }
 
   filteredProducts() {
-    return (this.products || []);
+    const sort = this.cache.sortByStock ? this.sortByVendorAndStock : this.sortAlphaNum;
+    return (this.products || []).sort(sort);
   }
 
   getAvatar(product: Product) {
@@ -132,7 +129,7 @@ export class ProductsPage implements OnInit {
     //
     // get selected product for admin or manager
     //
-    
+
     // case of admin
     if(forceShops) {
       params.shopname = forceShops;
@@ -149,11 +146,9 @@ export class ProductsPage implements OnInit {
       params.shopname = this.user.shops.map(shop => shop.urlpath);
     }
 
-
     //
     // force reload
     params.rnd = Date.now();
-
     this.$product.select(params).subscribe(
       (products: Product[]) => {
         //
@@ -269,9 +264,26 @@ export class ProductsPage implements OnInit {
     return this.products;
   }
 
+// label alphanum sort for this case "2000.10"
+  sortAlphaNum(p1: Product, p2: Product) {
+    const reA = /[^a-zA-Z]/g;
+    const reN = /[^0-9]/g;
+    const aA = p1.title.replace(reA, "");
+    const bA = p2.title.replace(reA, "");
+    if(aA === bA) {
+      var aN = parseInt(p1.title.replace(reN, ""), 10);
+      var bN = parseInt(p2.title.replace(reN, ""), 10);
+      return aN === bN ? 0 : aN > bN ? 1 : -1;
+    } else {
+      return aA > bA ? 1 : -1;
+    }
+  }
+
 
   sortByVendorAndStock(p1: Product, p2: Product) {
-    const vendor = (p1.vendor).urlpath.localeCompare(p2.vendor.urlpath);
+    const v1 = p1.vendor?.urlpath || p1.vendor;
+    const v2 = p2.vendor?.urlpath || p2.vendor;
+    const vendor = v1.localeCompare(v2);
     if (vendor != 0) {
       return vendor;
     }
@@ -290,7 +302,5 @@ export class ProductsPage implements OnInit {
       }
     );
   }
-
-
 
 }

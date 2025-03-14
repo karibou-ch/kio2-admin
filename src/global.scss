@@ -30,15 +30,25 @@
 @import "./theme/md-table.scss";
 @import "./theme/print.scss";
 
+ion-app.ion-page {
+  max-width: 900px;
+  margin: auto;
+}
+
+html.full-width ion-app.ion-page {
+  max-width: 100%;
+  margin: 0;
+}
+
 .datetime-popover,
 .customer-contact-popover{
-  --width:fit_content!important;  
+  --width:fit_content!important;
 
   @media (max-width:700px) {
-    --width:calc(100% - 20px)!important;  
-  }    
+    --width:calc(100% - 20px)!important;
+  }
 
-  
+
   .calendar-day-highlight{
     color: red;
   }
@@ -68,10 +78,10 @@
 }
 
 ion-toggle{
-  --background: #aaa; 
-  --background-checked: #aaa; 
-  --handle-background: #eee!important;     
-  --handle-background-checked: #eee!important;     
+  --background: #aaa;
+  --background-checked: #aaa;
+  --handle-background: #eee!important;
+  --handle-background-checked: #eee!important;
 }
 button.cancel-replace {
   border: 1px solid var(--ion-color-primary)!important;
@@ -89,6 +99,9 @@ button.cancel-danger {
 
 .link{
   color: var(--ion-color-primary);
+  &.blue{
+    color: blue;
+  }
   border-bottom: 1px dotted var(--ion-color-primary);
-  cursor: pointer;  
+  cursor: pointer;
 }

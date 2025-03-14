@@ -18,7 +18,16 @@ ion-app{
   animation: all 0.5s;
   visibility: hidden;
   text-align: center;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);  
   &.issue{
     visibility: visible;
   }
+  &.loading{
+    background: var(--ion-color-secondary);
+    color: var(--ion-color-secondary-contrast);
+      
+  }
 }
+

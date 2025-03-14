@@ -1,15 +1,16 @@
 {
   "name": "kio2-admin",
-  "version": "6.0.7",
+  "version": "6.2.0",
   "author": "olivier@karibou.ch",
   "homepage": "https://karibou.ch/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ionic build prod && npm run sentry:sourcemaps",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org evaletolab --project kio-admin-v3 ./www && sentry-cli sourcemaps upload --org evaletolab --project kio-admin-v3 ./www"
   },
   "private": true,
   "dependencies": {
@@ -33,15 +34,17 @@
     "@capacitor/status-bar": "^5.0.6",
     "@googlemaps/js-api-loader": "^1.16.2",
     "@ionic/angular": "^6.0.0",
-    "@sentry/angular-ivy": "^7.73.0",
+    "@sentry/angular-ivy": "^7.94.1",
+    "@sentry/cli": "^2.21.4",
+    "@sentry/wizard": "^3.16.4",
     "@types/google.maps": "^3.54.3",
     "ionicons": "^6.0.0",
-    "kng2-core": "^5.0.4",
+    "kng2-core": "file:../kng2-core/dist",
     "markdown-it": "^13.0.2",
     "ngx-uploadcare-widget": "^3.0.2",
-    "uploadcare-widget": "^3.21.2",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
+    "uploadcare-widget": "^3.21.2",
     "zone.js": "~0.11.4"
   },
   "peerDependencies": {

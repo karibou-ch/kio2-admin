@@ -83,6 +83,11 @@ export class SubscriptionsPage implements OnInit {
 
     
     this.$cart.subscriptionsGetAll().subscribe(subscriptions => {
+      subscriptions.forEach(sub => {
+        sub.nextInvoice = new Date(sub.nextInvoice);
+      })
+      console.log(subscriptions[0])
+
       this.subscriptions = this.cache.subscriptions = subscriptions.sort(this.sortBySubscription);
       this.isReady = true;
     }, status => {
@@ -123,9 +128,11 @@ export class SubscriptionsPage implements OnInit {
     if (p1.status !== "active" || p2.status !== "active") {
       return -1;
     }
+    if(!p2.nextInvoice||!p1.nextInvoice){
+      return 0;
+    }
 
-    //return p2.nextInvoice.getTime() - (p1.nextInvoice.getTime());
-    return 1;
+    return p1.nextInvoice.getTime() - (p2.nextInvoice.getTime());
   }
 
 }

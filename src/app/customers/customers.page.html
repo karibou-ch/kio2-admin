@@ -26,9 +26,9 @@
         <ion-icon name="checkmark-circle-outline" [hidden]="!cache.errors"></ion-icon>
         <ion-label color="primary">Erreur</ion-label>
       </ion-chip>
-      <ion-chip (click)="cache.refund=!cache.refund;sliceCustomers()">
-        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.refund"></ion-icon>
-        <ion-label color="primary">Remboursement</ion-label>
+      <ion-chip (click)="cache.geoloc=!cache.geoloc;sliceCustomers()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.geoloc"></ion-icon>
+        <ion-label color="primary">Geolocalisation</ion-label>
       </ion-chip>        
       <ion-chip (click)="cache.premium=!cache.premium;sliceCustomers()">
         <ion-icon name="checkmark-circle-outline" [hidden]="!cache.premium"></ion-icon>
@@ -58,6 +58,12 @@
           </p>
         </ion-label>
         <div class="note">
+          <div class="action" [hidden]="!user.isAdmin()">
+            <ion-button mode="ios" color="primary" (click)="doEdit(customer,i)">
+              <ion-icon name="edit-outline"></ion-icon> EDIT
+            </ion-button>                         
+
+          </div>
           <div class="label">{{customer.avg|currency:'CHF'}} </div> 
           {{customer.created|date:'MMM y'}} 
         </div>

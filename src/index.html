@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
+
 <head>
   <meta charset="UTF-8">
   <title>K. Vendor/Logistic</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui=yes">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui=yes">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0">
   <meta http-equiv="expires" content="0">
   <meta http-equiv="pragma" content="no-cache">
-  <meta name="color-scheme" content="light dark"/>
+  <meta name="color-scheme" content="light dark" />
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <meta http-equiv="Content-Security-Policy" content="
-        default-src * data: *; 
-        style-src *  'unsafe-inline'; 
-        script-src * 'unsafe-inline' 'unsafe-eval' data:;
-        media-src 'self' data: blob: *;">
-
+                    default-src * data: *; 
+                    style-src * 'unsafe-inline'; 
+                    script-src * 'unsafe-inline' 'unsafe-eval' data:;
+                    media-src 'self' data: blob: unsafe: *;">
+  <meta name="description" content="Karibou.ch - K. Vendor/Logistic">         
   <link rel="icon" type="image/x-icon" href="assets/icon/favicon.ico">
-  
+
   <meta name="mobile-web-app-capable" content="yes">
 
   <meta name="theme-color" content="#006a64">
@@ -39,19 +41,42 @@
       |_|\_\__,_|_|  |_|_.__/ \___/ \__,_|.ch
 
       Contact hello@karibou.ch if you're interested in working with us!
-  < -->          
+  < -->
 
-  <base href="/"/>
+  <base href="/" />
 
   <link rel="apple-touch-icon" sizes="73x72" href="assets/icons/icon-72x72.png">
   <link rel="apple-touch-icon" sizes="128x128" href="assets/icons/icon-128x128.png">
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512x512.png">
   <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    #loading-message {
+      display: block;position: fixed;top: 20px;left: 20px;
+    }
+    html:not(.hydrated) body {
+      display: block !important;
+    }
+    body{
+      background-image: linear-gradient(to right top, #e3eceb, #fff, #fff, #e3eceb);
+    }
+  </style>
+<body>
+  <div class="html-app-loading" id="loading-message">
+    Chargement des modules de l'application... 🚀 
+  </div>
+  <app-root></app-root>
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
 
-  <body>
-    <app-root></app-root>
-    <noscript>Please enable JavaScript to continue using this application.</noscript>
-  </body>
+  <script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      const loadingMessage = document.getElementById('loading-message');
+      if (loadingMessage) {
+        loadingMessage.setAttribute('style', 'display:none !important');
+
+      }
+    });
+  </script>  
+</body>
 
 
 </html>

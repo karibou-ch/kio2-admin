@@ -135,7 +135,7 @@
           <ion-button mode="ios" expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
             facturer
           </ion-button>
-          <ion-button mode="ios" expandable color="danger" (click)="orderCancel(order)" [hidden]="isOrderCapturable(order)">
+          <ion-button mode="ios" expandable color="danger" (click)="orderCancel(order)" [hidden]="!isOrderCancelable(order)">
             cancel
           </ion-button>
         </ion-item-option>

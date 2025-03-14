@@ -27,6 +27,9 @@ h2{
   
 .header-audio{
   --background: #dbe6e5;
+  .note{
+    white-space: break-spaces;
+  }
   audio{
     scale: .9;
     margin: 5px;
@@ -94,10 +97,11 @@ ion-item.customer-actions{
   left: 0px;
   margin: 0px;
   padding: 0;
-  --min-height:34px;
+  --min-height:50px;
   ion-button{
     --border-width: 0px;    
-    font-size: 12px;
+    font-size: 17px;
+    height: 40px;
   }
 }
 
@@ -210,8 +214,11 @@ ion-item{
 
   position: relative;
   display: flex;
+
+
   div.item{
-    min-height: 50px;
+    min-height: 55px;
+    width: 55%;
     &.large{
       min-height: 70px;
     }
@@ -220,6 +227,7 @@ ion-item{
     .rank{
       text-align: center;
     }
+    .vendor,
     .vendor{
       margin-left: 0;
       margin-top: 4px;
@@ -276,6 +284,10 @@ ion-item{
       .issue{
         position: relative;
         color: red;
+        border: 1px solid red;
+        border-radius: 6px;
+        padding: 0px 5px;
+        font-size: 12px;
       }
     }
     .price{
@@ -359,6 +371,14 @@ ion-item{
     &.validate,
     &.avoid {
       height: 52px!important;
+    }
+    &.issue{
+      width: 100%;
+      background-color: #ff4646;
+      color: white;
+      border-color: red;
+      font-weight: 600;
+      font-size: 11px;
     }
   }
   button.phone{

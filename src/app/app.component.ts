@@ -8,6 +8,7 @@ import { SwUpdate } from '@angular/service-worker';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Network } from '@capacitor/network';
+import { Time } from '@angular/common';
 
 
 @Component({
@@ -20,6 +21,8 @@ export class Kio2Admin {
   NETWORK_ISSUE: boolean;
   NETWORK_APP_ISSUE: boolean;
   firstInit: boolean;
+  isLoading: boolean;
+  loadingTimeout:any;
 
   constructor(
     private $engine: EngineService,
@@ -30,10 +33,13 @@ export class Kio2Admin {
     private $toast: ToastController
   ) {
     this.firstInit = true;
+    // let 300ms delay before displaying loading
+    this.loadingTimeout = setTimeout(() => this.isLoading = true, 1500);
     this.storeLoginToken();
     this.initializeApp();
     this.$loader.ready().subscribe((ctx)=>{},(status)=> {
       this.NETWORK_APP_ISSUE = true;
+      setTimeout(()=>document.location.reload(),8000);
     })
 
     this.$loader.update().subscribe((ctx) => {
@@ -56,7 +62,7 @@ export class Kio2Admin {
       this.$update.available.subscribe(event => {
         const msg = 'Une nouvelle version est disponible. Recharger la page maintenant';
         let force = true;
-        alert (msg); 
+        alert (msg);
         this.$update.activateUpdate().then(() => {
           document.location.reload(true);
           force=false;
@@ -68,7 +74,7 @@ export class Kio2Admin {
       // SIMPLE NETWORK CHECKER INFO
       // 'wifi' | 'cellular' | 'none' | 'unknown'
       Network.addListener('networkStatusChange', status => {
-        this.NETWORK_ISSUE = ['none','unknown'].indexOf(status.connectionType)>-1||(!window.navigator.onLine);
+        setTimeout(()=>this.NETWORK_ISSUE = ['none','unknown'].indexOf(status.connectionType)>-1||(!window.navigator.onLine),0);
       });
 
     });
@@ -80,8 +86,7 @@ export class Kio2Admin {
     //
     // update global state
     this.$engine.currentUser = user;
-    console.log('----', user);
-
+    clearTimeout(this.loadingTimeout);
     if (!user.isAuthenticated()) {
       this.$router.navigateByUrl('/login');
       return;
@@ -93,6 +98,7 @@ export class Kio2Admin {
 
     this.firstInit = false;
 
+    setTimeout(() => this.isLoading = false, 6000);
     //
     // navigation is running
     if(this.$router.url === '/') {
@@ -101,7 +107,7 @@ export class Kio2Admin {
 
     //
     // if admin||logistic => shopper
-    if (user.isAdmin() || user.hasRole('logistic')) {
+    if (user.hasRole('logistic')) {
       this.$router.navigateByUrl('/shopper');
       return;
     }
@@ -114,7 +120,12 @@ export class Kio2Admin {
       const token = /token=([^&]*)/gm.exec(window.location.href);
       if(token && token.length>1){
         window['KB_TOKEN'] = token[1];
-      }  
+      }
+      const authlink = /authlink=([^&]*)/gm.exec(window.location.href);
+      if(authlink && authlink.length>1){
+        window['KB_authlink'] = authlink[1];
+      }
+
     }catch(e){}
 
   }

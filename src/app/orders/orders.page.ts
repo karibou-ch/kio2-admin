@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
 import { ToastController, PopoverController, ModalController, LoadingController } from '@ionic/angular';
-import { CalendarPage } from '../calendar/calendar.page';
 import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 import { Router, ActivatedRoute } from '@angular/router';
 import { interval } from 'rxjs';
@@ -151,22 +150,10 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.maxErrors = this.$engine.currentConfig.shared.issue.verification;
-    //
-    // load Hubs
-    this.hubs = {undefined: { prefix: ''}};
-    (this.$engine.currentConfig.shared.hubs || []).forEach(hub => {
-      this.hubs[hub.id] = hub;
-      this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
-    });
-
     this.format = this.$engine.defaultFormat;
     this.formatWeek = this.$engine.defaultWeek;
-
+    this.hubs = {undefined: { prefix: ''}};
     this.user = this.$engine.currentUser;
-    if (this.user.isAdmin()) {
-      // change the average
-      this.orderBaseAmount = 0;
-    }
 
     //
     // use correct date
@@ -180,6 +167,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.interval$ = interval(60000 * 10).subscribe(() => {
       this.$engine.findAllOrders();
     });
+    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
+    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
 
     this.$engine.findAllOrders();
 
@@ -197,8 +186,6 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
       }
     });
 
-    this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
-    this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
 
   }
 
@@ -288,7 +275,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
   getOrderRank(order: Order) {
-    const prefix = this.hubs[order.hub].prefix;
+    const prefix = this.hubs[order.hub['_id'] || order.hub].prefix;
     return prefix + order.rank;
   }
 
@@ -327,6 +314,11 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   isOrderCapturable(order: Order) {
     // admin test should be outside
     return (['voided', 'paid', 'partially_refunded', 'manually_refunded', 'invoice'].indexOf(order.payment.status) === -1) && (order.fulfillments.status === 'fulfilled');
+  }
+
+  isOrderCancelable(order: Order) {
+    // admin test should be outside
+    return (['pending', 'authorized','prepaid'].indexOf(order.payment.status) >-1) && (order.fulfillments.status != 'fulfilled');
   }
 
   isOrderSelected(order: Order) {
@@ -471,7 +463,9 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     if (confirm('SUPPRIMER LA COMMANDE???')) {
       this.$order.cancelWithReason(order, EnumCancelReason.customer).subscribe(
         (ok) => {
-          Object.assign(order, ok);
+          const idx = this.orders.findIndex(o => o.oid === ok.oid);
+          this.orders.splice(idx, 1);
+          this.onInitOrders({orders:this.orders, when: this.shipping} as OrdersCtx);
           this.onDone('Commande annulée');
         },
         error => {
@@ -559,11 +553,26 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
   onEngineStatus(status: OrderStatus) {
     this.isReady = !status.running;
+
+    //
+    // load Hubs
+    (this.$engine.currentConfig.shared.hubs || []).forEach(hub => {
+      this.hubs[hub.id] = hub;
+      this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
+    });
+
+    this.user = this.$engine.currentUser;
+    if (this.user.isAdmin()) {
+      // change the average
+      this.orderBaseAmount = 0;
+    }
+
   }
 
   onInitOrders(ctx: OrdersCtx) {
     this.items = {};
     this.orders = ctx.orders.sort(this.sortOrdersByRank);
+
 
     this.mapOrderByItems();
     this.mapItemsPlanning();

@@ -135,9 +135,12 @@ export class EngineService {
     //
     // set default HUB
     const options: any = {
-      hub: hubs[0].slug
-    };
 
+    };
+    if(this.user.isAdmin() || this.user.hasRole('manager')) {
+      options.status = true;
+    }
+    console.log('findVendors', options);
     this.$shop.query(options).subscribe(shops => {
       this._shops = shops.filter(a=>a.status).sort((a,b)=> a.urlpath.localeCompare(b.urlpath));
     }, status => {

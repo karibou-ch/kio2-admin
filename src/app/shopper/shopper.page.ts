@@ -335,6 +335,15 @@ export class ShopperPage implements OnInit, OnDestroy {
     }, (error) => this.onError(error.error));
   }
 
+  getAddressDirection(order: Order) {
+    const currentOrder = order;
+    const address = currentOrder.shipping.streetAdress + ',' +
+                    currentOrder.shipping.postalCode + ',' +
+                    currentOrder.shipping.region;
+    // const geos = [currentOrder.shipping.geo.lat, currentOrder.shipping.geo.lng].join();
+    // const destination = (currentOrder.shipping.geo) ? address : geos ;
+    return address;    
+  }  
   getShopperInfo(order: Order) {
     if (!order || !order.shipping.shopper) {
       return '';
@@ -477,7 +486,17 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.searchFilter = null;
   }
 
+  onOpenDirection(order : Order) {
+    const destination = this.getAddressDirection(order);
+
+    try {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}&dir_action=navigate`);
+    } catch (error) {
+    }
+  }
+
   setShippingShopper($event?) {
+    console.log('--- DBG',$event);
     const hub = this.currentHub && this.currentHub.slug;
     const when = new Date(this.pickerShippingDate);
     const plan = this.currentPlanning;

@@ -15,6 +15,27 @@
   flex-wrap: wrap;
   flex-direction: column;
 
+  .stats {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .table{
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    .col{
+      width: 100%;
+      font-size: .85rem;
+      label{
+        background: #eee;        
+        margin-right: 3px;
+      }
+    }
+  }
+
+
   ion-list{
     width: 100%;
     ion-textarea{

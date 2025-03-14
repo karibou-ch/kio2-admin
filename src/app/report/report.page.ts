@@ -133,6 +133,15 @@ export class ReportPage implements OnInit {
     popover.dismiss();
   }
 
+  onCopyCA(report) {
+    let csv = `
+    Commission, "VENTE.COMMISSION", ${report.ca}
+    Service K. , "VENTE.SERVICE", ${report.serviceamount}
+    Livraison , "VENTE.LOGISTIQUE", ${report.shippingamount}
+    `  
+    navigator.clipboard.writeText(csv.trim());
+  }
+
 
   onInitReport() {
    this.month = new Date(this.currentDate).getMonth() + 1;
@@ -169,12 +178,14 @@ export class ReportPage implements OnInit {
         // actual delimiter characters for CSV format
         // const colDelim = '";"';
         // const rowDelim = '"\r\n"';
-        const csv = this.report.products.map( product => {
+        const header = ['"nom"', '"ventes"', '"chf"', '"tva"'].join(';')
+        const csv = header+"\n"+this.report.products.sort(this.sortByTvaAndSell).map( product => {
           // escape double quotes
           return [
             '"' + product.title.replace(/"/g, "'") + '"',
             product.count,
-            product.amount.toFixed(2).replace('.', ',')
+            product.amount.toFixed(2).replace('.', ','),
+            product.tva.toFixed(3 ).replace('.', ','),
           ].join(';');
         }).join('\r\n');
         this.csv = {
@@ -201,6 +212,15 @@ export class ReportPage implements OnInit {
     return this.shops.reduce((sum, slug) => {
       return sum + this.report.shops[slug].refunds;
     }, 0);
+  }
+
+  sortByTvaAndSell(a, b) {  
+    a.tva = a.tva || 0;
+    b.tva = b.tva || 0;
+    if (a.tva == b.tva) {
+      return b.count - a.count;
+    }
+    return b.tva - a.tva;
   }
 
 }
