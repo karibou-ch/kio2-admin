@@ -104,7 +104,9 @@ export class OrdersItemsPage implements OnInit {
       }
       // for vendors team
       else{
-        this.doubleCheck = this.orders[0].customer.latestErrors == 0 && this.orders[0].customer.rating < 3.0;
+        // this.doubleCheck = this.orders[0].customer.latestErrors == 0 && this.orders[0].customer.rating < 3.0;
+        this.doubleCheck = this.orders[0].customer.latestErrors>0;
+
       }
     }
 
@@ -152,7 +154,7 @@ export class OrdersItemsPage implements OnInit {
   }
 
   doDisplayMail(order) {
-    const email = order.email;
+    const email = order.customer.email;
     this.$alert.create({
       header: 'Adresse Mail',
       subHeader: order.customer.displayName,
@@ -483,10 +485,10 @@ export class OrdersItemsPage implements OnInit {
   }
 
   getPhoneNumber(order: Order) {
-    if (!order || !order.customer.phoneNumbers || !order.customer.phoneNumbers.length) {
+    if (!order || !order.customer.phone) {
       return false;
     }
-    return order.customer.phoneNumbers[0].number;
+    return order.customer.phone;
   }
 
 

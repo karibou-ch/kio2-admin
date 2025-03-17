@@ -89,13 +89,13 @@ D'avance merci pour votre compréhension.`
     // https://stackoverflow.com/a/19126326
     const prefix = (document.documentElement.classList.contains('ios')) ? '&' : '?';
 
-    const customerName = this.customerName;
+    const phoneNumber = this.order.customer.phone;
+
     const body = this.body;
-    const phones = this.order.customer.phoneNumbers.filter(phone => phone.number && phone.number.indexOf('022') == -1 && phone.number.indexOf('004122') == -1).map(phone => phone.number);
 
     const aLink = document.createElement('a');
-    aLink.href = "sms:"+phones[0] + prefix + 'body=' + encodeURI(body);
-    console.log('--- link',aLink.href);
+    aLink.href = "sms:"+phoneNumber + prefix + 'body=' + encodeURI(body);
+    aLink.textContent = "SMS ("+phoneNumber+")";
 
     aLink.click();
     this.$popup.dismiss(action);

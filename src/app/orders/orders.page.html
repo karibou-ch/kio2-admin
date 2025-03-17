@@ -15,10 +15,10 @@
                 outline  (click)="doTogglePlanning(plan)"
                 *ngFor="let plan of planning  "><b>{{plan}}</b>
         </button>
-      </div>    
-  
+      </div>
+
       <ion-label>Grouper par produits</ion-label>
-      <ion-toggle mode="md" (ionChange)="displayByItems=!displayByItems"></ion-toggle>      
+      <ion-toggle mode="md" (ionChange)="displayByItems=!displayByItems"></ion-toggle>
     </div>
   </ion-toolbar>
 </ion-header>
@@ -26,27 +26,27 @@
 <ion-content >
   <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
     <ng-template>
-      <ion-datetime 
+      <ion-datetime
         presentation="date"
         locale="fr-FR"
         [highlightedDates]="highlightedOrders"
-        [(ngModel)]="pickerShippingString" 
-        (ngModelChange)="onDatePicker(popover)" 
-        cancelText="Annuler" 
-        doneText="Fait" 
+        [(ngModel)]="pickerShippingString"
+        (ngModelChange)="onDatePicker(popover)"
+        cancelText="Annuler"
+        doneText="Fait"
         firstDayOfWeek="1"
         max="2030">
       </ion-datetime>
-    </ng-template>    
+    </ng-template>
   </ion-popover>
-  
+
 
   <div class="loader" [hidden]="isReady">
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
 
   <h1 class="info" [hidden]="!isReady||(orders?.length > 0)">Pas de commandes</h1>
-  
+
   <ion-refresher slot="fixed" [disabled]="false"
     (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -61,10 +61,10 @@
     [hidden]="!(orders?.length)"
     (ionInput)="onSearchInput($event)"
     (ionClear)="onSearchCancel($event)">
-  </ion-searchbar>  
+  </ion-searchbar>
 
   <ng-container *ngTemplateOutlet="displayByItems ? ordersItems: ordersByRank" ></ng-container>
-  
+
 
 </ion-content>
 
@@ -84,7 +84,7 @@
       <ion-note slot="end">
         <ion-button  size="small" color="medium" fill="outline" (click)="emailVendors()">
           <ion-icon name="send"></ion-icon>&nbsp;email
-        </ion-button> 
+        </ion-button>
       </ion-note>
     </ion-item>
     <!-- ITEMS -->
@@ -104,7 +104,7 @@
       <ion-note slot="end" >
         <span class="price">{{item.amount|number:'1.0-0'}} fr</span>
         <span class="progress">{{(item.progress/item.customers.length)|percent}}</span>
-      </ion-note>      
+      </ion-note>
     </ion-item>
 
 </ng-template>
@@ -139,11 +139,11 @@
             cancel
           </ion-button>
         </ion-item-option>
-      </ion-item-options>  
+      </ion-item-options>
       <ion-item-options side="end" class="shipping" [hidden]="!user.isAdmin() && !user.hasRole('operator')">
         <ion-item-option color="secondary">
-          <ion-select [(ngModel)]="order.payment.fees.shipping" 
-                      color="primary" 
+          <ion-select [(ngModel)]="order.payment.fees.shipping"
+                      color="primary"
                       [selectedText]="order.payment.fees.shipping + ' fr'"
                       interface="action-sheet"
                       (ionChange)="orderShippingFees(order)">
@@ -159,8 +159,8 @@
           </ion-select>
         </ion-item-option>
         <ion-item-option>
-          <ion-select  placeholder="Nb sacs" 
-                        [(ngModel)]="order.shipping.bags"                       
+          <ion-select  placeholder="Nb sacs"
+                        [(ngModel)]="order.shipping.bags"
                         [selectedText]="order.shipping.bags? (order.shipping.bags  + ' sacs'):'Nb sacs'"
                         (ngModelChange)="updateBag(order,$event)"
                         interface="action-sheet">
@@ -193,7 +193,7 @@
           </h3>
           <h2>
             <span class="label counter">{{i+1}}</span>
-            <span>&nbsp;{{ order.oid }} - {{order.customer.plan}}</span>
+            <span>&nbsp;{{ order.oid }} - {{order.customer.plan}} - {{order.customer.orders}}</span>
 
             <span class="small  bold" [hidden]="!order.customer.rating">
               [note:{{ order.customer.rating + 1| number: '1.0-1' }}/4]
@@ -210,11 +210,11 @@
           [hidden]="!user.isAdmin()||!isOrderCapturable(order)">
           facturer
         </button>
-  
-      </ion-item>      
+
+      </ion-item>
     </ion-item-sliding>
   </ion-list>
   <div>
     &nbsp;
   </div>
-</ng-template> 
+</ng-template>

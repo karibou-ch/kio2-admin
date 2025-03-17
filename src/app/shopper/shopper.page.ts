@@ -18,7 +18,7 @@ export interface ShopperPlan {
   templateUrl: './shopper.page.html',
   styleUrls: ['./shopper.page.scss'],
 })
-export class ShopperPage implements OnInit, OnDestroy {
+export class ShopperPage implements OnInit {
 
   selectedOrder = {};
   user: User;
@@ -112,7 +112,7 @@ export class ShopperPage implements OnInit, OnDestroy {
       return {
         date: order.shipping.when.toYYYYMMDD('-'),
         textColor: this.statusColor[status].text,
-        backgroundColor: this.statusColor[status].background,        
+        backgroundColor: this.statusColor[status].background,
       }
     });
     // console.log(highlighted[0],this.$engine.availableOrders[0].shipping.when)
@@ -123,7 +123,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   get currentOrders() {
     //
     // FIXME removed filter by hub
-    // .filter(filterByHub.bind(this))                    
+    // .filter(filterByHub.bind(this))
     // const filterByHub = (order) => {
     //   return !this.currentHub ||
     //   order.hub === this.currentHub.id;
@@ -137,20 +137,20 @@ export class ShopperPage implements OnInit, OnDestroy {
     };
 
     const filterByText = (order) => {
-      const filter = order.email + ' ' + order.rank + ' ' + order.customer.displayName;
+      const filter = order.customer.email + ' ' + order.rank + ' ' + order.customer.displayName;
       return filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
     };
 
     //
     // FIXME removed filter by hub
-    // .filter(filterByHub.bind(this))                    
+    // .filter(filterByHub.bind(this))
     if (!this.searchFilter) {
       return this.orders.filter(order => !order.shipping.parent)
                         .filter(filterByPlan.bind(this));
     }
     //
     // FIXME removed filter by hub
-    // .filter(filterByHub.bind(this))                    
+    // .filter(filterByHub.bind(this))
     return this.orders
                 .filter(order => !order.shipping.parent)
                 .filter(filterByPlan.bind(this))
@@ -158,8 +158,6 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
 
-  ngOnDestroy() {
-  }
 
   doDisplayPhone(order) {
     const phone = this.getPhoneNumber(order);
@@ -174,7 +172,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     this.$alert.create({
       header: 'Mail de la commande',
       subHeader: order.customer.displayName,
-      message: 'Contacter <a href="mailto:' + order.email + '">' + order.email + '</a>',
+      message: 'Contacter <a href="mailto:' + order.customer.email + '">' + order.customer.email + '</a>',
     }).then(alert => alert.present());
   }
 
@@ -210,17 +208,17 @@ export class ShopperPage implements OnInit, OnDestroy {
   onDatePicker(popover) {
     const date = this.$engine.currentShippingDate = this.pickerShippingDate;
     const orders = this.$engine.getOrdersByDay(date);
-    const today = new Date();    
-    const thisWeek = today.plusDays(- today.getDay());    
+    const today = new Date();
+    const thisWeek = today.plusDays(- today.getDay());
     const nextWeek = today.plusDays(7 - today.getDay());
     date.setHours(0, 0, 0, 0);
 
     if(date < thisWeek && !orders.length) {
-      this.$engine.selectOrderArchives(true);  
+      this.$engine.selectOrderArchives(true);
     }else if (date>nextWeek && !orders.length){
-      this.$engine.selectOrderArchives(false);  
+      this.$engine.selectOrderArchives(false);
     }else if(!orders.length){
-      this.$engine.selectOrderArchives(false);  
+      this.$engine.selectOrderArchives(false);
       this.$engine.currentShippingDate = date;
     }else{
       this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
@@ -247,7 +245,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     //
     // set default order value based on postalCode
     this.pickerShippingDate = ctx.when;
-    this.orders = ctx.orders.sort(this.sortOrdersByPosition);    
+    this.orders = ctx.orders.sort(this.sortOrdersByPosition);
     // this.orders.filter(o => o.shipping.priority === 1).forEach(order => {
     //   console.log('---- priority,position',order.rank,order.shipping.priority, order.shipping.position);
     // });
@@ -314,16 +312,16 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   getPhoneNumber(order: Order) {
-    if (!order || !order.customer.phoneNumbers || !order.customer.phoneNumbers.length) {
+    if (!order || !order.customer.phone) {
       return false;
     }
-    return order.customer.phoneNumbers[0].number;
+    return order.customer.phone;
   }
 
 
   getOrdersComplement(order) {
     return this.shippingComplement[order.oid] || 0;
-  } 
+  }
 
   isOrderSelected(order) {
     return this.selectedOrder[order.oid];
@@ -342,8 +340,8 @@ export class ShopperPage implements OnInit, OnDestroy {
                     currentOrder.shipping.region;
     // const geos = [currentOrder.shipping.geo.lat, currentOrder.shipping.geo.lng].join();
     // const destination = (currentOrder.shipping.geo) ? address : geos ;
-    return address;    
-  }  
+    return address;
+  }
   getShopperInfo(order: Order) {
     if (!order || !order.shipping.shopper) {
       return '';
@@ -368,7 +366,7 @@ export class ShopperPage implements OnInit, OnDestroy {
     const orders = this.currentOrders;
     const lastIdx = orders.length - 1;
     //
-    // depending the direction, we should compare the position 
+    // depending the direction, we should compare the position
     const direction = (index.detail.from > index.detail.to) ? -1 : 1;
     const to = orders[index.detail.to];
     const from = orders[index.detail.from];
@@ -437,7 +435,7 @@ export class ShopperPage implements OnInit, OnDestroy {
       if(order.shipping.shopper){
         shoppers[order.shipping.shopper] = true;
       }
-        
+
 
       //
       // list shopper
@@ -540,7 +538,7 @@ export class ShopperPage implements OnInit, OnDestroy {
           // update all plan
           this.trackPlanning(this.orders);
         }, status => {
-          this.onError(status.error);          
+          this.onError(status.error);
         });
   }
 
@@ -571,7 +569,7 @@ export class ShopperPage implements OnInit, OnDestroy {
   }
 
   //
-  // sort by (parent)->rank, 
+  // sort by (parent)->rank,
   sortOrdersByRankAndComplement(o1, o2) {
     // get source rank
     const rank1 = this.shippingComplement[o1.oid] || o1.rank;

@@ -57,7 +57,7 @@ export class CustomersPage implements OnInit {
           return {
             _id: user.id,
             // latestErrors: user.orders.latestErrors,
-            // latestRating: user.orders.latestRating,    
+            // latestRating: user.orders.latestRating,
             displayName: user.displayName,
             last1Month: user.orders.last1Month,
             last3Month: user.orders.last3Month,
@@ -108,8 +108,8 @@ export class CustomersPage implements OnInit {
   doDisplayMail(order) {
     this.$alert.create({
       header: 'Mail de la commande',
-      subHeader: order.displayName,
-      message: 'Contacter <a href="mailto:' + order.email + '">' + order.email + '</a>',
+      subHeader: order.customer.displayName,
+      message: 'Contacter <a href="mailto:' + order.customer.email + '">' + order.customer.email + '</a>',
     }).then(alert => alert.present());
   }
 
@@ -174,7 +174,7 @@ export class CustomersPage implements OnInit {
         result = !!customer.errors;
       }
       if (this.cache.premium) {
-        result = customer.premium;  
+        result = customer.premium;
       }
       if(this.cache.geoloc) {
         result = customer.missingGeo;

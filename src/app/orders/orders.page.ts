@@ -110,7 +110,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
       return {
         date: order.shipping.when.toYYYYMMDD('-'),
         textColor: this.statusColor[status].text,
-        backgroundColor: this.statusColor[status].background,        
+        backgroundColor: this.statusColor[status].background,
       }
     });
     // console.log(highlighted[0],this.$engine.availableOrders[0].shipping.when)
@@ -131,10 +131,10 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
       orders = this.orders.filter(order => (!this.currentPlanning || this.currentPlanning === order.shipping.priority));
     } else  {
       orders = this.orders.filter(order => {
-        const filter = order.oid + ' ' + order.email + ' ' + order.rank + ' ' + order.customer.displayName;
+        const filter = order.oid + ' ' + order.customer.email + ' ' + order.rank + ' ' + order.customer.displayName;
         const planning = (!this.currentPlanning || this.currentPlanning === order.shipping.priority);
         return planning && filter.toLocaleLowerCase().indexOf(this.searchFilter.toLocaleLowerCase()) > -1;
-      });  
+      });
     }
     this.complementsLength = orders.filter(order => order.shipping.parent).length;
     return orders.sort(this.sortOrdersByRankAndComplement.bind(this));
@@ -254,7 +254,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
   getOrdersComplement(order) {
     return this.shippingComplement[order.oid] || 0;
-  } 
+  }
 
   getOrdersCountByDate(when: Date) {
     return this.openItems[when.getTime()].count || 0;
@@ -268,7 +268,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   // FIXME use localOrders
   getOrdersLength() {
 
-  } 
+  }
 
   getUniqueOrders(){
     return (this.orders).filter(order => !order.shipping.parent);
@@ -282,7 +282,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   initDate() {
     const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
     //
-    // if no date is specified, then make sure that 
+    // if no date is specified, then make sure that
     if (isNaN(queryWhen.getTime())) {
       this.$engine.initDate();
     }
@@ -304,7 +304,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
   isAudio(order){
     return !!this.hasAudio[order.oid];
-  }  
+  }
 
   isDeposit(order) {
     // undefined test is for Bretzel
@@ -366,7 +366,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
         //
         this.items[item.sku].customers.push({
           oid: order.oid,
-          email: order.email,
+          email: order.customer.email,
           customer: order.customer,
           payment: {
             status: order.payment.status
@@ -521,17 +521,17 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   onDatePicker(popover) {
     const date = this.$engine.currentShippingDate = this.pickerShippingDate;
     const orders = this.$engine.getOrdersByDay(date);
-    const today = new Date();    
-    const thisWeek = today.plusDays(- today.getDay());    
+    const today = new Date();
+    const thisWeek = today.plusDays(- today.getDay());
     const nextWeek = today.plusDays(7 - today.getDay());
     date.setHours(0, 0, 0, 0);
 
     if(date < thisWeek && !orders.length) {
-      this.$engine.selectOrderArchives(true);  
+      this.$engine.selectOrderArchives(true);
     }else if (date>nextWeek && !orders.length){
-      this.$engine.selectOrderArchives(false);  
+      this.$engine.selectOrderArchives(false);
     }else if(!orders.length){
-      this.$engine.selectOrderArchives(false);  
+      this.$engine.selectOrderArchives(false);
       this.$engine.currentShippingDate = date;
     }else{
       this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
@@ -622,7 +622,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
   //
-  // sort by (parent)->rank, 
+  // sort by (parent)->rank,
   sortOrdersByRankAndComplement(o1, o2) {
     // get source rank
     const rank1 = this.shippingComplement[o1.oid] || o1.rank;

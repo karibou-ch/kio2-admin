@@ -86,7 +86,7 @@ export class InvoicePage implements OnInit {
 
     this.$order.findAllOrders(optionsInvoice).subscribe((orders) => {
       this.orders = this.orders.concat(orders as Order[]).sort((a,b)=>{
-        return a.email.localeCompare(b.email);
+        return a.customer.email.localeCompare(b.customer.email);
       });
       this.isReady = true;
     });
@@ -106,7 +106,7 @@ export class InvoicePage implements OnInit {
     this.$alert.create({
       header: 'Mail de la commande',
       subHeader: order.customer.displayName,
-      message: 'Contacter <a href="mailto:' + order.email + '">' + order.email + '</a>',
+      message: 'Contacter <a href="mailto:' + order.customer.email + '">' + order.customer.email + '</a>',
     }).then(alert => alert.present());
   }
 
@@ -117,10 +117,10 @@ export class InvoicePage implements OnInit {
 
 
   getPhoneNumber(order: Order) {
-    if (!order || !order.customer.phoneNumbers || !order.customer.phoneNumbers.length) {
+    if (!order || !order.customer.phone) {
       return false;
     }
-    return order.customer.phoneNumbers[0].number;
+    return order.customer.phone;
   }
 
   getTotal(order: Order) {

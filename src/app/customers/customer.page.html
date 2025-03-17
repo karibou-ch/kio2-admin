@@ -103,9 +103,9 @@
     </ion-item>
 
 
-    <ion-item *ngFor="let phone of customer.phoneNumbers">
+    <ion-item>
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Télephone</ion-label>
-      <ion-input type="phone" placeholder="Phone" ngDefaultControl [(ngModel)]="phone.number"></ion-input>
+      <ion-input type="phone" placeholder="Phone" ngDefaultControl [(ngModel)]="customer.phone"></ion-input>
     </ion-item>
 
     <ion-item>
