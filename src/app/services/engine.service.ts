@@ -3,6 +3,22 @@ import { User, Order, OrderService, Product, Config, ShopService, Shop } from 'k
 import { ReplaySubject, from } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
+
+export interface CRM {
+  from?:Date;
+  to?:Date;
+  customerChurn?:any[];
+  sort?:string;
+  selected?:string;
+  customerOblivious:{users:User[],churn:any[]};
+  customerNew:{users:User[],churn:any[]}  ;
+  customerOccasional:{users:User[],churn:any[]};
+  customerPremium:{users:User[],churn:any[]};
+  customerRecurrent:{users:User[],churn:any[]};
+  customerQuit:{users:User[],churn:any[]};
+}
+
+
 //
 // orders and context used by subject$
 export interface OrdersCtx {
@@ -32,7 +48,6 @@ export class EngineService {
   //
   // calendar of loaded Orders
   shippingWeekOrders: Order[];
-
 
   //
   // get only authorized orders (IN PROCESSING)
@@ -168,7 +183,7 @@ export class EngineService {
 
     const today = new Date();
     //
-    // FIXME some orders dates overlapp 
+    // FIXME some orders dates overlapp
     // when initial c.plusDays( - this.pickerShippingDate.getDay())urrentShippingDate.month() is not equal to today.month()
 
 
@@ -205,7 +220,7 @@ export class EngineService {
       // sort order by shipping dates
       this.shippingWeekOrders = this.shippingWeekOrders.sort((a: Order, b: Order) => a.shipping.when.getTime() - b.shipping.when.getTime());
 
-    
+
       //
       // publish status
       this.status$.next({running: false});

@@ -4,7 +4,7 @@
   <form (ngSubmit)="login()" #loginForm="ngForm">
 
     <ion-item>
-      <ion-input class="input-login" [(ngModel)]="model.email" [type]="authLink ? 'text' : 'email'" placeholder="Email" name="email" required></ion-input>
+      <ion-input class="input-login" [(ngModel)]="model.email" [type]="authLink ? 'text' : 'email'" placeholder="Email ou pseudo" name="email" required></ion-input>
     </ion-item>
 
     <ion-item [hidden]="!isValidEmail">

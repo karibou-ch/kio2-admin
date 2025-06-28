@@ -291,7 +291,7 @@
 }
 
 .hidden-sm{
-  @media  (max-width:430px){
+  @media  (max-width:440px){
     display: none!important;
   }
 }
@@ -347,7 +347,7 @@
 .modal-wrapper {
   @media  (min-width:426px){
     --max-width: calc( 100vw - 100px );
-    --width: calc( 100vw - 100px );  
+    --width: calc( 100vw - 100px );
     --height: 98%;
   }
 

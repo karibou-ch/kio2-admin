@@ -251,7 +251,7 @@
           Prix (TVA inc.)
         </ion-label>
         <ion-input type="number" min="0" step="0.1" placeholder="0.00" ngDefaultControl
-                (focus)="doSelectAllPrice($event)"
+                (ionFocus)="doSelectAllPrice($event)"
                 (ionInput)="doKeypressOnPrice($event)"
                 [ngModel]="product.pricing.price"></ion-input>
       </ion-item>
@@ -259,7 +259,7 @@
       <ion-item class="large" [hidden]="!product.getPortionParts().isWeight">
         <ion-label position="stacked" color="primary">Le prix au Kg en pour {{product.pricing.part}}</ion-label>
         <ion-input class="input-special " type="number" min="0" step="0.1"  placeholder="Prix au Kg"
-                (focus)="doSelectAllPrice($event)"
+                (ionFocus)="doSelectAllPrice($event)"
                 (ionInput)="doUpdatePriceKG($event)"
                 [ngModel]="priceKg"></ion-input>
       </ion-item>

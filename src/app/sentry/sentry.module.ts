@@ -31,7 +31,7 @@ Sentry.init({
   // We recommend adjusting this value in production
   tracesSampleRate: 0.7,
 
-  // Usefull for CORS api 
+  // Usefull for CORS api
   // Set `tracePropagationTargets` to control for which URLs distributed tracing should be enabled
   tracePropagationTargets: [/^https:\/\/admin.karibou/],
 
@@ -44,7 +44,7 @@ Sentry.init({
 });
 
 //
-// attach  handler for nginx 
+// attach  handler for nginx
 Sentry.setTag("k-debug", AnalyticsService.FBP);
 
 @NgModule({

@@ -1,3 +1,4 @@
+/* eslint-disable @angular-eslint/component-selector */
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
@@ -313,12 +314,14 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
   isOrderCapturable(order: Order) {
     // admin test should be outside
-    return (['voided', 'paid', 'partially_refunded', 'manually_refunded', 'invoice'].indexOf(order.payment.status) === -1) && (order.fulfillments.status === 'fulfilled');
+    // console.log('isOrderCapturable',order.payment.status,order.fulfillments.status)
+    return (['voided',  'paid', 'partially_refunded', 'manually_refunded', 'invoice'].indexOf(order.payment.status) === -1) &&
+           (order.fulfillments.status === 'fulfilled');
   }
 
   isOrderCancelable(order: Order) {
     // admin test should be outside
-    return (['pending', 'authorized','prepaid'].indexOf(order.payment.status) >-1) && (order.fulfillments.status != 'fulfilled');
+    return (['pending', 'authorized','prepaid'].indexOf(order.payment.status) >-1);
   }
 
   isOrderSelected(order: Order) {
@@ -326,7 +329,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
   isPaid(order: Order) {
-    return (['paid', 'partially_refunded', 'manually_refunded'].indexOf(order.payment.status) > -1);
+    return (['paid','invoice', 'partially_refunded', 'manually_refunded'].indexOf(order.payment.status) > -1);
   }
 
   isFulfilled(order: Order) {

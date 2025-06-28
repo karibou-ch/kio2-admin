@@ -66,10 +66,18 @@ export class ProductDetailsPage implements OnInit {
 
 
     if (this.sku === 'create') {
-      // create a copy ?
+      // FIXME, this is a hack to create a copy of the product with default values
+      // create a copy  with default values
+      const defaultVendor = this.$route.snapshot.queryParams['vendor'] || this.shops[0];
+      const template = defaultVendor ? this.$product.cacheToList().find(p => p.vendor?.urlpath == defaultVendor) : null;
+      const templateCopy = template? {
+        categories: template.categories,
+        vendor: template.vendor,
+      }: null;
       this.create = true;
-      this.product = new Product();
+      this.product = templateCopy ? new Product(templateCopy) : new Product();
       this.portion = this.product.getPortionParts();
+      this.product.vendor = this.product.vendor || {};
       if(this.portion.isWeight){
         this.priceKg = this.product.pricing.price / 1000 * this.portion.part;
       }
@@ -162,8 +170,12 @@ export class ProductDetailsPage implements OnInit {
 }
 
   doCheckBundle(product){
-    const vendor = this.shops.find(shop => shop._id == product.vendor);
+    const vendor = this.shops.find(shop => shop._id == product.vendor) || product.vendor;
     const exist = product.bundle.some(item => item.vendor == vendor.urlpath);
+    if(!vendor?.urlpath){
+      alert('La boutique n\'a pas été sélectionnée');
+      return;
+    }
     console.log('--- DBG doCheckBundle', exist, product.bundle);
     if(!exist){
       product.bundle.unshift({
@@ -204,6 +216,7 @@ export class ProductDetailsPage implements OnInit {
         shelflife: product.shelflife,
         bundle: product.bundle||[],
         title: product.title,
+        vendor: product.vendor,
       });
     };
     const content = JSON.stringify(copy(product));
@@ -278,33 +291,45 @@ export class ProductDetailsPage implements OnInit {
     this.productDiff.diff(dotNotation);
   }
 
-  doSelectAllPrice(event) {
-    console.log('--- DBG doSelectAllPrice',event.inputElement||event.target);
-    if (event.inputElement) {
-      setTimeout(function() {
-          try {event.inputElement.setSelectionRange(0, 9999); } catch (e) {}
+  doSelectAllPrice($event) {
+    const $elem = $event.inputElement||$event.target.querySelector('input');
+    console.log('--- DBG doSelectAllPrice', $elem);
+    if ($event.inputElement) {
+      return setTimeout(function() {
+          try {$elem.setSelectionRange(0, 9999); } catch (e) {
+            console.log('--- ERR doSelectAllPrice 1',e);
+          }
       }, 1);
-      return event.inputElement.select();
     }
 
     // check this on safari
-    setTimeout(function() {
-      try {event.target.setSelectionRange(0, 9999); } catch (e) {}
+    return setTimeout(function() {
+      try {$elem.select(); } catch (e) {
+        console.log('--- ERR doSelectAllPrice 2',e);
+      }
     }, 1);
-    event.target.select();
   }
 
   doKeypressOnPrice($event) {
     const $elem = $event.inputElement||$event.target;
     const price = parseFloat($elem.value || "0");
 
-    if(!this.portion.isWeight || !price){
+    //
+    // save on enter
+    if($event.keyCode === 13 || $event.key === 'Enter' || $event.code === 'Enter'){
+      this.doSave(this.product);
       return;
     }
-    console.log('--- DBG doKeypressOnPrice',this.portion);
 
+    if(isNaN(price)){
+      return;
+    }
     this.product.pricing.price = price;
-    this.priceKg = Utils.roundAmount(price * 1000 / this.portion.part);
+
+
+    if(this.portion.isWeight){
+      this.priceKg = Utils.roundAmount(price * 1000 / this.portion.part);
+    }
   }
 
   doUpdatePart(part: any) {

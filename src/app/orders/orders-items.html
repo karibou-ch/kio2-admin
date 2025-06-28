@@ -151,7 +151,6 @@
           <div class="price {{item.fulfillment.status}}" >
             <span class="suffix">fr</span>
             <input type="number" step="0.1" min="0"  class="input-price" tabindex="1"
-                   [disabled]="order.payment.subscription"
                    [(ngModel)]="item.finalprice"
                    (keypress)="doKeypress($event.keyCode,order,item)"
                    (focus)="doSelectAllPrice($event)"/>

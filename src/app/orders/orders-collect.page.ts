@@ -144,6 +144,10 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     });
   }
 
+  deepcopy(order: Order) {
+    const copy = JSON.stringify(order);
+    return new Order(JSON.parse(copy));
+  }
 
   initDate() {
     const currentDate = this.$engine.currentShippingDate;
@@ -320,7 +324,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   //
   // groupd by vendors to prepare collect
   onInitOrders(ctx: OrdersCtx) {
-    this.orders = ctx.orders;
+    this.orders = ctx.orders.map(order => this.deepcopy(order));
     this.shipping = ctx.when;
     this.isReady = true;
     this.vendors = {list: []};

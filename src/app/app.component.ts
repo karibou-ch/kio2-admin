@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 import { Platform,ToastController  } from '@ionic/angular';
-import { LoaderService, User } from 'kng2-core';
+import { LoaderService, User, UserService } from 'kng2-core';
 import { Router } from '@angular/router';
 import { EngineService } from './services/engine.service';
 import { SwUpdate } from '@angular/service-worker';
@@ -29,13 +29,20 @@ export class Kio2Admin {
     private $loader: LoaderService,
     private $router: Router,
     private $update: SwUpdate,
+    private $user: UserService,
     private platform: Platform,
     private $toast: ToastController
   ) {
     this.firstInit = true;
     // let 300ms delay before displaying loading
     this.loadingTimeout = setTimeout(() => this.isLoading = true, 1500);
-    this.storeLoginToken();
+
+    //
+    // digest magic auth
+    this.$user.digestMagicAuth();
+
+    //
+    // initialize app
     this.initializeApp();
     this.$loader.ready().subscribe((ctx)=>{},(status)=> {
       this.NETWORK_APP_ISSUE = true;
@@ -113,20 +120,4 @@ export class Kio2Admin {
     }
   }
 
-  storeLoginToken() {
-    //
-    // check existance on token
-    try{
-      const token = /token=([^&]*)/gm.exec(window.location.href);
-      if(token && token.length>1){
-        window['KB_TOKEN'] = token[1];
-      }
-      const authlink = /authlink=([^&]*)/gm.exec(window.location.href);
-      if(authlink && authlink.length>1){
-        window['KB_authlink'] = authlink[1];
-      }
-
-    }catch(e){}
-
-  }
 }

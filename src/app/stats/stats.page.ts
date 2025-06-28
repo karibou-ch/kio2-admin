@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Config, User, UserService, config } from 'kng2-core';
-import { EngineService } from '../services/engine.service';
+import { CRM, EngineService } from '../services/engine.service';
 import { PopoverController, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerEmail } from '../customer-email/customer-email.page';
@@ -44,24 +44,13 @@ export class StatsPage implements OnInit {
   isAdmin = false;
 
 
-  $crm:{
-    customerOblivious:{users:User[],churn:any[]};
-    customerNew:{users:User[],churn:any[]}  ;
-    customerOccasional:{users:User[],churn:any[]};
-    customerPremium:{users:User[],churn:any[]};
-    customerRecurrent:{users:User[],churn:any[]};
-    customerQuit:{users:User[],churn:any[]};
-    customerChurn:any[];
-    sort:string;
-    selected:string;
-  }
+  $crm:CRM;
 
   constructor(
     private $engine: EngineService,
     private $user: UserService,
     private $popup: PopoverController,
     private $route: ActivatedRoute,
-    private $router: Router,
     private $toast: ToastController,
   ) {
     this.currentDate = this.$engine.currentShippingDate;
@@ -80,7 +69,7 @@ export class StatsPage implements OnInit {
       customerRecurrent:{users:[],churn:[]},
       customerQuit:{users:[],churn:[]},
       customerChurn:[]
-    } as any;
+    } as CRM;
 
     this.toggle.when.setMonth(this.currentDate.getMonth()-1);
     //

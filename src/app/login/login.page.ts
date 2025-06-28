@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { Platform, ToastController, LoadingController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 
@@ -7,11 +7,12 @@ import { LoaderService, User, UserService, ConfigKeyStoreEnum, Config } from 'kn
 import pkg from '../../../package.json';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'kio2-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
+export class LoginPage implements OnInit, AfterViewInit {
 
   VERSION: string;
   siteName: string;
@@ -44,46 +45,20 @@ export class LoginPage implements OnInit {
 
     //
     // check existance on token
-    let defaultEmail;
-    let defaultPassword;
-    if (window['KB_TOKEN']) {
-      // FIXME split char is hardcoded
-      try{
-        const fields = atob(window['KB_TOKEN']).split('::');
-        if (fields.length === 2) {
-          this.model.email = defaultEmail = fields[0];
-          this.model.password = defaultPassword = fields[1];
-        }
-      }catch(e) {}
-    }
-
-    if (window['KB_authlink']) {
-      this.model.password = window['KB_authlink'];
-      console.log('---- DBG authlink', this.model.password);
-    }
+    const magic = this.$user.getMagicAuthToken();
+    this.model.email = magic.email;
+    this.model.password = magic.password;
 
     this.platform.ready().then(() => {
       //
       // reset the auto formfill when token is valid
       setTimeout(()=>{
-        if(defaultEmail && defaultPassword) {
-          this.model.email = defaultEmail;
-          this.model.password = defaultPassword;
+        if(magic.email && magic.password) {
+          this.model.email = magic.email;
+          this.model.password = magic.password;
         }
       },2000);
-      this.storageGet(this.KIO2_LOGIN_REMEMBER).then(remember => {
-        if (!remember) {
-          return;
-        }
-        this.model.email = defaultEmail || remember.mail;
-        this.model.password = defaultPassword || remember.password;
-        if (remember.password && remember.password !== '') {
-          this.keep = true;
-        }
-      }, (error) => {
-        // using ionic serve --livereload & nativestorage doesnt work
-        console.log('-- ERROR get', this.KIO2_LOGIN_REMEMBER, error);
-      });
+
     });
 
 
@@ -101,17 +76,43 @@ export class LoginPage implements OnInit {
     // https://stackoverflow.com/questions/37318472/ionic-2-app-remember-user-on-the-device
   }
 
+  ngAfterViewInit() {
+    const remember =this.storageGet(this.KIO2_LOGIN_REMEMBER)
+    if (remember) {
+      this.model.email = remember.mail;
+      this.model.password = remember.password;
+      if (remember.password && remember.password !== '') {
+        this.keep = true;
+      }
+    }
+
+    //
+    // check existance on token (override localstorage and auto-form-fill)
+    setTimeout(()=>{
+      const magic = this.$user.getMagicAuthToken();
+      this.model.email = magic.email;
+      this.model.password = magic.password;
+
+      if(magic.magic) {
+        this.login();
+      }
+    },250);
+  }
+
   get authLink() {
-    return !!window['KB_authlink'];
+    const magic = this.$user.getMagicAuthToken();
+    return magic.magic;
   }
 
 
   get isValidEmail() {
     const email = this.model.email || '';
-    if(window['KB_authlink']) {
-      return email.length > 1;
+    if(this.authLink) {
+      return true;
     }
-    return /\S+@\S+\.\S+/.test(email || '');
+
+    const $email = /^[^@]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return $email.test(email);
   }
 
   async login() {
@@ -128,11 +129,7 @@ export class LoginPage implements OnInit {
       const remember: any = {};
       remember.mail = this.model.email;
       remember.password = (this.keep) ? this.model.password : '';
-      this.storageSet(this.KIO2_LOGIN_REMEMBER, remember)
-        .catch(error => {
-          console.log('-- LOGIN ERROR storage', this.KIO2_LOGIN_REMEMBER, error);
-          // using ionic serve --livereload & nativestorage doesnt work
-        });
+      this.storageSet(this.KIO2_LOGIN_REMEMBER, remember);
 
 
       if (user.isAuthenticated()) {
@@ -163,25 +160,21 @@ export class LoginPage implements OnInit {
   }
 
   storageGet(key: string): any {
-    return new Promise((resolve, reject) => {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(key));
-        resolve(parsed);
-      } catch (err) {
-        return reject(err);
-      }
-    });
+    try {
+      return JSON.parse(localStorage.getItem(key));
+    } catch (err) {
+      return null;
+    }
+
   }
 
   storageSet(key: string, value: any) {
-    return new Promise((resolve, reject) => {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-        resolve(value);
-      } catch (err) {
-        reject(err);
-      }
-    });
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return value;
+    } catch (err) {
+      return null;
+    }
   }
 
   async showLoading() {

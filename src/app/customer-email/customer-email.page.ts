@@ -1,15 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { User, UserService } from 'kng2-core';
 import { PopoverController, ToastController } from '@ionic/angular';
-import { EngineService } from '../services/engine.service';
+import { CRM } from '../services/engine.service';
 
-type CRM = {
-  customerNew: User[];
-  customerOccasional: User[];
-  customerRecurrent: User[];
-  customerPremium: User[];
-  customerQuit: User[];
-}
 
 type CRMstats = {
   new: number;
@@ -22,12 +15,13 @@ type CRMstats = {
 
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'kio-customer-email',
   templateUrl: './customer-email.page.html',
   styleUrls: ['./customer-email.page.scss'],
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
-export class CustomerEmail  {
+export class CustomerEmail implements OnInit {
 
   @Input() customers: User[];
   @Input() CRM:CRM;
@@ -51,18 +45,18 @@ export class CustomerEmail  {
   get selectedEmailStats(): CRMstats {
     const emails = this.selectedEmail.split(/[,:\n]/).map(email => email.trim());
     const unknown = emails.filter(email => {
-      return !this.CRM.customerNew.some(user => user.email.address === email) &&
-        !this.CRM.customerOccasional.some(user => user.email.address === email) &&
-        !this.CRM.customerRecurrent.some(user => user.email.address === email) &&
-        !this.CRM.customerPremium.some(user => user.email.address === email) &&
-        !this.CRM.customerQuit.some(user => user.email.address === email);
+      return !this.CRM.customerNew.users.some(user => user.email.address === email) &&
+        !this.CRM.customerOccasional.users.some(user => user.email.address === email) &&
+        !this.CRM.customerRecurrent.users.some(user => user.email.address === email) &&
+        !this.CRM.customerPremium.users.some(user => user.email.address === email) &&
+        !this.CRM.customerQuit.users.some(user => user.email.address === email);
     });
     return {
-      new: this.CRM.customerNew.filter(user => emails.indexOf(user.email.address)>-1).length,
-      early: this.CRM.customerOccasional.filter(user => emails.indexOf(user.email.address)>-1).length,
-      recurrent: this.CRM.customerRecurrent.filter(user => emails.indexOf(user.email.address)>-1).length,
-      premium: this.CRM.customerPremium.filter(user => emails.indexOf(user.email.address)>-1).length,
-      quit: this.CRM.customerQuit.filter(user => emails.indexOf(user.email.address)>-1).length,
+      new: this.CRM.customerNew.users.filter(user => emails.indexOf(user.email.address)>-1).length,
+      early: this.CRM.customerOccasional.users.filter(user => emails.indexOf(user.email.address)>-1).length,
+      recurrent: this.CRM.customerRecurrent.users.filter(user => emails.indexOf(user.email.address)>-1).length,
+      premium: this.CRM.customerPremium.users.filter(user => emails.indexOf(user.email.address)>-1).length,
+      quit: this.CRM.customerQuit.users.filter(user => emails.indexOf(user.email.address)>-1).length,
       unknown
     };
   }
@@ -70,6 +64,7 @@ export class CustomerEmail  {
   get customersEmail() {
     return this.selectedEmail
   }
+
 
   set customersEmail(emails) {
     this.selectedEmail = emails;
@@ -83,6 +78,7 @@ export class CustomerEmail  {
     }
 
     this.emailStats = this.selectedEmailStats;
+    this.from = this.from? this.from.replace(/@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/m,'@karibou.ch'):'';
   }
 
   async onStats() {
@@ -128,10 +124,10 @@ export class CustomerEmail  {
         funnel:this.funnel
       }
       await this.$user.crmEmail(content).toPromise();
-    }catch(err){
-      console.log('crmTest ',err);
+    }catch(status:any){
+      console.log('crmTest ',status);
       this.$toast.create({
-        message: err.error||err.message,
+        message: status.error||status.message,
         duration: 3000,
         color: 'danger',
         position: 'middle'

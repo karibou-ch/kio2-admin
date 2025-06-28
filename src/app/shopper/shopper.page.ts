@@ -245,7 +245,7 @@ export class ShopperPage implements OnInit {
     //
     // set default order value based on postalCode
     this.pickerShippingDate = ctx.when;
-    this.orders = ctx.orders.sort(this.sortOrdersByPosition);
+    this.orders = ctx.orders.sort(this.sortOrdersByPosition).map(order => this.deepcopy(order));
     // this.orders.filter(o => o.shipping.priority === 1).forEach(order => {
     //   console.log('---- priority,position',order.rank,order.shipping.priority, order.shipping.position);
     // });
@@ -256,7 +256,11 @@ export class ShopperPage implements OnInit {
     this.orders.forEach(order => {
       if(order.shipping.parent) {
         const parent = this.orders.find(o => o.oid == order.shipping.parent);
-        this.shippingComplement[order.oid] = (parent)? parent.rank : 0;
+        if(!parent) {
+          return;
+        }
+        this.shippingComplement[order.oid] =parent.rank;
+        parent.items.push(...order.items);
       }
     });
 
@@ -550,6 +554,11 @@ export class ShopperPage implements OnInit {
     //
     // FIXME, currently force find-all-orders to reset local shippingShopper[plan]
     // this.$engine.findAllOrders();
+  }
+
+  deepcopy(order: Order) {
+    const copy = JSON.stringify(order);
+    return new Order(JSON.parse(copy));
   }
 
   sortOrdersByCP(o1, o2) {

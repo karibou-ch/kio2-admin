@@ -76,7 +76,7 @@ export class ProductsPage implements OnInit {
 
 
   doCreateProduct() {
-    this.$router.navigateByUrl('/product/create');
+    this.$router.navigate(['/product','create'],{queryParams:{vendor:this.defaultShop}});
   }
 
   doInfinite(infiniteScroll) {
@@ -172,7 +172,7 @@ export class ProductsPage implements OnInit {
 
   onSelectDefaultShop($event) {
     const shop = $event.detail.value;
-    console.log('def ',shop);
+    this.defaultShop = shop;
     this.loadProducts([shop]);
 
   }
