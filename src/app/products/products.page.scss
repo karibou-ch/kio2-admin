@@ -1,13 +1,13 @@
 .error{
   padding: 50px;
   font-size: 30px;
-  color: #aaa;    
+  color: #aaa;
 }
 .boost{
   padding: 10px 20px;
   padding-top: 20px;
   font-size: 20px;
-  color: #aaa;    
+  color: #aaa;
   text-align:center;
 }
 
@@ -30,7 +30,7 @@
 button.action{
   background: transparent;
   align-self: center;
-  color: #069a27;    
+  color: #069a27;
 }
 
 
@@ -46,6 +46,51 @@ button.action{
 
 ion-chip{
   font-size: 12px;
+  flex-shrink: 0; // Empêche les chips de rétrécir
+}
+
+// ============================================================================
+// FILTERS - Scroll horizontal
+// ============================================================================
+
+.filters-container {
+  width: 100%;
+  background: var(--ion-background-color, #fff);
+  border-bottom: 1px solid var(--ion-border-color, #ddd);
+
+  .filters-scroll {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; // Smooth scroll iOS
+
+    // Masquer la scrollbar tout en gardant la fonctionnalité
+    scrollbar-width: thin; // Firefox
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    // Indicateur visuel qu'il y a plus de contenu
+    &::after {
+      content: '';
+      display: block;
+      min-width: 1px;
+    }
+  }
 }
 
 @keyframes rotating {
@@ -60,4 +105,49 @@ ion-chip{
 .rotating {
   -webkit-animation: rotating 2s linear infinite;
   animation: rotating 2s linear infinite;
+}
+
+// ============================================================================
+// MODE SÉLECTION - Styles
+// ============================================================================
+
+ion-item.selected {
+  --background: rgba(var(--ion-color-primary-rgb), 0.1);
+  --border-color: var(--ion-color-primary);
+  border-left: 4px solid var(--ion-color-primary);
+}
+
+ion-footer {
+  ion-toolbar {
+    --min-height: 60px;
+
+    ion-button {
+      font-size: 12px;
+      margin: 4px;
+
+      ion-icon {
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+// Animation pour le mode sélection
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-toolbar[color="secondary"] {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+ion-footer {
+  animation: fadeIn 0.3s ease-in-out;
 }

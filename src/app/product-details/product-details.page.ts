@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, of } from 'rxjs';
 
 @Component({
-  selector: 'app-product-details',
+  selector: 'kio-product-details',
   templateUrl: './product-details.page.html',
   styleUrls: ['./product-details.page.scss'],
 })
@@ -53,12 +53,11 @@ export class ProductDetailsPage implements OnInit {
     private $router: Router
   ) {
 
-    const loader = this.$route.snapshot.data['loader'];
-    this.categories = loader[2];
-
-    this.user = this.$engine.currentUser;
-    this.config = this.$engine.currentConfig;
-    this.recipes = this.$engine.currentConfig.shared.recipes || [];
+    const { config, user, categories } = this.$loader.getLatestCoreData();
+    this.categories = categories;
+    this.user = user;
+    this.config = config;
+    this.recipes = config?.shared?.recipes || [];
 
     this.shops = this.user.shops || [];
     this.sku = this.$route.snapshot.params['sku'];
@@ -115,8 +114,10 @@ export class ProductDetailsPage implements OnInit {
 
     const product$ = (this.create) ? of(this.product) : this.$product.get(this.sku);
     const shops$ = (!this.user.isAdmin())? of(this.shops) : this.$shops.query({status:true});
+
+    // ✅ MIGRATION: ready() → readyWithStore()
     combineLatest([
-      this.$loader.ready(),
+      this.$loader.readyWithStore(),
       product$,
       orders$,
       shops$
@@ -127,11 +128,12 @@ export class ProductDetailsPage implements OnInit {
       this.productInOrders = orders || [];
       //
       // only interrested by active category
-      this.categories = (loader[2] || []).filter(c => c.type === 'Category' && c.active);
+      const { categories } = this.$loader.getLatestCoreData();
+      this.categories = (categories || []).filter(c => c.type === 'Category' && c.active);
       //
       // admin can move a product to all shops
       if (this.user.isAdmin()) {
-        this.shops = (loader[3] || []).sort((s1, s2) => s1.urlpath.localeCompare(s2.urlpath));
+        this.shops = (shops || []).sort((s1, s2) => s1.urlpath.localeCompare(s2.urlpath));
       }
 
       this.TVAs = this.config.shared.TVA;

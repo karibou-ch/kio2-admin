@@ -24,19 +24,11 @@
 </ion-header>
 
 <ion-content >
-  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover"
+               (didDismiss)="onCalendarDismiss($event)">
     <ng-template>
-      <ion-datetime
-        presentation="date"
-        locale="fr-FR"
-        [highlightedDates]="highlightedOrders"
-        [(ngModel)]="pickerShippingString"
-        (ngModelChange)="onDatePicker(popover)"
-        cancelText="Annuler"
-        doneText="Fait"
-        firstDayOfWeek="1"
-        max="2030">
-      </ion-datetime>
+      <!-- ✅ MIGRATION: Utiliser CalendarPage au lieu de ion-datetime -->
+      <kio-calendar [orders]="$engine.availableOrders"></kio-calendar>
     </ng-template>
   </ion-popover>
 
@@ -150,7 +142,6 @@
             <ion-select-option value="0">0.0 fr</ion-select-option>
             <ion-select-option value="4">4.0 fr</ion-select-option>
             <ion-select-option value="5">5.0 fr</ion-select-option>
-            <ion-select-option value="5.5">5.5 fr</ion-select-option>
             <ion-select-option value="7.5">7.5 fr</ion-select-option>
             <ion-select-option value="9">9.0 fr</ion-select-option>
             <ion-select-option value="10">10.0 fr</ion-select-option>
@@ -158,7 +149,8 @@
             <ion-select-option value="14.90">14.9 fr</ion-select-option>
             <ion-select-option value="16.90">16.9 fr</ion-select-option>
             <ion-select-option value="19.90">19.9 fr</ion-select-option>
-            <ion-select-option value="19.90">25 fr</ion-select-option>
+            <ion-select-option value="25.00">25 fr</ion-select-option>
+            <ion-select-option value="30.00">30 fr</ion-select-option>
           </ion-select>
         </ion-item-option>
         <ion-item-option>

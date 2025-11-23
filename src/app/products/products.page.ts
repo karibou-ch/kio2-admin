@@ -1,11 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { Product, Config, User, ProductService, ShopService, Shop } from 'kng2-core';
 import { EngineService, OrdersCtx } from '../services/engine.service';
-import { ToastController } from '@ionic/angular';
+import { ToastController, AlertController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 
+export interface ProductsFilterOptions {
+  forceShops?: string[];
+  lastMinute?: boolean;
+  subscription?: boolean;
+  discount?: boolean;
+  boost?: boolean;
+  business?: boolean;
+  lowstock?: boolean;
+}
+
+export interface SelectionMode {
+  enabled: boolean;
+  selectedProducts: Set<number>; // SKUs des produits sélectionnés
+}
+
+
 @Component({
-  selector: 'app-products',
+  selector: 'kio-products',
   templateUrl: './products.page.html',
   styleUrls: ['./products.page.scss'],
 })
@@ -21,10 +37,7 @@ export class ProductsPage implements OnInit {
   skus: string[];
   products: Product[];
   cache: {
-    discount: boolean;
-    subscription: boolean;
     active: boolean;
-    boost: boolean;
     search: string;
     products: Product[];
     step: number;
@@ -32,18 +45,23 @@ export class ProductsPage implements OnInit {
     sortByStock: boolean;
   };
 
+  filters: ProductsFilterOptions = {
+  };
+
+  selectionMode: SelectionMode = {
+    enabled: false,
+    selectedProducts: new Set<number>()
+  };
 
   constructor(
     private $router: Router,
     private $engine: EngineService,
     private $product: ProductService,
     private toast: ToastController,
+    private alert: AlertController
   ) {
     this.cache = {
-      discount: false,
-      subscription:false,
       active: true,
-      boost: false,
       search: '',
       products: [],
       step: 50,
@@ -73,6 +91,10 @@ export class ProductsPage implements OnInit {
     return this.$engine.shops;
   }
 
+
+  get userShops(): string[]{
+    return this.user?.shops?.map(shop => shop.urlpath) || [];
+  }
 
 
   doCreateProduct() {
@@ -113,7 +135,8 @@ export class ProductsPage implements OnInit {
 
   }
 
-  loadProducts(forceShops?) {
+  loadProducts(options: ProductsFilterOptions) {
+    const { forceShops, lastMinute, subscription, discount, lowstock } = options;
     this.isReady = false;
 
 
@@ -135,15 +158,36 @@ export class ProductsPage implements OnInit {
       params.shopname = forceShops;
       params.skus = [];
     }
-    else if (this.user.isAdmin() || this.user.hasRole('manager') || this.user.hasRole('logistic')){
+    else if (this.isManagerOrLogistic){
       params.skus = this.skus.slice();
       params.shopname = [];
+    }else{
+      params.shopname = this.userShops;
     }
 
     //
+    // create filter string for attributes
+    params.attributes = [
+      'lastMinute',
+      'discount',
+      'subscription'
+    ].filter(att => !!options[att]).join(',');
+
+    if(options.lowstock){
+      params.lowstock = true;
+    }
+
+    if(params.attributes?.length>1 || params.lowstock){
+      params.skus = [];
+      params.shopname = [];
+    }
+
+    console.log(params);
+
+    //
     // get select products for vendor
-    if (this.user.shops.length) {
-      params.shopname = this.user.shops.map(shop => shop.urlpath);
+    if (this.userShops.length) {
+      params.shopname = this.userShops;
     }
 
     //
@@ -154,7 +198,8 @@ export class ProductsPage implements OnInit {
         //
         // FIXME remove filter, server should clean orphan products!
         this.isReady = true;
-        this.cache.products = products.filter(p => p.vendor).sort(this.sortByVendorAndStock);
+        const sort = this.filters.lowstock ? this.sortByStock : this.sortByVendorAndStock;
+        this.cache.products = products.filter(p => p.vendor).sort(sort);
         this.products = this.sliceProducts();
       }
     );
@@ -167,16 +212,29 @@ export class ProductsPage implements OnInit {
                            .reduce((flatten, array) => flatten.concat(array), []);
     this.skus = [...new Set(skus)] as string[];
 
-    this.loadProducts();
+    this.loadProducts({});
   }
 
+
+  //
+  // this value exclude user filters
   onSelectDefaultShop($event) {
     const shop = $event.detail.value;
     this.defaultShop = shop;
-    this.loadProducts([shop]);
+    this.loadProducts({ forceShops: [shop] });
 
   }
 
+  //
+  // filters are based on all shops (except for non admin users)
+  onProductFilterChange(filter: string) {
+    if(this.filters[filter]){
+      delete this.filters[filter];
+    }else{
+      this.filters[filter] = true;
+    }
+    this.loadProducts(this.filters);
+  }
   onDone(msg) {
     this.toast.create({
       message: msg,
@@ -230,26 +288,9 @@ export class ProductsPage implements OnInit {
   // infiniteScroll OR filter options change
   sliceProducts(len?) {
     const search = this.cache.search.toLocaleLowerCase();
-
     this.products = this.cache.products
-      .filter((product, i) => {
-        return !this.cache.boost || product.attributes.discount || product.attributes.home;
-      })
       .filter((product) => {
-        if(!this.cache.discount){
-          return true;
-        }
-        return product.attributes.discount;
-      })
-      .filter((product) => {
-        if(!this.cache.subscription){
-          return true;
-        }
-        return product.attributes.subscription;
-      })
-
-      .filter((product) => {
-        return this.cache.active === product.attributes.available;
+        return this.cache.active == product.attributes.available;
       })
       .filter(product => {
         if (search == '') {
@@ -279,6 +320,11 @@ export class ProductsPage implements OnInit {
     }
   }
 
+  sortByStock(p1: Product, p2: Product) {
+    // order by stock
+    return p1.pricing.stock - p2.pricing.stock;
+  }
+
 
   sortByVendorAndStock(p1: Product, p2: Product) {
     const v1 = p1.vendor?.urlpath || p1.vendor;
@@ -301,6 +347,281 @@ export class ProductsPage implements OnInit {
         this.onDone(error.error);
       }
     );
+  }
+
+  // ============================================================================
+  // MODE SÉLECTION MULTIPLE - Méthodes
+  // ============================================================================
+
+  /**
+   * Active/désactive le mode sélection
+   */
+  toggleSelectionMode() {
+    this.selectionMode.enabled = !this.selectionMode.enabled;
+    if (!this.selectionMode.enabled) {
+      // Réinitialiser les sélections quand on quitte le mode
+      this.deselectAll();
+    }
+  }
+
+  /**
+   * Vérifie si un produit est sélectionné
+   */
+  isSelected(product: Product): boolean {
+    return this.selectionMode.selectedProducts.has(product.sku);
+  }
+
+  /**
+   * Toggle la sélection d'un produit
+   */
+  toggleSelection(product: Product) {
+    console.log('--- toggleSelection',product);
+    if (this.isSelected(product)) {
+      this.selectionMode.selectedProducts.delete(product.sku);
+    } else {
+      this.selectionMode.selectedProducts.add(product.sku);
+    }
+  }
+
+  /**
+   * Retourne le nombre de produits sélectionnés
+   */
+  getSelectedCount(): number {
+    return this.selectionMode.selectedProducts.size;
+  }
+
+  /**
+   * Sélectionne tous les produits visibles
+   */
+  selectAll() {
+    this.filteredProducts().forEach(product => {
+      this.selectionMode.selectedProducts.add(product.sku);
+    });
+  }
+
+  /**
+   * Désélectionne tous les produits
+   */
+  deselectAll() {
+    this.selectionMode.selectedProducts.clear();
+  }
+
+  /**
+   * Vérifie si tous les produits visibles sont sélectionnés
+   */
+  isAllSelected(): boolean {
+    const filtered = this.filteredProducts();
+    if (filtered.length === 0) return false;
+    return filtered.every(product => this.isSelected(product));
+  }
+
+  /**
+   * Récupère les produits sélectionnés
+   */
+  getSelectedProducts(): Product[] {
+    return this.products.filter(product => this.isSelected(product));
+  }
+
+  // ============================================================================
+  // ACTIONS GROUPÉES
+  // ============================================================================
+
+  /**
+   * Active tous les produits sélectionnés
+   */
+  async bulkActivate() {
+    const selected = this.getSelectedProducts();
+    if (selected.length === 0) return;
+
+    const alert = await this.alert.create({
+      header: 'Activer les produits',
+      message: `Voulez-vous activer ${selected.length} produit(s) ?`,
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel'
+        },
+        {
+          text: 'Activer',
+          handler: () => {
+            this.performBulkAction(selected, 'activate');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Désactive tous les produits sélectionnés
+   */
+  async bulkDeactivate() {
+    const selected = this.getSelectedProducts();
+    if (selected.length === 0) return;
+
+    const alert = await this.alert.create({
+      header: 'Désactiver les produits',
+      message: `Voulez-vous désactiver ${selected.length} produit(s) ?`,
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel'
+        },
+        {
+          text: 'Désactiver',
+          handler: () => {
+            this.performBulkAction(selected, 'deactivate');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Modifie le stock de tous les produits sélectionnés
+   */
+  async bulkUpdateStock() {
+    const selected = this.getSelectedProducts();
+    if (selected.length === 0) return;
+
+    const alert = await this.alert.create({
+      header: 'Modifier le stock',
+      message: `Définir le stock pour ${selected.length} produit(s)`,
+      inputs: [
+        {
+          name: 'stock',
+          type: 'number',
+          placeholder: 'Quantité',
+          min: 0,
+          value: 100
+        }
+      ],
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel'
+        },
+        {
+          text: 'Modifier',
+          handler: (data) => {
+            const stockValue = parseInt(data.stock, 10);
+            if (!isNaN(stockValue) && stockValue >= 0) {
+              this.performBulkAction(selected, 'stock', stockValue);
+            } else {
+              this.onDone('Valeur de stock invalide');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Toggle l'attribut Last Minute de tous les produits sélectionnés
+   */
+  async bulkLastMinute() {
+    const selected = this.getSelectedProducts();
+    if (selected.length === 0) return;
+
+    const alert = await this.alert.create({
+      header: 'Last Minute',
+      message: `Basculer l'attribut Last Minute pour ${selected.length} produit(s) ?`,
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel'
+        },
+        {
+          text: 'Toggle',
+          handler: () => {
+            this.performBulkAction(selected, 'lastminute');
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Exécute une action groupée sur les produits
+   * Avec délai de 100ms entre chaque requête pour éviter la surcharge serveur
+   */
+  private performBulkAction(products: Product[], action: 'activate' | 'deactivate' | 'stock' | 'lastminute', value?: number) {
+    let successCount = 0;
+    let errorCount = 0;
+    const total = products.length;
+
+    // Fonction récursive pour traiter les produits séquentiellement
+    const processNext = (index: number) => {
+      if (index >= products.length) {
+        // Tous les produits ont été traités
+        this.onBulkActionComplete(successCount, errorCount, total, action);
+        return;
+      }
+
+      const product = products[index];
+
+      // Appliquer l'action
+      switch (action) {
+        case 'activate':
+          product.attributes.available = true;
+          break;
+        case 'deactivate':
+          product.attributes.available = false;
+          break;
+        case 'stock':
+          if (value !== undefined) {
+            product.pricing.stock = 100;
+          }
+          break;
+        case 'lastminute':
+          product.attributes.lastMinute = !product.attributes.lastMinute;
+          break;
+      }
+
+      // Sauvegarder le produit
+      this.$product.save(product).subscribe(
+        () => {
+          successCount++;
+          // Attendre 100ms avant le prochain
+          setTimeout(() => processNext(index + 1), 100);
+        },
+        (error) => {
+          errorCount++;
+          // Attendre 100ms avant le prochain même en cas d'erreur
+          setTimeout(() => processNext(index + 1), 100);
+        }
+      );
+    };
+
+    // Démarrer le traitement
+    processNext(0);
+  }
+
+  /**
+   * Affiche le résultat d'une action groupée
+   */
+  private onBulkActionComplete(success: number, errors: number, total: number, action: string) {
+    const actionLabel = action === 'activate' ? 'activés' :
+                       action === 'deactivate' ? 'désactivés' :
+                       action === 'lastminute' ? 'modifiés (Last Minute)' : 'modifiés';
+
+    let message = `${success}/${total} produits ${actionLabel}`;
+    if (errors > 0) {
+      message += ` (${errors} erreur(s))`;
+    }
+
+    this.onDone(message);
+
+    // Réinitialiser la sélection
+    this.deselectAll();
+    this.toggleSelectionMode();
   }
 
 }

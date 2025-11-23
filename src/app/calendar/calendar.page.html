@@ -1,33 +1,53 @@
 
 <ion-content>
-  <ion-toolbar hidden>
-    <ion-chip slot="start" (click)="onBackMonth()" fill="outline" color="primary" >
+  <!-- ✅ Navigation mois (en haut) -->
+  <ion-toolbar>
+    <ion-chip slot="start" (click)="onBackMonth()" fill="outline" color="primary">
       <ion-icon name="arrow-back-outline"></ion-icon>
       <ion-label class="text-capitalize">{{backMonth()}}</ion-label>
     </ion-chip>
-    <!-- <span class="text-capitalize">&nbsp; {{month()}}</span> -->
+    <ion-title class="text-capitalize">{{month()}} {{currentYear}}</ion-title>
     <ion-chip slot="end" (click)="onForwardMonth()" fill="outline" color="primary">
       <ion-icon name="arrow-forward-outline"></ion-icon>
       <ion-label class="text-capitalize">{{forwardMonth()}}</ion-label>
     </ion-chip>
   </ion-toolbar>
+
+  <!-- ✅ NOUVEAU : Calendrier mensuel complet -->
+  <div class="calendar-month">
+    <!-- En-tête des jours de la semaine -->
+    <div class="calendar-header">
+      <div class="weekday-header" *ngFor="let weekday of weekdays">
+        {{weekday}}
+      </div>
+    </div>
+
+    <!-- Corps du calendrier : une ligne par semaine -->
+    <div class="calendar-week" *ngFor="let week of monthCalendar">
+      <div
+        *ngFor="let day of week"
+        class="day"
+        [ngClass]="getDayClasses(day)"
+        (click)="day && !isLoading && onSelectDay(day)">
+
+        <div *ngIf="day" class="day-content">
+          <div class="dd">{{ day | date:'d' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Overlay loading subtil -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
+  </div>
+
+  <!-- ✅ Segment Préparations/Archivées (en BAS après le calendrier) -->
   <ion-toolbar>
-    <ion-segment value="all" (ionChange)="onStatusChanged($event)" [value]="segmentValue" color="primary">
+    <ion-segment value="all" (ionChange)="onStatusChanged($event)" [value]="segmentValue" [disabled]="isLoading" color="primary">
       <ion-segment-button value="current">Préparations</ion-segment-button>
       <ion-segment-button value="archive">Archivées</ion-segment-button>
     </ion-segment>
   </ion-toolbar>
-
-  <div class="calendar">
-    <div *ngFor="let shipping of availableDates;let i = index" 
-      class="day"
-      [class.selected]="shipping.getTime()===currentShipping.getTime()"  
-      (click)="onSelectDay(shipping)">    
-      <div class="wd">{{ shipping | date:'EEEE' }}</div>
-      <div class="dd">{{ shipping | date:'d' }}</div>
-      <div class="month">{{ shipping | date:'MMMM' }}</div>
-    </div>    
-  </div>
-  
 
 </ion-content>

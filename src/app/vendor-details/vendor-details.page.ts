@@ -1,5 +1,5 @@
 import { Component, OnInit, OnChanges } from '@angular/core';
-import { User, Shop, Category, ShopService, Config } from 'kng2-core';
+import { User, Shop, Category, ShopService, Config, LoaderService } from 'kng2-core';
 import { ToastController, ModalController, AlertController } from '@ionic/angular';
 import { UploadImagePage } from '../upload-image/upload-image.page';
 import { EngineService } from '../services/engine.service';
@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { KngUtils } from '../services/kng-utils';
 
 @Component({
-  selector: 'app-vendor-details',
+  selector: 'kio-vendor-details',
   templateUrl: './vendor-details.page.html',
   styleUrls: ['./vendor-details.page.scss'],
 })
@@ -27,22 +27,21 @@ export class VendorDetailsPage implements OnChanges {
   locations: any[];
 
   constructor(
-    private $engine: EngineService,
     private $modal: ModalController,
     private $route: ActivatedRoute,
     private $router: Router,
     private $shop: ShopService,
     private $toast: ToastController,
-    private $util: KngUtils
+    private $util: KngUtils,
+    private $loader: LoaderService
+
   ) {
-    //
-    // loader[0] = User,
-    // loader[1] = Config
-    // loader[2] = Category[]
-    // loader[3] = Shop[]
-    const loader = this.$route.snapshot.data['loader'];
     const urlpath = this.$route.snapshot.params['shop'];
-    this.config = this.$engine.currentConfig;
+    const { config, user, categories } = this.$loader.getLatestCoreData();
+    this.user = user;
+    this.config = config;
+    this.categories = categories;
+
     this.shop = new Shop();
 
     //
@@ -68,9 +67,6 @@ export class VendorDetailsPage implements OnChanges {
 
     });
 
-
-    this.user = this.$engine.currentUser;
-    this.categories = loader[2];
     this.isCreate = (urlpath === 'create');
     if (this.isCreate) {
       this.initShop();

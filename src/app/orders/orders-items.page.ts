@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { CustomerMessage } from '../customer-message/customer-message.page';
 
 @Component({
-  selector: 'kio2-orders-items',
+  selector: 'kio-orders-items',
   templateUrl: 'orders-items.html',
   styleUrls: ['./orders-items.scss'],
 })
@@ -480,7 +480,8 @@ export class OrdersItemsPage implements OnInit {
   }
 
   getOrderRank(order: Order) {
-    const prefix = this.hubs[order.hub].prefix;
+    // FIXME, this is a hack to get the prefix of the hub
+    const prefix = this.hubs[order.hub]?.prefix || '';
     return prefix + order.rank;
   }
 
@@ -561,7 +562,7 @@ export class OrdersItemsPage implements OnInit {
 
 
 @Component({
-  selector: 'kio2-orders-by-items',
+  selector: 'kio-orders-by-items',
   templateUrl: 'orders-by-items.html',
   styleUrls: ['./orders-items.scss']
 })

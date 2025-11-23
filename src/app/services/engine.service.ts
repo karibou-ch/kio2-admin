@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User, Order, OrderService, Product, Config, ShopService, Shop } from 'kng2-core';
+import { User, Order, OrderService, Product, Config, ShopService, Shop, CalendarService } from 'kng2-core';
 import { ReplaySubject, from } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
@@ -68,7 +68,8 @@ export class EngineService {
   constructor(
     private $order: OrderService,
     private $route: ActivatedRoute,
-    private $shop: ShopService
+    private $shop: ShopService,
+    private $calendar: CalendarService
     ) {
 
     //
@@ -83,7 +84,22 @@ export class EngineService {
     this._shops = [];
   }
 
+  /**
+   * ✅ MIGRATION: Initialiser date avec CalendarService
+   * Délègue vers Calendar API au lieu de logique custom
+   */
   initDate() {
+    const hub = this.config?.shared?.hub;
+    if (hub) {
+      // ✅ Utiliser Calendar API pour obtenir le prochain jour de livraison
+      const nextDay = this.$calendar.nextShippingDay(hub);
+      if (nextDay) {
+        this.currentShippingDate = nextDay;
+        return;
+      }
+    }
+
+    // ✅ Fallback si pas de config chargé (garde compatibilité)
     const today = new Date();
     this.currentShippingDate = today.dayToDates([1, 2, 3, 4, 5, 6])[0];
   }
@@ -94,17 +110,63 @@ export class EngineService {
   get availableDates() {
     return this.shippingWeekOrders.map(order => order.shipping.when);
   }
+
+  /**
+   * @deprecated Utiliser `LoaderService.getLatestCoreData().config` à la place
+   * Cette propriété sera supprimée dans une version future.
+   *
+   * @example
+   * // ❌ ANCIEN (deprecated)
+   * const config = this.$engine.currentConfig;
+   *
+   * // ✅ NOUVEAU (recommandé)
+   * const { config } = this.$loader.getLatestCoreData();
+   */
   set currentConfig(config: Config) {
     this.config = config;
   }
+
+  /**
+   * @deprecated Utiliser `LoaderService.getLatestCoreData().config` à la place
+   * Cette propriété sera supprimée dans une version future.
+   *
+   * @example
+   * // ❌ ANCIEN (deprecated)
+   * const config = this.$engine.currentConfig;
+   *
+   * // ✅ NOUVEAU (recommandé)
+   * const { config } = this.$loader.getLatestCoreData();
+   */
   get currentConfig() {
     return this.config;
   }
 
-
+  /**
+   * @deprecated Utiliser `LoaderService.getLatestCoreData().user` à la place
+   * Cette propriété sera supprimée dans une version future.
+   *
+   * @example
+   * // ❌ ANCIEN (deprecated)
+   * const user = this.$engine.currentUser;
+   *
+   * // ✅ NOUVEAU (recommandé)
+   * const { user } = this.$loader.getLatestCoreData();
+   */
   set currentUser(user: User) {
     this.user = user;
   }
+
+  /**
+   * @deprecated Utiliser `LoaderService.getLatestCoreData().user` à la place
+   * Cette propriété sera supprimée dans une version future.
+   *
+   * @example
+   * // ❌ ANCIEN (deprecated)
+   * const user = this.$engine.currentUser;
+   *
+   * // ✅ NOUVEAU (recommandé)
+   * const { user } = this.$loader.getLatestCoreData();
+   */
   get currentUser() {
     return this.user;
   }
@@ -131,6 +193,28 @@ export class EngineService {
 
   get shops() {
     return this._shops;
+  }
+
+  /**
+   * ✅ NOUVELLE MÉTHODE: Obtenir dates disponibles via CalendarService
+   * Utile pour les composants qui affichent un calendrier
+   *
+   * @param hub Hub optionnel (utilise config par défaut si non fourni)
+   * @param days Nombre de jours à chercher (défaut: 30)
+   * @returns Array de dates de livraison disponibles
+   */
+  getAvailableShippingDates(hub?: any, days: number = 30): Date[] {
+    const targetHub = hub || this.config?.shared?.hub;
+    if (!targetHub) {
+      return [];
+    }
+
+    return this.$calendar.getValidShippingDatesForHub(targetHub, {
+      days: days,
+      currentRanks: this.config?.shared?.currentRanks,
+      config: this.config,
+      user: this.user
+    });
   }
 
   dateToString(date) {

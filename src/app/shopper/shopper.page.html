@@ -7,23 +7,16 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+  <ion-popover #popover side="bottom" alignment="start" reference="trigger" trigger="click-open-datetime"
+                triggerAction="click" class="datetime-popover"
+               (didDismiss)="onCalendarDismiss($event)">
     <ng-template>
-      <ion-datetime
-        presentation="date"
-        locale="fr-FR"
-        [highlightedDates]="highlightedOrders"
-        [(ngModel)]="pickerShippingString"
-        (ngModelChange)="onDatePicker(popover)"
-        cancelText="Annuler"
-        doneText="Fait"
-        firstDayOfWeek="1"
-        max="2030">
-      </ion-datetime>
+      <!-- ✅ MIGRATION: Utiliser CalendarPage au lieu de ion-datetime -->
+      <kio-calendar [orders]="$engine.availableOrders"></kio-calendar>
     </ng-template>
   </ion-popover>
 
-  <ion-refresher slot="fixed" [disabled]="false" (ionRefresh)="doRefresh($event)">
+  <ion-refresher slot="fixed" [disabled]="!isReady" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
@@ -113,9 +106,9 @@
 
     <!-- HUBS -->
     <ion-item class="hub" lines="none" [hidden]="!hubs.length || !orders.length">
-      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
+      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)" [hidden]="!hub.orders">
         <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
-        <ion-label color="primary">{{hub.name[0]}} ({{hub.orders}})</ion-label>
+        <ion-label color="primary">{{hub.name.substring(0,9)}}... ({{hub.orders}})</ion-label>
       </ion-chip>
     </ion-item>
 

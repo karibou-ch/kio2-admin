@@ -8,20 +8,12 @@
 </ion-header>
 
 <ion-content >
-  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover">
+  <ion-popover #popover trigger="click-open-datetime" triggerAction="click" class="datetime-popover"
+               (didDismiss)="onCalendarDismiss($event)">
     <ng-template>
-      <ion-datetime 
-        presentation="date"
-        locale="fr-FR"
-        [highlightedDates]="highlightedOrders"
-        [(ngModel)]="pickerShippingString" 
-        (ngModelChange)="onDatePicker(popover)" 
-        cancelText="Annuler" 
-        doneText="Fait" 
-        firstDayOfWeek="1"
-        max="2030">
-      </ion-datetime>
-    </ng-template>    
+      <!-- ✅ MIGRATION: Utiliser CalendarPage au lieu de ion-datetime -->
+      <kio-calendar [orders]="$engine.availableOrders"></kio-calendar>
+    </ng-template>
   </ion-popover>
 
   <div class="loader" [hidden]="isReady">
@@ -45,28 +37,28 @@
         [hidden]="!(vendors.list.length)"
         (ionInput)="onSearchInput($event)"
         (ionClear)="onSearchCancel($event)">
-      </ion-searchbar>  
+      </ion-searchbar>
       <ion-chip (click)="toggleCollect($event)" slot="end" [hidden]="!orders.length" tabIndex="-1">
         <!-- radio-button-off-outline || checkmark-circle-outline -->
         <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!toCollect"></ion-icon>
         <ion-label color="primary">A Collecter</ion-label>
-      </ion-chip>    
+      </ion-chip>
     </ion-item>
     <ion-item class="hub" lines="none" [hidden]="!hubs.length || !orders.length">
-      <ion-chip class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
+      <ion-chip [hidden]="!hub.orders" class="hub" slot="start"  *ngFor="let hub of hubs" (click)="setCurrentHub(hub)">
         <ion-icon color="primary" name="checkmark-circle-outline" [hidden]="!hub.selected"></ion-icon>
         <ion-label color="primary">{{hub.name}} ({{hub.orders}})</ion-label>
       </ion-chip>
     </ion-item>
-  
+
     <ion-item-sliding *ngFor="let vendor of getVendors()"
-                      [hidden]="toCollect && isCollected(vendor) || !isActiveHub(vendor)">    
+                      [hidden]="toCollect && isCollected(vendor) || !isActiveHub(vendor)">
       <ion-item-options side="end">
         <ion-item-option>
         <ion-button color="danger" (click)="openPhone(vendor)">
           <ion-icon name="call-outline"></ion-icon>
           Appeler
-        </ion-button>        
+        </ion-button>
       </ion-item-option>
       </ion-item-options>
       <ion-item >
@@ -81,8 +73,8 @@
         </div>
 
         <ion-note slot="end">
-          <span [class.red]="isFulfilled(vendor)">{{getFulfilled(vendor)}}</span><b>/</b>{{vendors[vendor].items.length}} 
-        </ion-note>        
+          <span [class.red]="isFulfilled(vendor)">{{getFulfilled(vendor)}}</span><b>/</b>{{vendors[vendor].items.length}}
+        </ion-note>
       </ion-item>
     </ion-item-sliding>
   </ion-list>

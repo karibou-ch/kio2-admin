@@ -1,7 +1,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
-import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason } from 'kng2-core';
+import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason, CalendarService } from 'kng2-core';
 import { ToastController, PopoverController, ModalController, LoadingController } from '@ionic/angular';
 import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -83,7 +83,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     public $route: ActivatedRoute,
     public $router: Router,
     public $order: OrderService,
-    public $cdr: ChangeDetectorRef
+    public $cdr: ChangeDetectorRef,
+    private $calendar: CalendarService
   ) {
     this.orders = [];
     this.cache = {};
@@ -208,19 +209,22 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
   emailVendors() {
     // inform all shops: 'shops'||false
-    // FIXME sent ISO date get wrong on server
-    const UTC = new Date(this.shipping);
-    UTC.setHours(8);
+    // ✅ MIGRATION: Utiliser timezone Hub au lieu de hardcoded UTC
+    const hub = this.$engine.currentConfig.shared.hub;
+    const shippingHub = this.$calendar.toHubTime(this.shipping, hub);
+
+    // Heure d'envoi des emails (8h timezone Hub)
+    shippingHub.setHours(8, 0, 0, 0);
+
     const loading = this.$loading.create({
       cssClass: '',
       message: 'Please wait...',
       duration: 2000
     }).then(load => load.present());
 
-
-    this.$order.informShopToOrders('shops', UTC).subscribe(
+    this.$order.informShopToOrders('shops', shippingHub).subscribe(
       (result) => {
-        this.$loading.dismiss();
+        this.$loading?.dismiss();
         this.onDone('Mail envoyé à '+ Object.keys(result).length +' destinataire(s)');
       }, err => this.onDone(err.error)
     );
@@ -280,12 +284,17 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     return prefix + order.rank;
   }
 
+  /**
+   * ✅ MIGRATION: Déléguer initDate vers EngineService migré
+   * Plus besoin de logique custom, EngineService utilise CalendarService
+   */
   initDate() {
     const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
+
     //
-    // if no date is specified, then make sure that
+    // if no date is specified, then make sure that EngineService initializes
     if (isNaN(queryWhen.getTime())) {
-      this.$engine.initDate();
+      this.$engine.initDate(); // ✅ Utilise CalendarService maintenant
     }
 
     const currentDate = this.$engine.currentShippingDate;
@@ -294,12 +303,11 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
     currentDate.setFullYear(year);
     currentDate.setMonth(month - 1);
-    //
-    // constraint Date engine with month/year
+
+    // Constraint Date engine with month/year
     this.$engine.currentShippingDate = currentDate;
 
-    //
-    // use full Date for Display
+    // Use full Date for Display
     this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
   }
 
@@ -519,10 +527,33 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
 
-  //
-  // on selected date
-  onDatePicker(popover) {
-    const date = this.$engine.currentShippingDate = this.pickerShippingDate;
+  /**
+   * ✅ MIGRATION: Callback depuis CalendarPage via (didDismiss)
+   * Reçoit [Date, boolean] depuis CalendarPage.onSelectDay() ou onClose()
+   */
+  onCalendarDismiss(event: any) {
+    // CalendarPage retourne [Date, boolean] via dismiss
+    if (!event || !event.detail || !event.detail.data) {
+      return;
+    }
+
+    const [selectedDate, isOpen] = event.detail.data;
+    if (!selectedDate) {
+      return;
+    }
+
+    // Mettre à jour pickerShippingDate pour l'affichage
+    this.pickerShippingDate = selectedDate;
+
+    // Appeler la logique existante
+    this.onDatePickerFromCalendar(selectedDate);
+  }
+
+  /**
+   * ✅ MIGRATION: Logique date picker adaptée pour CalendarPage
+   */
+  onDatePickerFromCalendar(selectedDate: Date) {
+    const date = this.$engine.currentShippingDate = selectedDate;
     const orders = this.$engine.getOrdersByDay(date);
     const today = new Date();
     const thisWeek = today.plusDays(- today.getDay());
@@ -543,13 +574,9 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
         orders: (orders),
         when: (date)
       } as OrdersCtx);
-
     }
 
-
-    popover.dismiss();
-    //
-    // update route
+    // Update route
     this.$router.navigate([], {queryParams: { when: (date.getTime()) }});
   }
 
@@ -666,7 +693,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 }
 
 @Component({
-  selector: 'kio2-orders-planning',
+  selector: 'kio-orders-planning',
   templateUrl: 'orders-planning.html',
   styleUrls: ['./orders.page.scss']
 })

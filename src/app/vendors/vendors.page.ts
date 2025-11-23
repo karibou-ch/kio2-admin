@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Config, User, Shop, ShopService } from 'kng2-core';
+import { Config, User, Shop, ShopService, LoaderService } from 'kng2-core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EngineService } from '../services/engine.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-vendors',
+  selector: 'kio-vendors',
   templateUrl: './vendors.page.html',
   styleUrls: ['./vendors.page.scss'],
 })
@@ -31,11 +31,11 @@ export class VendorsPage implements OnInit {
 
 
   constructor(
-    private $route: ActivatedRoute,
     private $router: Router,
-    private $engine: EngineService,
     private $shop: ShopService,
     private toast: ToastController,
+    private $loader: LoaderService
+
   ) {
     this.cache = {
       discount: false,
@@ -51,12 +51,12 @@ export class VendorsPage implements OnInit {
   }
 
   ngOnInit() {
-    this.user = this.$engine.currentUser;
-    this.config = this.$engine.currentConfig;
-    const loader = this.$route.snapshot.data['loader'];
+    const { config, user } = this.$loader.getLatestCoreData();
+    this.user = user;
+    this.config = config;
 
     //
-    // select default HUB 
+    // select default HUB
     this.hubs = (this.config.shared.hubs || []).slice();
     if (this.hubs.length) {
       //
@@ -72,7 +72,8 @@ export class VendorsPage implements OnInit {
     //
     // all available shops
     if (this.user.isAdmin()) {
-      this.cache.shops = (loader[3] || []).sort(this.sortByVendor);
+      const { shops } = this.$loader.getLatestCoreData();
+      this.cache.shops = (shops || []).sort(this.sortByVendor);
       if (!this.cache.shops.length) {
         this.getVendors();
       }

@@ -5,6 +5,39 @@
       <ion-back-button defaultHref="home"  text=""></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
+
+  <!-- Toolbar de sélection (affiché uniquement en mode sélection) -->
+  <ion-toolbar *ngIf="selectionMode.enabled" color="secondary">
+    <ion-buttons slot="start">
+      <ion-button (click)="deselectAll()" [disabled]="getSelectedCount() === 0">
+        <ion-icon slot="start" name="close"></ion-icon>
+        <b>{{getSelectedCount()}}</b>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="getSelectedCount() > 0">
+      <ion-button (click)="bulkUpdateStock()" fill="solid" color="warning">
+        <ion-icon slot="start" name="cube"></ion-icon>
+        Stock
+      </ion-button>
+      <ion-button [hidden]="cache.active" (click)="bulkActivate()" fill="solid" color="success">
+        <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+        Activer ({{getSelectedCount()}})
+      </ion-button>
+      <ion-button [hidden]="!cache.active" (click)="bulkDeactivate()" fill="solid" color="danger">
+        <ion-icon slot="start" name="close-circle"></ion-icon>
+        Désactiver ({{getSelectedCount()}})
+      </ion-button>
+      <ion-button (click)="bulkLastMinute()" fill="solid" color="secondary" [hidden]="!user.isAdmin()">
+        <ion-icon slot="start" name="flash"></ion-icon>
+        Last Minute ⏰
+      </ion-button>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+
+
 </ion-header>
 
 <ion-content>
@@ -12,6 +45,7 @@
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
 
+  <!-- HEADER/ Search/ Sort/ Selection/ Add -->
   <ion-item>
     <ion-label>Filtrer</ion-label>
     <ion-searchbar
@@ -22,41 +56,62 @@
       (ionClear)="onSearchCancel($event)">
     </ion-searchbar>
     <!-- SORT -->
-    <ion-chip (click)="cache.sortByStock=!cache.sortByStock;sliceProducts()" slot="end" mode="ios" >
-      <ion-icon name="funnel-outline" color="danger"></ion-icon>
-      <ion-label>
+    <ion-button (click)="cache.sortByStock=!cache.sortByStock;sliceProducts()"  mode="ios" >
+      <ion-icon name="funnel-outline" ></ion-icon>
+      <ion-label class="hidden-sm">
         {{products?.length}} <span class="bold" [hidden]="!cache.sortByStock">stock</span><span class="bold" [hidden]="cache.sortByStock">alpha</span>
       </ion-label>
-    </ion-chip>
+    </ion-button>
+    <ion-button mode="ios" (click)="toggleSelectionMode()">
+      <ion-icon [name]="selectionMode.enabled ? 'close-circle' : 'checkbox-outline'"></ion-icon>
+    </ion-button>
+
 
     <!-- ADD -->
-    <ion-button slot="end" icon-only (click)="doCreateProduct()">
-      <ion-icon name="add"></ion-icon>
+    <ion-button  icon-only (click)="doCreateProduct()" slot="end">
+      <ion-icon name="add"></ion-icon> New
     </ion-button>
   </ion-item>
-  <ion-item>
-    <!-- FILTERS -->
-    <ion-chip (click)="cache.active=!cache.active;sliceProducts()">
-      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
-      <ion-label color="primary">Actif</ion-label>
-    </ion-chip>
-    <ion-chip (click)="cache.discount=!cache.discount;sliceProducts()">
-      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.discount"></ion-icon>
-      <ion-label color="primary">Discount</ion-label>
-    </ion-chip>
 
-    <ion-chip (click)="cache.subscription=!cache.subscription;sliceProducts()">
-      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.subscription"></ion-icon>
-      <ion-label color="primary">Panier</ion-label>
-    </ion-chip>
+  <!-- FILTERS - Scrollable horizontalement -->
+  <div class="filters-container">
+    <div class="filters-scroll">
+      <ion-chip (click)="cache.active=!cache.active;sliceProducts()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
+        <ion-label color="primary">Actif</ion-label>
+      </ion-chip>
 
-    <ion-chip (click)="cache.boost=!cache.boost;sliceProducts()" [hidden]="!user.isAdmin()">
-      <ion-icon name="checkmark-circle-outline" [hidden]="!cache.boost"></ion-icon>
-      <ion-label color="primary">BB</ion-label>
-    </ion-chip>
+      <ion-chip (click)="onProductFilterChange('boost')" [hidden]="!user.isAdmin()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.boost"></ion-icon>
+        <ion-label color="primary">BB</ion-label>
+      </ion-chip>
 
+      <ion-chip (click)="onProductFilterChange('discount')">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.discount"></ion-icon>
+        <ion-label color="primary">Discount</ion-label>
+      </ion-chip>
 
-  </ion-item>
+      <ion-chip (click)="onProductFilterChange('subscription')">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.subscription"></ion-icon>
+        <ion-label color="primary">Abo</ion-label>
+      </ion-chip>
+
+      <ion-chip (click)="onProductFilterChange('business')">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.business"></ion-icon>
+        <ion-label color="primary">Business</ion-label>
+      </ion-chip>
+
+      <ion-chip (click)="onProductFilterChange('lastMinute')" [hidden]="!user.isAdmin()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.lastMinute"></ion-icon>
+        <ion-label color="primary">Last Minute</ion-label>
+      </ion-chip>
+
+      <ion-chip (click)="onProductFilterChange('lowstock')" [hidden]="!user.isAdmin()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.lowstock"></ion-icon>
+        <ion-label color="primary">Stock</ion-label>
+      </ion-chip>
+    </div>
+  </div>
 
   <!-- ADMIN -->
   <ion-item *ngIf="isManagerOrLogistic">
@@ -77,13 +132,26 @@
   </div>
 
   <ion-list>
-    <ion-item-sliding *ngFor="let product of filteredProducts()">
-        <ion-item (click)="openDetails(product)" [class.inactive]="!cache.active">
-          <ion-avatar slot="start">
+    <ion-item-sliding *ngFor="let product of filteredProducts()" [disabled]="selectionMode.enabled">
+        <ion-item (click)="selectionMode.enabled ? toggleSelection(product) : openDetails(product)"
+                  [class.inactive]="!cache.active"
+                  [class.selected]="isSelected(product)">
+
+          <!-- Checkbox en mode sélection -->
+          <ion-checkbox *ngIf="selectionMode.enabled"
+                        slot="start"
+                        [checked]="isSelected(product)">
+          </ion-checkbox>
+
+          <!-- Avatar normal -->
+          <ion-avatar *ngIf="!selectionMode.enabled" slot="start">
             <img [src]="getAvatar(product)">
           </ion-avatar>
+
           <ion-label>
-            <h2 [class.red]="product.attributes.discount">{{product.title}}</h2>
+            <h2 [class.red]="product.attributes.discount">
+              {{product.title}} <span [hidden]="!product.attributes.lastMinute">⏰</span>
+            </h2>
             <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}} &nbsp;<span class="gray">// {{product.details.origin}}</span></h3>
             <p>
               {{getStateLabel(product)}} <span>// {{product.belong.name}}</span> <span class="red" [hidden]="!product.attributes.timelimit">&nbsp;// {{product.attributes.timelimit}}h</span>
@@ -95,7 +163,9 @@
               {{product.pricing.stock}}
           </span>
         </ion-item>
-        <ion-item-options side="end">
+
+        <!-- Options désactivées en mode sélection -->
+        <ion-item-options *ngIf="!selectionMode.enabled" side="end">
           <ion-item-option>
             <ion-button [color]="product.attributes.available?'danger':'secondary'" (click)="toggleActive(product)">
               <ion-icon name="basket"></ion-icon>
@@ -115,9 +185,8 @@
             </ion-select>
           </ion-item-option>
         </ion-item-options>
-      </ion-item-sliding>
+    </ion-item-sliding>
   </ion-list>
-
   <ion-infinite-scroll (ionInfinite)="doInfinite($event)"  [position]="'bottom'">
       <ion-infinite-scroll-content
       loadingSpinner="bubbles"

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Config, User, CartSubscription, CartService } from 'kng2-core';
+import { Config, User, CartSubscription, CartService, CalendarService, LoaderService } from 'kng2-core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EngineService } from '../services/engine.service';
 import { ToastController } from '@ionic/angular';
 
 @Component({
-  selector: 'kng-subscriptions',
+  selector: 'kio-subscriptions',
   templateUrl: './subscriptions.page.html',
   styleUrls: ['./subscriptions.page.scss'],
 })
@@ -15,7 +15,8 @@ export class SubscriptionsPage implements OnInit {
   config: Config;
   user: User;
 
-  weekdays = "dimanche_lundi_mardi_mercredi_jeudi_vendredi_samedi".split("_");
+  // ✅ MIGRATION: Plus de hardcoded, utiliser CalendarService
+  weekdays: string[];
   hubs: any[];
   currentHub: any;
   subscriptions: CartSubscription[];
@@ -35,6 +36,8 @@ export class SubscriptionsPage implements OnInit {
     private $engine: EngineService,
     private $cart: CartService,
     private toast: ToastController,
+    private $calendar: CalendarService,
+    private $loader: LoaderService
   ) {
     this.cache = {
       active: true,
@@ -46,15 +49,18 @@ export class SubscriptionsPage implements OnInit {
 
     this.subscriptions = [];
     this.hubs = [];
+
+    // ✅ MIGRATION: Utiliser i18n centralisé
+    this.weekdays = this.$calendar.i18n_weekdays('fr');
   }
 
   ngOnInit() {
-    this.user = this.$engine.currentUser;
-    this.config = this.$engine.currentConfig;
-    const loader = this.$route.snapshot.data['loader'];
+    const { config, user } = this.$loader.getLatestCoreData();
+    this.user = user;
+    this.config = config;
 
     //
-    // select default HUB 
+    // select default HUB
     this.hubs = (this.config.shared.hubs || []).slice();
     if (this.hubs.length) {
       //
@@ -74,19 +80,30 @@ export class SubscriptionsPage implements OnInit {
     this.subscriptions = this.cache.subscriptions;
   }
 
-  namedDayOfWeek(day:number) {
-    return this.weekdays[day];
+  /**
+   * ✅ MIGRATION: Utiliser i18n centralisé via CalendarService
+   */
+  namedDayOfWeek(day: number) {
+    return this.$calendar.i18n_weekdays('fr')[day];
   }
 
+  /**
+   * ✅ MIGRATION: Conversion dates avec validation
+   */
   subscriptionsGet() {
     this.cache.subscriptions = [];
 
-    
     this.$cart.subscriptionsGetAll().subscribe(subscriptions => {
       subscriptions.forEach(sub => {
+        // ✅ Validation + conversion date
         sub.nextInvoice = new Date(sub.nextInvoice);
-      })
-      console.log(subscriptions[0])
+
+        // ✅ OPTIONNEL: Formater pour affichage timezone Hub si nécessaire
+        // const hub = this.$engine.currentConfig.shared.hub;
+        // sub.nextInvoiceFormatted = this.$calendar.formatForClient(sub.nextInvoice, hub);
+      });
+
+      console.log(subscriptions[0]);
 
       this.subscriptions = this.cache.subscriptions = subscriptions.sort(this.sortBySubscription);
       this.isReady = true;

@@ -66,6 +66,11 @@
           <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.subscription"></ion-toggle>
         </ion-item>
 
+        <ion-item  [hidden]="!user.isAdmin()">
+          <ion-label>Disponible en last-minute</ion-label>
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.lastMinute"></ion-toggle>
+        </ion-item>
+
         <ion-item [hidden]="!user.isAdmin()">
           <ion-label>
             Le produit bundle

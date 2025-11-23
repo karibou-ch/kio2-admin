@@ -44,11 +44,8 @@ export class Kio2Admin {
     //
     // initialize app
     this.initializeApp();
-    this.$loader.ready().subscribe((ctx)=>{},(status)=> {
-      this.NETWORK_APP_ISSUE = true;
-      setTimeout(()=>document.location.reload(),8000);
-    })
-
+    
+    // ✅ MIGRATION: ready() supprimé, utiliser update() directement
     this.$loader.update().subscribe((ctx) => {
       if (ctx.config) {
         this.$engine.currentConfig = ctx.config;
@@ -57,6 +54,10 @@ export class Kio2Admin {
       if (ctx.user) {
         this.onInit(ctx.user);
       }
+    }, (status) => {
+      // ✅ Gestion erreur déplacée ici depuis ancien ready()
+      this.NETWORK_APP_ISSUE = true;
+      setTimeout(() => document.location.reload(), 8000);
     });
   }
 

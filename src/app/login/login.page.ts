@@ -8,7 +8,7 @@ import pkg from '../../../package.json';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'kio2-login',
+  selector: 'kio-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
@@ -36,9 +36,9 @@ export class LoginPage implements OnInit, AfterViewInit {
     this.VERSION = pkg.version;
     this.siteName = '';
     this.isReady = false;
-    const loader = this.$route.snapshot.data['loader'];
-    this.config = loader[0];
-    this.user = loader[1];
+    const { config, user } = this.$loader.getLatestCoreData();
+    this.config = config;
+    this.user = user;
   }
 
   ngOnInit() {

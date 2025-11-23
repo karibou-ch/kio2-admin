@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ToastController, ModalController, PopoverController } from '@ionic/angular';
-import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop, HubService } from 'kng2-core';
+import { Config, EnumFulfillments, Order, OrderItem, OrderService, User, Shop, HubService, CalendarService } from 'kng2-core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { OrdersItemsPage } from './orders-items.page';
 import { CalendarPage } from '../calendar/calendar.page';
@@ -42,14 +42,15 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
 
   constructor(
-    private $engine: EngineService,
+    public $engine: EngineService,
     private $modal: ModalController,
     private $hub: HubService,
     private $order: OrderService,
     private $popup: PopoverController,
     private $route: ActivatedRoute,
     private $router: Router,
-    private $toast: ToastController
+    private $toast: ToastController,
+    private $calendar: CalendarService
   ) {
     this.vendors.list = [];
     this.shipping = this.$engine.currentShippingDate;
@@ -149,6 +150,10 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     return new Order(JSON.parse(copy));
   }
 
+  /**
+   * ✅ MIGRATION: Même logique que orders.page.ts
+   * Déléguer vers EngineService qui utilise CalendarService
+   */
   initDate() {
     const currentDate = this.$engine.currentShippingDate;
     const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
@@ -157,12 +162,11 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
     currentDate.setFullYear(year);
     currentDate.setMonth(month - 1);
-    //
-    // constraint Date engine with month/year
+    
+    // Constraint Date engine with month/year
     this.$engine.currentShippingDate = currentDate;
 
-    //
-    // use full Date for Display
+    // Use full Date for Display
     this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
   }
 
@@ -358,20 +362,39 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
 
-  //
-  // on selected date
-  onDatePicker(popover) {
-    // use one full week
-    const date = new Date(this.pickerShippingDate);
-    //const date = new Date(this.pickerShippingDate).plusDays( - this.pickerShippingDate.getDay());
+  /**
+   * ✅ MIGRATION: Callback depuis CalendarPage via (didDismiss)
+   * Reçoit [Date, boolean] depuis CalendarPage.onSelectDay() ou onClose()
+   */
+  onCalendarDismiss(event: any) {
+    // CalendarPage retourne [Date, boolean] via dismiss
+    if (!event || !event.detail || !event.detail.data) {
+      return;
+    }
 
+    const [selectedDate, isOpen] = event.detail.data;
+    if (!selectedDate) {
+      return;
+    }
+
+    // Mettre à jour pickerShippingDate pour l'affichage
+    this.pickerShippingDate = selectedDate;
+    
+    // Appeler la logique existante
+    this.onDatePickerFromCalendar(selectedDate);
+  }
+
+  /**
+   * ✅ MIGRATION: Logique date picker adaptée pour CalendarPage
+   */
+  onDatePickerFromCalendar(selectedDate: Date) {
+    const date = new Date(selectedDate);
 
     this.$engine.currentShippingDate = date;
     this.$engine.findAllOrders();
-    //
-    // update route
+    
+    // Update route
     this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
-    popover.dismiss();
   }
 
 
@@ -429,17 +452,25 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
 
+  /**
+   * ✅ MIGRATION: Utiliser configuration hub pour heure collecte
+   * Au lieu de hardcoded 22h, utiliser hub.timelimitH du hub sélectionné
+   */
   updateCollect(vendor) {
     const when = this.vendors[vendor].shipping.when;
     this.currentHub = this.hubs.find(hub => hub.selected) || {};
-    when.setHours(22, 0, 0, 0);
-    this.$order.updateCollect( vendor, true, when)
+    
+    // ✅ Utiliser configuration du hub au lieu de hardcoded
+    const collectHour = this.currentHub?.timelimitH || 22; // Fallback 22h si pas de config
+    when.setHours(collectHour, 0, 0, 0);
+    
+    this.$order.updateCollect(vendor, true, when)
       .subscribe(orders => {
         if(orders.length) {
           this.doToast('Collecte enregistrée');
           this.setCollected(vendor);
         } else {
-          this.doToast('Collecte n\'a pas eu être enregistrée', true);
+          this.doToast('Collecte n\'a pas pu être enregistrée', true);
         }
       }, error => this.doToast(error.error));
   }
