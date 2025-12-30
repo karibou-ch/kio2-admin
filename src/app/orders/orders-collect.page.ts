@@ -151,23 +151,22 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
   /**
-   * ✅ MIGRATION: Même logique que orders.page.ts
-   * Déléguer vers EngineService qui utilise CalendarService
+   * ✅ MIGRATION: Déléguer vers EngineService qui utilise CalendarService
+   * Utilise la date par défaut de engine.service lors de l'init
    */
   initDate() {
-    const currentDate = this.$engine.currentShippingDate;
     const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
-    const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
-    const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
 
-    currentDate.setFullYear(year);
-    currentDate.setMonth(month - 1);
-    
-    // Constraint Date engine with month/year
-    this.$engine.currentShippingDate = currentDate;
+    // ✅ Si pas de date en query param, utiliser la date par défaut de engine.service
+    if (isNaN(queryWhen.getTime())) {
+      this.$engine.initDate(); // Initialise avec CalendarService
+      this.pickerShippingDate = this.$engine.currentShippingDate;
+      return;
+    }
 
-    // Use full Date for Display
-    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
+    // ✅ Si date en query param, l'utiliser sans muter currentShippingDate
+    this.pickerShippingDate = queryWhen;
+    this.$engine.currentShippingDate = queryWhen;
   }
 
 
@@ -332,7 +331,11 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     this.shipping = ctx.when;
     this.isReady = true;
     this.vendors = {list: []};
-    this.pickerShippingDate = ctx.when;
+
+    // ✅ CORRECTION: Ne pas écraser pickerShippingDate si l'utilisateur a fait une sélection explicite
+    // ctx.when peut être différent de la date sélectionnée si engine fait un fallback (pas de commandes)
+    // On garde la date sélectionnée par l'utilisateur pour l'affichage du calendrier
+    // this.pickerShippingDate = ctx.when; // ← Supprimé pour éviter écrasement
 
     //
     // init orders count
@@ -377,24 +380,24 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
       return;
     }
 
-    // Mettre à jour pickerShippingDate pour l'affichage
-    this.pickerShippingDate = selectedDate;
-    
-    // Appeler la logique existante
+    // ✅ Déléguer à onDatePickerFromCalendar qui gère pickerShippingDate
     this.onDatePickerFromCalendar(selectedDate);
   }
 
   /**
    * ✅ MIGRATION: Logique date picker adaptée pour CalendarPage
+   * La date sélectionnée est utilisée directement sans fallback engine
    */
   onDatePickerFromCalendar(selectedDate: Date) {
-    const date = new Date(selectedDate);
+    // ✅ CORRECTION: S'assurer que pickerShippingDate est défini AVANT l'appel engine
+    // pour éviter qu'il soit écrasé par le fallback de onInitOrders
+    this.pickerShippingDate = selectedDate;
 
-    this.$engine.currentShippingDate = date;
+    this.$engine.currentShippingDate = selectedDate;
     this.$engine.findAllOrders();
-    
-    // Update route
-    this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
+
+    // Update route avec timestamp de la date sélectionnée
+    this.$router.navigate([], { queryParams: { when: selectedDate.getTime() }});
   }
 
 
@@ -459,11 +462,11 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   updateCollect(vendor) {
     const when = this.vendors[vendor].shipping.when;
     this.currentHub = this.hubs.find(hub => hub.selected) || {};
-    
+
     // ✅ Utiliser configuration du hub au lieu de hardcoded
     const collectHour = this.currentHub?.timelimitH || 22; // Fallback 22h si pas de config
     when.setHours(collectHour, 0, 0, 0);
-    
+
     this.$order.updateCollect(vendor, true, when)
       .subscribe(orders => {
         if(orders.length) {

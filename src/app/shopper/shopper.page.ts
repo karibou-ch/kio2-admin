@@ -89,10 +89,9 @@ export class ShopperPage implements OnInit {
     }
 
     //
-    // use valid date
+    // use valid date - ✅ initDate() set déjà pickerShippingDate
     this.initDate();
 
-    this.pickerShippingDate = this.$engine.currentShippingDate;
     this.$engine.status$.subscribe(this.onEngineStatus.bind(this));
     this.$engine.selectedOrders$.subscribe(this.onInitOrders.bind(this));
     this.$engine.findAllOrders();
@@ -183,22 +182,22 @@ export class ShopperPage implements OnInit {
   }
 
   /**
-   * ✅ MIGRATION: Déléguer vers EngineService migré
+   * ✅ MIGRATION: Déléguer vers EngineService qui utilise CalendarService
+   * Utilise la date par défaut de engine.service lors de l'init
    */
   initDate() {
-    const currentDate = this.$engine.currentShippingDate;
     const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
-    const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
-    const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
 
-    currentDate.setFullYear(year);
-    currentDate.setMonth(month - 1);
+    // ✅ Si pas de date en query param, utiliser la date par défaut de engine.service
+    if (isNaN(queryWhen.getTime())) {
+      this.$engine.initDate(); // Initialise avec CalendarService
+      this.pickerShippingDate = this.$engine.currentShippingDate;
+      return;
+    }
 
-    // Constraint Date engine with month/year
-    this.$engine.currentShippingDate = currentDate;
-
-    // Use full Date for Display
-    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
+    // ✅ Si date en query param, l'utiliser sans muter currentShippingDate
+    this.pickerShippingDate = queryWhen;
+    this.$engine.currentShippingDate = queryWhen;
   }
 
   isDeposit(order) {
@@ -233,12 +232,16 @@ export class ShopperPage implements OnInit {
    * Séparée de l'ancienne version pour compatibilité
    */
   onDatePickerFromCalendar(selectedDate: Date) {
+    // ✅ CORRECTION: S'assurer que pickerShippingDate est défini AVANT l'appel engine
+    // pour éviter qu'il soit écrasé par le fallback de onInitOrders
+    this.pickerShippingDate = selectedDate;
+
     const date = this.$engine.currentShippingDate = selectedDate;
     const orders = this.$engine.getOrdersByDay(date);
     const today = new Date();
     const thisWeek = today.plusDays(- today.getDay());
     const nextWeek = today.plusDays(7 - today.getDay());
-    date.setHours(0, 0, 0, 0);
+    // ❌ SUPPRIMÉ: date.setUTCHours(0, 0, 0, 0); - déjà fait dans CalendarPage
 
     if(date < thisWeek && !orders.length) {
       this.$engine.selectOrderArchives(true);
@@ -267,7 +270,8 @@ export class ShopperPage implements OnInit {
   onInitOrders(ctx: OrdersCtx) {
     //
     // set default order value based on postalCode
-    this.pickerShippingDate = ctx.when;
+    // ✅ CORRECTION: Ne pas écraser pickerShippingDate si sélection utilisateur explicite
+    // this.pickerShippingDate = ctx.when; // ← Supprimé pour éviter écrasement par fallback engine
     this.orders = ctx.orders.sort(this.sortOrdersByPosition).map(order => this.deepcopy(order));
     // this.orders.filter(o => o.shipping.priority === 1).forEach(order => {
     //   console.log('---- priority,position',order.rank,order.shipping.priority, order.shipping.position);
@@ -470,7 +474,7 @@ export class ShopperPage implements OnInit {
         this.shippingShopper[order.shipping.priority] = {
           shopper: order.shipping.shopper,
           plan: order.shipping.priority,
-          time: (order.shipping.shopper_time),
+          time: (order.shipping.shopper_time || '15:00'),
           hub: order.hub
         };
       }
@@ -520,13 +524,13 @@ export class ShopperPage implements OnInit {
     }
   }
 
-  setShippingShopper($event?) {
-    console.log('--- DBG',$event);
-    const hub = this.currentHub && this.currentHub.slug;
-    const when = new Date(this.pickerShippingDate);
+  setShippingShopper($event:any) {
     const plan = this.currentPlanning;
     const shopper = $event.shopper || this.shippingShopper[plan].shopper || this.shippingShoppers[0];
-    let time: any = (this.shippingShopper[plan].time);
+    // ✅ Support ngModelChange (string direct) et ionChange (event.detail.value)
+    let time = (typeof $event.time === 'string') ? $event.time : ($event.time?.detail?.value || '15:00');
+    const hub = this.currentHub && this.currentHub.slug;
+    const when = new Date(this.pickerShippingDate);
 
     //
     // return silently if setup is not complet

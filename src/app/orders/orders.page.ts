@@ -291,24 +291,32 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   initDate() {
     const queryWhen = new Date(+this.$route.snapshot.queryParams['when']);
 
-    //
-    // if no date is specified, then make sure that EngineService initializes
+    // ✅ Si pas de date en query param, utiliser la date par défaut de engine.service
     if (isNaN(queryWhen.getTime())) {
-      this.$engine.initDate(); // ✅ Utilise CalendarService maintenant
+      this.$engine.initDate(); // Initialise avec CalendarService
+      this.pickerShippingDate = this.$engine.currentShippingDate;
+      return;
     }
 
-    const currentDate = this.$engine.currentShippingDate;
-    const month = isNaN(queryWhen.getTime()) ? (currentDate.getMonth() + 1) : queryWhen.getMonth() + 1;
-    const year = isNaN(queryWhen.getTime()) ? (currentDate.getFullYear()) : queryWhen.getFullYear();
+    // ✅ Si date en query param, l'utiliser sans muter currentShippingDate
+    this.pickerShippingDate = queryWhen;
+    this.$engine.currentShippingDate = queryWhen;
+  }
 
-    currentDate.setFullYear(year);
-    currentDate.setMonth(month - 1);
-
-    // Constraint Date engine with month/year
-    this.$engine.currentShippingDate = currentDate;
-
-    // Use full Date for Display
-    this.pickerShippingDate = isNaN(queryWhen.getTime()) ? currentDate : queryWhen;
+  /**
+   * Calcule le temps restant (en heures) avant la limite de facturation
+   * La limite est de 7 jours (168h) depuis la création de la commande
+   * @param order - La commande
+   * @returns Nombre d'heures restantes (négatif si dépassé)
+   */
+  getOrderTimeLimit(order: Order): number {
+    const BILLING_LIMIT_HOURS = 7 * 24; // 168 heures = 7 jours
+    const now = (order.shipping.when).getTime();
+    const created = new Date(order.created);
+    const elapsedMs = now - created.getTime();
+    const elapsedHours = elapsedMs / (1000 * 60 * 60);
+    const remainingHours = BILLING_LIMIT_HOURS - elapsedHours;
+    return Math.round(remainingHours);
   }
 
   isAudio(order){
@@ -401,30 +409,31 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   mapItemsPlanning() {
     this.openItems = {};
     const ordersMap = this.$engine.getAllOrdersByDate();
-    this.currentDates = Array.from(ordersMap.keys()).map(when => new Date(when));
+    // ✅ CORRECTION: Les clés sont maintenant des strings "YYYY-MM-DD"
+    this.currentDates = Array.from(ordersMap.keys()).map(dayStr => new Date(dayStr + 'T12:00:00'));
 
     //
     // sort planing
     this.currentDates = this.currentDates.sort((a,b) => a.getTime() - b.getTime());
 
     //
-    // group items by date
+    // group items by date - ✅ CORRECTION: utiliser toYYYYMMDD() comme clé
     this.currentDates.forEach(when => {
-      const time = when.getTime();
-      if (!this.openItems[time]) {
-        this.openItems[time] = [];
-        this.openItems[time].count = ordersMap.get(time).length;
+      const dayKey = when.toYYYYMMDD('-');
+      if (!this.openItems[dayKey]) {
+        this.openItems[dayKey] = [];
+        this.openItems[dayKey].count = ordersMap.get(dayKey).length;
       }
 
-      ordersMap.get(time).forEach(order => {
+      ordersMap.get(dayKey).forEach(order => {
         //
         // create the list for that time
         order.items.forEach(item => {
-          const elem = this.openItems[time].find( $i => $i.sku === item.sku && $i.status === item.fulfillment.status);
+          const elem = this.openItems[dayKey].find( $i => $i.sku === item.sku && $i.status === item.fulfillment.status);
           if(elem) {
             elem.quantity += item.quantity;
           } else {
-            this.openItems[time].push({
+            this.openItems[dayKey].push({
               status: item.fulfillment.status ,
               issue: item.fulfillment.issue ,
               title: item.title,
@@ -435,7 +444,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
         });
         //
         // order the list by title
-        this.openItems[time] = this.openItems[time].sort((a, b) => {
+        this.openItems[dayKey] = this.openItems[dayKey].sort((a, b) => {
           if (a.title > b.title) {
             return 1;
           }
@@ -553,12 +562,16 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
    * ✅ MIGRATION: Logique date picker adaptée pour CalendarPage
    */
   onDatePickerFromCalendar(selectedDate: Date) {
+    // ✅ CORRECTION: S'assurer que pickerShippingDate est défini AVANT l'appel engine
+    // pour éviter qu'il soit écrasé par le fallback de onInitOrders
+    this.pickerShippingDate = selectedDate;
+
     const date = this.$engine.currentShippingDate = selectedDate;
     const orders = this.$engine.getOrdersByDay(date);
     const today = new Date();
     const thisWeek = today.plusDays(- today.getDay());
     const nextWeek = today.plusDays(7 - today.getDay());
-    date.setHours(0, 0, 0, 0);
+    // ❌ SUPPRIMÉ: date.setUTCHours(0, 0, 0, 0); - déjà fait dans CalendarPage
 
     if(date < thisWeek && !orders.length) {
       this.$engine.selectOrderArchives(true);
@@ -631,7 +644,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // use shipping day from
     // force current shipping day
     this.shipping = ctx.when;
-    this.pickerShippingDate = ctx.when;
+    // ✅ CORRECTION: Ne pas écraser pickerShippingDate si sélection utilisateur explicite
+    // this.pickerShippingDate = ctx.when; // ← Supprimé pour éviter écrasement par fallback engine
     // console.log('---- ctx.when',ctx.when.getTime(),ctx.when);
 
     // AVG
