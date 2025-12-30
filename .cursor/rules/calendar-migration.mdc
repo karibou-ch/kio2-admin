@@ -1,0 +1,168 @@
+# Migration CalendarService - kio2-admin
+
+## 🎯 Objectif
+
+Centraliser la gestion des dates via `CalendarService` de `@kng2-core` pour assurer la cohérence timezone entre le backend (UTC) et le frontend (HUB-CENTRIC Europe/Zurich).
+
+## 📋 Principe Fondamental
+
+### Stockage Backend (UTC)
+```typescript
+// ✅ order.shipping.when est TOUJOURS en UTC
+order.shipping.when = new Date('2024-12-30T15:00:00.000Z'); // UTC stocké en DB
+```
+
+### Client Frontend (HUB-CENTRIC)
+```typescript
+// ✅ Le client travaille en timezone Hub (Europe/Zurich)
+// CalendarService centralise toutes les conversions et comparaisons
+const hubDate = this.$calendar.toHubTime(order.shipping.when, hub);
+```
+
+## 🔧 Architecture des Dates
+
+### Map<string, Order[]> - Clés par YYYY-MM-DD
+
+**Problème résolu** : Les timestamps (`getTime()`) causaient des décalages timezone.
+
+**Solution** : Utiliser `toYYYYMMDD('-')` comme clés de map.
+
+```typescript
+// ❌ AVANT (bug timezone)
+const orderTime = order.shipping.when.getTime();
+this.monthOrders.set(orderTime, orders);
+
+// ✅ APRÈS (timezone-safe)
+const orderDay = order.shipping.when.toYYYYMMDD('-');
+this.monthOrders.set(orderDay, orders);
+```
+
+### Comparaison de Dates
+
+```typescript
+// ❌ AVANT (sensible aux millisecondes et timezone)
+if (date1.getTime() === date2.getTime()) { ... }
+
+// ✅ APRÈS (compare le jour uniquement)
+if (date1.toYYYYMMDD('-') === date2.toYYYYMMDD('-')) { ... }
+// ou avec equalsDate (extension Date)
+if (date1.equalsDate(date2)) { ... }
+```
+
+### Création de Dates Locales
+
+```typescript
+// ❌ AVANT (mélange UTC/local)
+const date = new Date(year, month, day);
+date.setUTCHours(0, 0, 0, 0); // ❌ Mélange contextes
+
+// ✅ APRÈS (cohérent local)
+const date = new Date(year, month, day);
+date.setHours(0, 0, 0, 0); // ✅ Cohérent timezone local
+```
+
+### Parsing de Dates depuis String YYYY-MM-DD
+
+```typescript
+// ❌ AVANT (peut décaler d'un jour selon timezone client)
+const date = new Date('2024-12-30');
+
+// ✅ APRÈS (force midi UTC pour éviter décalage)
+const date = new Date('2024-12-30T12:00:00');
+```
+
+## 📁 Fichiers Migrés
+
+### engine.service.ts
+- `monthOrders: Map<string, Order[]>` - Clés YYYY-MM-DD
+- `getOrdersByDay()` - Lookup par `toYYYYMMDD('-')`
+- `selectPreferredDay()` - Comparaisons string
+
+### calendar.page.ts
+- `buildMonthCalendar()` - Utilise `setHours()` au lieu de `setUTCHours()`
+- `getDayClasses()` - Comparaison via `toYYYYMMDD('-')`
+- `onSelectDay()` - Retourne date locale directement
+
+### shopper.page.ts & orders.page.ts
+- Suppression des `setUTCHours()` redondants
+- Utilisation des clés string pour `ordersMap`
+
+## ✅ Règles de Migration
+
+1. **Ne jamais mélanger** `setUTCHours()` et `setHours()` sur la même date
+2. **Utiliser `toYYYYMMDD('-')`** pour les clés de Map et comparaisons
+3. **Parser avec 'T12:00:00'** les strings YYYY-MM-DD pour éviter décalages
+4. **Déléguer à CalendarService** pour toute logique business de dates
+5. **order.shipping.when reste UTC** - conversion seulement pour affichage
+
+## 🚨 Fonctions à Centraliser dans CalendarService
+
+### Fonctions Existantes (à utiliser)
+```typescript
+// ✅ UTILISER ces fonctions au lieu de manipuler les dates directement
+$calendar.toHubTime(utcDate, hub)           // UTC → Hub timezone
+$calendar.toUTC(hubDate, hub)               // Hub → UTC
+$calendar.formatForClient(utcDate, hub)     // Affichage localisé
+$calendar.getValidShippingDatesForHub()     // Dates disponibles
+$calendar.timeleftBeforeCollect()           // Temps restant
+$calendar.isInAvailableDays(day, list)      // Vérifier si jour dans liste
+$calendar.isDayAvailable(day, list, opts)   // Validation complète
+```
+
+### Fonctions à Ajouter (TODO)
+```typescript
+// 🔧 À IMPLÉMENTER dans CalendarService pour éviter manipulations externes
+
+/**
+ * Normalise une date au début du jour (minuit) en timezone Hub
+ * Remplace: date.setHours(0, 0, 0, 0)
+ */
+normalizeToStartOfDay(date: Date, hub?: Hub): Date
+
+/**
+ * Normalise une date à midi en timezone Hub (safe pour parsing YYYY-MM-DD)
+ * Remplace: date.setHours(12, 0, 0, 0) ou new Date(str + 'T12:00:00')
+ */
+normalizeToNoon(date: Date, hub?: Hub): Date
+
+/**
+ * Compare deux dates par jour uniquement (ignore l'heure)
+ * Remplace: date1.toYYYYMMDD() === date2.toYYYYMMDD()
+ */
+isSameDay(date1: Date, date2: Date): boolean
+
+/**
+ * Crée une date locale pour un jour du mois (calendrier)
+ * Remplace: new Date(year, month, day) + setHours()
+ */
+createLocalDate(year: number, month: number, day: number, hub?: Hub): Date
+
+/**
+ * Parse une string YYYY-MM-DD en Date safe (midi Hub)
+ * Remplace: new Date(str + 'T12:00:00')
+ */
+parseDateString(dateStr: string, hub?: Hub): Date
+
+/**
+ * Retourne la clé string pour Map (YYYY-MM-DD)
+ * Remplace: date.toYYYYMMDD('-')
+ */
+toDateKey(date: Date): string
+```
+
+### Patterns Interdits → Remplacement
+
+| ❌ Pattern Interdit | ✅ Utiliser CalendarService |
+|--------------------|----------------------------|
+| `date.setHours(0,0,0,0)` | `$calendar.normalizeToStartOfDay(date)` |
+| `date.setUTCHours(0,0,0,0)` | ❌ NE PAS UTILISER côté client |
+| `date.setHours(12,0,0,0)` | `$calendar.normalizeToNoon(date)` |
+| `new Date(str + 'T12:00:00')` | `$calendar.parseDateString(str)` |
+| `date1.toYYYYMMDD() === date2.toYYYYMMDD()` | `$calendar.isSameDay(date1, date2)` |
+| `date.equalsDate(other)` | `$calendar.isSameDay(date, other)` |
+| `new Date(year, month, day)` | `$calendar.createLocalDate(year, month, day)` |
+| `date.toYYYYMMDD('-')` | `$calendar.toDateKey(date)` |
+
+## 🔗 Référence
+
+Voir `@kng2-core/src/calendar.service.ts` pour l'API complète.
