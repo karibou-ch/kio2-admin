@@ -14,7 +14,7 @@
   <ion-list>
     <ion-item>
         <ion-button expand="block" fill="outline" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button>
-      </ion-item>      
+      </ion-item>
       <ion-item [hidden]="!(user?.isAdmin())">
         <ion-label color="primary" >
           Boutique active pour la vente
@@ -24,10 +24,10 @@
       <ion-item >
         <ion-label color="primary">Plus de détails avec le Mail des commandes</ion-label>
         <ion-toggle color="positive" [(ngModel)]="shop.info.detailledOrder" ></ion-toggle>
-      </ion-item>        
-    
+      </ion-item>
+
   </ion-list>
-    
+
 
   <!-- VACANCE -->
   <ion-list [hidden]="shop.status !== true">
@@ -40,50 +40,50 @@
     </ion-item>
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary" >Le jour de fermeture</ion-label>
-      <ion-datetime 
-          [disabled]="!shop.available.active" 
+      <ion-datetime
+          [disabled]="!shop.available.active"
           presentation="date"
           locale="fr-FR"
           firstDayOfWeek="1"
-          displayFormat="DD/MM/YYYY" 
-          (ngModelChange)="shop.available.from=$event" 
+          displayFormat="DD/MM/YYYY"
+          (ngModelChange)="shop.available.from=$event"
           [ngModel]="formatToGMT(shop.available.from)" max="2030"></ion-datetime>
     </ion-item>
 
     <ion-item [class.inactive]="!shop.available.active">
       <ion-label position="floating" color="primary">Le jour de ré-ouverture</ion-label>
-      <ion-datetime 
-          [disabled]="!shop.available.active" 
+      <ion-datetime
+          [disabled]="!shop.available.active"
           presentation="date"
           locale="fr-FR"
           firstDayOfWeek="1"
-          displayFormat="DD/MM/YYYY" 
-          (ngModelChange)="shop.available.to=$event" 
+          displayFormat="DD/MM/YYYY"
+          (ngModelChange)="shop.available.to=$event"
           [ngModel]="formatToGMT(shop.available.to)" max="2030"></ion-datetime>
     </ion-item>
-      
+
   </ion-list>
 
   <ion-list *ngIf="isCreate">
     <ion-item >
       <ion-label position="floating" color="primary">
-        <ion-icon color="danger" name="information-circle-outline"></ion-icon> 
+        <ion-icon color="danger" name="information-circle-outline"></ion-icon>
         Le nom ne pourra pas être modifié par la suite.
       </ion-label>
       <ion-input type="url" placeholder="Nom de votre boutique" [(ngModel)]="shop.name"></ion-input>
-    </ion-item>    
+    </ion-item>
   </ion-list>
 
   <!-- DESCRIPTION -->
   <ion-list >
     <ion-item>
-      <ion-label color="primary" position="floating">Description </ion-label> 
+      <ion-label color="primary" position="floating">Description </ion-label>
       <ion-textarea  rows="10"  placeholder="votre histoire... " [(ngModel)]="shop.description" required></ion-textarea>
     </ion-item>
     <ion-item >
       <ion-label position="floating" color="primary">Ou vous trouver sur Internet</ion-label>
-      <ion-input type="url" placeholder="https:// ..." [(ngModel)]="shop.url"></ion-input>              
-    </ion-item>    
+      <ion-input type="url" placeholder="https:// ..." [(ngModel)]="shop.url"></ion-input>
+    </ion-item>
     <!-- PHOTO.FG -->
     <!-- PHOTO.OWNER -->
     <ion-item color="none" *ngIf="shop.photo.owner">
@@ -109,9 +109,9 @@
     <ion-item>
       <ion-button fill="outline" color="primary" expand="block" (click)="uploadImageLogo()">Votre logo (petite taille)</ion-button>
     </ion-item>
-  
-  </ion-list>  
-  
+
+  </ion-list>
+
   <!-- ADRESSE -->
   <ion-list >
     <ion-list-header color="primary">
@@ -119,25 +119,69 @@
     </ion-list-header>
 
     <ion-item>
-      <ion-label color="primary" position="stacked">Nom et prénom du contact</ion-label> 
+      <ion-label color="primary" position="stacked">Nom et prénom du contact</ion-label>
       <ion-input  type="text"  placeholder="Nom et prénom" [(ngModel)]="shop.address.name" required></ion-input>
     </ion-item>
-    
+
     <ion-item>
-      <ion-label color="primary" position="stacked">Rue et numéro </ion-label> 
+      <ion-label color="primary" position="stacked">Rue et numéro </ion-label>
       <ion-input  type="text"  placeholder="rue, numéro" (focusout)="ngOnChanges($event)" [(ngModel)]="shop.address.streetAdress" required></ion-input>
       <ion-input  type="text"  placeholder="Étage" class="floor" [(ngModel)]="shop.address.floor" required></ion-input>
     </ion-item>
     <ion-item >
-      <ion-label color="primary" position="stacked">Téléphone de contact</ion-label> 
+      <ion-label color="primary" position="stacked">Téléphone de contact</ion-label>
       <ion-input  type="text"  placeholder="Téléphone pro." [(ngModel)]="shop.address.phone" required></ion-input>
-    </ion-item>        
+    </ion-item>
     <ion-item >
-      <ion-label color="primary" position="stacked">Code postal et Région</ion-label> 
+      <ion-label color="primary" position="stacked">Code postal et Région</ion-label>
       <ion-input  type="text"  placeholder="Code postal" (focusout)="ngOnChanges($event)" [(ngModel)]="shop.address.postalCode" required></ion-input>
       <ion-input  type="text"  placeholder="Région" [(ngModel)]="shop.address.region" required></ion-input>
-    </ion-item>        
+    </ion-item>
   </ion-list>
+    <!-- BUSINESS -->
+    <ion-list>
+      <ion-list-header color="primary">
+        Business
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label color="primary" position="stacked">Votre identité TVA</ion-label>
+        <ion-input type="text" placeholder="ID TVA" [(ngModel)]="tvaId"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label color="primary" position="stacked">Votre IBAN</ion-label>
+        <ion-input [class.invalid-iban]="!ibanCtrl()" type="text" placeholder="CH..." [(ngModel)]="shop.account.IBAN"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label color="primary" position="stacked">BIC (IBAN hors CH)</ion-label>
+        <ion-input type="text" placeholder="CRESCH..." [(ngModel)]="shop.account.BIC"></ion-input>
+      </ion-item>
+
+
+      <!-- SHOP FEES -->
+      <ion-item [class.inactive]="!user.isAdmin()">
+        <ion-label color="primary" position="stacked">
+          Commission à la vente {{shop.account.fees|percent}}
+        </ion-label>
+        <ion-input type="number" [disabled]="!user.isAdmin()" placeholder="Commission sur chaque transaction" [(ngModel)]="shop.account.fees"></ion-input>
+      </ion-item>
+
+      <!-- SHOP WEIGHT -->
+      <ion-item [class.inactive]="!user.isAdmin()">
+        <ion-label color="primary" position="stacked">
+          Poids de la boutique {{shop.scoring.weight}}
+        </ion-label>
+        <ion-input type="number" [disabled]="!user.isAdmin()" placeholder="Poids de la boutique" [(ngModel)]="shop.scoring.weight"></ion-input>
+      </ion-item>
+
+      <ion-item>
+          <ion-label class="ion-text-wrap">
+            Boutique créée le {{shop.created|date:'mediumDate'}} dans la catégorie {{shop.catalog?.name}}<br/>
+            Validée le {{shop.account.updated|date:'mediumDate'}}
+          </ion-label>
+      </ion-item>
+    </ion-list>
 
   <!-- FAQ -->
   <ion-list >
@@ -149,33 +193,33 @@
     </ion-item>
     <div *ngFor="let faq of shop.faq;let idx=index" class="faq-separator">
       <ion-item class="faq-question">
-        <ion-label position="stacked" class="bold">Question </ion-label> 
+        <ion-label position="stacked" class="bold">Question </ion-label>
         <ion-textarea  rows="2"  placeholder="Question fréquente... " [(ngModel)]="faq.q" required></ion-textarea>
       </ion-item>
       <ion-item >
         <ion-label position="stacked" class="bold">Votre réponse </ion-label>
         <ion-textarea  rows="8"  placeholder="Votre réponse... " [(ngModel)]="faq.a" required></ion-textarea>
-      </ion-item>      
+      </ion-item>
       <ion-item >
         <ion-label color="primary" [hidden]="!faq.q">
           {{faq.q}}
         </ion-label>
         <ion-button fill="outline" slot="end" (click)="shop.faq.splice(idx, 1)">Supprimer</ion-button>
       </ion-item>
-    
+
     </div>
-    
-  </ion-list>      
-    
+
+  </ion-list>
+
     <!-- Admin BM -->
     <!-- Livraisons disponibles -->
     <!-- Adresse de collecte -->
-  
+
 
   <!-- BUSINESS -->
   <ion-list [class.discount]="shop.discount.active">
     <ion-list-header color="primary">
-        Fidéliser le client en lui offrant un rabais à la quantité      
+        Fidéliser le client en lui offrant un rabais à la quantité
     </ion-list-header>
     <ion-item>
       <ion-label color="primary">
@@ -186,23 +230,23 @@
     <ion-item [class.inactive]="!shop.discount.active">
         <ion-label color="primary" position="stacked">
             Le volume d'achat pour obtenir un rabais
-        </ion-label> 
-        <ion-input type="number" placeholder="Si le montant d'achat dépasse X.XX CHF" [(ngModel)]="shop.discount.threshold"></ion-input>              
+        </ion-label>
+        <ion-input type="number" placeholder="Si le montant d'achat dépasse X.XX CHF" [(ngModel)]="shop.discount.threshold"></ion-input>
     </ion-item>
 
     <ion-item [class.inactive]="!shop.discount.active">
         <ion-label color="primary" position="stacked">
             Vous offrez au client (CHF) (contribution à la livraison)
-        </ion-label> 
-        <ion-input type="number" placeholder="Votre participation en  X.XX CHF" [(ngModel)]="shop.discount.amount"></ion-input>              
-    </ion-item>    
+        </ion-label>
+        <ion-input type="number" placeholder="Votre participation en  X.XX CHF" [(ngModel)]="shop.discount.amount"></ion-input>
+    </ion-item>
   </ion-list>
 
   <!-- SHIPPING DAYS -->
-  <ion-list>    
+  <ion-list>
     <ion-list-header color="primary">
       Livraison
-    </ion-list-header>    
+    </ion-list-header>
     <ion-item>
       <ion-label>Lundi </ion-label>
       <ion-checkbox [disabled]="!user.isAdmin()" [(ngModel)]="weekdays[1]"></ion-checkbox>
@@ -233,50 +277,6 @@
     </ion-item>
   </ion-list>
 
-    <!-- BUSINESS -->
-  <ion-list>
-    <ion-list-header color="primary">
-      Business
-    </ion-list-header>
-
-    <ion-item>
-      <ion-label color="primary" position="stacked">Votre identité TVA</ion-label> 
-      <ion-input type="text" placeholder="ID TVA" [(ngModel)]="tvaId"></ion-input>              
-    </ion-item>
-
-    <ion-item>
-      <ion-label color="primary" position="stacked">Votre IBAN</ion-label> 
-      <ion-input [class.invalid-iban]="!ibanCtrl()" type="text" placeholder="CH..." [(ngModel)]="shop.account.IBAN"></ion-input>              
-    </ion-item>
-    <ion-item>
-      <ion-label color="primary" position="stacked">BIC</ion-label> 
-      <ion-input type="text" placeholder="CRESCH..." [(ngModel)]="shop.account.BIC"></ion-input>              
-    </ion-item>
-
-
-    <!-- SHOP FEES -->
-    <ion-item [class.inactive]="!user.isAdmin()">
-      <ion-label color="primary" position="stacked">
-        Commission à la vente {{shop.account.fees|percent}}
-      </ion-label> 
-      <ion-input type="number" [disabled]="!user.isAdmin()" placeholder="Commission sur chaque transaction" [(ngModel)]="shop.account.fees"></ion-input>              
-    </ion-item>
-
-    <!-- SHOP WEIGHT -->
-    <ion-item [class.inactive]="!user.isAdmin()">
-      <ion-label color="primary" position="stacked">
-        Poids de la boutique {{shop.scoring.weight}}
-      </ion-label> 
-      <ion-input type="number" [disabled]="!user.isAdmin()" placeholder="Poids de la boutique" [(ngModel)]="shop.scoring.weight"></ion-input>              
-    </ion-item>
-    
-    <ion-item>
-        <ion-label class="ion-text-wrap">
-          Boutique créée le {{shop.created|date:'mediumDate'}} dans la catégorie {{shop.catalog?.name}}<br/>
-          Validée le {{shop.account.updated|date:'mediumDate'}}
-        </ion-label>
-    </ion-item>
-  </ion-list>    
 
   <!-- CATALOG -->
   <ion-item>
@@ -284,7 +284,7 @@
       Catalogue
     </ion-label>
     <ion-select [(ngModel)]="catalog">
-      <ion-select-option *ngFor="let cat of getCatalog()"  [value]="cat._id">{{cat.name}}</ion-select-option>        
+      <ion-select-option *ngFor="let cat of getCatalog()"  [value]="cat._id">{{cat.name}}</ion-select-option>
     </ion-select>
   </ion-item>
 
@@ -292,11 +292,11 @@
   <ion-list>
     <ion-item [hidden]="!user.isAdmin()">
       <ion-button expand="block" fill="outline" size="large" color="danger" (click)="doDelete()">SUPPRIMER</ion-button>
-    </ion-item>      
+    </ion-item>
 
     <ion-item>
       <ion-button expand="block" fill="outline" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button>
-    </ion-item>      
+    </ion-item>
   </ion-list>
-    
+
 </ion-content>
