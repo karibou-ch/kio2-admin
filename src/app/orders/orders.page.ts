@@ -262,11 +262,15 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   }
 
   getOrdersCountByDate(when: Date) {
-    return this.openItems[when.getTime()].count || 0;
+    // ✅ CORRECTION: Utiliser toYYYYMMDD comme clé (cohérent avec mapItemsPlanning)
+    const dayKey = when.toYYYYMMDD('-');
+    return this.openItems[dayKey]?.count || 0;
   }
 
   getOrdersByDate(when: Date) {
-    return this.openItems[when.getTime()];
+    // ✅ CORRECTION: Utiliser toYYYYMMDD comme clé
+    const dayKey = when.toYYYYMMDD('-');
+    return this.openItems[dayKey] || [];
   }
 
   //
