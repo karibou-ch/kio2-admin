@@ -82,6 +82,8 @@ export class CalendarPage implements OnInit {
 
   onEngineStatus(status: OrderStatus) {
     this.isLoading = status.running;
+    this.availableDates = this.$engine.availableDates;
+    // console.log('availableDates', this.availableDates);
   }
 
 
@@ -99,6 +101,7 @@ export class CalendarPage implements OnInit {
 
     // ✅ Régénérer calendrier
     this.buildMonthCalendar();
+    this.$engine.selectOrderArchives(this.segmentValue === 'archive');
   }
 
   onForwardMonth() {
@@ -115,6 +118,8 @@ export class CalendarPage implements OnInit {
 
     // ✅ Régénérer calendrier
     this.buildMonthCalendar();
+    this.$engine.selectOrderArchives(this.segmentValue === 'archive');
+
   }
 
   /**
@@ -129,10 +134,16 @@ export class CalendarPage implements OnInit {
   }
 
   onSelectDay(shipping: Date) {
+    if(!this.hasOrders(shipping)) {
+      return;
+    }
+    // ✅ SIMPLIFIÉ: Plus besoin de normalisation UTC
+    // Les clés dans engine.service.ts utilisent maintenant toYYYYMMDD() (strings)
+    // La correspondance se fait sur le jour, pas sur le timestamp exact
     this.currentShipping = shipping;
     this.$engine.currentShippingDate = shipping;
     const status = this.segmentValue === this.STATUS_OPEN;
-    this.$popup.dismiss([this.currentShipping, status ]);
+    this.$popup.dismiss([this.currentShipping, status]);
   }
 
   onClose() {
@@ -168,9 +179,11 @@ export class CalendarPage implements OnInit {
     }
 
     // Ajouter tous les jours du mois
+    // ✅ CORRECTION: Utiliser setHours() (local) au lieu de setUTCHours() (UTC)
+    // Conforme au principe Hub-Centric: "Generate Hub, Stay Hub, Display Hub"
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const date = new Date(this.currentYear, this.currentMonth, day);
-      date.setHours(0, 0, 0, 0);
+      date.setHours(0, 0, 0, 0); // ✅ LOCAL cohérent avec Hub timezone
       currentWeek.push(date);
 
       // Si on a 7 jours, commencer une nouvelle semaine
@@ -191,12 +204,14 @@ export class CalendarPage implements OnInit {
 
   /**
    * ✅ NOUVEAU : Vérifier si un jour a des commandes
+   * ✅ CORRECTION: Comparer les jours avec toYYYYMMDD() au lieu de getTime()
+   * Les timestamps sont différents (backend UTC vs frontend Hub timezone)
    */
   hasOrders(day: Date): boolean {
     if (!day) return false;
 
     return this.availableDates.some(availableDate =>
-      availableDate.getTime() === day.getTime()
+      availableDate.toYYYYMMDD('-') === day.toYYYYMMDD('-')
     );
   }
 
@@ -216,11 +231,12 @@ export class CalendarPage implements OnInit {
 
   /**
    * ✅ NOUVEAU : Obtenir les classes CSS pour un jour
+   * ✅ CORRECTION: Comparer les jours avec toYYYYMMDD() au lieu de getTime()
    */
   getDayClasses(day: Date): any {
     if (!day) return { empty: true };
 
-    const isSelected = day.getTime() === this.currentShipping.getTime();
+    const isSelected = day.toYYYYMMDD('-') === this.currentShipping.toYYYYMMDD('-');
     const hasOrders = this.hasOrders(day);
     const status = this.getDayStatus(day);
 
