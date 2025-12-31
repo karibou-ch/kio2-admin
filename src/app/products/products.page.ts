@@ -4,6 +4,14 @@ import { EngineService, OrdersCtx } from '../services/engine.service';
 import { ToastController, AlertController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 
+export const attributesFilters = [
+  'lastMinute',
+  'boost',
+  'discount',
+  'subscription',
+  'business',
+  'home',
+];
 export interface ProductsFilterOptions {
   forceShops?: string[];
   lastMinute?: boolean;
@@ -11,6 +19,7 @@ export interface ProductsFilterOptions {
   discount?: boolean;
   boost?: boolean;
   business?: boolean;
+  home?: boolean;
   lowstock?: boolean;
 }
 
@@ -167,11 +176,7 @@ export class ProductsPage implements OnInit {
 
     //
     // create filter string for attributes
-    params.attributes = [
-      'lastMinute',
-      'discount',
-      'subscription'
-    ].filter(att => !!options[att]).join(',');
+    params.attributes = attributesFilters.filter(att => !!options[att]).join(',');
 
     if(options.lowstock){
       params.lowstock = true;
@@ -182,7 +187,6 @@ export class ProductsPage implements OnInit {
       params.shopname = [];
     }
 
-    console.log(params);
 
     //
     // get select products for vendor
@@ -228,11 +232,8 @@ export class ProductsPage implements OnInit {
   //
   // filters are based on all shops (except for non admin users)
   onProductFilterChange(filter: string) {
-    if(this.filters[filter]){
-      delete this.filters[filter];
-    }else{
-      this.filters[filter] = true;
-    }
+    attributesFilters.forEach(att => delete this.filters[att]);
+    this.filters[filter] = true;
     this.loadProducts(this.filters);
   }
   onDone(msg) {

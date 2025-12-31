@@ -81,9 +81,9 @@
         <ion-label color="primary">Actif</ion-label>
       </ion-chip>
 
-      <ion-chip (click)="onProductFilterChange('boost')" [hidden]="!user.isAdmin()">
-        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.boost"></ion-icon>
-        <ion-label color="primary">BB</ion-label>
+      <ion-chip (click)="onProductFilterChange('home')" [hidden]="!user.isAdmin()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.home"></ion-icon>
+        <ion-label color="primary">pinned</ion-label>
       </ion-chip>
 
       <ion-chip (click)="onProductFilterChange('discount')">
@@ -91,12 +91,12 @@
         <ion-label color="primary">Discount</ion-label>
       </ion-chip>
 
-      <ion-chip (click)="onProductFilterChange('subscription')">
+      <ion-chip (click)="onProductFilterChange('subscription')" [hidden]="!user.isAdmin()">
         <ion-icon name="checkmark-circle-outline" [hidden]="!filters.subscription"></ion-icon>
         <ion-label color="primary">Abo</ion-label>
       </ion-chip>
 
-      <ion-chip (click)="onProductFilterChange('business')">
+      <ion-chip (click)="onProductFilterChange('business')" [hidden]="!user.isAdmin()">
         <ion-icon name="checkmark-circle-outline" [hidden]="!filters.business"></ion-icon>
         <ion-label color="primary">Business</ion-label>
       </ion-chip>
@@ -104,6 +104,10 @@
       <ion-chip (click)="onProductFilterChange('lastMinute')" [hidden]="!user.isAdmin()">
         <ion-icon name="checkmark-circle-outline" [hidden]="!filters.lastMinute"></ion-icon>
         <ion-label color="primary">Last Minute</ion-label>
+      </ion-chip>
+      <ion-chip (click)="onProductFilterChange('boost')" [hidden]="!user.isAdmin()">
+        <ion-icon name="checkmark-circle-outline" [hidden]="!filters.boost"></ion-icon>
+        <ion-label color="primary">Boost</ion-label>
       </ion-chip>
 
       <ion-chip (click)="onProductFilterChange('lowstock')" [hidden]="!user.isAdmin()">
