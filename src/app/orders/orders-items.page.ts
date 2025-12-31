@@ -243,6 +243,8 @@ export class OrdersItemsPage implements OnInit {
 
     this.$order.updateItem(order, items, EnumFulfillments.fulfilled)
       .subscribe(ok => {
+        const vendor = items[0].vendor; /** items MUST BE for the same vendor */
+
         const len = 18;
         this.doToast('Articles du sac ' + order.rank);
         Object.assign(order, ok);
@@ -251,7 +253,6 @@ export class OrdersItemsPage implements OnInit {
         // when not admin, we should remove other vendor items
         // FIXME this items filter should be on server for NON admin user
         if (!this.user.isAdmin()) {
-          const vendor = items[0].vendor; /** items MUST BE for the same vendor */
           order.items = order.items.filter(i => i.vendor === vendor);
         }
 
@@ -270,6 +271,7 @@ export class OrdersItemsPage implements OnInit {
     this.$order.updateItem(order, [copy], EnumFulfillments.fulfilled)
       .subscribe(ok => {
         const len = 18;
+        const vendor = copy.vendor;
         const indexSrc = order.items.findIndex(this.cmpItemAndVdr(item));
         const indexDst = ok.items.findIndex(this.cmpItemAndVdr(item));
         if(indexSrc>-1 && indexDst>-1){
@@ -283,7 +285,7 @@ export class OrdersItemsPage implements OnInit {
         // when not admin, we should remove other vendor items
         // FIXME this items filter should be on server for NON admin user
         if (!this.user.isAdmin()) {
-          order.items = order.items.filter(i => i.vendor === item.vendor);
+          order.items = order.items.filter(i => i.vendor === vendor);
         }
 
         // // FIXME this items filter should be on server for NON admin user
