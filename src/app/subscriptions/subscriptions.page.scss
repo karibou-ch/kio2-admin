@@ -14,41 +14,239 @@ ion-chip.toggle {
 }
 
 .subscription{
-  h2{
-    font-weight: bold;
-    margin: 5px 2px;
+  // ✅ HEADER: Client => Status => Fréquence => Prochaine facture (une ligne)
+  .subscription-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .customer-name {
+    font-weight: 700;
+    font-size: 15px;
     text-transform: capitalize;
-    background-color: yellow;
-    width: fit-content;
-    padding: 2px 4px;
   }
-  h3{
-    font-weight: bold;
-    margin: 5px 2px;
-    &.red{
-      color: red;
-    }    
+
+  .status-tag {
+    padding: 3px 10px;
+    border-radius: .25rem;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: none;
+    border: 1px solid #eee;
+
+    &.active {
+      background: var(--ion-color-success);
+      color: white;
+    }
+    &.paused {
+      background: var(--ion-color-warning);
+      color: var(--ion-color-warning-contrast);
+    }
+    &.incomplete {
+      background: var(--ion-color-danger);
+      color: white;
+    }
+    &.canceled {
+      background: #666;
+      color: white;
+    }
   }
-  .tag {
-    padding: 1px 10px;
-    background: var(--ion-color-kio-primary);
-    border-radius: 17px;
-    color: white;
-    font-size: 14px;    
-    text-transform: lowercase;
-    float: right;
+
+  .frequency {
+    font-weight: 500;
+    text-transform: capitalize;
   }
-  ul{
-    margin: 5px 0;
+
+  .next-invoice-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ion-color-primary);
+    margin-left: auto;
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+
+  // ✅ Pause info
+  .pause-info {
+    padding: 6px 10px;
+    margin: 6px 0;
+    background: rgba(var(--ion-color-warning-rgb), 0.15);
+    border-radius: 6px;
+    font-size: 13px;
+    color: #856404;
+  }
+
+  // ✅ Alerte problème de paiement
+  .payment-issue {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin: 6px 0;
+    background-color: rgba(var(--ion-color-danger-rgb), 0.1);
+    border-left: 3px solid var(--ion-color-danger);
+    border-radius: 4px;
+
+    ion-icon {
+      font-size: 16px;
+    }
+
+    span {
+      font-size: 12px;
+      color: var(--ion-color-danger);
+    }
+  }
+
+  ul {
+    margin: 4px 0;
     padding: 0;
     list-style: none;
-    li{
-      font-size: 14px;
+    li {
+      font-size: 13px;
       color: #666;
-      .bold{
+      padding: 2px 0;
+      .bold {
         font-weight: bold;
         color: black;
       }
+      .red {
+        color: var(--ion-color-danger);
+        font-weight: 600;
+      }
+    }
+  }
+
+  // ✅ ADMIN: Indicateur visuel pour les abonnements en pause
+  &.paused {
+    border-left: 4px solid var(--ion-color-warning);
+    background-color: rgba(var(--ion-color-warning-rgb), 0.06);
+  }
+
+  // ✅ ADMIN: Indicateur visuel pour les abonnements inactifs
+  &.inactive:not(.paused) {
+    border-left: 4px solid var(--ion-color-danger);
+    background-color: rgba(var(--ion-color-danger-rgb), 0.04);
+  }
+}
+
+// ✅ ADMIN: Contrôles admin (date + boutons)
+.admin-controls {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #ddd;
+  display: flex;
+  flex-wrap: wrap;
+
+  .date-picker-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .5rem;
+  }
+
+  .control-label {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .date-input {
+    padding: .25rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 13px;
+    min-width: 140px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--ion-color-primary);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #f0f0f0;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: .5rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  // Checkbox de confirmation compact - inline desktop, nouvelle ligne mobile
+  .confirm-item {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem 0;
+
+    input {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    ion-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #666;
+      white-space: wrap;
+    }
+
+    // Mobile: nouvelle ligne (100% width)
+    @media (max-width: 768px) {
+      flex-basis: 100%;
+      margin-bottom: 8px;
+    }
+  }
+
+  .action-btn {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .pause-btn {
+    background-color: var(--ion-color-warning);
+    color: var(--ion-color-warning-contrast);
+
+    &:hover:not(:disabled) {
+      background-color: var(--ion-color-warning-shade);
+    }
+  }
+
+  .resume-btn {
+    background-color: var(--ion-color-success);
+    color: var(--ion-color-success-contrast);
+
+    &:hover:not(:disabled) {
+      background-color: var(--ion-color-success-shade);
+    }
+  }
+
+  .reset-btn {
+    background-color: var(--ion-color-tertiary);
+    color: var(--ion-color-tertiary-contrast);
+
+    &:hover:not(:disabled) {
+      background-color: var(--ion-color-tertiary-shade);
     }
   }
 }
