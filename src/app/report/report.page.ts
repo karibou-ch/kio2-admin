@@ -52,7 +52,7 @@ export class ReportPage implements OnInit {
     this.pickerShippingString = this.currentDate.toISOString();
 
     //
-    // reload data 
+    // reload data
     // this.$route.params.subscribe(params => {
     //   console.log('--',params);
     // });
@@ -60,7 +60,7 @@ export class ReportPage implements OnInit {
 
   set pickerShippingString(date: string){
     this.pickerDate = new Date(date);
-    this.pickerDate.setHours(0,0,0,0);
+    this.pickerDate.setUTCHours(0,0,0,0);
   }
 
   get pickerShippingString(){
@@ -138,7 +138,7 @@ export class ReportPage implements OnInit {
     Commission, "VENTE.COMMISSION", ${report.ca}
     Service K. , "VENTE.SERVICE", ${report.serviceamount}
     Livraison , "VENTE.LOGISTIQUE", ${report.shippingamount}
-    `  
+    `
     navigator.clipboard.writeText(csv.trim());
   }
 
@@ -214,7 +214,7 @@ export class ReportPage implements OnInit {
     }, 0);
   }
 
-  sortByTvaAndSell(a, b) {  
+  sortByTvaAndSell(a, b) {
     a.tva = a.tva || 0;
     b.tva = b.tva || 0;
     if (a.tva == b.tva) {
