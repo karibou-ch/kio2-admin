@@ -332,10 +332,8 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     this.isReady = true;
     this.vendors = {list: []};
 
-    // ✅ CORRECTION: Ne pas écraser pickerShippingDate si l'utilisateur a fait une sélection explicite
-    // ctx.when peut être différent de la date sélectionnée si engine fait un fallback (pas de commandes)
-    // On garde la date sélectionnée par l'utilisateur pour l'affichage du calendrier
-    // this.pickerShippingDate = ctx.when; // ← Supprimé pour éviter écrasement
+    // ✅ SOLUTION B: Toujours synchroniser pickerShippingDate avec ctx.when
+    this.pickerShippingDate = ctx.when;
 
     //
     // init orders count
@@ -385,19 +383,26 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
   /**
-   * ✅ MIGRATION: Logique date picker adaptée pour CalendarPage
-   * La date sélectionnée est utilisée directement sans fallback engine
+   * ✅ SOLUTION B: Respecter la sélection utilisateur
+   *
+   * Comportement:
+   * - Date par défaut = premier jour avec commandes (via findAllOrders)
+   * - Sélection utilisateur → poussée dans l'URL comme ancre (?when=timestamp)
+   * - Si pas de commandes pour la date → affiche liste vide (pas de redirection)
    */
   onDatePickerFromCalendar(selectedDate: Date) {
-    // ✅ CORRECTION: S'assurer que pickerShippingDate est défini AVANT l'appel engine
-    // pour éviter qu'il soit écrasé par le fallback de onInitOrders
     this.pickerShippingDate = selectedDate;
-
     this.$engine.currentShippingDate = selectedDate;
-    this.$engine.findAllOrders();
 
-    // Update route avec timestamp de la date sélectionnée
+    const orders = this.$engine.getOrdersByDay(selectedDate);
+
+    // Ancre URL pour la date sélectionnée
     this.$router.navigate([], { queryParams: { when: selectedDate.getTime() }});
+
+    this.onInitOrders({
+      orders: orders,  // [] si pas de commandes
+      when: selectedDate
+    } as OrdersCtx);
   }
 
 

@@ -228,39 +228,26 @@ export class ShopperPage implements OnInit {
   }
 
   /**
-   * ✅ MIGRATION: Logique date picker adaptée pour CalendarPage
-   * Séparée de l'ancienne version pour compatibilité
+   * ✅ SOLUTION B: Respecter la sélection utilisateur
+   *
+   * Comportement:
+   * - Date par défaut = premier jour avec commandes (via findAllOrders)
+   * - Sélection utilisateur → poussée dans l'URL comme ancre (?when=timestamp)
+   * - Si pas de commandes pour la date → affiche liste vide (pas de redirection)
    */
   onDatePickerFromCalendar(selectedDate: Date) {
-    // ✅ CORRECTION: S'assurer que pickerShippingDate est défini AVANT l'appel engine
-    // pour éviter qu'il soit écrasé par le fallback de onInitOrders
     this.pickerShippingDate = selectedDate;
+    this.$engine.currentShippingDate = selectedDate;
 
-    const date = this.$engine.currentShippingDate = selectedDate;
-    const orders = this.$engine.getOrdersByDay(date);
-    const today = new Date();
-    const thisWeek = today.plusDays(- today.getDay());
-    const nextWeek = today.plusDays(7 - today.getDay());
-    // ❌ SUPPRIMÉ: date.setUTCHours(0, 0, 0, 0); - déjà fait dans CalendarPage
+    const orders = this.$engine.getOrdersByDay(selectedDate);
 
-    if(date < thisWeek && !orders.length) {
-      this.$engine.selectOrderArchives(true);
-    }else if (date>nextWeek && !orders.length){
-      this.$engine.selectOrderArchives(false);
-    }else if(!orders.length){
-      this.$engine.selectOrderArchives(false);
-      this.$engine.currentShippingDate = date;
-    }else{
-      this.$router.navigate([], { queryParams: { when: (date.getTime()) }});
+    // Ancre URL pour la date sélectionnée
+    this.$router.navigate([], { queryParams: { when: selectedDate.getTime() }});
 
-      this.onInitOrders({
-        orders: (orders),
-        when: (date)
-      } as OrdersCtx);
-    }
-
-    // Update route
-    this.$router.navigate([], {queryParams: { when: (date.getTime()) }});
+    this.onInitOrders({
+      orders: orders,  // [] si pas de commandes
+      when: selectedDate
+    } as OrdersCtx);
   }
 
   onEngineStatus(status: OrderStatus) {
@@ -270,8 +257,6 @@ export class ShopperPage implements OnInit {
   onInitOrders(ctx: OrdersCtx) {
     //
     // set default order value based on postalCode
-    // ✅ CORRECTION: Ne pas écraser pickerShippingDate si sélection utilisateur explicite
-    // this.pickerShippingDate = ctx.when; // ← Supprimé pour éviter écrasement par fallback engine
     this.orders = ctx.orders.sort(this.sortOrdersByPosition).map(order => this.deepcopy(order));
     // this.orders.filter(o => o.shipping.priority === 1).forEach(order => {
     //   console.log('---- priority,position',order.rank,order.shipping.priority, order.shipping.position);
@@ -306,6 +291,8 @@ export class ShopperPage implements OnInit {
       if (select) {this.setCurrentHub(select); }
     }
 
+    // ✅ SOLUTION B: Toujours synchroniser pickerShippingDate avec ctx.when
+    this.pickerShippingDate = ctx.when;
     this.isReady = true;
     this.currentPlanning = undefined;
     this.trackPlanning(this.orders);
