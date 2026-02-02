@@ -3,7 +3,6 @@ import { Config, User, Order, OrderService, CalendarService } from 'kng2-core';
 import { ModalController, ToastController, PopoverController, AlertController } from '@ionic/angular';
 import { EngineService, OrdersCtx, OrderStatus } from '../services/engine.service';
 import { TrackerPage } from '../tracker/tracker.page';
-import { CalendarPage } from '../calendar/calendar.page';
 import { Router, ActivatedRoute } from '@angular/router';
 
 export interface ShopperPlan {
