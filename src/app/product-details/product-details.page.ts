@@ -312,26 +312,17 @@ export class ProductDetailsPage implements OnInit {
     }, 1);
   }
 
-  doKeypressOnPrice($event) {
-    const $elem = $event.inputElement||$event.target;
-    const price = parseFloat($elem.value || "0");
-
-    //
-    // save on enter
-    if($event.keyCode === 13 || $event.key === 'Enter' || $event.code === 'Enter'){
-      this.doSave(this.product);
-      return;
-    }
-
-    if(isNaN(price)){
-      return;
-    }
-    this.product.pricing.price = price;
-
-
-    if(this.portion.isWeight){
+  onPriceChange(price: number) {
+    if (this.portion.isWeight) {
       this.priceKg = Utils.roundAmount(price * 1000 / this.portion.part);
     }
+  }
+
+  onPriceKgChange(priceKg: number) {
+    if (isNaN(priceKg)) {
+      return;
+    }
+    this.product.pricing.price = Utils.roundAmount(priceKg / 1000 * this.portion.part);
   }
 
   doUpdatePart(part: any) {
@@ -341,18 +332,6 @@ export class ProductDetailsPage implements OnInit {
     if(this.portion.isWeight){
       this.priceKg = Utils.roundAmount(this.product.pricing.price * 1000 / this.portion.part);
     }
-
-  }
-
-  doUpdatePriceKG($event) {
-    const $elem = $event.inputElement||$event.target;
-    const price = parseFloat($elem.value || "0");
-    if (isNaN(price)) {
-      return;
-    }
-    this.product.pricing.price = Utils.roundAmount(price / 1000 * this.portion.part);
-    this.portion = this.product.getPortionParts();
-
 
   }
 
