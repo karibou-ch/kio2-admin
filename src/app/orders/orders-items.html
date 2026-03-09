@@ -117,12 +117,20 @@
 <!-- CHECK CONTENT ITEMS -->
 <ng-template #ordersValidateItems let-order >
     <!-- GLOBAL SAVE ACTION-->
-    <ion-item-sliding *ngFor="let item of sortedItem(order)">
+    <ng-container *ngFor="let item of sortedItem(order)">
+    <ion-item-sliding #sliding>
       <ion-item-options side="end" >
+        <ion-item-option [hidden]="isPaid(order) || !user.isAdmin()">
+          <ion-button class="avoid"
+                  color="secondary" slot="end" tabindex="-1"
+                  (click)="openVendorForm(order, item, sliding)">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>&nbsp;vendor
+          </ion-button>
+        </ion-item-option>
         <ion-item-option [hidden]="!isPaid(order)">
             <ion-button class="avoid button-refund"
                     color="danger"  slot="end" tabindex="-1"
-                    [disabled]="item.finalprice == 0"
+                    [disabled]="!item.finalprice"
                     (click)="doRefund(order,item)">
               <ion-icon name="card-outline" ></ion-icon>&nbsp;refund
             </ion-button>
@@ -143,7 +151,7 @@
           <div tabindex="-1" class="quantity {{item.fulfillment.status}}" [class.red.bold]="item.quantity>1">
             {{item.quantity}}x <span class="part">{{item.part}}</span>&nbsp;
             <span class="issue" [hidden]="!item.fulfillment.request">problème:{{item.fulfillment.request}} </span>
-            <span class="issue" [hidden]="!item.fulfillment.refunded"><span [hidden]="item.finalprice==0">partiellement</span> remboursé </span>
+            <span class="issue" [hidden]="!item.fulfillment.refunded"><span [hidden]="item.finalprice === 0">partiellement</span> remboursé </span>
             <span class="issue" [hidden]="!item.fulfillment.issue">{{getItemIssue(item)}}</span>
           </div>
 
@@ -187,4 +195,27 @@
       </ion-item>
 
     </ion-item-sliding>
+    <ion-item class="vendor-form-item" *ngIf="isVendorFormOpen(order, item)">
+      <div class="vendor-form">
+        <ion-item lines="none" class="customer-contact">
+          <ion-label color="primary">Vendeur</ion-label>
+          <ion-select ngDefaultControl [(ngModel)]="editVendorTarget" interface="action-sheet">
+            <ion-select-option *ngFor="let shop of shops" [value]="shop.urlpath">{{shop.name}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item lines="none" class="customer-contact">
+          <ion-label color="primary">Titre</ion-label>
+          <ion-input [(ngModel)]="editVendorTitle"></ion-input>
+        </ion-item>
+        <div class="vendor-form-actions">
+          <ion-button size="small" color="medium" fill="outline" (click)="cancelVendorForm(sliding)">
+            annuler
+          </ion-button>
+          <ion-button size="small" color="secondary" [disabled]="!editVendorTarget || isUpdatingVendor" (click)="submitVendorForm(order, item, sliding)">
+            valider
+          </ion-button>
+        </div>
+      </div>
+    </ion-item>
+    </ng-container>
 </ng-template>

@@ -108,6 +108,10 @@ ion-list{
 
 ion-item {
   --padding-start: 8px;
+  &.inline-form{
+    --background: #f3f7f6;
+    --inner-padding-end: 8px;
+  }
   &.header{
     min-height: 1.9rem;
     background: var(--ion-color-kio-primary);
@@ -277,6 +281,32 @@ ion-item {
     ion-chip{
       border	: 1px solid  var(--ion-color-primary);
     }
+  }
+}
+
+.inline-order-form{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 0;
+  ion-label{
+    min-width: 110px;
+    color: var(--ion-color-kio-primary);
+    font-weight: 600;
+  }
+  input{
+    min-height: 36px;
+    border: 1px solid #cfd8d7;
+    border-radius: 6px;
+    padding: 0 10px;
+    background: white;
+    color: #333;
+  }
+  .actions{
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
   }
 }
 

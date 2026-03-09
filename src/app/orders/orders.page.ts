@@ -2,7 +2,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EngineService, OrderStatus, OrdersCtx } from '../services/engine.service';
 import { User, LoaderService, OrderService, Order, OrderItem, EnumCancelReason, CalendarService } from 'kng2-core';
-import { ToastController, PopoverController, ModalController, LoadingController } from '@ionic/angular';
+import { ToastController, PopoverController, ModalController, LoadingController, IonItemSliding } from '@ionic/angular';
 import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 import { Router, ActivatedRoute } from '@angular/router';
 import { interval } from 'rxjs';
@@ -59,6 +59,9 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
   pickerShippingDate: Date;
   searchFilter: string;
   interval$;
+  moveOrderOid: number;
+  moveOrderWhen: string;
+  isMovingOrder = false;
 
   currentDates: Date[];
   openItems: {
@@ -94,6 +97,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.openItems = {};
     this.shippingComplement = {};
     this.complementsLength = 0;
+    this.moveOrderOid = null;
+    this.moveOrderWhen = '';
 
   }
 
@@ -499,6 +504,58 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     }
   }
 
+  isMoveOrderOpen(order: Order) {
+    return this.moveOrderOid === order.oid;
+  }
+
+  openMoveOrder(order: Order, sliding?: IonItemSliding) {
+    this.moveOrderOid = order.oid;
+    this.moveOrderWhen = order.shipping.when.toYYYYMMDD('-');
+    if (sliding) {
+      sliding.close();
+    }
+  }
+
+  cancelMoveOrder(sliding?: IonItemSliding) {
+    this.moveOrderOid = null;
+    this.moveOrderWhen = '';
+    if (sliding) {
+      sliding.close();
+    }
+  }
+
+  submitMoveOrder(order: Order, sliding?: IonItemSliding) {
+    if (!this.moveOrderWhen) {
+      return this.onDone('Choisissez une date');
+    }
+    this.isMovingOrder = true;
+    this.$order.move(order, this.moveOrderWhen).subscribe(
+      ok => {
+        this.isMovingOrder = false;
+        this.cancelMoveOrder(sliding);
+
+        const movedDay = ok.shipping.when.toYYYYMMDD('-');
+        const currentDay = this.shipping.toYYYYMMDD('-');
+
+        if (movedDay !== currentDay) {
+          this.orders = this.orders.filter(elem => elem.oid !== ok.oid);
+        } else {
+          const idx = this.orders.findIndex(elem => elem.oid === ok.oid);
+          if (idx > -1) {
+            this.orders[idx] = ok;
+          }
+        }
+
+        this.onInitOrders({ orders: this.orders, when: this.shipping } as OrdersCtx);
+        this.onDone('Commande déplacée');
+      },
+      error => {
+        this.isMovingOrder = false;
+        this.onDone(error.error);
+      }
+    );
+  }
+
   orderShippingFees(order) {
     this.$order.updateShippingPrice(order, order.payment.fees.shipping).subscribe(
       (ok) => {
@@ -645,7 +702,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.orderTotal = this.orders.reduce((sum, order, i) => {
       return order.getSubTotal({ withoutCharge: true }) + sum + this.orderBaseAmount;
     }, 0);
-    this.orderAvg = this.orderTotal / this.ordersCount;
+    this.orderAvg = this.ordersCount ? (this.orderTotal / this.ordersCount) : 0;
 
     this.$cdr.detectChanges();
   }

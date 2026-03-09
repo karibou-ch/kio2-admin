@@ -196,6 +196,11 @@ ion-item{
     }
   }
 
+  &.vendor-form-item{
+    --background: #f3f7f6;
+    --inner-padding-end: 8px;
+  }
+
   .verify {
     color: red!important;
   }
@@ -415,4 +420,19 @@ ion-item{
     }
   }
 
+}
+
+.vendor-form{
+  width: 100%;
+  padding: 8px 0;
+  ion-item.customer-contact{
+    --background: transparent;
+  }
+}
+
+.vendor-form-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 8px 0;
 }

@@ -121,7 +121,8 @@
         </ion-button>
       </ion-note>
     </ion-item>
-    <ion-item-sliding *ngFor="let order of sortedOrders;let i=index;">
+    <ng-container *ngFor="let order of sortedOrders;let i=index;">
+    <ion-item-sliding #sliding>
       <ion-item-options side="start" [hidden]="!user.isAdmin() && !user.hasRole('operator')">
         <ion-item-option>
           <ion-button mode="ios" expandable (click)="orderCapture(order)" [hidden]="!isOrderCapturable(order)">
@@ -129,6 +130,9 @@
           </ion-button>
           <ion-button mode="ios" expandable color="danger" (click)="orderCancel(order)" [hidden]="!isOrderCancelable(order)">
             cancel
+          </ion-button>
+          <ion-button mode="ios" expandable color="secondary" (click)="openMoveOrder(order, sliding)" [hidden]="!user.isAdmin()">
+            déplacer
           </ion-button>
         </ion-item-option>
       </ion-item-options>
@@ -209,6 +213,21 @@
 
       </ion-item>
     </ion-item-sliding>
+    <ion-item class="inline-form" *ngIf="isMoveOrderOpen(order)">
+      <div class="inline-order-form">
+        <ion-label>Date de livraison</ion-label>
+        <input type="date" [(ngModel)]="moveOrderWhen">
+        <div class="actions">
+          <ion-button size="small" color="medium" fill="outline" (click)="cancelMoveOrder(sliding)">
+            annuler
+          </ion-button>
+          <ion-button size="small" color="secondary" [disabled]="!moveOrderWhen || isMovingOrder" (click)="submitMoveOrder(order, sliding)">
+            valider
+          </ion-button>
+        </div>
+      </div>
+    </ion-item>
+    </ng-container>
   </ion-list>
   <div>
     &nbsp;

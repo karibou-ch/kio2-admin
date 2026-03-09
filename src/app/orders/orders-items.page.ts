@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ToastController, AlertController, ModalController, PopoverController } from '@ionic/angular';
+import { ToastController, AlertController, ModalController, PopoverController, IonItemSliding } from '@ionic/angular';
 
-import { Order, EnumFulfillments, OrderService, OrderItem, audioMimeType, ProductService, User, EnumOrderIssue } from 'kng2-core';
+import { Order, EnumFulfillments, OrderService, OrderItem, audioMimeType, ProductService, User, EnumOrderIssue, Shop, ShopService } from 'kng2-core';
 import { EngineService } from 'src/app/services/engine.service';
 import { Router } from '@angular/router';
 import { CustomerMessage } from '../customer-message/customer-message.page';
@@ -20,6 +20,11 @@ export class OrdersItemsPage implements OnInit {
   public displayForCheck: boolean;
   public filterItem: string;
   public doubleCheck: boolean;
+  public shops: Shop[] = [];
+  public editVendorKey: string;
+  public editVendorTarget: string;
+  public editVendorTitle: string;
+  public isUpdatingVendor = false;
 
   public static mapItem:any = {};
   public cmpItemAndVdr = (item) =>  (a) => a.sku == item.sku && a.vendor == item.vendor;
@@ -41,6 +46,7 @@ export class OrdersItemsPage implements OnInit {
     public $alert: AlertController,
     public $engine: EngineService,
     public $order: OrderService,
+    public $shops: ShopService,
     private $popup: PopoverController,
     public $modal: ModalController,
     public $product: ProductService,
@@ -60,6 +66,9 @@ export class OrdersItemsPage implements OnInit {
     this.format = this.$engine.defaultFormat;
     this.doubleCheck = false;
     this.header = true;
+    this.editVendorKey = null;
+    this.editVendorTarget = '';
+    this.editVendorTitle = '';
   }
 
   get mapItem(){
@@ -71,6 +80,12 @@ export class OrdersItemsPage implements OnInit {
   }
 
   ngOnInit() {
+    if (this.user.isAdmin()) {
+      this.$shops.query({ status: true }).subscribe(shops => {
+        this.shops = (shops || []).sort((a, b) => a.name.localeCompare(b.name));
+      });
+    }
+
     if(this.defaultSmall) {
       this.doubleCheck = true;
       this.displayForCheck = true;
@@ -310,6 +325,66 @@ export class OrdersItemsPage implements OnInit {
 
   doReplace(order,item) {
 
+  }
+
+  getVendorFormKey(order: Order, item: OrderItem) {
+    return order.oid + ':' + item.sku + ':' + item.vendor;
+  }
+
+  isVendorFormOpen(order: Order, item: OrderItem) {
+    return this.editVendorKey === this.getVendorFormKey(order, item);
+  }
+
+  openVendorForm(order: Order, item: OrderItem, sliding?: IonItemSliding) {
+    this.editVendorKey = this.getVendorFormKey(order, item);
+    this.editVendorTarget = item.vendor;
+    this.editVendorTitle = item.title;
+    if (sliding) {
+      sliding.close();
+    }
+  }
+
+  cancelVendorForm(sliding?: IonItemSliding) {
+    this.editVendorKey = null;
+    this.editVendorTarget = '';
+    this.editVendorTitle = '';
+    if (sliding) {
+      sliding.close();
+    }
+  }
+
+  submitVendorForm(order: Order, item: OrderItem, sliding?: IonItemSliding) {
+    if (!this.editVendorTarget) {
+      return this.doToast('Choisissez un vendeur');
+    }
+    if (this.editVendorTarget === item.vendor && this.editVendorTitle === item.title) {
+      return this.doToast('Aucun changement');
+    }
+
+    this.isUpdatingVendor = true;
+    const title = this.editVendorTitle?.trim() || item.title;
+
+    this.$order.updateItemVendor(order, item, this.editVendorTarget, title).subscribe(
+      ok => {
+        this.isUpdatingVendor = false;
+        Object.assign(order, ok);
+
+        if (!this.user.isAdmin()) {
+          order.items = order.items.filter(i => i.vendor === item.vendor);
+        }
+        if (this.vendor) {
+          order.items = order.items.filter(i => i.vendor === this.vendor);
+        }
+
+        this.computeDeltaPrice(order);
+        this.cancelVendorForm(sliding);
+        this.doToast('Vendeur modifié');
+      },
+      error => {
+        this.isUpdatingVendor = false;
+        this.doToast(error.error, error);
+      }
+    );
   }
   async doAskCancel($event, order, item) {
     const pop = await this.$popup.create({
