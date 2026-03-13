@@ -1,0 +1,306 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Nouvelle commande</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/orders" text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
+  <div [hidden]="!isReady">
+
+    <ion-list lines="full">
+      <ion-item>
+        <ion-input
+          placeholder="Rechercher un produit..."
+          [(ngModel)]="productQuery"
+          (ngModelChange)="onProductQueryChange()"
+          clearInput="true">
+          <ion-icon
+            slot="end"
+            [name]="productLoading ? 'reload-outline' : 'search-outline'"
+            [class.rotating]="productLoading"
+            color="medium">
+          </ion-icon>
+        </ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="productSuggestions.length > 0" class="suggestions" lines="none">
+      <ion-item
+        *ngFor="let suggestion of productSuggestions"
+        button="true"
+        (click)="onSelectProductSuggestion(suggestion)"
+        detail="false">
+        <ion-icon slot="start" name="cube-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h3>{{ suggestion.title }}</h3>
+          <p>sku: {{ suggestion.sku }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-card *ngIf="currentCartItems.length" color="light">
+      <ion-card-header>
+        <ion-card-subtitle>Produits sélectionnés</ion-card-subtitle>
+        <ion-card-title>{{ currentCartItems.length }} ligne(s)</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item *ngFor="let item of currentCartItems" lines="full" class="cart-item">
+          <ion-label class="ion-text-wrap">
+            <h3>{{ item.title }}</h3>
+            <p>sku: {{ item.sku }} <span *ngIf="item.part">- {{ item.part }}</span></p>
+            <p *ngIf="item.error" color="danger" class="error-text">{{ item.error }}</p>
+          </ion-label>
+          <div slot="end" class="qty-actions">
+            <ion-button fill="clear" size="small" color="medium" (click)="removeQuantity(item)">
+              <ion-icon name="remove-outline"></ion-icon>
+            </ion-button>
+            <span class="qty">{{ item.quantity }}</span>
+            <ion-button fill="clear" size="small" color="primary" (click)="addQuantity(item)">
+              <ion-icon name="add-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" color="danger" (click)="removeItem(item)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list lines="full">
+      <ion-item>
+        <ion-input
+          placeholder="Nom, email ou téléphone..."
+          [(ngModel)]="userQuery"
+          (ngModelChange)="onUserQueryChange()"
+          clearInput="true">
+          <ion-icon
+            slot="start"
+            [name]="userLoading ? 'reload-outline' : 'person-outline'"
+            [class.rotating]="userLoading"
+            color="medium">
+          </ion-icon>
+        </ion-input>
+      </ion-item>
+      <ion-item *ngIf="userSearchError && !userLoading">
+        <ion-label color="danger">{{ userSearchError }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="userSuggestions.length > 0" class="suggestions" lines="none">
+      <ion-item
+        *ngFor="let customer of userSuggestions"
+        button="true"
+        (click)="onSelectUser(customer)"
+        detail="false">
+        <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h3>{{ customer.name?.givenName }} {{ customer.name?.familyName }}</h3>
+          <p>{{ customer.email?.address }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-card *ngIf="selectedUser" color="light">
+      <ion-card-header>
+        <ion-card-subtitle>Client sélectionné</ion-card-subtitle>
+        <ion-card-title>{{ selectedUser.name?.givenName }} {{ selectedUser.name?.familyName }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ selectedUser.email?.address }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list lines="full">
+      <ion-item *ngIf="clientAddresses.length > 1">
+        <ion-label position="stacked">Adresse de livraison</ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="selectedAddress"
+          [compareWith]="compareAddresses"
+          (ionChange)="onAddressChange($any($event).detail.value)"
+          placeholder="Choisir une adresse...">
+          <ion-select-option *ngFor="let addr of clientAddresses" [value]="addr">
+            {{ addr.streetAdress }}, {{ addr.postalCode }} - {{ addr.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngIf="selectedUser && clientAddresses.length === 1 && selectedAddress" color="light">
+        <ion-label>
+          <p><b>Adresse :</b> {{ selectedAddress.streetAdress }}, {{ selectedAddress.postalCode }} {{ selectedAddress.region }}</p>
+          <p *ngIf="selectedAddress.floor">{{ selectedAddress.floor }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="selectedUser && clientAddresses.length === 0" color="warning">
+        <ion-label class="ion-text-wrap">
+          <ion-icon name="warning-outline"></ion-icon>
+          Ce client n'a aucune adresse enregistrée.
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Marché (hub)</ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="selectedHub"
+          [compareWith]="compareHubs"
+          (ionChange)="onHubChange($any($event).detail.value)">
+          <ion-select-option *ngFor="let hub of hubs" [value]="hub">{{ hub.name }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Date de livraison</ion-label>
+        <ion-input
+          type="date"
+          slot="end"
+          [(ngModel)]="form.when"
+          (ngModelChange)="onDeliveryDateChange($event)"
+          style="max-width: 170px; text-align:right;">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          Horaire de livraison
+          <div class="info">Selon la configuration du marché.</div>
+        </ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="form.hours"
+          (ionChange)="onDeliveryHoursChange($any($event).detail.value)">
+          <ion-select-option *ngFor="let opt of shippingTimeOptions" [value]="opt.value">
+            {{ opt.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Note interne</ion-label>
+        <ion-input
+          type="text"
+          [(ngModel)]="form.note"
+          placeholder="optionnel...">
+        </ion-input>
+      </ion-item>
+
+      <ion-list-header>
+        <ion-label>Paiement</ion-label>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label>
+          Paiement par facture
+          <div class="info">
+            <b>Désactivé</b> = carte du client.
+            <b>Activé</b> = facturation manuelle.
+          </div>
+        </ion-label>
+        <ion-toggle
+          slot="end"
+          [(ngModel)]="form.useInvoice"
+          (ionChange)="onInvoiceChange()"
+          color="warning">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item *ngIf="!form.useInvoice && paymentMethods.length">
+        <ion-label position="stacked">Méthode de paiement</ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="selectedPayment"
+          [compareWith]="comparePayments"
+          (ionChange)="onPaymentChange($any($event).detail.value)">
+          <ion-select-option *ngFor="let payment of paymentMethods" [value]="payment">
+            {{ paymentLabel(payment) }} <span *ngIf="payment.default">- défaut</span>
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngIf="!form.useInvoice && !paymentMethods.length" color="warning">
+        <ion-label class="ion-text-wrap">
+          <ion-icon name="warning-outline"></ion-icon>
+          Ce client n'a pas de méthode de paiement enregistrée. Activez le mode facture pour créer la commande.
+        </ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="form.useInvoice" color="warning">
+        <ion-label class="ion-text-wrap">
+          <ion-icon name="warning-outline"></ion-icon>
+          Mode facture. Le paiement devra être confirmé manuellement.
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-card *ngIf="canCreate" color="light">
+      <ion-card-content>
+        <p><b>Client :</b> {{ selectedUser?.email?.address }}</p>
+        <p><b>Adresse :</b> {{ selectedAddress?.streetAdress }}, {{ selectedAddress?.postalCode }} {{ selectedAddress?.region }}</p>
+        <p><b>Hub :</b> {{ selectedHub?.name }}</p>
+        <p *ngIf="selectedDeliveryDate"><b>Livraison :</b> {{ selectedDeliveryDate | date:'EEEE d MMMM yyyy':'':'fr' }}</p>
+        <p><b>Horaire :</b> {{ form.hours }}h</p>
+        <p><b>Paiement :</b> {{ form.useInvoice ? 'Facture manuelle' : paymentLabel(selectedPayment) }}</p>
+
+        <ng-container *ngIf="orderSubtotal">
+          <ion-item lines="none" style="--padding-start:0">
+            <ion-label color="medium">Produits</ion-label>
+            <span slot="end">{{ orderSubtotal.products | number:'1.2-2' }} CHF</span>
+          </ion-item>
+          <ion-item lines="none" style="--padding-start:0">
+            <ion-label color="medium">Frais de service</ion-label>
+            <span slot="end">{{ orderSubtotal.fees | number:'1.2-2' }} CHF</span>
+          </ion-item>
+          <ion-item lines="none" style="--padding-start:0" *ngIf="orderSubtotal.discount > 0">
+            <ion-label color="medium">Remise</ion-label>
+            <span slot="end">-{{ orderSubtotal.discount | number:'1.2-2' }} CHF</span>
+          </ion-item>
+          <ion-item lines="none" style="--padding-start:0">
+            <ion-label color="medium">Livraison</ion-label>
+            <span slot="end">{{ orderSubtotal.delivery | number:'1.2-2' }} CHF</span>
+          </ion-item>
+          <ion-item lines="none" style="--padding-start:0; font-weight:bold">
+            <ion-label><b>Total commande</b></ion-label>
+            <span slot="end"><b>{{ orderSubtotal.total | number:'1.2-2' }} CHF</b></span>
+          </ion-item>
+        </ng-container>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-item *ngIf="!canCreate" color="light">
+      <ion-label color="medium">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        Complétez produits, client, adresse, date et paiement pour créer la commande.
+      </ion-label>
+    </ion-item>
+
+  </div>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="onCancel()">Annuler</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button
+        color="primary"
+        fill="solid"
+        [disabled]="!canCreate || isSaving"
+        (click)="onCreate()">
+        <ion-icon *ngIf="!isSaving" name="checkmark-outline" slot="start"></ion-icon>
+        <ion-icon *ngIf="isSaving" class="rotating" name="reload-outline" slot="start"></ion-icon>
+        {{ isSaving ? 'Création...' : 'Créer la commande' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

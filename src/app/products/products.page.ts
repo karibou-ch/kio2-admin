@@ -195,6 +195,12 @@ export class ProductsPage implements OnInit {
     }
 
     //
+    // Admin and vendors see all product types (item, contract, custom)
+    if (this.user.isAdmin() || this.userShops.length > 0) {
+      params.type = 'all';
+    }
+
+    //
     // force reload
     params.rnd = Date.now();
     this.$product.select(params).subscribe(

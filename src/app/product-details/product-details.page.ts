@@ -190,6 +190,12 @@ export class ProductDetailsPage implements OnInit {
   }
 
 
+  onTypeChange(type: string) {
+    if (type === 'contract') {
+      this.product.attributes.bundle = true;
+    }
+  }
+
   doCreateVariant(product: Product) {
     if (!product.variants) {
       product.variants = [];
@@ -275,12 +281,6 @@ export class ProductDetailsPage implements OnInit {
     if ((this.shops.length > 0 && this.shops.length < 3) &&
       (typeof this.product.vendor !== 'string')) {
       this.product.vendor = this.shops[0]._id;
-    }
-
-    //
-    // default bundle vendor
-    if(this.product.attributes.bundle){
-      this.doCheckBundle(product);
     }
 
     if(this.portion.isWeight){

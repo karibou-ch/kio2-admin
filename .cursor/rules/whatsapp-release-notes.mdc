@@ -1,0 +1,29 @@
+# Format des Notes de Version
+
+## 🎯 Objectif
+
+Standardiser le format des annonces de mise à jour pour WhatsApp destinées aux utilisateurs de l'application admin.
+
+## 📋 Template Standard
+
+```
+🔧 **Mise à jour <nom-application-ou-domaine> vX.Y.Z**
+
+[Description principale du problème résolu ou de la fonctionnalité ajoutée] ✅
+
+*Autres corrections apportées :*
+• [Correction 1]
+• [Correction 2]
+• [Correction 3]
+
+La mise à jour est disponible dès maintenant.
+Merci pour votre patience 🙏
+```
+
+
+## ✅ Bonnes Pratiques
+
+- ✅ Lire package.json pour la version exacte
+- ✅ Résumer les commits en langage utilisateur
+- ✅ Tester le message sur mobile avant envoi
+- ✅ Envoyer aux heures de bureau (9h-18h)

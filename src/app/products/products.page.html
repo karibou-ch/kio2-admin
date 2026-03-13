@@ -155,6 +155,8 @@
           <ion-label>
             <h2 [class.red]="product.attributes.discount">
               {{product.title}} <span [hidden]="!product.attributes.lastMinute">⏰</span>
+              <ion-badge *ngIf="product.type === 'contract'" color="tertiary" style="margin-left:6px;font-size:0.65em;vertical-align:middle">contrat</ion-badge>
+              <ion-badge *ngIf="product.type === 'custom'" color="medium" style="margin-left:6px;font-size:0.65em;vertical-align:middle">custom</ion-badge>
             </h2>
             <h3>{{product.pricing.price|currency:'CHF'}} <b>/</b> {{product.pricing.part}} &nbsp;<span class="gray">// {{product.details.origin}}</span></h3>
             <p>

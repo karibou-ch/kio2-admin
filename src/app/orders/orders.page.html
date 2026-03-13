@@ -58,6 +58,12 @@
   <ng-container *ngTemplateOutlet="displayByItems ? ordersItems: ordersByRank" ></ng-container>
 
 
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="user?.isAdmin()">
+    <ion-fab-button color="primary" routerLink="create" routerDirection="forward">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>
 
 

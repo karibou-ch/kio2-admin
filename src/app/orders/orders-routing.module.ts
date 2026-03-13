@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { LoaderResolve } from 'kng2-core';
 
 import { OrdersCustomerPage, OrdersPlanningPage } from './orders.page';
 import { OrdersCollectPage } from './orders-collect.page';
+import { OrderCreatePage } from './order-create.page';
 
 const routes: Routes = [
   {
@@ -20,6 +22,11 @@ const routes: Routes = [
   {
     path: 'planning',
     component: OrdersPlanningPage
+  },
+  {
+    path: 'create',
+    component: OrderCreatePage,
+    resolve: { loader: LoaderResolve }
   }
 
 ];

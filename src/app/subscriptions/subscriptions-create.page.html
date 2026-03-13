@@ -1,0 +1,317 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Nouveau contrat</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/subscriptions" text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
+  <div [hidden]="!isReady">
+
+    <!-- ─── 1. Produit ────────────────────────────────────────────────── -->
+    <ion-list lines="full">
+      <ion-item>
+        <ion-input
+          placeholder="Rechercher un produit..."
+          [(ngModel)]="productQuery"
+          (ngModelChange)="onProductQueryChange()"
+          clearInput="true">
+          <ion-icon slot="end" [name]="productLoading ? 'reload-outline' : 'search-outline'"
+            [class.rotating]="productLoading" color="medium">
+          </ion-icon>
+        </ion-input>
+      </ion-item>
+    </ion-list>
+
+    <!-- Suggestions produit -->
+    <ion-list *ngIf="productSuggestions.length > 0" class="suggestions" lines="none">
+      <ion-item
+        *ngFor="let s of productSuggestions"
+        button="true"
+        (click)="onSelectProductSuggestion(s)"
+        detail="false">
+        <ion-icon slot="start" name="cube-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h3>{{ s.title }}</h3>
+          <p>sku: {{ s.sku }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Résumé produit sélectionné -->
+    <ion-card *ngIf="selectedProduct" color="light">
+      <ion-card-header>
+        <ion-card-subtitle>Produit sélectionné</ion-card-subtitle>
+        <ion-card-title>{{ selectedProduct.title }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Prix : <b>{{ selectedProduct.pricing.price }} CHF</b></p>
+        <p *ngIf="selectedProduct.attributes?.bundle && productBundleItems.length > 0">
+          <b>Bundle ({{ productBundleItems.length }} articles) :</b>
+        </p>
+        <p *ngFor="let b of productBundleItems" style="padding-left:8px; margin:2px 0;">
+          {{ b.title }} &mdash; {{ b.vendor }} &mdash; {{ b.price }} CHF
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- ─── 2. Client ─────────────────────────────────────────────────── -->
+    <ion-list lines="full">
+      <ion-item>
+        <ion-input
+          placeholder="Nom, email ou téléphone..."
+          [(ngModel)]="userQuery"
+          (ngModelChange)="onUserQueryChange()"
+          clearInput="true">
+          <ion-icon slot="start" [name]="userLoading ? 'reload-outline' : 'person-outline'"
+            [class.rotating]="userLoading" color="medium">
+          </ion-icon>
+        </ion-input>
+      </ion-item>
+      <ion-item *ngIf="userSearchError && !userLoading">
+        <ion-label color="danger">{{ userSearchError }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Suggestions client -->
+    <ion-list *ngIf="userSuggestions.length > 0" class="suggestions" lines="none">
+      <ion-item
+        *ngFor="let u of userSuggestions"
+        button="true"
+        (click)="onSelectUser(u)"
+        detail="false">
+        <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h3>{{ u.name?.givenName }} {{ u.name?.familyName }}</h3>
+          <p>{{ u.email?.address }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Résumé client sélectionné -->
+    <ion-card *ngIf="selectedUser" color="light">
+      <ion-card-header>
+        <ion-card-subtitle>Client sélectionné</ion-card-subtitle>
+        <ion-card-title>{{ selectedUser.name?.givenName }} {{ selectedUser.name?.familyName }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ selectedUser.email?.address }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list lines="full">
+
+      <!-- Adresses (plusieurs) -->
+      <ion-item *ngIf="clientAddresses.length > 1">
+        <ion-label position="stacked">Adresse de livraison</ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="selectedAddress"
+          [compareWith]="compareAddresses"
+          (ionChange)="onAddressChange($any($event).detail.value)"
+          placeholder="Choisir une adresse...">
+          <ion-select-option *ngFor="let addr of clientAddresses" [value]="addr">
+            {{ addr.streetAdress }}, {{ addr.postalCode }} — {{ addr.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Adresse unique : lecture seule -->
+      <ion-item *ngIf="selectedUser && clientAddresses.length === 1 && selectedAddress" color="light">
+        <ion-label>
+          <p><b>Adresse :</b> {{ selectedAddress.streetAdress }}, {{ selectedAddress.postalCode }} {{ selectedAddress.region }}</p>
+          <p *ngIf="selectedAddress.floor">{{ selectedAddress.floor }}</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Aucune adresse -->
+      <ion-item *ngIf="selectedUser && clientAddresses.length === 0" color="warning">
+        <ion-label class="ion-text-wrap">
+          <ion-icon name="warning-outline"></ion-icon>
+          Ce client n'a aucune adresse enregistrée.
+        </ion-label>
+      </ion-item>
+
+      <!-- ─── 3. Livraison ──────────────────────────────────────────────── -->
+
+      <ion-item>
+        <ion-label position="stacked">Marché (hub)</ion-label>
+        <ion-select interface="action-sheet" [value]="selectedHub" [compareWith]="compareHubs" (ionChange)="onHubChange($any($event).detail.value)">
+          <ion-select-option *ngFor="let h of hubs" [value]="h">{{ h.name }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Jour de livraison</ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="form.dayOfWeek"
+          (ionChange)="form.dayOfWeek = +$any($event).detail.value">
+          <ion-select-option *ngFor="let opt of weekdayOptions" [value]="opt.value">
+            {{ opt.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          Horaire de livraison
+          <div class="info">Selon la configuration du marché.</div>
+        </ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="form.hours"
+          (ionChange)="form.hours = +$any($event).detail.value">
+          <ion-select-option *ngFor="let opt of shippingTimeOptions" [value]="opt.value">
+            {{ opt.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Fréquence</ion-label>
+        <ion-select
+          interface="action-sheet"
+          [value]="form.frequency"
+          (ionChange)="form.frequency = $any($event).detail.value">
+          <ion-select-option value="week">Hebdomadaire</ion-select-option>
+          <ion-select-option value="2week">Bihebdomadaire</ion-select-option>
+          <ion-select-option value="month">Mensuel</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          Date de démarrage
+          <div class="info">Laissez vide pour démarrer immédiatement.</div>
+        </ion-label>
+        <ion-input
+          type="date"
+          slot="end"
+          [(ngModel)]="form.startDate"
+          style="max-width: 160px; text-align:right;">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          Prix de livraison (CHF)
+          <div class="info">Calculé depuis l'adresse ou le plan — modifiable.</div>
+        </ion-label>
+        <ion-input
+          type="number"
+          slot="end"
+          [(ngModel)]="form.deliveryPrice"
+          (ngModelChange)="onDeliveryPriceChange($event)"
+          placeholder="ex: 8"
+          style="text-align:right; max-width: 80px;">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Note interne</ion-label>
+        <ion-input type="text" [(ngModel)]="form.note" placeholder="optionnel..."></ion-input>
+      </ion-item>
+
+      <!-- ─── 4. Paiement ───────────────────────────────────────────────── -->
+      <ion-list-header>
+        <ion-label>4. Paiement</ion-label>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label>
+          Paiement par facture
+          <div class="info">
+            <b>Désactivé</b> = Stripe automatique (carte par défaut du client).
+            <b>Activé</b> = facturation manuelle.
+          </div>
+        </ion-label>
+        <ion-toggle slot="end" [(ngModel)]="form.useInvoice" color="warning"></ion-toggle>
+      </ion-item>
+
+      <ion-item *ngIf="form.useInvoice" color="warning">
+        <ion-label class="ion-text-wrap">
+          <ion-icon name="warning-outline"></ion-icon>
+          Mode facture. Le paiement devra être confirmé manuellement.
+        </ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="!form.useInvoice" color="light">
+        <ion-label class="ion-text-wrap">
+          <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+          Stripe utilisera la carte par défaut du client, avec cascade automatique.
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+
+    <!-- ─── Résumé ────────────────────────────────────────────────────── -->
+
+    <ion-card *ngIf="canCreate" color="light">
+      <ion-card-content>
+        <p><b>Produit :</b> {{ selectedProduct?.title }}</p>
+        <p><b>Client :</b> {{ selectedUser?.email?.address }}</p>
+        <p><b>Adresse :</b> {{ selectedAddress?.streetAdress }}, {{ selectedAddress?.postalCode }} {{ selectedAddress?.region }}</p>
+        <p><b>Hub :</b> {{ selectedHub?.name }}</p>
+        <p><b>Fréquence :</b> {{ form.frequency }} — {{ weekdays[form.dayOfWeek] }}</p>
+        <p><b>Horaire :</b> {{ form.hours }}h</p>
+        <p *ngIf="form.startDate"><b>Démarrage contrat :</b> {{ form.startDate | date:'d MMMM yyyy':'':'fr' }}</p>
+        <p *ngIf="firstDeliveryDate"><b>Première livraison :</b> {{ firstDeliveryDate | date:'EEEE d MMMM':'':'fr' }}</p>
+        <p><b>Paiement :</b> {{ form.useInvoice ? 'Facture manuelle' : 'Stripe — carte par défaut' }}</p>
+        <ng-container *ngIf="orderSubtotal">
+          <ion-item lines="none" style="--padding-start:0">
+            <ion-label color="medium">Produits</ion-label>
+            <span slot="end">{{ orderSubtotal.products | number:'1.2-2' }} CHF</span>
+          </ion-item>
+          <ion-item lines="none" style="--padding-start:0">
+            <ion-label color="medium">Frais de service</ion-label>
+            <span slot="end">{{ orderSubtotal.fees | number:'1.2-2' }} CHF</span>
+          </ion-item>
+          <ion-item lines="none" style="--padding-start:0">
+            <ion-label color="medium">Livraison</ion-label>
+            <span slot="end">{{ orderSubtotal.delivery | number:'1.2-2' }} CHF</span>
+          </ion-item>
+          <ion-item lines="none" style="--padding-start:0; font-weight:bold">
+            <ion-label><b>Total par commande</b></ion-label>
+            <span slot="end"><b>{{ orderSubtotal.total | number:'1.2-2' }} CHF</b></span>
+          </ion-item>
+        </ng-container>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-item *ngIf="!canCreate" color="light">
+      <ion-label color="medium">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        Complétez produit, client et adresse pour créer le contrat.
+      </ion-label>
+    </ion-item>
+
+  </div>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="onCancel()">Annuler</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button
+        color="primary"
+        fill="solid"
+        [disabled]="!canCreate || isSaving"
+        (click)="onCreate()">
+        <ion-icon *ngIf="!isSaving" name="checkmark-outline" slot="start"></ion-icon>
+        <ion-icon *ngIf="isSaving" class="rotating" name="reload-outline" slot="start"></ion-icon>
+        {{ isSaving ? 'Création...' : 'Créer le contrat' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,41 @@
+.info {
+  font-size: 0.82em;
+  color: var(--ion-color-medium);
+  margin-top: 2px;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+
+  ion-icon {
+    font-size: 2rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+.rotating {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+ion-card {
+  margin: 8px 16px;
+}
+
+ion-list.suggestions {
+  margin: 0;
+  border-left: 3px solid var(--ion-color-primary);
+  background: var(--ion-color-light-shade);
+
+  ion-item {
+    --background: var(--ion-color-light-shade);
+    --border-color: var(--ion-color-light);
+    font-size: 0.95em;
+  }
+}

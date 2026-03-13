@@ -61,6 +61,20 @@
           <ion-toggle  color="primary" ngDefaultControl [(ngModel)]="product.attributes.available"></ion-toggle>
         </ion-item>
 
+        <ion-item [hidden]="!user.isAdmin()">
+          <ion-label>
+            Type de produit
+            <div class="info">
+              <b>item</b> : catalogue public. <b>contract</b> : produit B2B/institutionnel (bundle obligatoire, bypass validations). <b>custom</b> : produit sur-mesure.
+            </div>
+          </ion-label>
+          <ion-select slot="end" [(ngModel)]="product.type" (ionChange)="onTypeChange(product.type)" interface="action-sheet">
+            <ion-select-option value="item">item (public)</ion-select-option>
+            <ion-select-option value="contract">contract (spécial)</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+
         <ion-item  [hidden]="!user.isAdmin()">
           <ion-label>Disponible en abonement</ion-label>
           <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.subscription"></ion-toggle>
@@ -80,8 +94,9 @@
             </div>
           </ion-label>
 
-          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.bundle" (click)="doCheckBundle(product)"></ion-toggle>
+          <ion-toggle  color="primary" slot="end" ngDefaultControl [(ngModel)]="product.attributes.bundle"></ion-toggle>
         </ion-item>
+
 
         <ion-item [hidden]="!user.isAdmin()">
           <ion-label>Boost</ion-label>

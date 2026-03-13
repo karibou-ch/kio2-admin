@@ -12,6 +12,7 @@ import { CalendarPage } from '../calendar/calendar.page';
 import { OrdersCustomerPage, OrdersPlanningPage } from './orders.page';
 import { OrdersItemsPage, OrdersByItemsPage } from './orders-items.page';
 import { OrdersCollectPage } from './orders-collect.page';
+import { OrderCreatePage } from './order-create.page';
 import { CustomerMessageModule } from '../customer-message/customer-message.module';
 import { CustomerMessage } from '../customer-message/customer-message.page';
 
@@ -25,6 +26,6 @@ import { CustomerMessage } from '../customer-message/customer-message.page';
     OrdersCustomerPageRoutingModule
   ],
   entryComponents:[CustomerMessage, CalendarPage, OrdersItemsPage, OrdersByItemsPage, OrdersPlanningPage],
-  declarations: [OrdersCustomerPage, OrdersItemsPage, OrdersByItemsPage, OrdersPlanningPage, OrdersCollectPage]
+  declarations: [OrdersCustomerPage, OrdersItemsPage, OrdersByItemsPage, OrdersPlanningPage, OrdersCollectPage, OrderCreatePage]
 })
 export class OrdersPageModule {}

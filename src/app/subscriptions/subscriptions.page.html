@@ -163,3 +163,9 @@
   </ion-card>
 
 </ion-content>
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="isAdmin">
+  <ion-fab-button color="primary" routerLink="create" routerDirection="forward">
+    <ion-icon name="add-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
