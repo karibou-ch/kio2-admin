@@ -51,6 +51,8 @@ export class OrderCreatePage implements OnInit, OnDestroy {
   form = {
     when: '',
     hours: 16,
+    customShipping: null as number | null,
+    customContract: false,
     useInvoice: false,
     note: ''
   };
@@ -122,15 +124,11 @@ export class OrderCreatePage implements OnInit, OnDestroy {
   }
 
   get shippingTimeOptions(): { label: string; value: number }[] {
-    const shippingtimes = this.selectedHub?.shippingtimes || {};
-    const keys = Object.keys(shippingtimes);
-    if (!keys.length) {
-      return [{ label: '16h', value: 16 }];
-    }
-    return keys.map(key => ({
-      value: Number(key),
-      label: shippingtimes[key] || `${key}h`
-    }));
+    return [
+      { value: 10, label: '10h' },
+      { value: 12, label: '12h' },
+      { value: 16, label: '16h' }
+    ];
   }
 
   get selectedDeliveryDate(): Date | null {
@@ -157,10 +155,14 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     const gatewayFees = Number((gateways.find((gateway: any) => gateway.label === gatewayLabel))?.fees || 0);
     const fees = round((serviceFees + gatewayFees) * products);
     const discount = round(this.$cart.getTotalDiscount(this.currentHubSlug) || 0);
-    const delivery = round(this.$cart.computeShippingFees({
-      hub: this.currentHubSlug,
-      address: this.selectedAddress
-    }) || 0);
+    const delivery = round(
+      this.form.customShipping && this.form.customShipping > 0
+        ? this.form.customShipping
+        : (this.$cart.computeShippingFees({
+            hub: this.currentHubSlug,
+            address: this.selectedAddress
+          }) || 0)
+    );
     const total = round(products + fees + delivery - discount);
 
     return { products, fees, discount, delivery, total };
@@ -350,8 +352,14 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     this.isSaving = true;
     this.$cart.clearErrors();
 
-    const shipping = new ShippingAddress(this.selectedAddress, shippingDay, this.form.hours);
+    const shipping: any = new ShippingAddress(this.selectedAddress, shippingDay, this.form.hours);
     shipping.note = this.form.note || shipping.note;
+    if (this.form.customContract) {
+      shipping.customContract = true;
+    }
+    if (this.form.customShipping && this.form.customShipping > 0) {
+      shipping.customPrice = this.form.customShipping;
+    }
 
     const payment = this.form.useInvoice
       ? { issuer: 'invoice', alias: 'invoice' }
@@ -365,7 +373,7 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     const items = this.currentCartItems.map(item => item.toDEPRECATED());
     const hubSlug = this.currentHubSlug;
 
-    this.$order.create(
+    (this.$order as any).create(
       hubSlug,
       shipping,
       items,
