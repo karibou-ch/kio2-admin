@@ -40,6 +40,8 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     closed:{background:"#777",text:"white"}
   }
 
+  private readonly notePreviewLimit = 120;
+
 
   constructor(
     public $engine: EngineService,
@@ -193,6 +195,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
         this.vendors[item.vendor].shipping = order.shipping;
         this.vendors[item.vendor].hubs = [order.hub];
         this.vendors[item.vendor].items = [];
+        this.vendors[item.vendor].notes = [];
         this.vendors[item.vendor].oids = [];
         this.vendors[item.vendor].complements = [];
         this.vendors[item.vendor].collected = collected;
@@ -208,6 +211,16 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
       // add item to this vendor
       this.vendors[item.vendor].items.push(item);
+      if ((item.note || '').trim()) {
+        this.vendors[item.vendor].notes.push({
+          oid: order.oid,
+          rank: order.rank,
+          customer: order.customer?.displayName || '',
+          title: item.title,
+          quantity: item.quantity,
+          note: item.note.trim(),
+        });
+      }
       //
       // filter unique ranks
 
@@ -287,6 +300,25 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     return this.vendors[vendor].items.reduce((amount, item) =>
       (item.fulfillment.status !== 'failure') ? (amount + item.finalprice) : amount
     , 0).toFixed(2);
+  }
+
+  getVendorNotes(vendor: string) {
+    return this.vendors[vendor]?.notes || [];
+  }
+
+  hasVendorNotes(vendor: string): boolean {
+    return this.getVendorNotes(vendor).length > 0;
+  }
+
+  formatVendorNote(note: string): string {
+    if (!note) {
+      return '';
+    }
+    const out = note.trim().replace(/\s+/g, ' ');
+    if (out.length <= this.notePreviewLimit) {
+      return out;
+    }
+    return out.slice(0, this.notePreviewLimit) + '...';
   }
 
   getVendors() {

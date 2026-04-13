@@ -187,6 +187,41 @@ ion-item {
     font-weight: 600;
   }
 
+  .collect-notes{
+    padding: 0.5rem 0.5rem;
+    border-left: 0.1875rem solid var(--ion-color-kio-primary);
+    border-bottom: 0.1px solid #ccc;
+    margin-top: -2px;
+    margin-right: -0.75rem;
+    background: var(--ion-color-primary-contrast);
+    width: calc(100% + 1rem);
+  }
+
+  .collect-notes-title{
+    margin: 0 0 0.25rem;
+    font-size: 0.7rem !important;
+    font-weight: 700;
+  }
+
+  .collect-note{
+    margin: 0.1875rem 0 0;
+    font-size: 0.72rem !important;
+    color: #333;
+  }
+
+  .collect-note-meta{
+    display: block;
+    font-weight: 600;
+    color: #555;
+  }
+
+  .collect-note-text{
+    display: block;
+    color: #c2152c;
+    font-weight: 600;
+    white-space: break-spaces;
+  }
+
   span.progress{
     color: green;
     position: absolute;

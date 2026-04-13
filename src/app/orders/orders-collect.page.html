@@ -71,6 +71,13 @@
           <h3 text-capitalize class="bold">{{vendor}} ({{getVendorOids(vendor).length}})</h3>
           <p><span class="time-collected">{{vendors[vendor].collected_timestamp|date:'HH:mm'}}</span>Total validé: {{getAmount(vendor)}} fr</p>
         </div>
+        <div slot="helper" class="collect-notes" [hidden]="!hasVendorNotes(vendor)">
+          <p class="collect-notes-title">Notes ({{getVendorNotes(vendor).length}})</p>
+          <p class="collect-note" *ngFor="let vendorNote of getVendorNotes(vendor)">
+            <span class="collect-note-meta">#{{vendorNote.rank}} {{vendorNote.customer}} - {{vendorNote.quantity}}x {{vendorNote.title}}</span>
+            <span class="collect-note-text">{{formatVendorNote(vendorNote.note)}}</span>
+          </p>
+        </div>
 
         <ion-note slot="end">
           <span [class.red]="isFulfilled(vendor)">{{getFulfilled(vendor)}}</span><b>/</b>{{vendors[vendor].items.length}}
