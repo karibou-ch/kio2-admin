@@ -32,6 +32,7 @@ export class VendorDetailsPage implements OnChanges {
     private $router: Router,
     private $shop: ShopService,
     private $toast: ToastController,
+    private $alert: AlertController,
     private $util: KngUtils,
     private $loader: LoaderService
 
@@ -208,6 +209,123 @@ export class VendorDetailsPage implements OnChanges {
   }
   onDateTo() {
 
+  }
+
+  onCopy(event: ClipboardEvent) {
+    const clipboard = event.clipboardData;
+    if (!clipboard) {
+      return;
+    }
+
+    const jsonString = this.serializeShop();
+    const html = this.serializeShopToHtml(this.shop);
+
+    event.preventDefault();
+    clipboard.clearData();
+    clipboard.setData('text/plain', jsonString);
+    clipboard.setData('text/html', html);
+    this.notify('Vendeur copié dans le presse-papiers');
+  }
+
+  onPaste(event: ClipboardEvent) {
+    const jsonString = event.clipboardData && event.clipboardData.getData('text/plain');
+    if (!jsonString) {
+      return;
+    }
+
+    let shop;
+    try {
+      shop = JSON.parse(jsonString);
+    } catch (error) {
+      this.notify('Le clipboard ne contient pas un vendeur', 'warning');
+      return;
+    }
+
+    event.preventDefault();
+    if (!this.canPasteIntoShop()) {
+      this.notify('Le collage est autorisé uniquement sur une nouvelle boutique vide', 'warning');
+      return;
+    }
+
+    const html = this.serializeShopToHtml(shop);
+    this.$alert.create({
+      header: 'Remplacer la boutique ?',
+      message: html,
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel'
+        },
+        {
+          text: 'Accepter',
+          handler: () => {
+            this.weekdays = {};
+            this.catalog = undefined;
+            this.tvaId = undefined;
+            this.shop = shop;
+            this.initShop();
+          }
+        }
+      ]
+    }).then(alert => alert.present());
+  }
+
+  private serializeShop() {
+    return JSON.stringify(this.shop, (key, value) => {
+      if (this.isProtectedCopyField(key)) {
+        return undefined;
+      }
+      return value;
+    }, 2);
+  }
+
+  private serializeShopToHtml(shop: any) {
+    const name = shop && shop.name ? shop.name : 'Boutique sans nom';
+    const description = shop && shop.description ? shop.description : '';
+    return '<h2>' + this.escapeHtml(name) + '</h2><p>' + this.escapeHtml(description) + '</p>';
+  }
+
+  private isProtectedCopyField(key: string) {
+    return ['_id', 'id', '__v', 'urlpath', 'slug', 'created', 'name', 'description'].indexOf(key) > -1;
+  }
+
+  private canPasteIntoShop() {
+    return !this.shop._id &&
+      !this.shop['id'] &&
+      !this.shop['slug'] &&
+      !this.shop['urlpath'] &&
+      !this.shop.name &&
+      !this.hasContent(this.shop.description);
+  }
+
+  private hasContent(value: any) {
+    if (!value) {
+      return false;
+    }
+    if (typeof value === 'string') {
+      return value.trim().length > 0;
+    }
+    if (typeof value === 'object') {
+      return Object.keys(value).some(key => this.hasContent(value[key]));
+    }
+    return true;
+  }
+
+  private notify(message: string, color = 'dark') {
+    this.$toast.create({
+      message,
+      duration: 2000,
+      color
+    }).then(alert => alert.present());
+  }
+
+  private escapeHtml(value: string) {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   doDelete() {
