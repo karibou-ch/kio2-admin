@@ -79,6 +79,11 @@ const routes: Routes = [
     loadChildren: () => import('./vendors/vendors.module').then( m => m.VendorsPageModule)
   },
   {
+    path: 'hubs',
+    resolve: {loader : LoaderResolve },
+    loadChildren: () => import('./hub-details/hub-details.module').then( m => m.HubDetailsPageModule)
+  },
+  {
     path: 'vendor',
     resolve: {loader : LoaderResolve },
     loadChildren: () => import('./vendor-details/vendor-details.module').then( m => m.VendorDetailsPageModule)

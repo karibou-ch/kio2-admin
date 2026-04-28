@@ -36,6 +36,10 @@ export class HomePage {
     this.isAdminOrLogistic = this.user.hasRole('logistic') || this.user.isAdmin();
   }
 
+  get userCanCreateShop(): boolean {
+    return this.user.isAdmin() || this.user.hasRole('operator')|| !this.user.shops.length;
+  }
+
 
   doRefresh($event){
     window.location.reload();
@@ -87,6 +91,10 @@ export class HomePage {
 
   openVendors() {
     this.$router.navigate(['/vendors']);
+  }
+
+  openHubs() {
+    this.$router.navigate(['/hubs']);
   }
 
   openIssue() {

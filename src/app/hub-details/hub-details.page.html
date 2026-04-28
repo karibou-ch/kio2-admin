@@ -1,0 +1,260 @@
+<ion-header>
+  <ion-toolbar [color]="currentHub?.status?.active ? 'primary':'danger'">
+    <ion-title>{{currentHub?.name || 'Hub'}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="doBack()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="currentHub" (copy)="onCopy($event)" (paste)="onPaste($event)">
+  <div class="loader" [hidden]="!isLoading">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
+  <ion-list>
+    <ion-item>
+      <ion-button expand="block" fill="outline" size="large" color="primary" (click)="onHubSave()">Enregistrer</ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Status</ion-list-header>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Nom du hub</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Hub actif</ion-label>
+      <ion-toggle
+        color="positive"
+        [checked]="currentHub.status.active"
+        (ionChange)="onHubStatusChange($event)"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Hub privé</ion-label>
+      <ion-toggle
+        color="positive"
+        [checked]="currentHub.status.private"
+        (ionChange)="onHubPrivateChange($event)"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Raison inactive</ion-label>
+      <ion-textarea rows="3" [(ngModel)]="currentHub.status.reason.fr"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-button expand="block" fill="outline" color="primary" (click)="onAdminHubSave()">Sauver les informations admin</ion-button>
+    </ion-item>
+    <ion-item *ngIf="currentHub.alias?.length">
+      <ion-label>
+        <h3>Alias</h3>
+        <p>{{currentHub.alias.join(', ')}}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Adresse</ion-list-header>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Rue et numéro</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.address.streetAdress" (ngModelChange)="updateGeo($event)"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Code postal</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.address.postalCode" (ngModelChange)="updateGeo($event)"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Région</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.address.region"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Téléphone</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.address.phone"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Site web</ion-label>
+      <ion-input type="url" [(ngModel)]="currentHub.address.url"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="currentHub.address.geo?.lat">
+      <ion-label>
+        <h3>Geo</h3>
+        <p>{{currentHub.address.geo.lat}}, {{currentHub.address.geo.lng}}</p>
+      </ion-label>
+      <ion-icon slot="end" name="map-outline" color="primary"></ion-icon>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Core informations</ion-list-header>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Limite de commandes</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.currentLimit"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Service fees</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.serviceFees"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Montant réservé</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.reservedAmount"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Last minute order</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.acceptLastMinuteOrder"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Timelimit</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.timelimit"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Timelimit heure</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.timelimitH"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Capture limit (jours)</ion-label>
+      <ion-input type="number" min="0" max="30" [(ngModel)]="currentHub.uncapturedTimeLimit"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">Jours d'ouverture</ion-label>
+      <ion-select multiple="true" [(ngModel)]="currentHub.weekdays">
+        <ion-select-option *ngFor="let day of weekdays" [value]="day.id">{{day.label}}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Shipping time</ion-list-header>
+    <ion-item *ngFor="let time of shippingtimeKeys">
+      <ion-label color="primary" position="stacked">Boundary {{time}}h {{time === '0' ? 'collect' : ''}}</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.shippingtimes[time]"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Mail</ion-list-header>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Subject</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.mail.subject"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Signature</ion-label>
+      <ion-textarea rows="5" [(ngModel)]="currentHub.mail.signature"></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Couleurs</ion-list-header>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Color mixer</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.colormix"></ion-input>
+    </ion-item>
+    <ion-item [style.background]="currentHub.colors.primary">
+      <ion-label color="primary" position="stacked">
+        Primary <span class="color-preview" [style.background]="currentHub.colors.primary"></span>
+      </ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.primary"></ion-input>
+      <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.primary"></ion-input>
+    </ion-item>
+    <ion-item [style.background]="currentHub.colors.primary">
+      <ion-label color="primary" position="stacked">
+        Primary text <span class="color-preview" [style.background]="currentHub.colors.primaryText"></span>
+      </ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.primaryText"></ion-input>
+      <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.primaryText"></ion-input>
+    </ion-item>
+    <ion-item [style.background]="currentHub.colors.action">
+      <ion-label color="primary" position="stacked">
+        Action <span class="color-preview" [style.background]="currentHub.colors.action"></span>
+      </ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.action"></ion-input>
+      <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.action"></ion-input>
+    </ion-item>
+    <ion-item [style.background]="currentHub.colors.action">
+      <ion-label color="primary" position="stacked">
+        Action text <span class="color-preview" [style.background]="currentHub.colors.actionText"></span>
+      </ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.actionText"></ion-input>
+      <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.actionText"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Design</ion-list-header>
+    <ion-item>
+      <ion-label color="primary">Activer les thématiques</ion-label>
+      <ion-toggle color="positive" [(ngModel)]="currentHub.pageOptions.themas"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary">UX minimale</ion-label>
+      <ion-toggle color="positive" [(ngModel)]="currentHub.pageOptions.minimal"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Nombre de catégories</ion-label>
+      <ion-input type="number" [(ngModel)]="currentHub.pageOptions.maxcat"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Textes principaux</ion-list-header>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Site name</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.siteName.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Description</ion-label>
+      <ion-textarea rows="5" [(ngModel)]="currentHub.description.fr"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Home link label</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.home.customLink.label.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Home link URL</ion-label>
+      <ion-input type="url" [(ngModel)]="currentHub.home.customLink.url"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Tagline titre</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.tagLine.t.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Tagline header</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.tagLine.h.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Tagline paragraphe</ion-label>
+      <ion-textarea rows="4" [(ngModel)]="currentHub.tagLine.p.fr"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">About titre</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.about.t.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">About header</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.about.h.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">About paragraphe</ion-label>
+      <ion-textarea rows="4" [(ngModel)]="currentHub.about.p.fr"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Footer titre</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.footer.t.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Footer header</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.footer.h.fr"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" position="stacked">Footer paragraphe</ion-label>
+      <ion-textarea rows="4" [(ngModel)]="currentHub.footer.p.fr"></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-item>
+      <ion-button expand="block" fill="outline" size="large" color="primary" (click)="onHubSave()">Enregistrer</ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

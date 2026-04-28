@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Hubs</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="onCreateHub()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <div class="loader" [hidden]="isReady">
+      <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+    </div>
+
+    <ion-item *ngFor="let hub of hubs" (click)="openDetails(hub)">
+      <ion-label>
+        <h2>{{getHubName(hub)}}</h2>
+        <p>{{getHubSlug(hub)}}</p>
+      </ion-label>
+      <ion-note slot="end" [color]="hub.status?.active ? 'primary':'danger'">
+        <ion-icon name="cloud-done" size="large"></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+</ion-content>
