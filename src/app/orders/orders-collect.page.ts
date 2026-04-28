@@ -352,7 +352,20 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
   isActiveHub(vendor: string): boolean {
     const name = (this.currentHub && this.currentHub.name);
-    return (this.hubsVendors[name]||[]).indexOf(this.vendors[vendor]._id)>-1;
+    const hubVendors = this.hubsVendors[name] || [];
+    if (!Array.isArray(hubVendors)) {
+      return false;
+    }
+    const vendorId = this.getEntityId(this.vendors[vendor] && this.vendors[vendor]._id);
+    return hubVendors.map(this.getEntityId).indexOf(vendorId) > -1;
+  }
+
+  private getEntityId(entity: any): string {
+    if (!entity) {
+      return '';
+    }
+    const value = entity._id || entity.id || entity;
+    return value.toString ? value.toString() : String(value);
   }
 
 
