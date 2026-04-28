@@ -17,6 +17,7 @@ export class CustomerPage implements OnInit {
   config: Config;
   user: User;
   customer: User;
+  hubs: any[];
   currentGeoIndex: number;
   defaultShop: Shop;
   authlinkName: string;
@@ -35,6 +36,8 @@ export class CustomerPage implements OnInit {
     private $util: KngUtils
   ) {
     this.user = this.$engine.currentUser;
+    this.config = this.$engine.currentConfig;
+    this.hubs = (this.config.shared.hubs || []).slice();
     this.invoice = {
       expiry: '',
       issuer: 'invoice'
@@ -65,6 +68,9 @@ export class CustomerPage implements OnInit {
     const forceload = true;
     this.$user.get(id,forceload).subscribe(user => {
       this.customer = user;
+      this.customer.identity = this.customer.identity || {} as any;
+      this.customer.reminder = this.customer.reminder || {} as any;
+      this.authlinkName = (this.customer.identity as any).codelink || '';
 
       if (this.customer.shops.length) {
         this.defaultShop = this.customer.shops[0];
@@ -104,16 +110,66 @@ export class CustomerPage implements OnInit {
   doUpdateAuthLink() {
     console.log('doUpdateAuthLink', this.customer.id);
     this.$user.createOrUpdateAuthLink(this.customer.id, {
-      name: this.authlinkName,
+      codelink: this.authlinkName,
       email: this.customer.email.address
     }).subscribe(result => {
       this.customer.identity.authlink = result.link;
+      (this.customer.identity as any).codelink = result.codelink || this.authlinkName;
       this.doToast('L\'autorisation a été mise à jour');
     });
   }
 
+  getAuthLinkUrl(target: 'store' | 'admin') {
+    if (!this.customer || !this.customer.identity || !this.customer.identity.authlink) {
+      return '';
+    }
+    const base = target === 'admin' ? 'https://admin.karibou.ch' : 'https://karibou.ch';
+    return base + '?authlink=' + this.customer.identity.authlink;
+  }
+
+  async copyAuthLink(target: 'store' | 'admin') {
+    const link = this.getAuthLinkUrl(target);
+    if (!link) {
+      return;
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        this.copyTextFallback(link);
+      }
+      this.doToast('Lien copié');
+    } catch (err) {
+      this.copyTextFallback(link);
+      this.doToast('Lien copié');
+    }
+  }
+
+  private copyTextFallback(text: string) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  }
+
   doCustomerPlan($event) {
     this.customer.plan.name = $event.detail.value;
+  }
+
+  getHubName(hub: any) {
+    return hub && hub.name ? hub.name : this.getHubSlug(hub);
+  }
+
+  getHubSlug(hub: any) {
+    if (!hub || !hub.slug) {
+      return '';
+    }
+    return Array.isArray(hub.slug) ? hub.slug[0] : hub.slug;
   }
 
   async doClose() {
@@ -163,7 +219,7 @@ export class CustomerPage implements OnInit {
   }
 
   doSave(customer) {
-    this.$user.save(customer).subscribe(user => {
+    this.$user.saveDelegated(customer).subscribe(user => {
       this.doToast('Save done!');
       this.customer = user;
     }, status => {

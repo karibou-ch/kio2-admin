@@ -42,22 +42,26 @@
     <!-- AUTH LINK -->
     <!-- AUTH LINK CREATION -->
     <ion-item [hidden]="!user.isAdmin()">
-      <ion-input type="text"  slot="start" placeholder="**nom** (en option)" ngDefaultControl [(ngModel)]="authlinkName"></ion-input>
+      <ion-input type="text"  slot="start" placeholder="**code client** (en option)" ngDefaultControl [(ngModel)]="authlinkName"></ion-input>
       <ion-button  slot="end" [hidden]="!customer.identity.authlink && !user.isAdmin()" fill="outline"  expand="block" color="danger" (click)="doUpdateAuthLink()">
         Créer un lien de login
       </ion-button>
     </ion-item>
-    <ion-item>
-      <div>
-        <div class="authlink" >
-          https://karibou.ch/store/superlocal/home?authlink={{customer.identity.authlink}}
-        </div>
-        <div class="authlink" >
-          https://admin.karibou.ch?authlink={{customer.identity.authlink}}
-        </div>
-
+    <ion-item [hidden]="!customer.identity.authlink">
+      <div class="authlink" >
+        {{getAuthLinkUrl('store')}}
       </div>
-
+      <ion-button slot="end" fill="clear" color="primary" (click)="copyAuthLink('store')">
+        <ion-icon name="copy-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <ion-item [hidden]="!customer.identity.authlink">
+      <div class="authlink" >
+        {{getAuthLinkUrl('admin')}}
+      </div>
+      <ion-button slot="end" fill="clear" color="primary" (click)="copyAuthLink('admin')">
+        <ion-icon name="copy-outline"></ion-icon>
+      </ion-button>
     </ion-item>
 
     <!-- portefeuille -->
@@ -73,8 +77,19 @@
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Catégorie de client</ion-label>
       <ion-select label="Catégorie de client"
                   label-placement="fixed"
-                  interface="popover" (ionChange)="doCustomerPlan($event)" [(ngModel)]="customer.plan.name">
+                  interface="action-sheet" (ionChange)="doCustomerPlan($event)" [(ngModel)]="customer.plan.name">
         <ion-select-option *ngFor="let plan of customerPlans" [value]="plan.id">{{ plan.id }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Hub par défaut</ion-label>
+      <ion-select
+        label="Hub par défaut"
+        label-placement="fixed"
+        interface="action-sheet"
+        [(ngModel)]="customer.reminder.defaultHub">
+        <ion-select-option value="">Aucun hub</ion-select-option>
+        <ion-select-option *ngFor="let hub of hubs" [value]="getHubSlug(hub)">{{ getHubName(hub) }}</ion-select-option>
       </ion-select>
     </ion-item>
     <!-- STATS -->
