@@ -288,8 +288,22 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     return (this.orders).filter(order => !order.shipping.parent);
   }
 
+  private getOrderHubId(order: Order) {
+    const hub = order && order.hub;
+    return hub && (hub['_id'] || hub['id'] || hub);
+  }
+
+  private indexHub(hub) {
+    if (!hub || !hub.id || this.hubs[hub.id]) {
+      return;
+    }
+    this.hubs[hub.id] = hub;
+    this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
+  }
+
   getOrderRank(order: Order) {
-    const prefix = this.hubs[order.hub['_id'] || order.hub].prefix;
+    const hub = this.hubs[this.getOrderHubId(order)];
+    const prefix = hub?.prefix || '';
     return prefix + order.rank;
   }
 
@@ -648,10 +662,8 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
 
     //
     // load Hubs
-    (this.$engine.currentConfig.shared.hubs || []).forEach(hub => {
-      this.hubs[hub.id] = hub;
-      this.hubs[hub.id].prefix = hub.name[0].toUpperCase();
-    });
+    this.indexHub(this.$engine.currentConfig.shared.hub);
+    (this.$engine.currentConfig.shared.hubs || []).forEach(hub => this.indexHub(hub));
 
     this.user = this.$engine.currentUser;
     if (this.user.isAdmin()) {
