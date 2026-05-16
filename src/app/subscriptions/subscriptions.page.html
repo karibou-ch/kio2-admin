@@ -25,7 +25,7 @@
       </ion-searchbar>
       <ion-chip (click)="cache.active=!cache.active" class="toggle">
         <ion-icon name="checkmark-circle-outline" [hidden]="!cache.active"></ion-icon>
-        <ion-label color="primary">Actif</ion-label>
+        <ion-label color="primary">{{cache.active ? 'Actifs / pause' : 'Autres'}}</ion-label>
       </ion-chip>
 
       <!-- ✅ Toggle contrôles admin -->
@@ -38,13 +38,13 @@
 
 
     <ion-item-sliding *ngFor="let subscription of subscriptions" #slidingItem>
-        <ion-item class="subscription" [class.inactive]="subscription.status !== 'active'" [class.paused]="subscription.pauseUntil">
+        <ion-item class="subscription" [class.inactive]="!isActiveOrPaused(subscription)" [class.paused]="subscription.pauseUntil || subscription.status === 'paused'">
           <ion-label>
             <!-- ✅ LIGNE 1: Client => Status => Fréquence, Jour => Prochaine facture -->
             <div class="subscription-header">
               <span class="tag status-tag"
                     [class.active]="subscription.status === 'active' && !subscription.pauseUntil"
-                    [class.paused]="subscription.pauseUntil"
+                    [class.paused]="subscription.pauseUntil || subscription.status === 'paused'"
                     [class.incomplete]="subscription.status === 'incomplete'"
                     [class.canceled]="subscription.status === 'canceled'">
                 {{getStatusLabel(subscription)}}
@@ -83,6 +83,17 @@
                 <span class="bold">{{item.unit_amount/100}} fr</span>
               </li>
             </ul>
+
+            <div class="contract-metadata" *ngIf="subscription.shipping">
+              <ion-icon name="cube-outline"></ion-icon>
+              <span>Metadata contrat: livraison</span>
+              <strong *ngIf="getContractShippingService(subscription) as shippingService; else missingShippingFee">
+                {{shippingService.fees}} fr
+              </strong>
+              <ng-template #missingShippingFee>
+                <strong>non trouvée</strong>
+              </ng-template>
+            </div>
 
             <!-- ✅ ADMIN: Contrôles de pause et reset billing -->
             <div class="admin-controls" [hidden]="subscription.status === 'canceled' || !cache.showAdminControls">

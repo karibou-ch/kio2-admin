@@ -11,6 +11,7 @@ import {
   ProductService,
   ShippingAddress,
   User,
+  UserAddress,
   UserCard,
   UserService
 } from 'kng2-core';
@@ -54,6 +55,8 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     customShipping: null as number | null,
     customContract: false,
     useInvoice: false,
+    phone: '',
+    billNote: '',
     note: ''
   };
 
@@ -265,6 +268,7 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     const addresses = (user as any).addresses || [];
     this.selectedAddress = addresses.find((address: any) => address.primary) || addresses[0] || null;
     this.form.note = this.selectedAddress?.note || '';
+    this.form.phone = this.getDefaultShippingPhone(this.selectedAddress);
     if (this.selectedAddress) {
       this.$cart.setShippingAddress(this.selectedAddress);
     }
@@ -291,6 +295,7 @@ export class OrderCreatePage implements OnInit, OnDestroy {
   onAddressChange(address: any) {
     this.selectedAddress = address;
     this.form.note = address?.note || '';
+    this.form.phone = this.getDefaultShippingPhone(address);
     this.$cart.setShippingAddress(address);
     this.syncShippingSelection();
   }
@@ -354,6 +359,7 @@ export class OrderCreatePage implements OnInit, OnDestroy {
 
     const shipping: any = new ShippingAddress(this.selectedAddress, shippingDay, this.form.hours);
     shipping.note = this.form.note || shipping.note;
+    shipping.phone = UserAddress.normalizePhone(this.form.phone || shipping.phone || this.getDefaultShippingPhone(this.selectedAddress));
     if (this.form.customContract) {
       shipping.customContract = true;
     }
@@ -378,7 +384,10 @@ export class OrderCreatePage implements OnInit, OnDestroy {
       shipping,
       items,
       payment,
-      this.selectedUser!.id
+      {
+        id: this.selectedUser!.id,
+        billNote: this.form.billNote
+      }
     ).subscribe({
       next: async (order: any) => {
         this.isSaving = false;
@@ -418,6 +427,14 @@ export class OrderCreatePage implements OnInit, OnDestroy {
     }
 
     this.setDefaultShippingSelection();
+  }
+
+  private getDefaultShippingPhone(address: any): string {
+    const phone = address?.phone ||
+      (this.selectedUser as any)?.phone ||
+      (this.selectedUser as any)?.phoneNumbers?.[0]?.number ||
+      '';
+    return UserAddress.normalizePhone(phone);
   }
 
   private setDefaultShippingSelection() {

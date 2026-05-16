@@ -118,14 +118,33 @@
   </div>
 
   <!-- ADMIN -->
-  <ion-item *ngIf="isManagerOrLogistic">
-    <ion-label>Choisir un vendeur</ion-label>
+  <ion-item *ngIf="isManagerOrLogistic" class="vendor-filter" lines="none">
+    <ion-searchbar
+      mode="ios"
+      [(ngModel)]="shopSearch"
+      [debounce]="600"
+      placeholder="Filtrer par vendeur">
+    </ion-searchbar>
+    <ion-button
+      slot="end"
+      size="default"
+      fill="outline"
+      color="primary"
+      (click)="openVendorSelect($event)">
+      <ion-icon slot="start" name="storefront-outline"></ion-icon>
+      Vendeurs
+    </ion-button>
+    <ion-select
+      #vendorSelect
+      interface="action-sheet"
+      color="primary"
+      [value]="defaultShop"
+      class="vendor-select-hidden"
+      (ionChange)="onSelectDefaultShop($event)" >
 
-    <ion-select interface="action-sheet" color="primary" (ionChange)="onSelectDefaultShop($event)">
-
-      <ion-select-option  *ngFor="let shop of shops" [value]="shop.urlpath">{{shop.name}}</ion-select-option>
-  </ion-select>
-
+      <ion-select-option value="">Tous les vendeurs</ion-select-option>
+      <ion-select-option *ngFor="let shop of filteredShops" [value]="shop.urlpath">{{shop.name}}</ion-select-option>
+    </ion-select>
   </ion-item>
 
 

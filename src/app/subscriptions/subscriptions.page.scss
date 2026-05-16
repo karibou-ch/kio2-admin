@@ -126,6 +126,26 @@ ion-chip.toggle {
     }
   }
 
+  .contract-metadata {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(var(--ion-color-primary-rgb), 0.08);
+    color: var(--ion-color-primary);
+    font-size: 12px;
+
+    ion-icon {
+      font-size: 14px;
+    }
+
+    strong {
+      color: #222;
+    }
+  }
+
   // ✅ ADMIN: Indicateur visuel pour les abonnements en pause
   &.paused {
     border-left: 4px solid var(--ion-color-warning);

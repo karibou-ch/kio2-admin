@@ -29,10 +29,17 @@ ion-list-header {
   div{
     button {
       margin-left: 20px;
-      background: red;
       color: white;
       border-radius: 5px;
       height: 24px;
+    }
+
+    .btn-geo {
+      background: var(--ion-color-primary);
+    }
+
+    .btn-danger {
+      background: red;
     }
 
   }

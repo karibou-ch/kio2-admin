@@ -156,6 +156,19 @@
           </ion-radio-group>
         </ion-item>
 
+        <ion-item [hidden]="!user.isAdmin()">
+          <ion-label>
+            Marchés autorisés
+            <div class="info">
+              Aucun marché sélectionné = produit visible sur tous les hubs.
+            </div>
+          </ion-label>
+
+          <ion-select multiple="true" ngDefaultControl [(ngModel)]="product.constraints" interface="alert">
+            <ion-select-option *ngFor="let hub of hubs" [value]="getHubId(hub)">{{getHubName(hub)}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+
       </ion-list>
 
 

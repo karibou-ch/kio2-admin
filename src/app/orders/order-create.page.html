@@ -137,6 +137,7 @@
         <ion-label>
           <p><b>Adresse :</b> {{ selectedAddress.streetAdress }}, {{ selectedAddress.postalCode }} {{ selectedAddress.region }}</p>
           <p *ngIf="selectedAddress.floor">{{ selectedAddress.floor }}</p>
+          <p *ngIf="selectedAddress.phone">{{ selectedAddress.phone }}</p>
         </ion-label>
       </ion-item>
 
@@ -156,6 +157,20 @@
           (ionChange)="onHubChange($any($event).detail.value)">
           <ion-select-option *ngFor="let hub of hubs" [value]="hub">{{ hub.name }}</ion-select-option>
         </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">
+          Téléphone livraison
+          <div class="info">Numéro à utiliser pour cette livraison, par défaut celui de l'adresse ou du client.</div>
+        </ion-label>
+        <ion-input
+          type="tel"
+          slot="end"
+          [(ngModel)]="form.phone"
+          placeholder="+41 ..."
+          style="text-align:right; max-width: 170px;">
+        </ion-input>
       </ion-item>
 
       <ion-item>
@@ -223,6 +238,16 @@
         <ion-input
           type="text"
           [(ngModel)]="form.note"
+          placeholder="optionnel...">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Note à utiliser avec la facture</ion-label>
+        <ion-input
+          type="text"
+          [(ngModel)]="form.billNote"
+          maxlength="512"
           placeholder="optionnel...">
         </ion-input>
       </ion-item>

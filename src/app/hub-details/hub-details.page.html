@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content *ngIf="currentHub" (copy)="onCopy($event)" (paste)="onPaste($event)">
+<ion-content *ngIf="currentHub" (paste)="onPaste($event)">
   <div class="loader" [hidden]="!isLoading">
     <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
   </div>
@@ -17,6 +17,10 @@
   <ion-list>
     <ion-item>
       <ion-button expand="block" fill="outline" size="large" color="primary" (click)="onHubSave()">Enregistrer</ion-button>
+      <ion-button expand="block" fill="outline" size="large" color="primary" (click)="onCopy()">
+        <ion-icon slot="start" name="copy-outline"></ion-icon>
+        Copier les données
+      </ion-button>
     </ion-item>
   </ion-list>
 
@@ -126,9 +130,14 @@
 
   <ion-list>
     <ion-list-header color="primary">Shipping time</ion-list-header>
+    <ion-item>
+      <ion-button expand="block" fill="outline" color="primary" (click)="onAddDefaultShippingtimes()">
+        Ajouter les horaires par défaut
+      </ion-button>
+    </ion-item>
     <ion-item *ngFor="let time of shippingtimeKeys">
-      <ion-label color="primary" position="stacked">Boundary {{time}}h {{time === '0' ? 'collect' : ''}}</ion-label>
-      <ion-input type="number" [(ngModel)]="currentHub.shippingtimes[time]"></ion-input>
+      <ion-label color="primary" position="stacked">Libellé du créneau {{time}}h {{time === '0' ? 'collecte' : ''}}</ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.shippingtimes[time]"></ion-input>
     </ion-item>
   </ion-list>
 
@@ -147,36 +156,50 @@
   <ion-list>
     <ion-list-header color="primary">Couleurs</ion-list-header>
     <ion-item>
-      <ion-label color="primary" position="stacked">Color mixer</ion-label>
+      <ion-label color="primary" position="stacked">Couleur de mélange (fonds clairs et variantes)</ion-label>
       <ion-input type="text" [(ngModel)]="currentHub.colors.colormix"></ion-input>
     </ion-item>
     <ion-item [style.background]="currentHub.colors.primary">
       <ion-label color="primary" position="stacked">
-        Primary <span class="color-preview" [style.background]="currentHub.colors.primary"></span>
+        Couleur principale (marque, titres, boutons) <span class="color-preview" [style.background]="currentHub.colors.primary"></span>
       </ion-label>
       <ion-input type="text" [(ngModel)]="currentHub.colors.primary"></ion-input>
       <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.primary"></ion-input>
     </ion-item>
     <ion-item [style.background]="currentHub.colors.primary">
       <ion-label color="primary" position="stacked">
-        Primary text <span class="color-preview" [style.background]="currentHub.colors.primaryText"></span>
+        Texte sur couleur principale <span class="color-preview" [style.background]="currentHub.colors.primaryText"></span>
       </ion-label>
       <ion-input type="text" [(ngModel)]="currentHub.colors.primaryText"></ion-input>
       <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.primaryText"></ion-input>
     </ion-item>
     <ion-item [style.background]="currentHub.colors.action">
       <ion-label color="primary" position="stacked">
-        Action <span class="color-preview" [style.background]="currentHub.colors.action"></span>
+        Couleur d'action (CTA, liens, éléments secondaires) <span class="color-preview" [style.background]="currentHub.colors.action"></span>
       </ion-label>
       <ion-input type="text" [(ngModel)]="currentHub.colors.action"></ion-input>
       <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.action"></ion-input>
     </ion-item>
     <ion-item [style.background]="currentHub.colors.action">
       <ion-label color="primary" position="stacked">
-        Action text <span class="color-preview" [style.background]="currentHub.colors.actionText"></span>
+        Texte sur couleur d'action <span class="color-preview" [style.background]="currentHub.colors.actionText"></span>
       </ion-label>
       <ion-input type="text" [(ngModel)]="currentHub.colors.actionText"></ion-input>
       <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.actionText"></ion-input>
+    </ion-item>
+    <ion-item [style.background]="currentHub.colors.appbar">
+      <ion-label color="primary" position="stacked">
+        Barre de navigation (fond app-bar) <span class="color-preview" [style.background]="currentHub.colors.appbar"></span>
+      </ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.appbar"></ion-input>
+      <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.appbar"></ion-input>
+    </ion-item>
+    <ion-item [style.background]="currentHub.colors.appbar">
+      <ion-label color="primary" position="stacked">
+        Texte et icônes de la barre de navigation <span class="color-preview" [style.background]="currentHub.colors.appbarText"></span>
+      </ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.appbarText"></ion-input>
+      <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.appbarText"></ion-input>
     </ion-item>
   </ion-list>
 

@@ -211,23 +211,25 @@ export class VendorDetailsPage implements OnChanges {
 
   }
 
-  onCopy(event: ClipboardEvent) {
-    const clipboard = event.clipboardData;
-    if (!clipboard) {
+  onCopy() {
+    const jsonString = this.serializeShop();
+    if (!navigator.clipboard || !navigator.clipboard.writeText) {
+      this.notify('La copie automatique n\'est pas disponible dans ce navigateur', 'warning');
       return;
     }
 
-    const jsonString = this.serializeShop();
-    const html = this.serializeShopToHtml(this.shop);
-
-    event.preventDefault();
-    clipboard.clearData();
-    clipboard.setData('text/plain', jsonString);
-    clipboard.setData('text/html', html);
-    this.notify('Vendeur copié dans le presse-papiers');
+    navigator.clipboard.writeText(jsonString).then(() => {
+      this.notify('Vendeur copié dans le presse-papiers');
+    }, () => {
+      this.notify('Impossible de copier le vendeur', 'warning');
+    });
   }
 
   onPaste(event: ClipboardEvent) {
+    if (this.isEditablePasteTarget(event)) {
+      return;
+    }
+
     const jsonString = event.clipboardData && event.clipboardData.getData('text/plain');
     if (!jsonString) {
       return;
@@ -296,6 +298,18 @@ export class VendorDetailsPage implements OnChanges {
       !this.shop['urlpath'] &&
       !this.shop.name &&
       !this.hasContent(this.shop.description);
+  }
+
+  private isEditablePasteTarget(event: ClipboardEvent) {
+    const path = typeof event.composedPath === 'function' ? event.composedPath() : [event.target];
+    return path.some(target => {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+      const tagName = target.tagName.toLowerCase();
+      return target.isContentEditable ||
+        ['input', 'textarea', 'select', 'ion-input', 'ion-textarea'].indexOf(tagName) > -1;
+    });
   }
 
   private hasContent(value: any) {

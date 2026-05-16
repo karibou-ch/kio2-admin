@@ -52,7 +52,20 @@
         <ion-card-title>{{ selectedProduct.title }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p>Prix : <b>{{ selectedProduct.pricing.price }} CHF</b></p>
+        <ion-item lines="none" class="qty-row" style="--padding-start:0">
+          <ion-label>
+            <p>Prix unitaire : <b>{{ selectedProduct.pricing.price }} CHF</b></p>
+          </ion-label>
+          <div slot="end" class="qty-actions">
+            <ion-button fill="clear" size="small" color="medium" (click)="removeQuantity()" [disabled]="form.quantity <= 1">
+              <ion-icon name="remove-outline"></ion-icon>
+            </ion-button>
+            <span class="qty">{{ form.quantity }}</span>
+            <ion-button fill="clear" size="small" color="primary" (click)="addQuantity()">
+              <ion-icon name="add-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-item>
         <p *ngIf="selectedProduct.attributes?.bundle && productBundleItems.length > 0">
           <b>Bundle ({{ productBundleItems.length }} articles) :</b>
         </p>
@@ -256,7 +269,7 @@
 
     <ion-card *ngIf="canCreate" color="light">
       <ion-card-content>
-        <p><b>Produit :</b> {{ selectedProduct?.title }}</p>
+        <p><b>Produit :</b> {{ selectedProduct?.title }} &mdash; quantité {{ form.quantity }}</p>
         <p><b>Client :</b> {{ selectedUser?.email?.address }}</p>
         <p><b>Adresse :</b> {{ selectedAddress?.streetAdress }}, {{ selectedAddress?.postalCode }} {{ selectedAddress?.region }}</p>
         <p><b>Hub :</b> {{ selectedHub?.name }}</p>

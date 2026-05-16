@@ -67,16 +67,18 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     // Manage HUB selections
     // back compatibility with K.v2
     if (this.hubs.length) {
-      this.hubs.forEach(hub => hub.orders = 0);
+      this.hubs.forEach(hub => {
+        hub.orders = 0;
+        hub.vendorsCount = 0;
+        hub.selected = false;
+      });
       //
       // if you are associed to one HUB
       this.currentHub = this.hubs[0];
       if (this.user.hubs && this.user.hubs.length === 1) {
         this.currentHub = this.hubs.find(hub => hub.slug === this.user.hubs[0]) || this.currentHub;
-        this.currentHub.selected = true;
-      } else {
-        this.hubs[0].selected = true;
       }
+      this.selectHub(this.currentHub);
     }
 
     //
@@ -368,6 +370,44 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
     return value.toString ? value.toString() : String(value);
   }
 
+  private getOrderHubId(order: Order): string {
+    return this.getEntityId(order && order.hub);
+  }
+
+  private selectHub(hub) {
+    if (!hub || !this.hubs.length) {
+      this.currentHub = {};
+      return;
+    }
+
+    this.hubs.forEach(h => h.selected = false);
+    this.currentHub = this.hubs.find(h => this.getEntityId(h.id) === this.getEntityId(hub.id)) || hub;
+    this.currentHub.selected = true;
+  }
+
+  private selectDefaultHubAfterLoad() {
+    if (!this.hubs.length) {
+      return;
+    }
+
+    const selectedHub = this.hubs.find(hub => hub.selected);
+    if (this.user.hubs && this.user.hubs.length === 1 && selectedHub) {
+      this.currentHub = selectedHub;
+      return;
+    }
+
+    if (selectedHub && selectedHub.orders) {
+      this.currentHub = selectedHub;
+      return;
+    }
+
+    const defaultHub = this.hubs
+      .filter(hub => hub.orders > 0)
+      .sort((a, b) => (b.vendorsCount || 0) - (a.vendorsCount || 0) || (b.orders || 0) - (a.orders || 0))[0];
+
+    this.selectHub(defaultHub || selectedHub || this.hubs[0]);
+  }
+
 
   //
   // groupd by vendors to prepare collect
@@ -382,13 +422,28 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
 
     //
     // init orders count
-    this.hubs.forEach(hub => hub.orders = 0);
+    const vendorsByHub = {};
+    this.hubs.forEach(hub => {
+      hub.orders = 0;
+      hub.vendorsCount = 0;
+    });
     this.orders.forEach(order => {
       if (this.hubs.length) {
-        this.hubs.find(hub =>  (order.hub['_id']||order.hub) === hub.id).orders ++;
+        const hub = this.hubs.find(h => this.getOrderHubId(order) === this.getEntityId(h.id));
+        if (hub) {
+          hub.orders ++;
+          const hubId = this.getEntityId(hub.id);
+          vendorsByHub[hubId] = vendorsByHub[hubId] || {};
+          (order.items || []).forEach(item => vendorsByHub[hubId][item.vendor] = true);
+        }
       }
       this.orderToVendor(order);
     });
+    this.hubs.forEach(hub => {
+      const vendors = vendorsByHub[this.getEntityId(hub.id)] || {};
+      hub.vendorsCount = Object.keys(vendors).length;
+    });
+    this.selectDefaultHubAfterLoad();
   }
 
   onEngineStatus(status: OrderStatus) {
@@ -466,9 +521,7 @@ export class OrdersCollectPage  implements OnInit, OnDestroy {
   }
 
   setCurrentHub(hub) {
-    this.hubs.forEach( h => h.selected = false);
-    this.currentHub = this.hubs.find(h => h.id === hub.id) || {};
-    this.currentHub.selected = true;
+    this.selectHub(hub);
     this.vendors = {
       list: []
     };

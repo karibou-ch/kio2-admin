@@ -9,11 +9,14 @@
   </ion-toolbar>
 </ion-header>
 
-
-<ion-content  *ngIf="shop.available && isReady" (copy)="onCopy($event)" (paste)="onPaste($event)">
+<ion-content  *ngIf="shop.available && isReady" (paste)="onPaste($event)">
   <ion-list>
     <ion-item>
         <ion-button expand="block" fill="outline" size="large" color="primary" (click)="doSave()">Enregistrer</ion-button>
+        <ion-button expand="block" fill="outline" size="large" color="primary" (click)="onCopy()">
+          <ion-icon slot="start" name="copy-outline"></ion-icon>
+          Copier les données
+        </ion-button>
       </ion-item>
       <ion-item [hidden]="!(user?.isAdmin())">
         <ion-label color="primary" >

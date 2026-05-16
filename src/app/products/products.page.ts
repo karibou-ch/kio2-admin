@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Product, Config, User, ProductService, ShopService, Shop } from 'kng2-core';
 import { EngineService, OrdersCtx } from '../services/engine.service';
-import { ToastController, AlertController } from '@ionic/angular';
+import { ToastController, AlertController, IonSelect } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 
 export const attributesFilters = [
@@ -12,6 +12,7 @@ export const attributesFilters = [
   'business',
   'home',
 ];
+const exclusiveProductFilters = [...attributesFilters, 'lowstock'];
 export interface ProductsFilterOptions {
   forceShops?: string[];
   lastMinute?: boolean;
@@ -36,6 +37,7 @@ export interface SelectionMode {
 })
 export class ProductsPage implements OnInit {
 
+  @ViewChild('vendorSelect', { static: false }) vendorSelect: IonSelect;
 
   isReady: boolean;
   loadError: boolean;
@@ -43,6 +45,7 @@ export class ProductsPage implements OnInit {
   config: Config;
   user: User;
   defaultShop: string;
+  shopSearch: string;
   skus: string[];
   products: Product[];
   cache: {
@@ -84,6 +87,7 @@ export class ProductsPage implements OnInit {
     //
     // filter active shop and order by name
     this.skus = [];
+    this.shopSearch = '';
     this.$engine.findVendors();
 
   }
@@ -98,6 +102,17 @@ export class ProductsPage implements OnInit {
 
   get shops(): Shop[]{
     return this.$engine.shops;
+  }
+
+  get filteredShops(): Shop[] {
+    const query = (this.shopSearch || '').trim().toLocaleLowerCase();
+    if (!query) {
+      return this.shops;
+    }
+    return this.shops.filter((shop) => {
+      const haystack = `${shop.name || ''} ${shop.description || ''}`.toLocaleLowerCase();
+      return haystack.indexOf(query) > -1;
+    });
   }
 
 
@@ -225,22 +240,40 @@ export class ProductsPage implements OnInit {
     this.loadProducts({});
   }
 
+  private getCurrentFilterOptions(extra: ProductsFilterOptions = {}): ProductsFilterOptions {
+    const options: ProductsFilterOptions = Object.assign({}, this.filters, extra);
+    if (this.defaultShop) {
+      options.forceShops = [this.defaultShop];
+    }
+    return options;
+  }
+
 
   //
   // this value exclude user filters
   onSelectDefaultShop($event) {
-    const shop = $event.detail.value;
+    const shop = $event.detail.value || '';
     this.defaultShop = shop;
-    this.loadProducts({ forceShops: [shop] });
+    this.loadProducts(this.getCurrentFilterOptions());
 
+  }
+
+  async openVendorSelect(event?: UIEvent) {
+    if (!this.vendorSelect) {
+      return;
+    }
+    await this.vendorSelect.open(event);
   }
 
   //
   // filters are based on all shops (except for non admin users)
   onProductFilterChange(filter: string) {
-    attributesFilters.forEach(att => delete this.filters[att]);
-    this.filters[filter] = true;
-    this.loadProducts(this.filters);
+    const wasActive = !!this.filters[filter];
+    exclusiveProductFilters.forEach(att => delete this.filters[att]);
+    if (!wasActive) {
+      this.filters[filter] = true;
+    }
+    this.loadProducts(this.getCurrentFilterOptions());
   }
   onDone(msg) {
     this.toast.create({

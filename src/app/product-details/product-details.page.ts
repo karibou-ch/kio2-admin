@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, KeyValueDiffers, KeyValueDiffer } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, KeyValueDiffers, KeyValueDiffer } from '@angular/core';
 import { Product, ProductPortion, Utils, Config, Category, Shop, User, LoaderService, ProductService, ShopService, OrderService, AssistantService } from 'kng2-core';
 import { ToastController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
@@ -11,7 +11,7 @@ import { combineLatest, of } from 'rxjs';
   templateUrl: './product-details.page.html',
   styleUrls: ['./product-details.page.scss'],
 })
-export class ProductDetailsPage implements OnInit {
+export class ProductDetailsPage implements OnInit, OnDestroy {
 
   defaultProduct: Product = new Product();
   detailled = false;
@@ -24,6 +24,7 @@ export class ProductDetailsPage implements OnInit {
   productInOrders: any[];
   portion: ProductPortion;
   priceKg: number;
+  hubs: any[];
   shops: Shop[];
   TVAs: number[];
   timelimits: number[];
@@ -59,6 +60,7 @@ export class ProductDetailsPage implements OnInit {
     this.config = config;
     this.recipes = config?.shared?.recipes || [];
 
+    this.hubs = [];
     this.shops = this.user.shops || [];
     this.sku = this.$route.snapshot.params['sku'];
     this.productInOrders = [];
@@ -138,6 +140,7 @@ export class ProductDetailsPage implements OnInit {
 
       this.TVAs = this.config.shared.TVA;
       this.timelimits = this.config.shared.product.timelimit||[];
+      this.hubs = this.getAvailableHubs();
 
       this.doInitProduct(product);
 
@@ -220,6 +223,7 @@ export class ProductDetailsPage implements OnInit {
         details: (details),
         pricing: product.pricing,
         recipes: product.recipes,
+        constraints: product.constraints || [],
         quantity: product.quantity,
         shelflife: product.shelflife,
         bundle: product.bundle||[],
@@ -269,6 +273,7 @@ export class ProductDetailsPage implements OnInit {
     this.product.categories = product.categories || {};
     this.product.categories = product.categories._id || this.product.categories;
     this.product.vendor = product.vendor._id || this.product.vendor;
+    (this.product as any).constraints = (product.constraints || []).map(hub => this.getHubId(hub));
     this.product.belong = product.belong || { name: null, weight: 0 };
     this.product.details = product.details || {};
     this.product.bundle = product.bundle || [];
@@ -540,6 +545,32 @@ export class ProductDetailsPage implements OnInit {
 
   sortByVendor(p1: Shop, p2: Shop) {
     return p1.name.localeCompare(p2.name);
+  }
+
+  getAvailableHubs() {
+    const hubs = [
+      this.config?.shared?.hub,
+      ...(this.config?.shared?.hubs || [])
+    ].filter(Boolean);
+    return hubs.filter((hub, index) => {
+      const id = this.getHubId(hub);
+      return id && hubs.findIndex(candidate => this.getHubId(candidate) === id) === index;
+    });
+  }
+
+  getHubId(hub: any) {
+    return hub && String(hub._id || hub.id || hub);
+  }
+
+  getHubName(hub: any) {
+    return hub && hub.name ? hub.name : this.getHubSlug(hub);
+  }
+
+  getHubSlug(hub: any) {
+    if (!hub || !hub.slug) {
+      return '';
+    }
+    return Array.isArray(hub.slug) ? hub.slug[0] : hub.slug;
   }
 
 

@@ -39,3 +39,15 @@ ion-list.suggestions {
     font-size: 0.95em;
   }
 }
+
+.qty-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.qty {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 600;
+}

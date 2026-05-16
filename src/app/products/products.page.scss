@@ -93,6 +93,31 @@ ion-chip{
   }
 }
 
+.vendor-filter {
+  ion-label {
+    margin-bottom: 0.35rem;
+  }
+
+  ion-searchbar {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    --box-shadow: none;
+  }
+
+  ion-button[slot="end"] {
+    margin-top: 0.5rem;
+    align-self: center;
+  }
+}
+
+.vendor-select-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 @keyframes rotating {
   from{
       -webkit-transform: rotate(0deg);

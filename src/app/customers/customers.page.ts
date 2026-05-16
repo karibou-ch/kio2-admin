@@ -7,7 +7,7 @@ import { debounceTime } from 'rxjs/operators';
 import { CustomerPage } from './customer.page';
 
 @Component({
-  selector: 'app-customers',
+  selector: 'kng-customers',
   templateUrl: './customers.page.html',
   styleUrls: ['./customers.page.scss'],
 })

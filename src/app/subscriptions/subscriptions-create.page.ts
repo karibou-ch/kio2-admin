@@ -51,6 +51,7 @@ export class SubscriptionsCreatePage implements OnInit, OnDestroy {
     startDate: '',          // ISO date string, empty = 'now'
     useInvoice: false,
     deliveryPrice: null as number | null,
+    quantity: 1,
     note: ''
   };
 
@@ -117,6 +118,7 @@ export class SubscriptionsCreatePage implements OnInit, OnDestroy {
 
   onProductQueryChange() {
     this.selectedProduct = null;
+    this.form.quantity = 1;
     if (this.productQuery.length >= 2) {
       this.productSearch$.next(this.productQuery);
     } else {
@@ -147,6 +149,7 @@ export class SubscriptionsCreatePage implements OnInit, OnDestroy {
       next: (product) => {
         this.productLoading = false;
         this.selectedProduct = product;
+        this.form.quantity = 1;
         // Add to admin cart so CartService.subTotal() / total() are correct
         const hubSlug = Array.isArray(this.selectedHub?.slug) ? this.selectedHub.slug[0] : this.selectedHub?.slug;
         const cartItem = CartItem.fromProduct(product, hubSlug);
@@ -157,6 +160,18 @@ export class SubscriptionsCreatePage implements OnInit, OnDestroy {
         this.productLoading = false;
       }
     });
+  }
+
+  addQuantity() {
+    if (!this.selectedProduct) { return; }
+    this.form.quantity = (this.form.quantity || 1) + 1;
+  }
+
+  removeQuantity() {
+    if (!this.selectedProduct) { return; }
+    if ((this.form.quantity || 1) > 1) {
+      this.form.quantity--;
+    }
   }
 
   get productBundleItems(): any[] {
@@ -293,19 +308,21 @@ export class SubscriptionsCreatePage implements OnInit, OnDestroy {
     // apply Math.round(v*100)/100 at each intermediate step to prevent float error propagation
     const r = (v: number) => Math.round(v * 100) / 100;
 
-    const rawPrice = r((this.selectedProduct as any).pricing?.price || 0);
+    const unitPrice = r((this.selectedProduct as any).pricing?.price || 0);
+    const quantity  = this.form.quantity || 1;
+    const products  = r(unitPrice * quantity);
 
     // Fees: pick the right gateway from config.shared.order.gateway by label
     const serviceFees: number = this.config?.shared.hub?.serviceFees || 0;
     const gateways: any[] = this.config?.shared.order.gateway || [];
     const label = this.form.useInvoice ? 'invoice' : 'visa';
     const gatewayFees: number = (gateways.find((g: any) => g.label === label))?.fees || 0;
-    const fees    = r((serviceFees + gatewayFees) * rawPrice);
+    const fees    = r((serviceFees + gatewayFees) * products);
 
     // Delivery: always use the admin-chosen value (form.deliveryPrice)
     const delivery = r(this.form.deliveryPrice ?? 0);
-    const total    = r(rawPrice + fees + delivery);
-    return { products: rawPrice, fees, delivery, total };
+    const total    = r(products + fees + delivery);
+    return { products, fees, delivery, total };
   }
 
   get firstDeliveryDate(): Date | null {
@@ -381,7 +398,7 @@ export class SubscriptionsCreatePage implements OnInit, OnDestroy {
     const baseItem: any = {
       sku: product.sku,
       title: product.title,
-      quantity: 1,
+      quantity: this.form.quantity || 1,
       price: product.pricing.price,
       finalprice: product.pricing.price,
       hub: Array.isArray(this.selectedHub.slug) ? this.selectedHub.slug[0] : this.selectedHub.slug,

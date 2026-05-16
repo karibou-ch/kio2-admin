@@ -25,6 +25,12 @@
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Prenom</ion-label>
       <ion-input type="text" placeholder="Prénom" ngDefaultControl [(ngModel)]="customer.name.givenName"></ion-input>
     </ion-item>
+
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Téléphone principal</ion-label>
+      <ion-input type="tel" placeholder="+41 ..." ngDefaultControl [(ngModel)]="customer.phone" (ionBlur)="normalizeCustomerPhone(customer)"></ion-input>
+    </ion-item>
+
     <ion-item>
       <ion-label position="fixed" color="primary">
         Email
@@ -82,6 +88,23 @@
       </ion-select>
     </ion-item>
     <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Note plan</ion-label>
+      <ion-textarea
+        rows="4"
+        maxlength="512"
+        placeholder="Note interne"
+        [(ngModel)]="customer.plan.note">
+      </ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label position="fixed" class="ion-text-wrap" color="primary">Fin du plan</ion-label>
+      <ion-input
+        type="date"
+        [ngModel]="formatDateInput(customer.plan.end)"
+        (ngModelChange)="onPlanEndChange($event)">
+      </ion-input>
+    </ion-item>
+    <ion-item>
       <ion-label position="fixed" class="ion-text-wrap" color="primary">Hub par défaut</ion-label>
       <ion-select
         label="Hub par défaut"
@@ -115,12 +138,6 @@
       <div class="">
         <ion-input type="number" placeholder="limite 4" ngDefaultControl [(ngModel)]="customer.plan.maxInvoices"></ion-input>
       </div>
-    </ion-item>
-
-
-    <ion-item>
-      <ion-label position="fixed" class="ion-text-wrap" color="primary">Télephone</ion-label>
-      <ion-input type="phone" placeholder="Phone" ngDefaultControl [(ngModel)]="customer.phone"></ion-input>
     </ion-item>
 
     <ion-item>
@@ -168,35 +185,46 @@
 
 
     <!-- ADRESSE -->
+    <ion-item>
+      <ion-label color="primary">Adresses</ion-label>
+      <ion-button slot="end" fill="outline" color="primary" (click)="onAddAddress()">Ajouter une adresse</ion-button>
+    </ion-item>
+
     <ion-list *ngFor="let address of customer.addresses;let idx=index">
       <ion-list-header color="primary">
         <b>{{idx + 1}} -</b>&nbsp; {{address.name}}
         <div class="align-right">
-          <span class="small">map:[{{address.geo.lat| number: '1.4-5'}},{{address.geo.lng| number: '1.4-5'}}]</span>
-          <button  (click)="customer.addresses.splice(idx, 1)">DEL</button>
+          <span class="small">map:[{{address.geo?.lat| number: '1.4-5'}},{{address.geo?.lng| number: '1.4-5'}}]</span>
+          <button class="btn-geo" (click)="onGeloc(idx, address)">GEO</button>
+          <button class="btn-danger" (click)="onRemoveAddress(idx)">DEL</button>
         </div>
 
       </ion-list-header>
 
       <ion-item>
         <ion-label color="primary" position="stacked">Nom et prénom du contact</ion-label>
-        <ion-input  type="text"  placeholder="Nom et prénom" [(ngModel)]="address.name" required></ion-input>
+        <ion-input  type="text"  placeholder="Nom et prénom" [(ngModel)]="address.name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label color="primary" position="stacked">Téléphone spécifique pour cette adresse</ion-label>
+        <ion-input type="tel" placeholder="+41 ..." [(ngModel)]="address.phone" (ionBlur)="normalizeAddressPhone(address)"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label color="primary" position="stacked">Rue et numéro </ion-label>
-        <ion-input  type="text"  placeholder="rue, numéro" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.streetAdress" required></ion-input>
-        <ion-input  type="text"  placeholder="Étage" class="floor" [(ngModel)]="address.floor" required></ion-input>
+        <ion-input  type="text"  placeholder="rue, numéro" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.streetAdress"></ion-input>
+        <ion-input  type="text"  placeholder="Étage" class="floor" [(ngModel)]="address.floor"></ion-input>
       </ion-item>
       <ion-item >
         <ion-label color="primary" position="stacked">Code postal et Région</ion-label>
-        <ion-input  type="text"  placeholder="Code postal" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.postalCode" required></ion-input>
-        <ion-input  type="text"  placeholder="Région" [(ngModel)]="address.region" required></ion-input>
+        <ion-input  type="text"  placeholder="Code postal" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.postalCode"></ion-input>
+        <ion-input  type="text"  placeholder="Région" (focusout)="onGeloc(idx, address)" [(ngModel)]="address.region"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label color="primary" position="stacked">Note </ion-label>
-        <ion-input  type="text"  placeholder="note" [(ngModel)]="address.note" required></ion-input>
+        <ion-input  type="text"  placeholder="note" [(ngModel)]="address.note"></ion-input>
       </ion-item>
 
     </ion-list>

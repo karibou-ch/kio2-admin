@@ -1,12 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Config, User, UserService, Shop } from 'kng2-core';
+import { Config, User, UserAddress, UserService, Shop } from 'kng2-core';
 import { ToastController, AlertController, ModalController } from '@ionic/angular';
 import { EngineService } from '../services/engine.service';
 import { ActivatedRoute } from '@angular/router';
 import { KngUtils } from '../services/kng-utils';
 
 @Component({
-  selector: 'app-customer',
+  selector: 'kio-customer',
   templateUrl: './customer.page.html',
   styleUrls: ['./customer.page.scss'],
 })
@@ -18,7 +18,7 @@ export class CustomerPage implements OnInit {
   user: User;
   customer: User;
   hubs: any[];
-  currentGeoIndex: number;
+  currentGeoIndex: number = null;
   defaultShop: Shop;
   authlinkName: string;
   invoice: {
@@ -45,7 +45,7 @@ export class CustomerPage implements OnInit {
 
     this.$util.getGeoCode().subscribe(result => {
       const geo = (result.geo || {}).location;
-      if(this.currentGeoIndex >= 0 && geo.lat) {
+      if(this.customer && this.currentGeoIndex >= 0 && this.customer.addresses[this.currentGeoIndex] && geo && geo.lat) {
         this.customer.addresses[this.currentGeoIndex].geo = geo;
         this.doToast('La géoloc a bien été modifiée');
       }
@@ -68,7 +68,10 @@ export class CustomerPage implements OnInit {
     const forceload = true;
     this.$user.get(id,forceload).subscribe(user => {
       this.customer = user;
+      this.customer.addresses = this.customer.addresses || [];
+      this.customer.addresses.forEach(address => address.geo = address.geo || {lat: 0, lng: 0});
       this.customer.identity = this.customer.identity || {} as any;
+      this.customer.plan = this.customer.plan || {} as any;
       this.customer.reminder = this.customer.reminder || {} as any;
       this.authlinkName = (this.customer.identity as any).codelink || '';
 
@@ -80,11 +83,44 @@ export class CustomerPage implements OnInit {
 
 
   onGeloc(idx, address) {
+    if (!address) {
+      return;
+    }
+    const hasAddress = [address.streetAdress, address.postalCode, address.region].some(value => {
+      return (value || '').trim();
+    });
+    if (!hasAddress) {
+      return;
+    }
     this.currentGeoIndex = idx;
-    this.$util.updateGeoCode(address.streetAdress,
-                        address.postalCode,
-                        address.region);
+    this.$util.updateGeoCode(address.streetAdress || '',
+                        address.postalCode || '',
+                        address.region || '');
 
+  }
+
+  onAddAddress() {
+    if (!this.customer) {
+      return;
+    }
+    this.customer.addresses = this.customer.addresses || [];
+    const name = this.customer.name || {} as any;
+    const displayName = [name.givenName, name.familyName]
+      .filter(value => !!value)
+      .join(' ');
+    this.customer.addresses.push(new UserAddress({
+      name: this.customer.displayName || displayName,
+      geo: {lat: 0, lng: 0}
+    }));
+  }
+
+  onRemoveAddress(idx: number) {
+    this.customer.addresses.splice(idx, 1);
+    if (this.currentGeoIndex === idx) {
+      this.currentGeoIndex = null;
+    } else if (this.currentGeoIndex > idx) {
+      this.currentGeoIndex--;
+    }
   }
 
 
@@ -161,6 +197,23 @@ export class CustomerPage implements OnInit {
     this.customer.plan.name = $event.detail.value;
   }
 
+  formatDateInput(value: any) {
+    if (!value) {
+      return '';
+    }
+    if (typeof value === 'string') {
+      return value.slice(0, 10);
+    }
+    if (value.toISOString) {
+      return value.toISOString().slice(0, 10);
+    }
+    return '';
+  }
+
+  onPlanEndChange(value: string) {
+    // this.customer.plan.end = value || null;
+  }
+
   getHubName(hub: any) {
     return hub && hub.name ? hub.name : this.getHubSlug(hub);
   }
@@ -216,6 +269,18 @@ export class CustomerPage implements OnInit {
       }).then(alert => alert.present());
 
     });
+  }
+
+  normalizeCustomerPhone(customer) {
+    if (customer.phone) {
+      customer.phone = UserAddress.normalizePhone(customer.phone);
+    }
+  }
+
+  normalizeAddressPhone(address) {
+    if (address.phone) {
+      address.phone = UserAddress.normalizePhone(address.phone);
+    }
   }
 
   doSave(customer) {

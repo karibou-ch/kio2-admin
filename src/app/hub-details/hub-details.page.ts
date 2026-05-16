@@ -24,7 +24,7 @@ export class HubDetailsPage implements OnInit {
     { id: 5, label: 'Vendredi' },
     { id: 6, label: 'Samedi' }
   ];
-  shippingtimeKeys = ['0', '10', '12', '16', '19'];
+  shippingtimeKeys = [];
 
   constructor(
     private $route: ActivatedRoute,
@@ -108,6 +108,22 @@ export class HubDetailsPage implements OnInit {
     this.currentHub.status.private = $event.detail.checked;
   }
 
+  onAddDefaultShippingtimes() {
+    const defaultShippingtimes = this.getDefaultShippingtimes();
+    const defaultKeys = Object.keys(defaultShippingtimes);
+    if (!defaultKeys.length) {
+      this.notify('Aucun horaire par défaut disponible', 'warning');
+      return;
+    }
+
+    this.currentHub.shippingtimes = this.currentHub.shippingtimes || {} as any;
+    defaultKeys.forEach(time => {
+      this.currentHub.shippingtimes[time] = defaultShippingtimes[time];
+    });
+    this.updateShippingtimeKeys(defaultShippingtimes);
+    this.notify('Horaires par défaut appliqués');
+  }
+
   updateGeo($event: any) {
     const address = this.currentHub.address;
     const street = address.streetAdress;
@@ -121,23 +137,25 @@ export class HubDetailsPage implements OnInit {
     this.$utils.updateGeoCode(street, postal, region);
   }
 
-  onCopy(event: ClipboardEvent) {
-    const clipboard = event.clipboardData;
-    if (!clipboard) {
+  onCopy() {
+    const jsonString = this.serializeHub();
+    if (!navigator.clipboard || !navigator.clipboard.writeText) {
+      this.notify('La copie automatique n\'est pas disponible dans ce navigateur', 'warning');
       return;
     }
 
-    const jsonString = this.serializeHub();
-    const html = this.serializeHubToHtml(this.currentHub);
-
-    event.preventDefault();
-    clipboard.clearData();
-    clipboard.setData('text/plain', jsonString);
-    clipboard.setData('text/html', html);
-    this.notify('Hub copié dans le presse-papiers');
+    navigator.clipboard.writeText(jsonString).then(() => {
+      this.notify('Hub copié dans le presse-papiers');
+    }, () => {
+      this.notify('Impossible de copier le hub', 'warning');
+    });
   }
 
   onPaste(event: ClipboardEvent) {
+    if (this.isEditablePasteTarget(event)) {
+      return;
+    }
+
     const jsonString = event.clipboardData && event.clipboardData.getData('text/plain');
     if (!jsonString) {
       return;
@@ -187,7 +205,13 @@ export class HubDetailsPage implements OnInit {
     this.currentHub.status.private = this.normalizeBoolean(this.currentHub.status.private, false);
     this.currentHub.mail = this.currentHub.mail || {} as any;
     this.currentHub.colors = this.currentHub.colors || {} as any;
-    this.currentHub.pageOptions = this.currentHub.pageOptions || {} as any;
+    this.currentHub.pageOptions = Object.assign({
+      maxcat: 12,
+      themas: true,
+      minimal: false
+    }, this.currentHub.pageOptions || {});
+    this.currentHub.pageOptions.themas = this.normalizeBoolean(this.currentHub.pageOptions.themas, true);
+    this.currentHub.pageOptions.minimal = this.normalizeBoolean(this.currentHub.pageOptions.minimal, false);
     this.currentHub.home = this.currentHub.home || {} as any;
     this.currentHub.home.customLink = this.currentHub.home.customLink || {} as any;
     this.currentHub.home.customLink.label = this.currentHub.home.customLink.label || { fr: '', en: '', de: '' };
@@ -219,18 +243,26 @@ export class HubDetailsPage implements OnInit {
   }
 
   private initShippingtimes() {
-    const defaultShippingtimes = this.config && this.config.shared && this.config.shared.hub ?
-      this.config.shared.hub.shippingtimes || {} :
-      {};
-    const defaultPricetime = this.config && this.config.shared && this.config.shared.shipping ?
-      this.config.shared.shipping.pricetime || {} :
-      {};
+    const defaultShippingtimes = this.getDefaultShippingtimes();
+    this.updateShippingtimeKeys(defaultShippingtimes);
 
     this.shippingtimeKeys.forEach(time => {
       if (this.currentHub.shippingtimes[time] === undefined || this.currentHub.shippingtimes[time] === null) {
-        this.currentHub.shippingtimes[time] = defaultShippingtimes[time] || defaultPricetime[time];
+        this.currentHub.shippingtimes[time] = defaultShippingtimes[time];
       }
     });
+  }
+
+  private getDefaultShippingtimes() {
+    const shippingtimes = this.config && this.config.shared && this.config.shared.shipping ?
+      this.config.shared.shipping.shippingtimes || {} :
+      {};
+
+    return Object.assign({}, shippingtimes);
+  }
+
+  private updateShippingtimeKeys(defaultShippingtimes: any) {
+    this.shippingtimeKeys = Object.keys(defaultShippingtimes || {}).sort((a: string, b: string) => Number(a) - Number(b));
   }
 
   private serializeHub() {
@@ -271,6 +303,18 @@ export class HubDetailsPage implements OnInit {
       !this.currentHub.slug &&
       !this.currentHub.name &&
       !this.hasContent(this.currentHub.description);
+  }
+
+  private isEditablePasteTarget(event: ClipboardEvent) {
+    const path = typeof event.composedPath === 'function' ? event.composedPath() : [event.target];
+    return path.some(target => {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+      const tagName = target.tagName.toLowerCase();
+      return target.isContentEditable ||
+        ['input', 'textarea', 'select', 'ion-input', 'ion-textarea'].indexOf(tagName) > -1;
+    });
   }
 
   private hasContent(value: any) {

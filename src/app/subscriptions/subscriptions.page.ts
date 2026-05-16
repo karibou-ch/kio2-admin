@@ -69,16 +69,21 @@ export class SubscriptionsPage implements OnInit {
     return this.user.isAdmin();
   }
 
-  /**
-   * ✅ Getter pour filtrer les abonnements actifs vs inactifs
-   * cache.active = true  → affiche seulement les actifs
-   * cache.active = false → affiche seulement les inactifs/canceled
-   */
   get subscriptions(): CartSubscription[] {
     if (this.cache.active) {
-      return this._subscriptions.filter(sub => sub.status === 'active');
+      return this._subscriptions.filter(sub => this.isActiveOrPaused(sub));
     }
-    return this._subscriptions.filter(sub => sub.status !== 'active');
+    return this._subscriptions.filter(sub => !this.isActiveOrPaused(sub));
+  }
+
+  isActiveOrPaused(subscription: CartSubscription): boolean {
+    return subscription.status === 'active' ||
+           subscription.status === 'paused' ||
+           !!subscription.pauseUntil;
+  }
+
+  getContractShippingService(subscription: CartSubscription) {
+    return subscription.services?.find(service => service.id === 'shipping');
   }
 
   ngOnInit() {
@@ -185,7 +190,8 @@ export class SubscriptionsPage implements OnInit {
    * Retourne le label de statut pour affichage dans le tag
    */
   getStatusLabel(subscription: CartSubscription): string {
-    // Pause a priorité sur le status
+    // Pause a priorité sur le status.
+    // Stripe trialing est normalisé en paused quand metadata.pausedUntil est présent.
     if (subscription.pauseUntil) {
       return '⏸️';
     }
