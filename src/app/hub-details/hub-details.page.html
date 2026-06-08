@@ -158,6 +158,17 @@
     <ion-item>
       <ion-label color="primary" position="stacked">Couleur de mélange (fonds clairs et variantes)</ion-label>
       <ion-input type="text" [(ngModel)]="currentHub.colors.colormix"></ion-input>
+      <ion-note slot="helper">
+        Le fond global est calculé depuis cette couleur, éclaircie à 50% vers blanc.
+      </ion-note>
+    </ion-item>
+    <ion-item [style.background]="currentHub.colors.ink">
+      <ion-label color="primary" position="stacked">
+        Encre principale (texte sur le fond global calculé depuis la couleur de mélange)
+        <span class="color-preview" [style.background]="currentHub.colors.ink"></span>
+      </ion-label>
+      <ion-input type="text" [(ngModel)]="currentHub.colors.ink"></ion-input>
+      <ion-input class="color-picker" type="color" [(ngModel)]="currentHub.colors.ink"></ion-input>
     </ion-item>
     <ion-item [style.background]="currentHub.colors.primary">
       <ion-label color="primary" position="stacked">
