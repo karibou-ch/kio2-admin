@@ -1,0 +1,41 @@
+.info {
+  margin: 20px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  color: #666;
+  background: antiquewhite;
+  font-size: 14px;
+}
+
+.actions {
+  padding: 20px;
+}
+
+.coupon-box {
+  margin: 20px;
+  text-align: center;
+}
+
+.coupon-code {
+  font-size: x-large;
+  letter-spacing: 2px;
+}
+
+.loader {
+  text-align: center;
+  margin-top: 80px;
+}
+
+.rotating {
+  animation: rotating 1s linear infinite;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

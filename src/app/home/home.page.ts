@@ -61,6 +61,10 @@ export class HomePage {
     this.$router.navigate(['/customers']);
   }
 
+  openCoupons() {
+    this.$router.navigate(['/coupons']);
+  }
+
   openInvoices() {
     this.$router.navigate(['/invoices']);
   }

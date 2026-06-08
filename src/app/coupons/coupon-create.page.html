@@ -1,0 +1,133 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Nouveau coupon</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" text=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
+  <div [hidden]="!isReady">
+    <div class="info">
+      Crée un coupon Stripe utilisable par un client dont le prénom, nom ou email matche la contrainte.
+      Le montant est saisi en centimes.
+    </div>
+
+    <ion-card *ngIf="!canCreate" color="warning">
+      <ion-card-content>
+        Cette fonctionnalité est réservée aux administrateurs.
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list lines="full" [hidden]="!canCreate">
+      <ion-item>
+        <ion-label>Créer un utilisateur</ion-label>
+        <ion-checkbox slot="end" [(ngModel)]="createUser"></ion-checkbox>
+      </ion-item>
+
+      <ng-container *ngIf="createUser">
+        <ion-item>
+          <ion-label position="stacked">Prénom</ion-label>
+          <ion-input
+            placeholder="Prénom"
+            [(ngModel)]="userForm.firstname"
+            clearInput="true">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Nom</ion-label>
+          <ion-input
+            placeholder="Nom"
+            [(ngModel)]="userForm.lastname"
+            clearInput="true">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input
+            type="email"
+            inputmode="email"
+            placeholder="client@example.com"
+            [(ngModel)]="userForm.email"
+            clearInput="true">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Téléphone mobile</ion-label>
+          <ion-input
+            type="tel"
+            inputmode="tel"
+            placeholder="0791234567"
+            [(ngModel)]="userForm.mobile"
+            clearInput="true">
+          </ion-input>
+        </ion-item>
+      </ng-container>
+
+      <ion-item>
+        <ion-label position="stacked">Code</ion-label>
+        <ion-input
+          placeholder="K26-ABC-123"
+          [(ngModel)]="form.code"
+          clearInput="true">
+        </ion-input>
+        <ion-button slot="end" fill="clear" color="primary" (click)="onGenerateCode()">
+          Générer
+        </ion-button>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Montant centimes</ion-label>
+        <ion-input
+          type="number"
+          inputmode="numeric"
+          placeholder="2500"
+          [(ngModel)]="form.amount">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Contrainte client</ion-label>
+        <ion-input
+          placeholder="dupont|@karibou.ch"
+          [(ngModel)]="form.constraint"
+          clearInput="true">
+        </ion-input>
+      </ion-item>
+    </ion-list>
+
+    <div class="actions" [hidden]="!canCreate">
+      <ion-button expand="block" color="primary" (click)="onCreate()" [disabled]="isSaving">
+        <ion-icon slot="start" [name]="isSaving ? 'reload-outline' : 'pricetag-outline'" [class.rotating]="isSaving"></ion-icon>
+        Créer le coupon
+      </ion-button>
+    </div>
+
+    <ion-card *ngIf="error" color="danger">
+      <ion-card-content>{{ error }}</ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="coupon" class="coupon-box">
+      <ion-card-header>
+        <ion-card-subtitle>Coupon créé</ion-card-subtitle>
+        <ion-card-title class="coupon-code">{{ coupon.code }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p *ngIf="createdUser">
+          Utilisateur : {{ createdUser.name?.givenName }} {{ createdUser.name?.familyName }} — {{ createdUser.email?.address }}
+        </p>
+        <p><b>{{ coupon.amount_off }} centimes</b></p>
+        <p>{{ coupon.amount }} {{ coupon.currency | uppercase }}</p>
+        <p *ngIf="coupon.constraint">Contrainte : {{ coupon.constraint }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
