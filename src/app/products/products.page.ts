@@ -145,7 +145,7 @@ export class ProductsPage implements OnInit {
     if (!product || !product.photo.url) {
       return '/assets/img/add.png';
     }
-    return 'https:' + product.photo.url + '/-/resize/128x/';
+    return product.photo.url + '/-/resize/128x/';
 
   }
 

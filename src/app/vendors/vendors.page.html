@@ -49,7 +49,7 @@
     <ion-item-sliding *ngFor="let shop of shops" [hidden]="shop.status!=cache.active">    
         <ion-item (click)="openDetails(shop)" [class.inactive]="shop.available.active">
           <ion-avatar slot="start">
-            <img [src]="'https:'+shop.photo.owner+'/-/resize/128x/'">
+            <img [src]="shop.photo.owner+'/-/resize/128x/'">
           </ion-avatar>      
           <ion-label>
             <h2>{{shop.name}}</h2>      

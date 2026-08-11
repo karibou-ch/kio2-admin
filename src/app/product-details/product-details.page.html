@@ -238,7 +238,7 @@
 
       <ion-item color="none" *ngIf="product.photo.url">
         <ion-thumbnail slot="start" class="image" >
-          <img  [src]="'https:'+product.photo.url+'/-/resize/128x/'"/>
+          <img  [src]="product.photo.url+'/-/resize/128x/'"/>
         </ion-thumbnail>
         <div class="photo">
           <img  [src]="product.photo.url+'/-/resize/400x/'"/>

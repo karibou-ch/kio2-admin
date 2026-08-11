@@ -34,7 +34,7 @@ export class UploadImagePage implements OnInit{
   
   get urlImage() {
     if(!this.image) return '';
-    return 'https:' + this.image;
+    return this.image;
   }
 
 
@@ -64,17 +64,28 @@ export class UploadImagePage implements OnInit{
     this.$modal.dismiss();
   }
 
-  onDialogOpen(dialog) {
-    dialog.done(dlg => {
-      if (dlg.state() === 'rejected') {
-        this.showMsg('Attention, la taille maximum d\'une image est limitée à 150kb');
+  onChange(selection) {
+    if(!selection) {
+      return;
+    }
+    const upload = typeof selection.promise === 'function' ? selection.promise() : selection;
+    if(typeof upload.fail !== 'function') {
+      return;
+    }
+    upload.fail((errorType) => {
+      if(errorType === 'user') {
+        return;
       }
+      this.showMsg(this.uploadErrorMessage(errorType));
     });
   }
 
   onUpload($uc) {
-    // this.image="//ucarecdn.com/"+$uc.uuid+"/";
-    this.image = $uc.cdnUrl.replace('https:', '');
+    if(!$uc?.cdnUrl) {
+      this.showMsg('La photo n\'a pas pu être chargée. Veuillez réessayer.');
+      return;
+    }
+    this.image = $uc.cdnUrl;
     if (this.product) {
       this.product.photo.url = this.image;
     }
@@ -88,6 +99,21 @@ export class UploadImagePage implements OnInit{
       this.shoplogo.photo.logo = this.image;
     }
 
+  }
+
+  private uploadErrorMessage(errorType: string): string {
+    switch(errorType) {
+      case 'size':
+        return 'La photo est trop volumineuse.';
+      case 'image':
+        return 'Le fichier sélectionné n\'est pas une image prise en charge.';
+      case 'upload':
+        return 'La photo n\'a pas pu être envoyée. Vérifiez votre connexion et réessayez.';
+      case 'info':
+        return 'Les informations de la photo n\'ont pas pu être chargées.';
+      default:
+        return 'Une erreur est survenue pendant l\'envoi de la photo. Veuillez réessayer.';
+    }
   }
 
   showMsg(msg) {

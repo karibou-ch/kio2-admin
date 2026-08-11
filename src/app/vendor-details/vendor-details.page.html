@@ -107,11 +107,11 @@
     <!-- PHOTO.OWNER -->
     <ion-item color="none" *ngIf="shop.photo.owner">
       <ion-thumbnail slot="start" class="image">
-        <img [hidden]="!shop?.photo.owner" [src]="'https:'+shop?.photo.owner+'/-/resize/128x/'"/>
+        <img [hidden]="!shop?.photo.owner" [src]="shop.photo.owner+'/-/resize/128x/'"/>
         <img [hidden]="shop?.photo.owner" src="/assets/img/add.png"/>
       </ion-thumbnail>
       <div class="photo">
-        <img [hidden]="!shop?.photo.fg" [src]="shop?.photo.fg+'/-/resize/400x/'"/>
+        <img [hidden]="!shop?.photo.fg" [src]="shop.photo.fg+'/-/resize/400x/'"/>
       </div>
     </ion-item>
 
@@ -122,7 +122,7 @@
     <!-- PHOTO.LOGO -->
     <ion-item color="none">
       <div class="photo">
-        <img [hidden]="!shop?.photo.logo" [src]="'https:'+shop.photo.logo+'/-/resize/400x/'"/>
+        <img [hidden]="!shop?.photo.logo" [src]="shop.photo.logo+'/-/resize/400x/'"/>
       </div>
     </ion-item>
     <ion-item>
