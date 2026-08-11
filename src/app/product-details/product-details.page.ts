@@ -36,6 +36,7 @@ export class ProductDetailsPage implements OnInit, OnDestroy {
   // TODO make this compliant with the server.
   productDiff: KeyValueDiffer<string, any>;
   saveBeforeQuit = false;
+  assistantDescriptionLoading = false;
 
 
   history: string[] = [];
@@ -154,13 +155,45 @@ export class ProductDetailsPage implements OnInit, OnDestroy {
   }
 
   doAssistantForDescription(product: Product) {
+    if(this.assistantDescriptionLoading) {
+      return;
+    }
+    const originalDescription = product.details.description || '';
     const params: any = { agent: 'products' };
     params.q = "( ͡° ᴥ ͡°)";
     params.body = JSON.parse(JSON.stringify(product));
-    product.details.description = "";//"En cours de rédaction...";
-    this.$assistant.chat(params).subscribe((content) => {
-      product.details.description += content.text;
-    });
+    let correctedDescription = '';
+    this.assistantDescriptionLoading = true;
+    this.$assistant.chat(params).subscribe(
+      (content) => {
+        correctedDescription += content.text || '';
+      },
+      (error) => {
+        this.assistantDescriptionLoading = false;
+        product.details.description = originalDescription;
+        this.$toast.create({
+          message: error?.message || 'La correction GPT a échoué',
+          duration: 5000,
+          position: 'middle',
+          color: 'danger'
+        }).then(alert => alert.present());
+      },
+      () => {
+        this.assistantDescriptionLoading = false;
+        const corrected = correctedDescription.trim();
+        if(!corrected || corrected.indexOf('**Oups:**') === 0) {
+          product.details.description = originalDescription;
+          this.$toast.create({
+            message: corrected || 'La correction GPT n’a retourné aucun texte',
+            duration: 5000,
+            position: 'middle',
+            color: 'danger'
+          }).then(alert => alert.present());
+          return;
+        }
+        product.details.description = corrected;
+      }
+    );
   }
 
   doAddBundle(product: Product) {

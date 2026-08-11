@@ -191,7 +191,11 @@
 
       <!-- GPT -->
       <ion-item>
-        <ion-button fill="outline" class="assistant"  expand="block" (click)="doAssistantForDescription(product)">Assistant GPT</ion-button>
+        <ion-button fill="outline" class="assistant" expand="block"
+                    [disabled]="assistantDescriptionLoading"
+                    (click)="doAssistantForDescription(product)">
+          {{assistantDescriptionLoading ? 'Correction en cours…' : 'Assistant GPT'}}
+        </ion-button>
       </ion-item>
 
       <!-- VARIANT -->
