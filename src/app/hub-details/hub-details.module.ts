@@ -8,6 +8,7 @@ import { HubDetailsPageRoutingModule } from './hub-details-routing.module';
 
 import { HubsPage } from './hubs.page';
 import { HubDetailsPage } from './hub-details.page';
+import { HubManagerPage } from './hub-manager.page';
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import { HubDetailsPage } from './hub-details.page';
   ],
   declarations: [
     HubsPage,
-    HubDetailsPage
+    HubDetailsPage,
+    HubManagerPage
   ]
 })
 export class HubDetailsPageModule {}

@@ -1,0 +1,150 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/hubs"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Gestion du hub</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="currentHub">
+  <div class="loader" [hidden]="isReady">
+    <ion-icon class="rotating" name="reload-outline" size="large"></ion-icon>
+  </div>
+
+  <ion-list>
+    <ion-list-header color="primary">Fermetures de livraison</ion-list-header>
+    <ion-item *ngFor="let noshipping of currentHub.noshipping; let index = index">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12">
+            <ion-input
+              label="Raison"
+              labelPlacement="stacked"
+              [(ngModel)]="noshipping.reason.fr"></ion-input>
+          </ion-col>
+          <ion-col size="6">
+            <ion-input
+              type="date"
+              label="Du"
+              labelPlacement="stacked"
+              [(ngModel)]="noshipping.from"></ion-input>
+          </ion-col>
+          <ion-col size="6">
+            <ion-input
+              type="date"
+              label="Au"
+              labelPlacement="stacked"
+              [(ngModel)]="noshipping.to"></ion-input>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <ion-button slot="end" fill="clear" color="danger" (click)="currentHub.noshipping.splice(index, 1)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <ion-item>
+      <ion-button fill="outline" color="primary" (click)="addNoShipping()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Ajouter une fermeture
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Administrateurs</ion-list-header>
+    <ion-item *ngFor="let manager of currentHub.manager; let index = index">
+      <ion-label>{{manager}}</ion-label>
+      <ion-button slot="end" fill="clear" color="danger" (click)="removeManager(index)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <ion-item>
+      <ion-input
+        type="email"
+        label="Ajouter un contact"
+        labelPlacement="stacked"
+        [(ngModel)]="newManager"></ion-input>
+      <ion-button slot="end" (click)="addManager()">Ajouter</ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Logistique</ion-list-header>
+    <ion-item *ngFor="let logistic of currentHub.logistic; let index = index">
+      <ion-label>{{logistic}}</ion-label>
+      <ion-button slot="end" fill="clear" color="danger" (click)="removeLogistic(index)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <ion-item>
+      <ion-input
+        type="email"
+        label="Ajouter un contact"
+        labelPlacement="stacked"
+        [(ngModel)]="newLogistic"></ion-input>
+      <ion-button slot="end" (click)="addLogistic()">Ajouter</ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Vendeurs</ion-list-header>
+    <ion-item *ngFor="let vendor of currentHub.vendors; let index = index">
+      <ion-label>
+        <h3>{{getVendorLabel(vendor)}}</h3>
+        <p>Afficher uniquement les produits en contrainte</p>
+      </ion-label>
+      <div slot="end" class="ion-align-items-center ion-display-flex">
+        <ion-toggle
+          color="primary"
+          [checked]="isVendorConstrained(vendor)"
+          (ionChange)="onVendorAssortmentChange(vendor, $event)"></ion-toggle>
+        <ion-button fill="clear" color="danger" (click)="removeVendor(index)">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-item>
+    <ion-item>
+      <ion-select
+        label="Ajouter un vendeur"
+        labelPlacement="stacked"
+        interface="action-sheet"
+        [(ngModel)]="newVendor">
+        <ion-select-option *ngFor="let vendor of getAvailableVendors()" [value]="vendor._id">
+          {{getVendorLabel(vendor)}}
+        </ion-select-option>
+      </ion-select>
+      <ion-button slot="end" (click)="addVendor()">Ajouter</ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header color="primary">Catégories</ion-list-header>
+    <ion-item *ngFor="let category of currentHub.categories; let index = index">
+      <ion-label>{{getCategoryLabel(category)}}</ion-label>
+      <ion-button slot="end" fill="clear" color="danger" (click)="removeCategory(index)">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <ion-item>
+      <ion-select
+        label="Ajouter une catégorie"
+        labelPlacement="stacked"
+        interface="action-sheet"
+        [(ngModel)]="newCategory">
+        <ion-select-option *ngFor="let category of categories" [value]="category._id">
+          {{category.name}}
+        </ion-select-option>
+      </ion-select>
+      <ion-button slot="end" (click)="addCategory()">Ajouter</ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-button
+    expand="block"
+    color="primary"
+    [disabled]="isLoading"
+    (click)="onHubManagerSave()">
+    Enregistrer la gestion du hub
+  </ion-button>
+</ion-content>
