@@ -185,7 +185,7 @@ export class ReportPage implements OnInit {
             '"' + product.title.replace(/"/g, "'") + '"',
             product.count,
             product.amount.toFixed(2).replace('.', ','),
-            product.tva.toFixed(3 ).replace('.', ','),
+            Number(product.tva || 0).toFixed(3).replace('.', ','),
           ].join(';');
         }).join('\r\n');
         this.csv = {
