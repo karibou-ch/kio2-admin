@@ -20,6 +20,11 @@
                     media-src 'self' data: blob: unsafe: *;">
   <meta name="description" content="Karibou.ch - K. Vendor/Logistic">         
   <link rel="icon" type="image/x-icon" href="assets/icon/favicon.ico">
+  <script>
+    // High-resolution mobile photos are previewed from Uploadcare's CDN after upload.
+    // This avoids canvas.toBlob() returning null on memory-constrained Safari devices.
+    window.UPLOADCARE_IMAGE_PREVIEW_MAX_SIZE = 8 * 1024 * 1024;
+  </script>
 
   <meta name="mobile-web-app-capable" content="yes">
 

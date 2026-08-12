@@ -123,14 +123,4 @@ export class UploadImagePage implements OnInit{
     }).then(alert => alert.present());
   }
 
-  ucValidator(info, more) {
-    console.log('DEBUG uc --', info);
-    console.log('DEBUG uc --', more);
-    if (info.size !== null && info.size > 170 * 1024) {
-      // throw new Error("fileMaximumSize");
-    }
-  }
-
-
-
 }
