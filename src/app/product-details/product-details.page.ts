@@ -350,17 +350,21 @@ export class ProductDetailsPage implements OnInit, OnDestroy {
     }, 1);
   }
 
-  onPriceChange(price: number) {
-    if (this.portion.isWeight) {
-      this.priceKg = Utils.roundAmount(price * 1000 / this.portion.part);
+  onPriceChange(event: any) {
+    const price = event?.detail?.value;
+    const amount = Number(price);
+    if (price !== '' && Number.isFinite(amount) && this.portion.isWeight && this.portion.part > 0) {
+      this.priceKg = Utils.roundAmount(amount * 1000 / this.portion.part);
     }
   }
 
-  onPriceKgChange(priceKg: number) {
-    if (isNaN(priceKg)) {
+  onPriceKgChange(event: any) {
+    const priceKg = event?.detail?.value;
+    const amount = Number(priceKg);
+    if (priceKg === '' || !Number.isFinite(amount) || this.portion.part <= 0) {
       return;
     }
-    this.product.pricing.price = Utils.roundAmount(priceKg / 1000 * this.portion.part);
+    this.product.pricing.price = Utils.roundAmount(amount / 1000 * this.portion.part);
   }
 
   doUpdatePart(part: any) {
