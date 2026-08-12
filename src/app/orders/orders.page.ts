@@ -212,7 +212,7 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     this.currentPlanning = plan;
   }
 
-  emailVendors() {
+  async emailVendors() {
     // inform all shops: 'shops'||false
     // ✅ MIGRATION: Utiliser timezone Hub au lieu de hardcoded UTC
     const hub = this.$engine.currentConfig.shared.hub;
@@ -221,17 +221,21 @@ export class OrdersCustomerPage implements OnInit, OnDestroy {
     // Heure d'envoi des emails (8h timezone Hub)
     shippingHub.setHours(8, 0, 0, 0);
 
-    const loading = this.$loading.create({
+    const loading = await this.$loading.create({
       cssClass: '',
-      message: 'Please wait...',
-      duration: 2000
-    }).then(load => load.present());
+      message: 'Please wait...'
+    });
+    await loading.present();
 
     this.$order.informShopToOrders('shops', shippingHub).subscribe(
-      (result) => {
-        this.$loading?.dismiss();
+      async (result) => {
+        await loading.dismiss().catch(() => undefined);
         this.onDone('Mail envoyé à '+ Object.keys(result).length +' destinataire(s)');
-      }, err => this.onDone(err.error)
+      },
+      async err => {
+        await loading.dismiss().catch(() => undefined);
+        this.onDone(err.error);
+      }
     );
   }
 

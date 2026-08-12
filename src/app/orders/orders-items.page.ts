@@ -29,6 +29,21 @@ export class OrdersItemsPage implements OnInit {
   public static mapItem:any = {};
   public cmpItemAndVdr = (item) =>  (a) => a.sku == item.sku && a.vendor == item.vendor;
 
+  private syncUpdatedItem(order, item, updatedOrder) {
+    const orderItems = Array.isArray(order?.items) ? order.items : [];
+    const updatedItems = Array.isArray(updatedOrder?.items) ? updatedOrder.items : [];
+    order.items = orderItems;
+
+    const indexSrc = orderItems.findIndex(this.cmpItemAndVdr(item));
+    const indexDst = updatedItems.findIndex(this.cmpItemAndVdr(item));
+    if(indexSrc > -1 && indexDst > -1) {
+      Object.assign(orderItems[indexSrc], updatedItems[indexDst]);
+    }
+    if(indexDst > -1) {
+      Object.assign(item, updatedItems[indexDst]);
+    }
+  }
+
 
 
   @Input() vendor: string;
@@ -287,14 +302,7 @@ export class OrdersItemsPage implements OnInit {
       .subscribe(ok => {
         const len = 18;
         const vendor = copy.vendor;
-        const indexSrc = order.items.findIndex(this.cmpItemAndVdr(item));
-        const indexDst = ok.items.findIndex(this.cmpItemAndVdr(item));
-        if(indexSrc>-1 && indexDst>-1){
-          Object.assign(order.items[indexSrc],ok.items[indexDst]);
-        }
-        if(indexDst>-1) {
-          Object.assign(item,ok.items[indexDst]);
-        }
+        this.syncUpdatedItem(order, item, ok);
 
         //
         // when not admin, we should remove other vendor items
@@ -421,15 +429,7 @@ export class OrdersItemsPage implements OnInit {
     this.$order.updateItem(order, [item], EnumFulfillments.failure)
       .subscribe(ok => {
         this.doToast('Annulation enregistrée');
-        const indexSrc = order.items.findIndex(this.cmpItemAndVdr(item));
-        const indexDst = ok.items.findIndex(this.cmpItemAndVdr(item));
-        if(indexSrc>-1 && indexDst>-1){
-          Object.assign(order.items[indexSrc],ok.items[indexDst]);
-        }
-
-        if(indexDst>-1) {
-          Object.assign(item,ok.items[indexDst]);
-        }
+        this.syncUpdatedItem(order, item, ok);
 
 
         //
@@ -457,15 +457,7 @@ export class OrdersItemsPage implements OnInit {
    this.$order.updateIssue(order,item,issue)
    .subscribe(ok => {
       this.doToast('Erreur enregistrée');
-      const indexSrc = order.items.findIndex(this.cmpItemAndVdr(item));
-      const indexDst = ok.items.findIndex(this.cmpItemAndVdr(item));
-      if(indexSrc>-1 && indexDst>-1){
-        Object.assign(order.items[indexSrc],ok.items[indexDst]);
-      }
-
-      if(indexDst>-1) {
-        Object.assign(item,ok.items[indexDst]);
-      }
+      this.syncUpdatedItem(order, item, ok);
 
 
       //
