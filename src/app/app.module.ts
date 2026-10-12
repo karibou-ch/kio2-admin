@@ -17,6 +17,11 @@ import localeFr from '@angular/common/locales/fr';
 import { TokenInterceptorProvider } from './services/token-interceptor/token-interceptor';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import {
+  captureTimeOnlyContext,
+  isUnknownStatusZero,
+  readHttpStatusZeroContext,
+} from './sentry/http-failure-context';
 registerLocaleData(localeFr);
 
 
@@ -98,7 +103,35 @@ export class Kio2AdminErrorHandler implements ErrorHandler {
       if (environment.production &&
           window.location.origin.indexOf('evaletolab.ch') === -1 &&
           window.location.origin.indexOf('localhost') === -1) {
-          Sentry.captureException(extractedError);
+          const statusZero = isUnknownStatusZero(error, extractedError);
+          const diag = statusZero
+            ? (readHttpStatusZeroContext(error) || captureTimeOnlyContext())
+            : null;
+          Sentry.withScope(scope => {
+            if (diag) {
+              scope.setTag('http.status', '0');
+              if (diag.elapsedBucket) {
+                scope.setTag('http.elapsed_bucket', diag.elapsedBucket);
+              }
+              if (diag.visibilityAtFailure) {
+                scope.setTag('net.visibility', diag.visibilityAtFailure);
+              }
+              if (diag.onlineAtFailure !== null) {
+                scope.setTag('net.online', String(diag.onlineAtFailure));
+              }
+              if (diag.onlineChanged !== null) {
+                scope.setTag('net.online_changed', String(diag.onlineChanged));
+              }
+              if (diag.swControlled !== null) {
+                scope.setTag('net.sw', diag.swControlled ? 'controlled' : 'none');
+              }
+              if (diag.wasDiscarded) {
+                scope.setTag('net.discarded', 'true');
+              }
+              scope.setContext('http_status_0', diag);
+            }
+            Sentry.captureException(extractedError);
+          });
       }
 
 
