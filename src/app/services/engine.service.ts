@@ -344,11 +344,11 @@ export class EngineService {
         orders: result,
         when: this.currentShippingDate
       } as OrdersCtx);
-    }, error => {
-      // publish status
+    }, () => {
+      // Keep selectedOrders$ open. Calling .error() stops the ReplaySubject:
+      // each page subscribed without an error callback throws into Sentry,
+      // and a later successful load can no longer publish.
       this.status$.next({running: false});
-      // Cette fonctionalité est réservée à la logistique
-      this.selectedOrders$.error(error);
     });
   }
 
